@@ -3,9 +3,16 @@ require("dotenv").config();
 const express = require("express");
 const db = require("./config/db");
 
+
+
 // ==========================================
 // Routes
 // ==========================================
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
+// تفعيل رابط التوثيق
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const authRoutes =
     require("./routes/auth.routes");
