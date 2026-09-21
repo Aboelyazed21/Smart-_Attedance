@@ -1,3 +1,27 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getSessions,
@@ -8,6 +32,9 @@ import {
   getSessionRoster,
   getSections,
   getRooms,
+  getLecturerSectionStudents,
+  addStudentToLecturerSection,
+  removeLecturerEnrollment,
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import "./AttendanceSessions.css";
@@ -111,6 +138,14 @@ function AttendanceSessions() {
 
   const [selectedSession, setSelectedSession] = useState(null);
   const [roster, setRoster] = useState([]);
+
+  const [showStudentsModal, setShowStudentsModal] = useState(false);
+  const [sectionStudents, setSectionStudents] = useState([]);
+  const [studentsSection, setStudentsSection] = useState(null);
+  const [studentSearch, setStudentSearch] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentActionLoading, setStudentActionLoading] = useState(false);
 
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [qrExpiresAt, setQrExpiresAt] = useState(null);
@@ -415,6 +450,160 @@ function AttendanceSessions() {
     } finally {
       setActionLoading(false);
     }
+  }
+
+  async function handleManageStudents(session) {
+    const sectionId = Number(
+      session?.section_id ||
+        session?.sectionId ||
+        session?.section?.id
+    );
+
+    if (!sectionId) {
+      showToast("error", "This session is not linked to a valid section.");
+      return;
+    }
+
+    try {
+      setStudentsLoading(true);
+      setStudentSearch("");
+      setStudentEmail("");
+
+      const data = await getLecturerSectionStudents(sectionId);
+
+      setStudentsSection(
+        data?.section || {
+          id: sectionId,
+          course_code: session?.course_code,
+          course_name: session?.course_name,
+          section_name: session?.section_name,
+          capacity: session?.capacity,
+        }
+      );
+
+      setSectionStudents(
+        Array.isArray(data)
+          ? data
+          : data?.students || data?.rows || []
+      );
+
+      setShowStudentsModal(true);
+    } catch (err) {
+      console.error("Load section students error:", err);
+      showToast(
+        "error",
+        err.message || "Failed to load section students."
+      );
+    } finally {
+      setStudentsLoading(false);
+    }
+  }
+
+  async function handleAddSectionStudent(event) {
+    event.preventDefault();
+
+    const email = studentEmail.trim().toLowerCase();
+    const sectionId = Number(studentsSection?.id);
+
+    if (!sectionId) {
+      showToast("error", "No section selected.");
+      return;
+    }
+
+    if (!email) {
+      showToast("error", "Enter the student's email.");
+      return;
+    }
+
+    try {
+      setStudentActionLoading(true);
+
+      const data = await addStudentToLecturerSection(
+        sectionId,
+        email
+      );
+
+      const refreshed = await getLecturerSectionStudents(sectionId);
+
+      setSectionStudents(
+        Array.isArray(refreshed)
+          ? refreshed
+          : refreshed?.students || refreshed?.rows || []
+      );
+
+      setStudentEmail("");
+
+      showToast(
+        "success",
+        data?.message || "Student added to the section successfully."
+      );
+    } catch (err) {
+      console.error("Add section student error:", err);
+      showToast(
+        "error",
+        err.message || "Failed to add student to the section."
+      );
+    } finally {
+      setStudentActionLoading(false);
+    }
+  }
+
+  async function handleRemoveSectionStudent(student) {
+    const enrollmentId = Number(
+      student?.enrollment_id || student?.enrollmentId
+    );
+
+    if (!enrollmentId) {
+      showToast("error", "Enrollment ID was not returned for this student.");
+      return;
+    }
+
+    const studentName =
+      student?.student_name ||
+      `${student?.first_name || ""} ${student?.last_name || ""}`.trim() ||
+      "this student";
+
+    const confirmed = window.confirm(
+      `Remove ${studentName} from this section?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setStudentActionLoading(true);
+
+      const data = await removeLecturerEnrollment(enrollmentId);
+
+      setSectionStudents((current) =>
+        current.map((item) =>
+          Number(item.enrollment_id || item.enrollmentId) ===
+          enrollmentId
+            ? { ...item, enrollment_status: "dropped" }
+            : item
+        )
+      );
+
+      showToast(
+        "success",
+        data?.message || "Student removed from the section."
+      );
+    } catch (err) {
+      console.error("Remove section student error:", err);
+      showToast(
+        "error",
+        err.message || "Failed to remove student from the section."
+      );
+    } finally {
+      setStudentActionLoading(false);
+    }
+  }
+
+  function closeStudentsModal() {
+    setShowStudentsModal(false);
+    setSectionStudents([]);
+    setStudentsSection(null);
+    setStudentSearch("");
+    setStudentEmail("");
   }
 
   function closeQrModal() {
@@ -805,14 +994,25 @@ function AttendanceSessions() {
                             )}
 
                             {session.status !== "cancelled" && (
-                              <button
-                                type="button"
-                                className="action-secondary"
-                                onClick={() => handleViewRoster(session)}
-                                disabled={actionLoading}
-                              >
-                                Roster
-                              </button>
+                              <>
+                                <button
+                                  type="button"
+                                  className="action-secondary"
+                                  onClick={() => handleManageStudents(session)}
+                                  disabled={actionLoading}
+                                >
+                                  Students
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="action-secondary"
+                                  onClick={() => handleViewRoster(session)}
+                                  disabled={actionLoading}
+                                >
+                                  Roster
+                                </button>
+                              </>
                             )}
 
                             {session.status === "active" && (
@@ -984,6 +1184,275 @@ function AttendanceSessions() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showStudentsModal && (
+        <div
+          className="lecturer-modal-overlay"
+          onClick={closeStudentsModal}
+        >
+          <div
+            className="lecturer-students-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="students-modal-header">
+              <div>
+                <span className="section-kicker">SECTION MANAGEMENT</span>
+                <h2>Students in this section</h2>
+                <p>
+                  {studentsSection?.course_code || "Course"}{" "}
+                  {studentsSection?.section_name
+                    ? `— Section ${studentsSection.section_name}`
+                    : ""}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeStudentsModal}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="students-summary-grid">
+              <div>
+                <span>Active students</span>
+                <strong>
+                  {
+                    sectionStudents.filter(
+                      (student) =>
+                        String(
+                          student.enrollment_status ||
+                            student.status ||
+                            ""
+                        ).toLowerCase() === "active"
+                    ).length
+                  }
+                </strong>
+              </div>
+
+              <div>
+                <span>Section capacity</span>
+                <strong>
+                  {studentsSection?.capacity ?? "Open"}
+                </strong>
+              </div>
+
+              <div>
+                <span>Course</span>
+                <strong>{studentsSection?.course_code || "-"}</strong>
+              </div>
+            </div>
+
+            <form
+              className="student-add-form"
+              onSubmit={handleAddSectionStudent}
+            >
+              <div className="student-add-copy">
+                <span className="student-add-badge">ADD</span>
+                <div>
+                  <strong>Add student by email</strong>
+                  <p>
+                    The student must already have an active student account.
+                  </p>
+                </div>
+              </div>
+
+              <div className="student-add-controls">
+                <input
+                  type="email"
+                  value={studentEmail}
+                  onChange={(event) =>
+                    setStudentEmail(event.target.value)
+                  }
+                  placeholder="student@example.com"
+                  autoComplete="off"
+                />
+
+                <button
+                  type="submit"
+                  className="action-primary"
+                  disabled={studentActionLoading}
+                >
+                  {studentActionLoading ? "Saving..." : "Add Student"}
+                </button>
+              </div>
+            </form>
+
+            <div className="students-list-toolbar">
+              <div>
+                <strong>Section roster</strong>
+                <span>
+                  {sectionStudents.length} enrollment record
+                  {sectionStudents.length === 1 ? "" : "s"}
+                </span>
+              </div>
+
+              <div className="student-search">
+                <span>Q</span>
+                <input
+                  value={studentSearch}
+                  onChange={(event) =>
+                    setStudentSearch(event.target.value)
+                  }
+                  placeholder="Search student or email..."
+                />
+              </div>
+            </div>
+
+            <div className="section-students-table-wrap">
+              {studentsLoading ? (
+                <div className="students-modal-loading">
+                  <div className="loading-ring" />
+                  <strong>Loading section students</strong>
+                  <span>Reading the current enrollment roster...</span>
+                </div>
+              ) : (
+                (() => {
+                  const query = studentSearch.trim().toLowerCase();
+
+                  const visibleStudents = sectionStudents.filter(
+                    (student) => {
+                      const name =
+                        student.student_name ||
+                        `${student.first_name || ""} ${
+                          student.last_name || ""
+                        }`.trim();
+
+                      const haystack = [
+                        name,
+                        student.email,
+                        student.student_code,
+                        student.university_id,
+                        student.enrollment_status,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")
+                        .toLowerCase();
+
+                      return !query || haystack.includes(query);
+                    }
+                  );
+
+                  if (visibleStudents.length === 0) {
+                    return (
+                      <div className="students-modal-empty">
+                        <div className="empty-visual">ST</div>
+                        <h3>No matching students</h3>
+                        <p>
+                          Add a student by email or change the search text.
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <table className="section-students-table">
+                      <thead>
+                        <tr>
+                          <th>Student</th>
+                          <th>Student code</th>
+                          <th>Enrollment</th>
+                          <th>Added</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {visibleStudents.map((student) => {
+                          const status = String(
+                            student.enrollment_status ||
+                              student.status ||
+                              "active"
+                          ).toLowerCase();
+
+                          const name =
+                            student.student_name ||
+                            `${student.first_name || ""} ${
+                              student.last_name || ""
+                            }`.trim() ||
+                            "Student";
+
+                          return (
+                            <tr
+                              key={
+                                student.enrollment_id ||
+                                student.student_id ||
+                                student.id
+                              }
+                            >
+                              <td>
+                                <div className="roster-student">
+                                  <div className="roster-avatar">
+                                    {getInitials(
+                                      student.first_name,
+                                      student.last_name
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    <strong>{name}</strong>
+                                    <span>
+                                      {student.email || "Student account"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td>
+                                {student.student_code || "-"}
+                              </td>
+
+                              <td>
+                                <span
+                                  className={`student-enrollment-status ${
+                                    status === "active"
+                                      ? "student-enrollment-active"
+                                      : "student-enrollment-inactive"
+                                  }`}
+                                >
+                                  <span className="status-dot" />
+                                  {status}
+                                </span>
+                              </td>
+
+                              <td>
+                                {student.enrolled_at
+                                  ? formatDate(student.enrolled_at)
+                                  : "-"}
+                              </td>
+
+                              <td>
+                                {status === "active" ? (
+                                  <button
+                                    type="button"
+                                    className="student-remove-button"
+                                    onClick={() =>
+                                      handleRemoveSectionStudent(student)
+                                    }
+                                    disabled={studentActionLoading}
+                                  >
+                                    Remove
+                                  </button>
+                                ) : (
+                                  <span className="student-removed-label">
+                                    Removed
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  );
+                })()
+              )}
+            </div>
           </div>
         </div>
       )}
