@@ -15,6 +15,7 @@ import CourseDetails from "./pages/admin/CourseDetails";
 import Sections from "./pages/admin/Sections";
 import Rooms from "./pages/admin/Rooms";
 import Timetable from "./pages/admin/Timetable";
+import Attendance from "./pages/admin/Attendance";
 
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
 
@@ -258,6 +259,24 @@ function App() {
     }
 
     return <Timetable />;
+  }
+
+
+  /* =========================================================
+     ADMIN ATTENDANCE
+  ========================================================= */
+
+  if (
+    location.pathname ===
+    "/admin/attendance"
+  ) {
+    if (
+      !isAdminAuthenticated()
+    ) {
+      return <Login />;
+    }
+
+    return <Attendance />;
   }
 
 
