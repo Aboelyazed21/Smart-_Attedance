@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getSessions,
   createSession,
@@ -10,141 +9,159 @@ import {
   getSections,
   getRooms,
 } from "../../services/api";
-
 import { useNavigate } from "react-router-dom";
-
-import "../../App.css";
-
-/* =========================================================
-   HELPERS
-========================================================= */
+import "./AttendanceSessions.css";
 
 function formatDate(date) {
   if (!date) return "-";
 
   const value = new Date(date);
+  if (Number.isNaN(value.getTime())) return date;
 
-  if (Number.isNaN(value.getTime())) {
-    return date;
-  }
-
-  return value.toLocaleDateString();
+  return value.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function formatTime(time) {
   if (!time) return "-";
-
   return String(time).substring(0, 5);
 }
 
 function getStatusClass(status) {
   switch (String(status || "").toLowerCase()) {
     case "active":
-      return "status-active";
-
-    case "closed":
-      return "status-closed";
-
+      return "lecturer-status-active";
     case "scheduled":
-      return "status-scheduled";
-
+      return "lecturer-status-scheduled";
+    case "closed":
+      return "lecturer-status-closed";
     case "cancelled":
-      return "status-cancelled";
-
+      return "lecturer-status-cancelled";
     default:
-      return "";
+      return "lecturer-status-default";
   }
 }
 
-/* =========================================================
-   COMPONENT
-========================================================= */
+function getInitials(firstName = "", lastName = "") {
+  const first = String(firstName).trim().charAt(0);
+  const last = String(lastName).trim().charAt(0);
+  return `${first}${last}`.toUpperCase() || "L";
+}
+
+function getSavedUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function getTodayInputValue() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  const local = new Date(now.getTime() - offset * 60 * 1000);
+  return local.toISOString().slice(0, 10);
+}
+
+function getRosterStatusClass(status) {
+  switch (String(status || "").toLowerCase()) {
+    case "present":
+      return "roster-status-present";
+    case "late":
+      return "roster-status-late";
+    case "excused":
+      return "roster-status-excused";
+    case "absent":
+    default:
+      return "roster-status-absent";
+  }
+}
+
+function normalizeRoster(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.rows)) return data.rows;
+  if (Array.isArray(data?.roster)) return data.roster;
+  if (Array.isArray(data?.students)) return data.students;
+  return [];
+}
 
 function AttendanceSessions() {
   const navigate = useNavigate();
-
-  /* =======================================================
-     DATA
-  ======================================================= */
+  const savedUser = useMemo(() => getSavedUser(), []);
 
   const [sessions, setSessions] = useState([]);
   const [sections, setSections] = useState([]);
   const [rooms, setRooms] = useState([]);
 
-  /* =======================================================
-     UI STATE
-  ======================================================= */
-
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [toast, setToast] = useState(null);
 
-  const [showCreateModal, setShowCreateModal] =
-    useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
 
-  const [showQrModal, setShowQrModal] =
-    useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [showRosterModal, setShowRosterModal] = useState(false);
 
-  const [showRosterModal, setShowRosterModal] =
-    useState(false);
-
-  const [selectedSession, setSelectedSession] =
-    useState(null);
-
+  const [selectedSession, setSelectedSession] = useState(null);
   const [roster, setRoster] = useState([]);
 
-  const [loadingAction, setLoadingAction] =
-    useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState("");
+  const [qrExpiresAt, setQrExpiresAt] = useState(null);
+  const [qrVersion, setQrVersion] = useState(null);
+  const [countdown, setCountdown] = useState(0);
 
-  const [error, setError] = useState("");
-
-  /* =======================================================
-     QR STATE
-  ======================================================= */
-
-  const [qrDataUrl, setQrDataUrl] =
-    useState("");
-
-  const [qrExpiresAt, setQrExpiresAt] =
-    useState(null);
-
-  const [qrVersion, setQrVersion] =
-    useState(null);
-
-  const [countdown, setCountdown] =
-    useState(0);
-
-  const qrTimerRef = useRef(null);
-  const countdownTimerRef = useRef(null);
-
-  /* =======================================================
-     CREATE FORM
-  ======================================================= */
+  const qrCountdownRef = useRef(null);
 
   const [form, setForm] = useState({
     sectionId: "",
     roomId: "",
-    sessionDate: "",
+    sessionDate: getTodayInputValue(),
     scheduledStart: "",
     scheduledEnd: "",
   });
 
-  /* =======================================================
-     LOAD DATA
-  ======================================================= */
+  const firstName = savedUser?.first_name || "Lecturer";
+  const lastName = savedUser?.last_name || "";
+  const initials = getInitials(firstName, lastName);
+
+  function showToast(type, message) {
+    setToast({ type, message });
+    window.setTimeout(() => setToast(null), 3500);
+  }
+
+  function clearQrCountdown() {
+    if (qrCountdownRef.current) {
+      window.clearInterval(qrCountdownRef.current);
+      qrCountdownRef.current = null;
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+
+    return () => {
+      clearQrCountdown();
+    };
+  }, []);
 
   async function loadData() {
     try {
       setLoading(true);
       setError("");
 
-      const [
-        sessionsResult,
-        sectionsResult,
-        roomsResult,
-      ] = await Promise.all([
-        getSessions(),
-        getSections(),
-        getRooms(),
-      ]);
+      const [sessionsResult, sectionsResult, roomsResult] =
+        await Promise.all([
+          getSessions(),
+          getSections(),
+          getRooms(),
+        ]);
 
       setSessions(
         Array.isArray(sessionsResult)
@@ -164,63 +181,70 @@ function AttendanceSessions() {
           : roomsResult?.rooms || []
       );
     } catch (err) {
-      console.error(
-        "Attendance sessions load error:",
-        err
-      );
-
-      setError(
-        err.message ||
-          "Failed to load attendance sessions"
-      );
+      console.error("Attendance sessions load error:", err);
+      setError(err.message || "Failed to load attendance sessions.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    loadData();
+  const stats = useMemo(() => {
+    const normalized = sessions.map((session) =>
+      String(session.status || "").toLowerCase()
+    );
 
-    return () => {
-      clearQrTimers();
+    return {
+      total: sessions.length,
+      active: normalized.filter((value) => value === "active").length,
+      scheduled: normalized.filter((value) => value === "scheduled").length,
+      closed: normalized.filter((value) => value === "closed").length,
     };
-  }, []);
+  }, [sessions]);
 
-  /* =======================================================
-     QR TIMER CLEANUP
-  ======================================================= */
+  const filteredSessions = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const today = getTodayInputValue();
 
-  function clearQrTimers() {
-    if (qrTimerRef.current) {
-      clearTimeout(qrTimerRef.current);
-      qrTimerRef.current = null;
-    }
+    return sessions.filter((session) => {
+      const status = String(session.status || "").toLowerCase();
 
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-  }
+      if (statusFilter !== "all" && status !== statusFilter) {
+        return false;
+      }
 
-  /* =======================================================
-     FORM
-  ======================================================= */
+      if (dateFilter === "today") {
+        const sessionDate = String(session.session_date || "").slice(0, 10);
+        if (sessionDate !== today) return false;
+      }
 
-  function handleFormChange(e) {
-    const { name, value } = e.target;
+      if (!query) return true;
 
-    setForm((prev) => ({
-      ...prev,
+      const haystack = [
+        session.course_code,
+        session.course_name,
+        session.section_name,
+        session.room_name,
+        session.building,
+        session.status,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [sessions, search, statusFilter, dateFilter]);
+
+  function handleFormChange(event) {
+    const { name, value } = event.target;
+    setForm((previous) => ({
+      ...previous,
       [name]: value,
     }));
   }
 
-  /* =======================================================
-     CREATE SESSION
-  ======================================================= */
-
-  async function handleCreateSession(e) {
-    e.preventDefault();
+  async function handleCreateSession(event) {
+    event.preventDefault();
 
     if (
       !form.sectionId ||
@@ -228,1590 +252,975 @@ function AttendanceSessions() {
       !form.scheduledStart ||
       !form.scheduledEnd
     ) {
-      alert("Please fill all required fields.");
+      showToast("error", "Please complete all required fields.");
       return;
     }
 
-    if (
-      form.scheduledStart >=
-      form.scheduledEnd
-    ) {
-      alert(
-        "End time must be after start time."
-      );
+    if (form.scheduledEnd <= form.scheduledStart) {
+      showToast("error", "End time must be later than start time.");
       return;
     }
 
     try {
-      setLoadingAction(true);
+      setActionLoading(true);
 
       await createSession({
         sectionId: Number(form.sectionId),
-
-        roomId: form.roomId
-          ? Number(form.roomId)
-          : null,
-
+        roomId: form.roomId ? Number(form.roomId) : null,
         sessionDate: form.sessionDate,
-
-        scheduledStart:
-          form.scheduledStart,
-
-        scheduledEnd:
-          form.scheduledEnd,
+        scheduledStart: form.scheduledStart,
+        scheduledEnd: form.scheduledEnd,
       });
-
-      alert(
-        "Attendance session created successfully."
-      );
 
       setForm({
         sectionId: "",
         roomId: "",
-        sessionDate: "",
+        sessionDate: getTodayInputValue(),
         scheduledStart: "",
         scheduledEnd: "",
       });
 
       setShowCreateModal(false);
-
       await loadData();
+      showToast("success", "Attendance session created successfully.");
     } catch (err) {
-      console.error(
-        "Create session error:",
-        err
-      );
-
-      alert(
-        err.message ||
-          "Failed to create session."
-      );
+      console.error("Create session error:", err);
+      showToast("error", err.message || "Failed to create session.");
     } finally {
-      setLoadingAction(false);
+      setActionLoading(false);
     }
   }
 
-  /* =======================================================
-     OPEN SESSION
-  ======================================================= */
+  function startQrCountdown(expiresAt, sessionId) {
+    clearQrCountdown();
+
+    if (!expiresAt) {
+      setCountdown(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        Math.ceil((new Date(expiresAt).getTime() - Date.now()) / 1000)
+      );
+
+      setCountdown(remaining);
+
+      if (remaining <= 0) {
+        clearQrCountdown();
+        refreshQr(sessionId, true);
+      }
+    };
+
+    tick();
+    qrCountdownRef.current = window.setInterval(tick, 1000);
+  }
 
   async function handleOpenSession(session) {
     try {
-      setLoadingAction(true);
+      setActionLoading(true);
       setError("");
 
-      const data =
-        await openSession(session.id);
+      const data = await openSession(session.id);
+      const qr = data?.qr || data || {};
 
       setSelectedSession({
         ...session,
         status: "active",
       });
 
-      setQrDataUrl(
-        data?.qr?.qrDataUrl ||
-          data?.qrDataUrl ||
-          ""
-      );
-
-      setQrExpiresAt(
-        data?.qr?.expiresAt ||
-          null
-      );
-
-      setQrVersion(
-        data?.qr?.version ||
-          data?.version ||
-          null
-      );
-
+      setQrDataUrl(qr.qrDataUrl || data?.qrDataUrl || "");
+      setQrExpiresAt(qr.expiresAt || data?.expiresAt || null);
+      setQrVersion(qr.version ?? data?.version ?? null);
       setShowQrModal(true);
 
       await loadData();
+      startQrCountdown(qr.expiresAt || data?.expiresAt, session.id);
 
-      startQrCountdown(
-        data?.qr?.expiresAt ||
-          data?.expiresAt,
-        session.id
-      );
+      showToast("success", "Attendance session is now active.");
     } catch (err) {
-      console.error(
-        "Open session error:",
-        err
-      );
-
-      alert(
-        err.message ||
-          "Failed to open session."
-      );
+      console.error("Open session error:", err);
+      showToast("error", err.message || "Failed to open session.");
     } finally {
-      setLoadingAction(false);
+      setActionLoading(false);
     }
   }
 
-  /* =======================================================
-     QR COUNTDOWN
-  ======================================================= */
-
-  function startQrCountdown(
-    expiresAt,
-    sessionId
-  ) {
-    clearQrTimers();
-
-    if (!expiresAt) {
-      return;
-    }
-
-    const updateCountdown = () => {
-      const remaining = Math.max(
-        0,
-        Math.ceil(
-          (
-            new Date(expiresAt).getTime() -
-            Date.now()
-          ) / 1000
-        )
-      );
-
-      setCountdown(remaining);
-
-      if (remaining <= 0) {
-        refreshQr(sessionId);
-      }
-    };
-
-    updateCountdown();
-
-    countdownTimerRef.current =
-      setInterval(
-        updateCountdown,
-        1000
-      );
-  }
-
-  /* =======================================================
-     REFRESH QR
-  ======================================================= */
-
-  async function refreshQr(sessionId) {
+  async function refreshQr(sessionId, silent = false) {
     try {
-      const data =
-        await refreshSessionQr(
-          sessionId
-        );
+      const data = await refreshSessionQr(sessionId);
 
-      setQrDataUrl(
-        data?.qrDataUrl || ""
-      );
-
-      setQrExpiresAt(
-        data?.expiresAt || null
-      );
-
-      setQrVersion(
-        data?.version || null
-      );
+      setQrDataUrl(data?.qrDataUrl || data?.qr?.qrDataUrl || "");
+      setQrExpiresAt(data?.expiresAt || data?.qr?.expiresAt || null);
+      setQrVersion(data?.version ?? data?.qr?.version ?? null);
 
       startQrCountdown(
-        data?.expiresAt,
+        data?.expiresAt || data?.qr?.expiresAt,
         sessionId
       );
+
+      if (!silent) {
+        showToast("success", "QR code refreshed.");
+      }
     } catch (err) {
-      console.error(
-        "Refresh QR error:",
-        err
-      );
+      console.error("Refresh QR error:", err);
+      clearQrCountdown();
+      showToast("error", err.message || "Failed to refresh QR.");
     }
   }
 
-  /* =======================================================
-     CLOSE SESSION
-  ======================================================= */
+  async function handleCloseSession(session) {
+    const confirmed = window.confirm(
+      "Are you sure you want to close this attendance session?"
+    );
 
-  async function handleCloseSession(
-    session
-  ) {
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to close this attendance session?"
-      );
-
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
-      setLoadingAction(true);
+      setActionLoading(true);
 
-      await closeSession(
-        session.id
-      );
+      await closeSession(session.id);
 
-      clearQrTimers();
-
+      clearQrCountdown();
       setShowQrModal(false);
-
       setQrDataUrl("");
-
+      setQrExpiresAt(null);
+      setQrVersion(null);
+      setCountdown(0);
       setSelectedSession(null);
 
-      alert(
-        "Attendance session closed successfully."
-      );
-
       await loadData();
+      showToast("success", "Attendance session closed successfully.");
     } catch (err) {
-      console.error(
-        "Close session error:",
-        err
-      );
-
-      alert(
-        err.message ||
-          "Failed to close session."
-      );
+      console.error("Close session error:", err);
+      showToast("error", err.message || "Failed to close session.");
     } finally {
-      setLoadingAction(false);
+      setActionLoading(false);
     }
   }
 
-  /* =======================================================
-     VIEW ROSTER
-  ======================================================= */
-
-  async function handleViewRoster(
-    session
-  ) {
+  async function handleViewRoster(session) {
     try {
-      setLoadingAction(true);
+      setActionLoading(true);
 
-      const data =
-        await getSessionRoster(
-          session.id
-        );
+      const data = await getSessionRoster(session.id);
 
-      setSelectedSession(
-        session
-      );
-
-      setRoster(
-        Array.isArray(data)
-          ? data
-          : data?.rows || []
-      );
-
+      setSelectedSession(session);
+      setRoster(normalizeRoster(data));
       setShowRosterModal(true);
     } catch (err) {
-      console.error(
-        "Roster error:",
-        err
-      );
-
-      alert(
-        err.message ||
-          "Failed to load session roster."
-      );
+      console.error("Roster error:", err);
+      showToast("error", err.message || "Failed to load session roster.");
     } finally {
-      setLoadingAction(false);
+      setActionLoading(false);
     }
   }
 
-  /* =======================================================
-     CLOSE QR MODAL
-  ======================================================= */
-
-  function handleCloseQrModal() {
-    clearQrTimers();
-
+  function closeQrModal() {
+    clearQrCountdown();
     setShowQrModal(false);
-
     setQrDataUrl("");
-
     setQrExpiresAt(null);
-
     setQrVersion(null);
-
     setCountdown(0);
-
     setSelectedSession(null);
   }
 
-  /* =======================================================
-     LOGOUT
-  ======================================================= */
+  function closeRosterModal() {
+    setShowRosterModal(false);
+    setRoster([]);
+    setSelectedSession(null);
+  }
 
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     navigate("/");
   }
 
-  /* =======================================================
-     USER
-  ======================================================= */
+  const rosterStats = useMemo(() => {
+    const values = roster.map((student) =>
+      String(
+        student.attendance_status ||
+          student.status ||
+          "absent"
+      ).toLowerCase()
+    );
 
-  const savedUser = (() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("user") ||
-          "null"
-      );
-    } catch {
-      return null;
-    }
-  })();
+    return {
+      total: roster.length,
+      present: values.filter((value) => value === "present").length,
+      late: values.filter((value) => value === "late").length,
+      absent: values.filter((value) => value === "absent").length,
+      excused: values.filter((value) => value === "excused").length,
+    };
+  }, [roster]);
 
-  const firstName =
-    savedUser?.first_name ||
-    "Lecturer";
-
-  const lastName =
-    savedUser?.last_name ||
-    "";
-
-  /* =======================================================
-     RENDER
-  ======================================================= */
+  const rosterAttendanceRate =
+    rosterStats.total > 0
+      ? Math.round(
+          ((rosterStats.present + rosterStats.late) /
+            rosterStats.total) *
+            100
+        )
+      : 0;
 
   return (
-    <div className="dashboard-page">
-
-      {/* ===================================================
-          GLASS MODAL STYLES
-      =================================================== */}
-
-      <style>{`
-
-        .attendance-modal-overlay {
-          position: fixed;
-          inset: 0;
-          z-index: 9999;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-          background: rgba(15, 23, 42, 0.55);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-        }
-
-        .attendance-create-modal {
-          width: min(580px, 94vw);
-          max-height: 88vh;
-          overflow-y: auto;
-          border-radius: 22px;
-          background: rgba(255, 255, 255, 0.94);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow:
-            0 25px 70px rgba(15, 23, 42, 0.28),
-            0 8px 30px rgba(37, 99, 235, 0.10);
-          backdrop-filter: blur(18px);
-          -webkit-backdrop-filter: blur(18px);
-          animation: attendanceModalIn 0.2s ease-out;
-        }
-
-        @keyframes attendanceModalIn {
-          from {
-            opacity: 0;
-            transform: translateY(12px) scale(0.98);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        .attendance-modal-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          padding: 22px 24px;
-          border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-        }
-
-        .attendance-modal-title {
-          margin: 0;
-          font-size: 23px;
-          font-weight: 750;
-          color: #172033;
-          letter-spacing: -0.4px;
-        }
-
-        .attendance-modal-subtitle {
-          margin: 5px 0 0;
-          font-size: 13px;
-          color: #64748b;
-        }
-
-        .attendance-modal-close {
-          width: 36px;
-          height: 36px;
-          border: 0;
-          border-radius: 10px;
-          background: rgba(241, 245, 249, 0.9);
-          color: #334155;
-          font-size: 22px;
-          line-height: 1;
-          cursor: pointer;
-          transition: 0.2s ease;
-        }
-
-        .attendance-modal-close:hover {
-          background: #e2e8f0;
-          transform: rotate(3deg);
-        }
-
-        .attendance-modal-body {
-          padding: 22px 24px 24px;
-        }
-
-        .attendance-form-section {
-          padding: 18px;
-          margin-bottom: 14px;
-          border: 1px solid rgba(148, 163, 184, 0.20);
-          border-radius: 16px;
-          background: rgba(248, 250, 252, 0.78);
-        }
-
-        .attendance-form-section-title {
-          margin: 0 0 14px;
-          font-size: 15px;
-          font-weight: 700;
-          color: #1e293b;
-        }
-
-        .attendance-form-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 14px;
-        }
-
-        .attendance-form-full {
-          grid-column: 1 / -1;
-        }
-
-        .attendance-form-field {
-          display: flex;
-          flex-direction: column;
-          gap: 7px;
-        }
-
-        .attendance-form-field label {
-          font-size: 12px;
-          font-weight: 650;
-          color: #334155;
-        }
-
-        .attendance-form-field label span {
-          color: #ef4444;
-        }
-
-        .attendance-form-field select,
-        .attendance-form-field input {
-          width: 100%;
-          height: 44px;
-          box-sizing: border-box;
-          padding: 0 12px;
-          border: 1px solid #dbe3ef;
-          border-radius: 11px;
-          background: rgba(255, 255, 255, 0.88);
-          color: #172033;
-          font-size: 13px;
-          outline: none;
-          transition: 0.2s ease;
-        }
-
-        .attendance-form-field select:focus,
-        .attendance-form-field input:focus {
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.10);
-          background: #fff;
-        }
-
-        .attendance-modal-actions {
-          display: flex;
-          justify-content: flex-end;
-          gap: 10px;
-          margin-top: 18px;
-        }
-
-        .attendance-cancel-btn {
-          min-width: 100px;
-          height: 42px;
-          padding: 0 18px;
-          border: 1px solid #dbe3ef;
-          border-radius: 10px;
-          background: rgba(248, 250, 252, 0.9);
-          color: #334155;
-          font-weight: 650;
-          cursor: pointer;
-        }
-
-        .attendance-create-btn {
-          min-width: 145px;
-          height: 42px;
-          padding: 0 20px;
-          border: 0;
-          border-radius: 10px;
-          background: linear-gradient(
-            135deg,
-            #2563eb,
-            #1d4ed8
-          );
-          color: white;
-          font-weight: 700;
-          cursor: pointer;
-          box-shadow:
-            0 8px 20px rgba(37, 99, 235, 0.20);
-        }
-
-        .attendance-create-btn:disabled {
-          opacity: 0.65;
-          cursor: not-allowed;
-        }
-
-        .attendance-create-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow:
-            0 10px 24px rgba(37, 99, 235, 0.25);
-        }
-
-        @media (max-width: 600px) {
-          .attendance-modal-overlay {
-            padding: 12px;
-          }
-
-          .attendance-create-modal {
-            width: 100%;
-            max-height: 92vh;
-            border-radius: 18px;
-          }
-
-          .attendance-modal-header {
-            padding: 18px;
-          }
-
-          .attendance-modal-body {
-            padding: 16px;
-          }
-
-          .attendance-form-section {
-            padding: 14px;
-          }
-
-          .attendance-form-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .attendance-form-full {
-            grid-column: auto;
-          }
-
-          .attendance-modal-actions {
-            flex-direction: column-reverse;
-          }
-
-          .attendance-cancel-btn,
-          .attendance-create-btn {
-            width: 100%;
-          }
-        }
-
-      `}</style>
-
-      {/* ===================================================
-          SIDEBAR
-      =================================================== */}
-
-      <aside className="dashboard-sidebar">
-
-        <div className="sidebar-brand">
-
-          <div className="sidebar-logo">
-            🎓
-          </div>
-
+    <div className="lecturer-sessions-page">
+      <aside className="lecturer-sidebar">
+        <div className="lecturer-brand">
+          <div className="lecturer-brand-mark">A</div>
           <div>
-            <h2>Attendify</h2>
+            <strong>Attendify</strong>
             <span>SMART ATTENDANCE</span>
           </div>
-
         </div>
 
-        <div className="sidebar-profile">
-
-          <div className="profile-avatar">
-            {firstName
-              .charAt(0)
-              .toUpperCase()}
-          </div>
-
-          <div className="profile-info">
+        <div className="lecturer-profile">
+          <div className="lecturer-avatar">{initials}</div>
+          <div>
             <strong>
               {firstName} {lastName}
             </strong>
-
             <span>Lecturer</span>
           </div>
-
         </div>
 
-        <nav className="dashboard-nav">
-
+        <nav className="lecturer-nav">
           <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/dashboard")
-            }
+            type="button"
+            onClick={() => navigate("/dashboard")}
           >
-            <span>▦</span>
+            <span className="nav-icon">D</span>
             Dashboard
           </button>
 
           <button
-            className="nav-item active"
-            onClick={() =>
-              navigate(
-                "/lecturer/sessions"
-              )
-            }
+            type="button"
+            className="active"
+            onClick={() => navigate("/lecturer/sessions")}
           >
-            <span>◫</span>
+            <span className="nav-icon">S</span>
             Attendance Sessions
           </button>
 
           <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/lecturer/attendance"
-              )
-            }
+            type="button"
+            onClick={() => navigate("/lecturer/attendance")}
           >
-            <span>✓</span>
+            <span className="nav-icon">A</span>
             Attendance
           </button>
 
           <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/lecturer/reports"
-              )
-            }
+            type="button"
+            onClick={() => navigate("/lecturer/reports")}
           >
-            <span>▥</span>
+            <span className="nav-icon">R</span>
             Reports
           </button>
-
         </nav>
 
-        <div className="sidebar-bottom">
+        <div className="lecturer-sidebar-footer">
+          <div className="lecturer-sidebar-note">
+            <span className="note-badge">LIVE</span>
+            <strong>Smart attendance</strong>
+            <p>Manage sessions and track attendance in real time.</p>
+          </div>
 
           <button
-            className="nav-item logout-button"
+            type="button"
+            className="lecturer-logout"
             onClick={handleLogout}
           >
-            <span>↪</span>
+            <span className="nav-icon">L</span>
             Logout
           </button>
-
         </div>
-
       </aside>
 
-      {/* ===================================================
-          MAIN
-      =================================================== */}
-
-      <main className="dashboard-main">
-
-        <header className="dashboard-header">
-
+      <main className="lecturer-main">
+        <header className="lecturer-topbar">
           <div>
-            <h1>
-              Attendance Sessions
-            </h1>
-
-            <p>
-              Create and manage attendance sessions
-            </p>
+            <span className="topbar-kicker">LECTURER PORTAL</span>
+            <h1>Attendance Sessions</h1>
+            <p>Create, open and manage attendance sessions for your sections.</p>
           </div>
 
-          <div className="dashboard-user">
-
-            <div className="header-avatar">
-              {firstName
-                .charAt(0)
-                .toUpperCase()}
+          <div className="topbar-user">
+            <div className="topbar-user-text">
+              <strong>
+                {firstName} {lastName}
+              </strong>
+              <span>Lecturer</span>
             </div>
-
+            <div className="topbar-avatar">{initials}</div>
           </div>
-
         </header>
 
-        <section className="dashboard-content">
-
-          <div className="panel-header">
-
+        <section className="lecturer-content">
+          <div className="lecturer-hero">
             <div>
-              <h2>Sessions</h2>
-
+              <span className="hero-eyebrow">ATTENDANCE MANAGEMENT</span>
+              <h2>Your teaching sessions</h2>
               <p>
-                Manage your attendance sessions
+                Everything you need to open attendance, display the QR code
+                and review the live roster from one place.
               </p>
             </div>
 
             <button
-              className="sign-in-button"
               type="button"
-              onClick={() =>
-                setShowCreateModal(true)
-              }
+              className="hero-create-button"
+              onClick={() => setShowCreateModal(true)}
             >
-              + New Session
+              <span>+</span>
+              New Session
             </button>
-
           </div>
 
           {error && (
-            <div
-              style={{
-                marginBottom: "20px",
-                padding: "12px 16px",
-                borderRadius: "10px",
-                background: "#fee2e2",
-                color: "#991b1b",
-              }}
-            >
-              {error}
+            <div className="lecturer-alert lecturer-alert-error">
+              <div className="alert-badge">!</div>
+              <div>
+                <strong>Unable to load sessions</strong>
+                <p>{error}</p>
+              </div>
+              <button type="button" onClick={loadData}>
+                Retry
+              </button>
             </div>
           )}
 
-          <div className="dashboard-panel">
-
-            {loading ? (
-              <div className="empty-state">
-
-                <div className="empty-icon">
-                  ◌
-                </div>
-
-                <h3>
-                  Loading sessions...
-                </h3>
-
+          <div className="lecturer-stats-grid">
+            <div className="lecturer-stat-card">
+              <div className="stat-icon stat-blue">TS</div>
+              <div>
+                <span>Total sessions</span>
+                <strong>{stats.total}</strong>
+                <small>All your attendance sessions</small>
               </div>
-            ) : sessions.length === 0 ? (
-              <div className="empty-state">
+            </div>
 
-                <div className="empty-icon">
-                  ◫
-                </div>
+            <div className="lecturer-stat-card">
+              <div className="stat-icon stat-green">ON</div>
+              <div>
+                <span>Active now</span>
+                <strong>{stats.active}</strong>
+                <small>Sessions currently collecting attendance</small>
+              </div>
+            </div>
 
-                <h3>
-                  No attendance sessions
-                </h3>
+            <div className="lecturer-stat-card">
+              <div className="stat-icon stat-purple">SC</div>
+              <div>
+                <span>Scheduled</span>
+                <strong>{stats.scheduled}</strong>
+                <small>Sessions waiting to be opened</small>
+              </div>
+            </div>
 
+            <div className="lecturer-stat-card">
+              <div className="stat-icon stat-slate">CL</div>
+              <div>
+                <span>Completed</span>
+                <strong>{stats.closed}</strong>
+                <small>Closed sessions in your history</small>
+              </div>
+            </div>
+          </div>
+
+          <section className="lecturer-workspace-card">
+            <div className="workspace-heading">
+              <div>
+                <span className="section-kicker">SESSION CONTROL</span>
+                <h3>Attendance sessions</h3>
                 <p>
-                  Create your first attendance session.
+                  Live data from your attendance service and MySQL database.
                 </p>
-
               </div>
-            ) : (
-              <div
-                style={{
-                  overflowX: "auto",
-                }}
-              >
 
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse:
-                      "collapse",
+              <div className="workspace-count">
+                <strong>{filteredSessions.length}</strong>
+                <span>shown</span>
+              </div>
+            </div>
+
+            <div className="lecturer-filters">
+              <div className="filter-search">
+                <span>Q</span>
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search course, section or room..."
+                />
+              </div>
+
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+              >
+                <option value="all">All statuses</option>
+                <option value="active">Active</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="closed">Closed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <select
+                value={dateFilter}
+                onChange={(event) => setDateFilter(event.target.value)}
+              >
+                <option value="all">All dates</option>
+                <option value="today">Today</option>
+              </select>
+
+              {(search || statusFilter !== "all" || dateFilter !== "all") && (
+                <button
+                  type="button"
+                  className="clear-filters-button"
+                  onClick={() => {
+                    setSearch("");
+                    setStatusFilter("all");
+                    setDateFilter("all");
                   }}
                 >
+                  Clear
+                </button>
+              )}
+            </div>
 
+            <div className="sessions-table-wrap">
+              {loading ? (
+                <div className="sessions-loading">
+                  <div className="loading-ring" />
+                  <strong>Loading your sessions</strong>
+                  <span>Connecting to the attendance service...</span>
+                </div>
+              ) : filteredSessions.length === 0 ? (
+                <div className="sessions-empty">
+                  <div className="empty-visual">S</div>
+                  <h3>No sessions found</h3>
+                  <p>
+                    {sessions.length === 0
+                      ? "Create your first attendance session to start taking attendance."
+                      : "Try changing the search or filters."}
+                  </p>
+                  {sessions.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateModal(true)}
+                    >
+                      Create Session
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <table className="lecturer-sessions-table">
                   <thead>
                     <tr>
                       <th>Course</th>
                       <th>Section</th>
                       <th>Room</th>
-                      <th>Date</th>
-                      <th>Time</th>
+                      <th>Schedule</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
 
                   <tbody>
-
-                    {sessions.map(
-                      (session) => (
-                        <tr
-                          key={
-                            session.id
-                          }
-                        >
-
-                          <td>
-                            <strong>
-                              {
-                                session.course_code
-                              }
-                            </strong>
-
+                    {filteredSessions.map((session) => (
+                      <tr key={session.id}>
+                        <td>
+                          <div className="course-cell">
+                            <div className="course-code">
+                              {session.course_code || "COURSE"}
+                            </div>
                             <div>
-                              {
-                                session.course_name
-                              }
+                              <strong>
+                                {session.course_name || "Course"}
+                              </strong>
+                              <span>Session #{session.id}</span>
                             </div>
-                          </td>
+                          </div>
+                        </td>
 
-                          <td>
-                            {
-                              session.section_name ||
-                              "-"
-                            }
-                          </td>
+                        <td>
+                          <span className="section-chip">
+                            {session.section_name || "-"}
+                          </span>
+                        </td>
 
-                          <td>
-                            {session.room_name
-                              ? `${session.building || ""} ${session.room_name}`
-                              : "-"}
-                          </td>
+                        <td>
+                          <div className="room-cell">
+                            <strong>{session.room_name || "No room"}</strong>
+                            <span>{session.building || "Location not set"}</span>
+                          </div>
+                        </td>
 
-                          <td>
-                            {formatDate(
-                              session.session_date
-                            )}
-                          </td>
-
-                          <td>
-                            {formatTime(
-                              session.scheduled_start
-                            )}
-                            {" - "}
-                            {formatTime(
-                              session.scheduled_end
-                            )}
-                          </td>
-
-                          <td>
-                            <span
-                              className={`status-badge ${getStatusClass(
-                                session.status
-                              )}`}
-                            >
-                              {
-                                session.status
-                              }
+                        <td>
+                          <div className="schedule-cell">
+                            <strong>{formatDate(session.session_date)}</strong>
+                            <span>
+                              {formatTime(session.scheduled_start)} -{" "}
+                              {formatTime(session.scheduled_end)}
                             </span>
-                          </td>
+                          </div>
+                        </td>
 
-                          <td>
+                        <td>
+                          <span
+                            className={`lecturer-status ${getStatusClass(
+                              session.status
+                            )}`}
+                          >
+                            <span className="status-dot" />
+                            {session.status || "Unknown"}
+                          </span>
+                        </td>
 
-                            <div
-                              style={{
-                                display:
-                                  "flex",
-                                gap: "8px",
-                                flexWrap:
-                                  "wrap",
-                              }}
-                            >
+                        <td>
+                          <div className="session-actions">
+                            {session.status === "scheduled" && (
+                              <button
+                                type="button"
+                                className="action-primary"
+                                onClick={() => handleOpenSession(session)}
+                                disabled={actionLoading}
+                              >
+                                Open
+                              </button>
+                            )}
 
-                              {session.status ===
-                                "scheduled" && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleOpenSession(
-                                      session
-                                    )
-                                  }
-                                >
-                                  Open
-                                </button>
-                              )}
+                            {session.status === "active" && (
+                              <button
+                                type="button"
+                                className="action-primary"
+                                onClick={() => handleOpenSession(session)}
+                                disabled={actionLoading}
+                              >
+                                QR
+                              </button>
+                            )}
 
-                              {session.status ===
-                                "active" && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleOpenSession(
-                                      session
-                                    )
-                                  }
-                                >
-                                  QR
-                                </button>
-                              )}
+                            {session.status !== "cancelled" && (
+                              <button
+                                type="button"
+                                className="action-secondary"
+                                onClick={() => handleViewRoster(session)}
+                                disabled={actionLoading}
+                              >
+                                Roster
+                              </button>
+                            )}
 
-                              {session.status !==
-                                "cancelled" && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleViewRoster(
-                                      session
-                                    )
-                                  }
-                                >
-                                  Roster
-                                </button>
-                              )}
-
-                              {session.status ===
-                                "active" && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleCloseSession(
-                                      session
-                                    )
-                                  }
-                                >
-                                  Close
-                                </button>
-                              )}
-
-                            </div>
-
-                          </td>
-
-                        </tr>
-                      )
-                    )}
-
+                            {session.status === "active" && (
+                              <button
+                                type="button"
+                                className="action-danger"
+                                onClick={() => handleCloseSession(session)}
+                                disabled={actionLoading}
+                              >
+                                Close
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
-
                 </table>
-
-              </div>
-            )}
-
-          </div>
-
+              )}
+            </div>
+          </section>
         </section>
-
       </main>
 
-      {/* ===================================================
-          CREATE SESSION GLASS MODAL
-      =================================================== */}
+      {toast && (
+        <div className={`lecturer-toast lecturer-toast-${toast.type}`}>
+          <span className="toast-indicator" />
+          <div>
+            <strong>{toast.type === "success" ? "Done" : "Action failed"}</strong>
+            <p>{toast.message}</p>
+          </div>
+          <button type="button" onClick={() => setToast(null)}>
+            Close
+          </button>
+        </div>
+      )}
 
       {showCreateModal && (
         <div
-          className="attendance-modal-overlay"
-          onClick={() =>
-            setShowCreateModal(false)
-          }
+          className="lecturer-modal-overlay"
+          onClick={() => setShowCreateModal(false)}
         >
-
           <div
-            className="attendance-create-modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            className="lecturer-create-modal"
+            onClick={(event) => event.stopPropagation()}
           >
-
-            <div className="attendance-modal-header">
-
-              <div>
-                <h2 className="attendance-modal-title">
-                  Create Attendance Session
-                </h2>
-
-                <p className="attendance-modal-subtitle">
-                  Schedule a new attendance session for your students
-                </p>
+            <div className="modal-top">
+              <div className="modal-title-block">
+                <div className="modal-brand-icon">NS</div>
+                <div>
+                  <span className="section-kicker">LECTURER PORTAL</span>
+                  <h2>Create Attendance Session</h2>
+                  <p>
+                    Schedule a new session and open its secure attendance QR.
+                  </p>
+                </div>
               </div>
 
               <button
                 type="button"
-                className="attendance-modal-close"
-                onClick={() =>
-                  setShowCreateModal(false)
-                }
-                aria-label="Close"
+                className="modal-close"
+                onClick={() => setShowCreateModal(false)}
               >
-                ×
+                Close
               </button>
-
             </div>
 
-            <form
-              className="attendance-modal-body"
-              onSubmit={
-                handleCreateSession
-              }
-            >
-
-              {/* SESSION DETAILS */}
-
-              <div className="attendance-form-section">
-
-                <h3 className="attendance-form-section-title">
-                  Session Details
-                </h3>
-
-                <div className="attendance-form-grid">
-
-                  <div className="attendance-form-field attendance-form-full">
-
-                    <label>
-                      Section{" "}
-                      <span>*</span>
-                    </label>
-
-                    <select
-                      name="sectionId"
-                      value={
-                        form.sectionId
-                      }
-                      onChange={
-                        handleFormChange
-                      }
-                      required
-                    >
-
-                      <option value="">
-                        Select Section
+            <form onSubmit={handleCreateSession}>
+              <div className="create-form-grid">
+                <div className="create-field create-field-wide">
+                  <label>Course section</label>
+                  <select
+                    name="sectionId"
+                    value={form.sectionId}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="">Select a section</option>
+                    {sections.map((section) => (
+                      <option key={section.id} value={section.id}>
+                        {section.course_code || "Course"} —{" "}
+                        {section.section_name || `Section ${section.id}`}
                       </option>
-
-                      {sections.map(
-                        (section) => (
-                          <option
-                            key={
-                              section.id
-                            }
-                            value={
-                              section.id
-                            }
-                          >
-                            {section.course_code
-                              ? `${section.course_code} - `
-                              : ""}
-                            {section.section_name ||
-                              section.name ||
-                              `Section ${section.id}`}
-                          </option>
-                        )
-                      )}
-
-                    </select>
-
-                  </div>
-
-                  <div className="attendance-form-field attendance-form-full">
-
-                    <label>
-                      Room{" "}
-                      <small
-                        style={{
-                          color:
-                            "#94a3b8",
-                          fontWeight:
-                            500,
-                        }}
-                      >
-                        Optional
-                      </small>
-                    </label>
-
-                    <select
-                      name="roomId"
-                      value={
-                        form.roomId
-                      }
-                      onChange={
-                        handleFormChange
-                      }
-                    >
-
-                      <option value="">
-                        Select Room
-                      </option>
-
-                      {rooms.map(
-                        (room) => (
-                          <option
-                            key={
-                              room.id
-                            }
-                            value={
-                              room.id
-                            }
-                          >
-                            {room.building
-                              ? `${room.building} - `
-                              : ""}
-                            {room.room_name ||
-                              room.name ||
-                              `Room ${room.id}`}
-                          </option>
-                        )
-                      )}
-
-                    </select>
-
-                  </div>
-
+                    ))}
+                  </select>
+                  <small>
+                    Only sections returned by your authenticated backend are
+                    available here.
+                  </small>
                 </div>
 
-              </div>
-
-              {/* SCHEDULE */}
-
-              <div className="attendance-form-section">
-
-                <h3 className="attendance-form-section-title">
-                  Schedule
-                </h3>
-
-                <div className="attendance-form-grid">
-
-                  <div className="attendance-form-field attendance-form-full">
-
-                    <label>
-                      Session Date{" "}
-                      <span>*</span>
-                    </label>
-
-                    <input
-                      type="date"
-                      name="sessionDate"
-                      value={
-                        form.sessionDate
-                      }
-                      onChange={
-                        handleFormChange
-                      }
-                      required
-                    />
-
-                  </div>
-
-                  <div className="attendance-form-field">
-
-                    <label>
-                      Start Time{" "}
-                      <span>*</span>
-                    </label>
-
-                    <input
-                      type="time"
-                      name="scheduledStart"
-                      value={
-                        form.scheduledStart
-                      }
-                      onChange={
-                        handleFormChange
-                      }
-                      required
-                    />
-
-                  </div>
-
-                  <div className="attendance-form-field">
-
-                    <label>
-                      End Time{" "}
-                      <span>*</span>
-                    </label>
-
-                    <input
-                      type="time"
-                      name="scheduledEnd"
-                      value={
-                        form.scheduledEnd
-                      }
-                      onChange={
-                        handleFormChange
-                      }
-                      required
-                    />
-
-                  </div>
-
+                <div className="create-field create-field-wide">
+                  <label>Room</label>
+                  <select
+                    name="roomId"
+                    value={form.roomId}
+                    onChange={handleFormChange}
+                  >
+                    <option value="">No room selected</option>
+                    {rooms.map((room) => (
+                      <option key={room.id} value={room.id}>
+                        {room.building || "Building"} —{" "}
+                        {room.room_name || room.name || `Room ${room.id}`}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
+                <div className="create-field">
+                  <label>Session date</label>
+                  <input
+                    type="date"
+                    name="sessionDate"
+                    value={form.sessionDate}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="create-field">
+                  <label>Start time</label>
+                  <input
+                    type="time"
+                    name="scheduledStart"
+                    value={form.scheduledStart}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+
+                <div className="create-field">
+                  <label>End time</label>
+                  <input
+                    type="time"
+                    name="scheduledEnd"
+                    value={form.scheduledEnd}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
               </div>
 
-              {/* ACTIONS */}
+              <div className="create-info">
+                <div className="create-info-badge">QR</div>
+                <div>
+                  <strong>Secure attendance flow</strong>
+                  <p>
+                    After creation, open the session to generate the QR code
+                    used by enrolled students.
+                  </p>
+                </div>
+              </div>
 
-              <div className="attendance-modal-actions">
-
+              <div className="modal-actions">
                 <button
                   type="button"
-                  className="attendance-cancel-btn"
-                  onClick={() =>
-                    setShowCreateModal(
-                      false
-                    )
-                  }
+                  className="modal-secondary-button"
+                  onClick={() => setShowCreateModal(false)}
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="attendance-create-btn"
-                  disabled={
-                    loadingAction
-                  }
+                  className="modal-primary-button"
+                  disabled={actionLoading}
                 >
-                  {loadingAction
-                    ? "Creating..."
-                    : "Create Session"}
+                  {actionLoading ? "Creating..." : "Create Session"}
                 </button>
-
               </div>
-
             </form>
-
           </div>
-
         </div>
       )}
 
-      {/* ===================================================
-          QR MODAL
-      =================================================== */}
-
       {showQrModal && (
         <div
-          className="modal-overlay"
-          onClick={
-            handleCloseQrModal
-          }
+          className="lecturer-modal-overlay"
+          onClick={closeQrModal}
         >
-
           <div
-            className="modal-card"
-            style={{
-              maxWidth: "520px",
-              textAlign: "center",
-            }}
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            className="lecturer-qr-modal"
+            onClick={(event) => event.stopPropagation()}
           >
-
-            <div className="modal-header">
-
-              <div
-                style={{
-                  textAlign: "left",
-                }}
-              >
-                <h2>
-                  Attendance QR
-                </h2>
-
+            <div className="qr-modal-header">
+              <div>
+                <span className="section-kicker">LIVE ATTENDANCE</span>
+                <h2>Attendance QR</h2>
                 <p>
-                  {
-                    selectedSession?.course_code
-                  }
-                  {" - "}
-                  {
-                    selectedSession?.section_name
-                  }
+                  {selectedSession?.course_code || "Course"}{" "}
+                  {selectedSession?.course_name
+                    ? `— ${selectedSession.course_name}`
+                    : ""}
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={
-                  handleCloseQrModal
-                }
+                className="modal-close"
+                onClick={closeQrModal}
               >
-                ×
+                Close
               </button>
-
             </div>
 
-            {qrDataUrl ? (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent:
-                      "center",
-                    margin: "20px 0",
-                  }}
-                >
-                  <img
-                    src={qrDataUrl}
-                    alt="Attendance QR Code"
-                    style={{
-                      width: "320px",
-                      height: "320px",
-                      objectFit:
-                        "contain",
-                    }}
-                  />
+            <div className="qr-session-summary">
+              <div>
+                <span>Section</span>
+                <strong>{selectedSession?.section_name || "-"}</strong>
+              </div>
+              <div>
+                <span>Date</span>
+                <strong>{formatDate(selectedSession?.session_date)}</strong>
+              </div>
+              <div>
+                <span>Time</span>
+                <strong>
+                  {formatTime(selectedSession?.scheduled_start)} -{" "}
+                  {formatTime(selectedSession?.scheduled_end)}
+                </strong>
+              </div>
+            </div>
+
+            <div className="qr-main">
+              <div className="qr-frame">
+                {qrDataUrl ? (
+                  <img src={qrDataUrl} alt="Attendance QR Code" />
+                ) : (
+                  <div className="qr-placeholder">
+                    <strong>QR unavailable</strong>
+                    <span>The server did not return a QR image.</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="qr-meta">
+                <div className="qr-countdown">
+                  <span>QR expires in</span>
+                  <strong>{countdown}s</strong>
                 </div>
 
-                <div
-                  style={{
-                    marginBottom:
-                      "12px",
-                    fontWeight: "600",
-                  }}
-                >
-                  Expires in:{" "}
-                  <strong>
-                    {countdown}s
-                  </strong>
+                <div className="qr-version">
+                  <span>QR version</span>
+                  <strong>{qrVersion ?? "-"}</strong>
                 </div>
 
-                <div
-                  style={{
-                    marginBottom:
-                      "20px",
-                    fontSize: "14px",
-                    opacity: 0.7,
-                  }}
-                >
-                  QR Version:{" "}
-                  {qrVersion ?? "-"}
-                </div>
+                <p>
+                  Students enrolled in this section can use this active QR to
+                  register attendance.
+                </p>
 
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent:
-                      "center",
-                    gap: "10px",
-                    flexWrap: "wrap",
-                  }}
-                >
-
+                <div className="qr-actions">
                   <button
                     type="button"
-                    onClick={() =>
-                      refreshQr(
-                        selectedSession.id
-                      )
-                    }
+                    className="action-primary"
+                    onClick={() => refreshQr(selectedSession.id)}
                   >
                     Refresh QR
                   </button>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      handleCloseSession(
-                        selectedSession
-                      )
-                    }
-                    disabled={
-                      loadingAction
-                    }
+                    className="action-danger"
+                    onClick={() => handleCloseSession(selectedSession)}
+                    disabled={actionLoading}
                   >
                     Close Session
                   </button>
-
                 </div>
-
-              </>
-            ) : (
-              <div className="empty-state">
-
-                <h3>
-                  QR is not available
-                </h3>
-
               </div>
-            )}
-
+            </div>
           </div>
-
         </div>
       )}
 
-      {/* ===================================================
-          ROSTER MODAL
-      =================================================== */}
-
       {showRosterModal && (
         <div
-          className="modal-overlay"
-          onClick={() =>
-            setShowRosterModal(
-              false
-            )
-          }
+          className="lecturer-modal-overlay"
+          onClick={closeRosterModal}
         >
-
           <div
-            className="modal-card"
-            style={{
-              maxWidth: "900px",
-            }}
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            className="lecturer-roster-modal"
+            onClick={(event) => event.stopPropagation()}
           >
-
-            <div className="modal-header">
-
+            <div className="roster-modal-header">
               <div>
-                <h2>
-                  Session Roster
-                </h2>
-
+                <span className="section-kicker">SESSION ROSTER</span>
+                <h2>Student attendance</h2>
                 <p>
-                  {
-                    selectedSession?.course_code
-                  }
-                  {" - "}
-                  {
-                    selectedSession?.section_name
-                  }
+                  {selectedSession?.course_code || "Course"}{" "}
+                  {selectedSession?.section_name
+                    ? `— Section ${selectedSession.section_name}`
+                    : ""}
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowRosterModal(
-                    false
-                  )
-                }
+                className="modal-close"
+                onClick={closeRosterModal}
               >
-                ×
+                Close
               </button>
-
             </div>
 
-            {roster.length === 0 ? (
-              <div className="empty-state">
-
-                <h3>
-                  No students found
-                </h3>
-
-                <p>
-                  No students are enrolled in this section.
-                </p>
-
+            <div className="roster-stat-grid">
+              <div>
+                <span>Total students</span>
+                <strong>{rosterStats.total}</strong>
               </div>
-            ) : (
-              <div
-                style={{
-                  overflowX:
-                    "auto",
-                }}
-              >
+              <div className="roster-stat-present">
+                <span>Present</span>
+                <strong>{rosterStats.present}</strong>
+              </div>
+              <div className="roster-stat-late">
+                <span>Late</span>
+                <strong>{rosterStats.late}</strong>
+              </div>
+              <div className="roster-stat-absent">
+                <span>Absent</span>
+                <strong>{rosterStats.absent}</strong>
+              </div>
+              <div className="roster-stat-rate">
+                <span>Attendance rate</span>
+                <strong>{rosterAttendanceRate}%</strong>
+              </div>
+            </div>
 
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse:
-                      "collapse",
-                  }}
-                >
-
+            <div className="roster-table-wrap">
+              {roster.length === 0 ? (
+                <div className="sessions-empty roster-empty">
+                  <div className="empty-visual">ST</div>
+                  <h3>No students found</h3>
+                  <p>
+                    There are no active enrollments returned for this session.
+                  </p>
+                </div>
+              ) : (
+                <table className="roster-table">
                   <thead>
-
                     <tr>
-
-                      <th>
-                        Student
-                      </th>
-
-                      <th>
-                        Student Code
-                      </th>
-
-                      <th>
-                        Status
-                      </th>
-
-                      <th>
-                        Scanned At
-                      </th>
-
-                      <th>
-                        Source
-                      </th>
-
+                      <th>Student</th>
+                      <th>Student code</th>
+                      <th>Attendance</th>
+                      <th>Scanned at</th>
+                      <th>Source</th>
                     </tr>
-
                   </thead>
-
                   <tbody>
+                    {roster.map((student) => {
+                      const status = String(
+                        student.attendance_status ||
+                          student.status ||
+                          "absent"
+                      ).toLowerCase();
 
-                    {roster.map(
-                      (student) => (
-                        <tr
-                          key={
-                            student.student_id
-                          }
-                        >
-
+                      return (
+                        <tr key={student.student_id || student.id}>
                           <td>
-                            {
-                              student.student_name
-                            }
+                            <div className="roster-student">
+                              <div className="roster-avatar">
+                                {getInitials(
+                                  student.first_name || student.student_name,
+                                  student.last_name
+                                )}
+                              </div>
+                              <div>
+                                <strong>
+                                  {student.student_name ||
+                                    `${student.first_name || ""} ${
+                                      student.last_name || ""
+                                    }`.trim() ||
+                                    "Student"}
+                                </strong>
+                                <span>
+                                  {student.email || "Student account"}
+                                </span>
+                              </div>
+                            </div>
                           </td>
-
+                          <td>{student.student_code || "-"}</td>
                           <td>
-                            {
-                              student.student_code
-                            }
+                            <span
+                              className={`roster-status ${getRosterStatusClass(
+                                status
+                              )}`}
+                            >
+                              {status}
+                            </span>
                           </td>
-
                           <td>
-                            <strong>
-                              {
-                                student.attendance_status
-                              }
-                            </strong>
+                            {student.scanned_at
+                              ? new Date(
+                                  student.scanned_at
+                                ).toLocaleString()
+                              : "-"}
                           </td>
-
-                          <td>
-                            {
-                              student.scanned_at
-                                ? new Date(
-                                    student.scanned_at
-                                  ).toLocaleString()
-                                : "-"
-                            }
-                          </td>
-
-                          <td>
-                            {
-                              student.source ||
-                              "-"
-                            }
-                          </td>
-
+                          <td>{student.source || "-"}</td>
                         </tr>
-                      )
-                    )}
-
+                      );
+                    })}
                   </tbody>
-
                 </table>
-
-              </div>
-            )}
-
+              )}
+            </div>
           </div>
-
         </div>
       )}
-
     </div>
   );
 }
