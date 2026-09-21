@@ -16,6 +16,7 @@ import Sections from "./pages/admin/Sections";
 import Rooms from "./pages/admin/Rooms";
 import Timetable from "./pages/admin/Timetable";
 import Attendance from "./pages/admin/Attendance";
+import Reports from "./pages/admin/Reports";
 
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
 
@@ -34,6 +35,7 @@ import "./App.css";
 
 function getSavedUser() {
   try {
+
     const savedUser =
       localStorage.getItem("user");
 
@@ -44,6 +46,7 @@ function getSavedUser() {
     return JSON.parse(savedUser);
 
   } catch {
+
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 
@@ -57,6 +60,7 @@ function getSavedUser() {
 ========================================================= */
 
 function isAdminAuthenticated() {
+
   const user =
     getSavedUser();
 
@@ -86,6 +90,7 @@ function isAdminAuthenticated() {
 ========================================================= */
 
 function isLecturerAuthenticated() {
+
   const user =
     getSavedUser();
 
@@ -114,6 +119,7 @@ function isLecturerAuthenticated() {
 ========================================================= */
 
 function App() {
+
   const location =
     useLocation();
 
@@ -126,6 +132,7 @@ function App() {
     location.pathname ===
     "/register"
   ) {
+
     return <Register />;
   }
 
@@ -138,9 +145,11 @@ function App() {
     location.pathname ===
     "/admin/users"
   ) {
+
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -156,9 +165,11 @@ function App() {
     location.pathname ===
     "/admin/courses"
   ) {
+
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -181,6 +192,7 @@ function App() {
       getSavedUser();
 
     if (!user) {
+
       return <Login />;
     }
 
@@ -206,9 +218,11 @@ function App() {
 
     if (
       role !== "admin" &&
+      role !== "administrator" &&
       role !== "lecturer" &&
       role !== "instructor"
     ) {
+
       return <Login />;
     }
 
@@ -224,9 +238,11 @@ function App() {
     location.pathname ===
     "/admin/sections"
   ) {
+
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -242,9 +258,11 @@ function App() {
     location.pathname ===
     "/admin/rooms"
   ) {
+
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -260,9 +278,11 @@ function App() {
     location.pathname ===
     "/admin/timetable"
   ) {
+
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -278,13 +298,35 @@ function App() {
     location.pathname ===
     "/admin/attendance"
   ) {
+
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
     return <Attendance />;
+  }
+
+
+  /* =========================================================
+     ADMIN REPORTS
+  ========================================================= */
+
+  if (
+    location.pathname ===
+    "/admin/reports"
+  ) {
+
+    if (
+      !isAdminAuthenticated()
+    ) {
+
+      return <Login />;
+    }
+
+    return <Reports />;
   }
 
 
@@ -300,6 +342,7 @@ function App() {
     if (
       !isLecturerAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -319,6 +362,7 @@ function App() {
     if (
       !isLecturerAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -346,6 +390,7 @@ function App() {
       getSavedUser();
 
     if (!user) {
+
       return <Login />;
     }
 
@@ -361,6 +406,7 @@ function App() {
     if (
       role !== "student"
     ) {
+
       return <Login />;
     }
 
@@ -381,6 +427,7 @@ function App() {
       getSavedUser();
 
     if (!user) {
+
       return <Login />;
     }
 
@@ -396,6 +443,7 @@ function App() {
     if (
       role !== "student"
     ) {
+
       return <Login />;
     }
 
@@ -415,6 +463,7 @@ function App() {
     if (
       !isAdminAuthenticated()
     ) {
+
       return <Login />;
     }
 
@@ -435,6 +484,7 @@ function App() {
       getSavedUser();
 
     if (!user) {
+
       return <Login />;
     }
 
@@ -449,8 +499,10 @@ function App() {
 
 
     if (
-      role === "admin"
+      role === "admin" ||
+      role === "administrator"
     ) {
+
       return <AdminDashboard />;
     }
 
@@ -459,6 +511,7 @@ function App() {
       role === "lecturer" ||
       role === "instructor"
     ) {
+
       return <LecturerSessions />;
     }
 
@@ -480,6 +533,7 @@ function App() {
 ========================================================= */
 
 function Login() {
+
   const navigate =
     useNavigate();
 
@@ -509,6 +563,7 @@ function Login() {
 
       e.preventDefault();
 
+
       if (
         !email ||
         !password
@@ -526,6 +581,7 @@ function Login() {
 
         setLoading(true);
 
+
         const data =
           await loginUser(
             email,
@@ -537,6 +593,7 @@ function Login() {
           "token",
           data.token
         );
+
 
         localStorage.setItem(
           "user",
@@ -556,6 +613,7 @@ function Login() {
           "/dashboard"
         );
 
+
       } catch (error) {
 
         console.error(
@@ -563,20 +621,22 @@ function Login() {
           error
         );
 
+
         alert(
           error.message ||
           "Login failed"
         );
 
+
       } finally {
 
         setLoading(false);
-
       }
     };
 
 
   return (
+
     <div className="login-page">
 
       {/* =====================================================
@@ -735,9 +795,11 @@ function Login() {
                   }
                 >
 
-                  {showPassword
-                    ? "◉"
-                    : "◌"}
+                  {
+                    showPassword
+                      ? "◉"
+                      : "◌"
+                  }
 
                 </button>
 
@@ -767,9 +829,11 @@ function Login() {
             >
 
               <span>
-                {loading
-                  ? "Signing In..."
-                  : "Sign In"}
+                {
+                  loading
+                    ? "Signing In..."
+                    : "Sign In"
+                }
               </span>
 
               {!loading && (
@@ -852,6 +916,7 @@ function Login() {
 ========================================================= */
 
 function StudentDashboard() {
+
   const navigate =
     useNavigate();
 
@@ -886,6 +951,7 @@ function StudentDashboard() {
 
 
   return (
+
     <div className="dashboard-page">
 
       {/* =====================================================
@@ -919,9 +985,11 @@ function StudentDashboard() {
 
           <div className="profile-avatar">
 
-            {firstName
-              .charAt(0)
-              .toUpperCase()}
+            {
+              firstName
+                .charAt(0)
+                .toUpperCase()
+            }
 
           </div>
 
@@ -951,8 +1019,13 @@ function StudentDashboard() {
               )
             }
           >
-            <span>▦</span>
+
+            <span>
+              ▦
+            </span>
+
             Dashboard
+
           </button>
 
 
@@ -964,32 +1037,52 @@ function StudentDashboard() {
               )
             }
           >
-            <span>✓</span>
+
+            <span>
+              ✓
+            </span>
+
             My Attendance
+
           </button>
 
 
           <button
             className="nav-item"
           >
-            <span>◫</span>
+
+            <span>
+              ◫
+            </span>
+
             My Sessions
+
           </button>
 
 
           <button
             className="nav-item"
           >
-            <span>⚑</span>
+
+            <span>
+              ⚑
+            </span>
+
             Correction Requests
+
           </button>
 
 
           <button
             className="nav-item"
           >
-            <span>🔔</span>
+
+            <span>
+              🔔
+            </span>
+
             Notifications
+
           </button>
 
         </nav>
@@ -1043,9 +1136,11 @@ function StudentDashboard() {
 
             <div className="header-avatar">
 
-              {firstName
-                .charAt(0)
-                .toUpperCase()}
+              {
+                firstName
+                  .charAt(0)
+                  .toUpperCase()
+              }
 
             </div>
 
@@ -1360,13 +1455,16 @@ function StudentDashboard() {
 */
 
 function LecturerSections() {
+
   const [
     Component,
     setComponent,
   ] = useState(null);
 
-  const [error, setError] =
-    useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
 
   useState(() => {
@@ -1375,11 +1473,14 @@ function LecturerSections() {
       "./pages/lecturer/LecturerSections"
     )
       .then((module) => {
+
         setComponent(
           () => module.default
         );
+
       })
       .catch((err) => {
+
         console.error(
           "Failed to load LecturerSections:",
           err
@@ -1388,13 +1489,16 @@ function LecturerSections() {
         setError(
           "Failed to load lecturer sections."
         );
+
       });
 
   });
 
 
   if (error) {
+
     return (
+
       <div
         style={{
           minHeight: "100vh",
@@ -1404,14 +1508,18 @@ function LecturerSections() {
           color: "#991b1b",
         }}
       >
+
         {error}
+
       </div>
     );
   }
 
 
   if (!Component) {
+
     return (
+
       <div
         style={{
           minHeight: "100vh",
@@ -1421,7 +1529,9 @@ function LecturerSections() {
           color: "#64748b",
         }}
       >
+
         Loading sections...
+
       </div>
     );
   }
