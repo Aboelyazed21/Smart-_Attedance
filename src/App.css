@@ -3178,3 +3178,344 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* =========================================================
+   FINAL UI FIX - SIDEBAR + TEXT + RESPONSIVE
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.dashboard-page,
+.student-dashboard-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* =========================
+   DASHBOARD SIDEBAR
+========================= */
+
+.dashboard-sidebar {
+  width: 270px;
+  min-width: 270px;
+  max-width: 270px;
+  flex: 0 0 270px;
+  overflow-x: hidden;
+}
+
+.sidebar-brand {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebar-brand > div:last-child {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebar-brand h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.sidebar-brand span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.sidebar-profile {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.profile-info {
+  min-width: 0;
+  max-width: calc(100% - 55px);
+  overflow: hidden;
+}
+
+.profile-info strong,
+.profile-info span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.dashboard-nav {
+  width: 100%;
+  min-width: 0;
+}
+
+.nav-item {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-item span {
+  flex: 0 0 22px;
+  width: 22px;
+  min-width: 22px;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.dashboard-main {
+  width: calc(100% - 270px);
+  max-width: calc(100% - 270px);
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.dashboard-header {
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-header > div:first-child {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dashboard-header h1,
+.dashboard-header p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-content {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.dashboard-panel,
+.dashboard-grid,
+.dashboard-stats {
+  min-width: 0;
+}
+
+.dashboard-grid > *,
+.dashboard-stats > * {
+  min-width: 0;
+}
+
+/* =========================
+   TEXT PROTECTION
+========================= */
+
+.dashboard-page h1,
+.dashboard-page h2,
+.dashboard-page h3,
+.dashboard-page p,
+.dashboard-page span,
+.dashboard-page strong,
+.dashboard-page small,
+.dashboard-page button {
+  line-height: 1.4;
+}
+
+.dashboard-page button {
+  font-family: Arial, sans-serif;
+}
+
+/* =========================
+   STUDENT SIDEBAR
+========================= */
+
+.student-sidebar {
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  overflow-x: hidden;
+}
+
+.student-brand {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-brand > div:last-child {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-brand h2,
+.student-brand span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-profile {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-profile > div:last-child {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-profile strong,
+.student-profile span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-nav {
+  width: 100%;
+  min-width: 0;
+}
+
+.student-nav-item {
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-nav-item span {
+  flex-shrink: 0;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 1050px) {
+  .dashboard-sidebar {
+    width: 225px;
+    min-width: 225px;
+    max-width: 225px;
+    flex-basis: 225px;
+  }
+
+  .dashboard-main {
+    width: calc(100% - 225px);
+    max-width: calc(100% - 225px);
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-page {
+    display: block;
+    width: 100%;
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    flex-basis: auto;
+  }
+
+  .dashboard-main {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dashboard-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nav-item {
+    white-space: normal;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 520px) {
+  .dashboard-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-content {
+    padding: 15px;
+  }
+
+  .dashboard-header {
+    padding: 0 15px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 20px;
+  }
+}
+
+/* =========================
+   PREVENT TABLE OVERFLOW
+========================= */
+
+.users-panel,
+.users-table-wrapper {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.users-table-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* =========================
+   MODAL TEXT
+========================= */
+
+.modal-overlay {
+  overflow: auto;
+}
+
+.user-modal {
+  min-width: 0;
+}
+
+.modal-header > div {
+  min-width: 0;
+}
+
+.modal-header h2,
+.modal-header p {
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   GENERAL OVERFLOW PROTECTION
+========================= */
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
