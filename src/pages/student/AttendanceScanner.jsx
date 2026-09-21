@@ -10,6 +10,8 @@ function AttendanceScanner() {
   const scannerRef = useRef(null);
   const isScanningRef = useRef(false);
   const processingRef = useRef(false);
+  const startingRef = useRef(false);
+  const stopRequestedRef = useRef(false);
 
   const [scanResult, setScanResult] = useState(null);
   const [error, setError] = useState("");
@@ -20,12 +22,19 @@ function AttendanceScanner() {
   ========================================================= */
 
   async function startScanner() {
+    if (startingRef.current) {
+      return;
+    }
+
     if (
       isScanningRef.current ||
       scannerRef.current?.isScanning
     ) {
       return;
     }
+
+    startingRef.current = true;
+    stopRequestedRef.current = false;
 
     try {
       setError("");
@@ -71,8 +80,15 @@ function AttendanceScanner() {
           "attendance-qr-reader"
         );
 
-      scannerRef.current =
-        scanner;
+      scannerRef.current = scanner;
+
+      if (stopRequestedRef.current) {
+        scannerRef.current = null;
+        try {
+          scanner.clear();
+        } catch {}
+        return;
+      }
 
       await scanner.start(
         rearCamera.id,
@@ -161,6 +177,8 @@ function AttendanceScanner() {
       );
 
       setError(message);
+    } finally {
+      startingRef.current = false;
     }
   }
 
@@ -189,6 +207,8 @@ function AttendanceScanner() {
   ========================================================= */
 
   async function stopScanner() {
+    stopRequestedRef.current = true;
+
     const scanner =
       scannerRef.current;
 
