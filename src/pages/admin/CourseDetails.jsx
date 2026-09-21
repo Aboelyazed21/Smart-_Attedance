@@ -106,9 +106,28 @@ import {
           getSections(),
         ]);
   
+        /*
+          Courses API may return:
+          1. Array
+          2. { courses: [] }
+          3. { data: [] }
+          4. { data: { courses: [] } }
+        */
         const courses =
           Array.isArray(coursesData)
             ? coursesData
+            : Array.isArray(
+                coursesData?.courses
+              )
+            ? coursesData.courses
+            : Array.isArray(
+                coursesData?.data
+              )
+            ? coursesData.data
+            : Array.isArray(
+                coursesData?.data?.courses
+              )
+            ? coursesData.data.courses
             : [];
   
         const allEnrollments =
@@ -118,6 +137,14 @@ import {
                 enrollmentsData?.enrollments
               )
             ? enrollmentsData.enrollments
+            : Array.isArray(
+                enrollmentsData?.data
+              )
+            ? enrollmentsData.data
+            : Array.isArray(
+                enrollmentsData?.data?.enrollments
+              )
+            ? enrollmentsData.data.enrollments
             : [];
   
         const allStudents =
@@ -127,6 +154,14 @@ import {
                 studentsData?.students
               )
             ? studentsData.students
+            : Array.isArray(
+                studentsData?.data
+              )
+            ? studentsData.data
+            : Array.isArray(
+                studentsData?.data?.students
+              )
+            ? studentsData.data.students
             : [];
   
         const allSections =
@@ -136,13 +171,28 @@ import {
                 sectionsData?.sections
               )
             ? sectionsData.sections
+            : Array.isArray(
+                sectionsData?.data
+              )
+            ? sectionsData.data
+            : Array.isArray(
+                sectionsData?.data?.sections
+              )
+            ? sectionsData.data.sections
             : [];
   
+        /*
+          Find course by:
+          - id
+          - course_id
+        */
         const foundCourse =
           courses.find(
             (item) =>
               Number(item.id) ===
-              Number(id)
+                Number(id) ||
+              Number(item.course_id) ===
+                Number(id)
           );
   
         if (!foundCourse) {
@@ -151,15 +201,22 @@ import {
           );
   
           setCourse(null);
+  
           return;
         }
+  
+        const courseId =
+          Number(
+            foundCourse.id ??
+            foundCourse.course_id
+          );
   
         const courseEnrollments =
           allEnrollments.filter(
             (item) =>
               Number(
                 item.course_id
-              ) === Number(foundCourse.id) ||
+              ) === courseId ||
               String(
                 item.course_code || ""
               ).toLowerCase() ===
@@ -173,8 +230,7 @@ import {
             (section) =>
               Number(
                 section.course_id
-              ) ===
-              Number(foundCourse.id)
+              ) === courseId
           );
   
         setCourse(foundCourse);
@@ -477,19 +533,23 @@ import {
           <aside className="dashboard-sidebar">
   
             <div className="sidebar-brand">
+  
               <div className="sidebar-logo">
                 A
               </div>
   
               <div>
                 <h2>Attendify</h2>
+  
                 <span>
                   Smart Attendance
                 </span>
               </div>
+  
             </div>
   
           </aside>
+  
   
           <main className="dashboard-main">
   
@@ -525,19 +585,23 @@ import {
           <aside className="dashboard-sidebar">
   
             <div className="sidebar-brand">
+  
               <div className="sidebar-logo">
                 A
               </div>
   
               <div>
                 <h2>Attendify</h2>
+  
                 <span>
                   Smart Attendance
                 </span>
               </div>
+  
             </div>
   
           </aside>
+  
   
           <main className="dashboard-main">
   
@@ -960,6 +1024,7 @@ import {
   
                 </div>
   
+  
                 {!showAddStudent && (
                   <button
                     type="button"
@@ -970,11 +1035,13 @@ import {
                       setAddMessage("");
                     }}
                   >
+  
                     <span className="button-icon">
                       +
                     </span>
   
                     Add Student
+  
                   </button>
                 )}
   
@@ -982,6 +1049,7 @@ import {
   
   
               {showAddStudent && (
+  
                 <form
                   className="course-add-form"
                   onSubmit={
@@ -1116,6 +1184,7 @@ import {
                   </div>
   
                 </form>
+  
               )}
   
             </section>
@@ -1219,11 +1288,13 @@ import {
                       setAddMessage("");
                     }}
                   >
+  
                     <span className="button-icon">
                       +
                     </span>
   
                     Add First Student
+  
                   </button>
   
                 </div>
@@ -1271,6 +1342,7 @@ import {
   
                       {filteredEnrollments.map(
                         (enrollment) => (
+  
                           <tr
                             key={
                               enrollment.enrollment_id
@@ -1282,13 +1354,16 @@ import {
                               <div className="user-cell">
   
                                 <div className="user-table-avatar">
+  
                                   {String(
                                     enrollment.student_name ||
                                       "S"
                                   )
                                     .charAt(0)
                                     .toUpperCase()}
+  
                                 </div>
+  
   
                                 <div>
   
@@ -1316,11 +1391,13 @@ import {
                             <td>
   
                               <span className="student-email-cell">
+  
                                 {
                                   enrollment.email ||
                                   enrollment.student_email ||
                                   "—"
                                 }
+  
                               </span>
   
                             </td>
@@ -1329,10 +1406,12 @@ import {
                             <td>
   
                               <span className="course-code-badge">
+  
                                 {
                                   enrollment.student_code ||
                                   "—"
                                 }
+  
                               </span>
   
                             </td>
@@ -1341,10 +1420,12 @@ import {
                             <td>
   
                               <span className="student-section-cell">
+  
                                 {
                                   enrollment.section_name ||
                                   "—"
                                 }
+  
                               </span>
   
                             </td>
@@ -1360,10 +1441,12 @@ import {
                                     : "student-status inactive"
                                 }
                               >
+  
                                 {
                                   enrollment.status ||
                                   "active"
                                 }
+  
                               </span>
   
                             </td>
@@ -1386,6 +1469,7 @@ import {
                             </td>
   
                           </tr>
+  
                         )
                       )}
   
