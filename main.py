@@ -253,13 +253,21 @@ from models.anomaly.predict import detect_anomaly
 from rules.red_flags import generate_flags
 from analytics.attendance import generate_attendance_analytics
 from explanation.explain import build_explanation
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Smart Attendance AI",
     version="1.0.0"
 )
 
+# تفعيل الـ CORS ل السماح للواجهة الأمامية بالاتصال بالـ API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # يمكن تعديلها لاحقاً لتحديد نطاق الواجهة الأمامية بدقة
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():

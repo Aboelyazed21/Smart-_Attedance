@@ -2,7 +2,6 @@ import os
 import joblib
 import pandas as pd
 
-
 FEATURES = [
     "attendance_rate",
     "late_rate",
