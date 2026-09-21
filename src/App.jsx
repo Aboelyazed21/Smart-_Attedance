@@ -64,11 +64,19 @@ function isAdminAuthenticated() {
     return false;
   }
 
-  return (
+  const role =
     String(
-      user.role_name || ""
-    ).toLowerCase() ===
-    "admin"
+      user.role_name ||
+        user.role ||
+        user.roleName ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
+
+  return (
+    role === "admin" ||
+    role === "administrator"
   );
 }
 
