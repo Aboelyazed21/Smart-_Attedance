@@ -1,7 +1,8 @@
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
-
+https://www.figma.com/design/w5mJDQOvrEQ2kKZ2wNAWn7/Untitled?node-id=5-2&t=FwrOGuJnXItYSZbC-1
+https://www.figma.com/make/4xrJ21tVlsx5nh2rhsM3f9/Smart-Attendance-Mobile-App?t=amyNpufn5NQwg8ar-1
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
