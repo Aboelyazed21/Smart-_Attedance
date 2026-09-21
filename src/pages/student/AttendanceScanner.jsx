@@ -345,7 +345,7 @@ function AttendanceScanner() {
         );
       }
 
-      setScanResult({
+      const attendanceResult = {
         success: true,
 
         message:
@@ -373,9 +373,26 @@ function AttendanceScanner() {
 
         scannedAt:
           new Date(),
-      });
+      };
+
+      setScanResult(attendanceResult);
 
       await stopScanner();
+
+      /*
+       * After the attendance API confirms the scan, move the student
+       * to the dedicated Attendance Confirmation page.
+       *
+       * We pass the real API response data through router state so the
+       * confirmation page can display the course, section, status,
+       * time, and whether this was already recorded.
+       */
+      navigate("/student/attendance-confirmed", {
+        state: {
+          ...attendanceResult,
+          method: "QR Code",
+        },
+      });
 
     } catch (err) {
       console.error(
