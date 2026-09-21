@@ -1,27 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getSessions,
@@ -35,6 +11,7 @@ import {
   getLecturerSectionStudents,
   addStudentToLecturerSection,
   removeLecturerEnrollment,
+  updateAttendanceCorrection,
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import "./AttendanceSessions.css";
@@ -108,11 +85,45 @@ function getRosterStatusClass(status) {
 }
 
 function normalizeRoster(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.rows)) return data.rows;
-  if (Array.isArray(data?.roster)) return data.roster;
-  if (Array.isArray(data?.students)) return data.students;
-  return [];
+  const rows = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.rows)
+      ? data.rows
+      : Array.isArray(data?.roster)
+        ? data.roster
+        : Array.isArray(data?.students)
+          ? data.students
+          : [];
+
+  return rows.map((student) => ({
+    ...student,
+    student_id:
+      student.student_id ?? student.studentId ?? student.id ?? null,
+    student_code:
+      student.student_code ?? student.studentCode ?? "-",
+    first_name:
+      student.first_name ?? student.firstName ?? "",
+    last_name:
+      student.last_name ?? student.lastName ?? "",
+    email: student.email ?? "",
+    enrollment_status:
+      student.enrollment_status ?? student.enrollmentStatus ?? "active",
+    attendance_id:
+      student.attendance_id ?? student.attendance?.id ?? null,
+    attendance_status:
+      String(
+        student.attendance_status ??
+          student.attendance?.status ??
+          student.status ??
+          "absent"
+      ).toLowerCase(),
+    source: student.source ?? student.attendance?.source ?? null,
+    scanned_at:
+      student.scanned_at ?? student.attendance?.scannedAt ?? null,
+    qr_version:
+      student.qr_version ?? student.attendance?.qrVersion ?? null,
+    notes: student.notes ?? student.attendance?.notes ?? null,
+  }));
 }
 
 function AttendanceSessions() {
@@ -135,9 +146,14 @@ function AttendanceSessions() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showRosterModal, setShowRosterModal] = useState(false);
+  const [showCorrectionModal, setShowCorrectionModal] = useState(false);
 
   const [selectedSession, setSelectedSession] = useState(null);
   const [roster, setRoster] = useState([]);
+  const [correctionStudent, setCorrectionStudent] = useState(null);
+  const [correctionStatus, setCorrectionStatus] = useState("present");
+  const [correctionReason, setCorrectionReason] = useState("");
+  const [correctionLoading, setCorrectionLoading] = useState(false);
 
   const [showStudentsModal, setShowStudentsModal] = useState(false);
   const [sectionStudents, setSectionStudents] = useState([]);
@@ -452,6 +468,72 @@ function AttendanceSessions() {
     }
   }
 
+  function handleOpenCorrection(student) {
+    const currentStatus = String(
+      student?.attendance_status || "absent"
+    ).toLowerCase();
+
+    setCorrectionStudent(student);
+    setCorrectionStatus(
+      ["present", "absent", "late", "excused"].includes(currentStatus)
+        ? currentStatus
+        : "present"
+    );
+    setCorrectionReason("");
+    setShowCorrectionModal(true);
+  }
+
+  function closeCorrectionModal() {
+    setShowCorrectionModal(false);
+    setCorrectionStudent(null);
+    setCorrectionStatus("present");
+    setCorrectionReason("");
+  }
+
+  async function handleSaveCorrection(event) {
+    event.preventDefault();
+
+    if (!selectedSession?.id || !correctionStudent?.student_id) {
+      showToast("error", "Session or student information is missing.");
+      return;
+    }
+
+    const reason = correctionReason.trim();
+
+    if (!reason) {
+      showToast("error", "Please enter a reason for the correction.");
+      return;
+    }
+
+    try {
+      setCorrectionLoading(true);
+
+      await updateAttendanceCorrection(
+        correctionStudent.attendance_id || "new",
+        {
+          sessionId: selectedSession.id,
+          studentId: correctionStudent.student_id,
+          status: correctionStatus,
+          reason,
+        }
+      );
+
+      const refreshed = await getSessionRoster(selectedSession.id);
+      setRoster(normalizeRoster(refreshed));
+
+      closeCorrectionModal();
+      showToast("success", "Attendance updated successfully.");
+    } catch (err) {
+      console.error("Attendance correction error:", err);
+      showToast(
+        "error",
+        err.message || "Failed to update attendance."
+      );
+    } finally {
+      setCorrectionLoading(false);
+    }
+  }
+
   async function handleManageStudents(session) {
     const sectionId = Number(
       session?.section_id ||
@@ -617,6 +699,7 @@ function AttendanceSessions() {
   }
 
   function closeRosterModal() {
+    closeCorrectionModal();
     setShowRosterModal(false);
     setRoster([]);
     setSelectedSession(null);
@@ -1093,7 +1176,7 @@ function AttendanceSessions() {
                     <option value="">Select a section</option>
                     {sections.map((section) => (
                       <option key={section.id} value={section.id}>
-                        {section.course_code || "Course"} —{" "}
+                        {section.course_code || "Course"} â€”{" "}
                         {section.section_name || `Section ${section.id}`}
                       </option>
                     ))}
@@ -1114,7 +1197,7 @@ function AttendanceSessions() {
                     <option value="">No room selected</option>
                     {rooms.map((room) => (
                       <option key={room.id} value={room.id}>
-                        {room.building || "Building"} —{" "}
+                        {room.building || "Building"} â€”{" "}
                         {room.room_name || room.name || `Room ${room.id}`}
                       </option>
                     ))}
@@ -1204,7 +1287,7 @@ function AttendanceSessions() {
                 <p>
                   {studentsSection?.course_code || "Course"}{" "}
                   {studentsSection?.section_name
-                    ? `— Section ${studentsSection.section_name}`
+                    ? `â€” Section ${studentsSection.section_name}`
                     : ""}
                 </p>
               </div>
@@ -1473,7 +1556,7 @@ function AttendanceSessions() {
                 <p>
                   {selectedSession?.course_code || "Course"}{" "}
                   {selectedSession?.course_name
-                    ? `— ${selectedSession.course_name}`
+                    ? `â€” ${selectedSession.course_name}`
                     : ""}
                 </p>
               </div>
@@ -1573,7 +1656,7 @@ function AttendanceSessions() {
                 <p>
                   {selectedSession?.course_code || "Course"}{" "}
                   {selectedSession?.section_name
-                    ? `— Section ${selectedSession.section_name}`
+                    ? `â€” Section ${selectedSession.section_name}`
                     : ""}
                 </p>
               </div>
@@ -1628,6 +1711,7 @@ function AttendanceSessions() {
                       <th>Attendance</th>
                       <th>Scanned at</th>
                       <th>Source</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1680,6 +1764,15 @@ function AttendanceSessions() {
                               : "-"}
                           </td>
                           <td>{student.source || "-"}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="roster-edit-button"
+                              onClick={() => handleOpenCorrection(student)}
+                            >
+                              Edit attendance
+                            </button>
+                          </td>
                         </tr>
                       );
                     })}
@@ -1687,6 +1780,115 @@ function AttendanceSessions() {
                 </table>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {showCorrectionModal && (
+        <div
+          className="lecturer-modal-overlay lecturer-correction-overlay"
+          onClick={closeCorrectionModal}
+        >
+          <div
+            className="lecturer-correction-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="correction-modal-header">
+              <div>
+                <span className="section-kicker">MANUAL CORRECTION</span>
+                <h2>Update attendance</h2>
+                <p>
+                  Change the attendance status and record why the correction
+                  was made.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeCorrectionModal}
+                disabled={correctionLoading}
+              >
+                Close
+              </button>
+            </div>
+
+            <form
+              className="correction-form"
+              onSubmit={handleSaveCorrection}
+            >
+              <div className="correction-student-card">
+                <div className="roster-avatar">
+                  {getInitials(
+                    correctionStudent?.first_name,
+                    correctionStudent?.last_name
+                  )}
+                </div>
+                <div>
+                  <strong>
+                    {correctionStudent?.first_name || ""}{" "}
+                    {correctionStudent?.last_name || ""}
+                  </strong>
+                  <span>
+                    {correctionStudent?.student_code || "-"}
+                    {correctionStudent?.email
+                      ? ` · ${correctionStudent.email}`
+                      : ""}
+                  </span>
+                </div>
+              </div>
+
+              <div className="correction-field">
+                <label htmlFor="correction-status">Attendance status</label>
+                <select
+                  id="correction-status"
+                  value={correctionStatus}
+                  onChange={(event) => setCorrectionStatus(event.target.value)}
+                  disabled={correctionLoading}
+                >
+                  <option value="present">Present</option>
+                  <option value="absent">Absent</option>
+                  <option value="late">Late</option>
+                  <option value="excused">Excused</option>
+                </select>
+              </div>
+
+              <div className="correction-field">
+                <label htmlFor="correction-reason">Reason</label>
+                <textarea
+                  id="correction-reason"
+                  value={correctionReason}
+                  onChange={(event) => setCorrectionReason(event.target.value)}
+                  placeholder="Example: Student attended but the QR scan failed."
+                  rows={4}
+                  maxLength={500}
+                  disabled={correctionLoading}
+                  required
+                />
+                <span className="correction-hint">
+                  A reason is required and will be stored with the attendance
+                  record.
+                </span>
+              </div>
+
+              <div className="correction-actions">
+                <button
+                  type="button"
+                  className="modal-secondary-button"
+                  onClick={closeCorrectionModal}
+                  disabled={correctionLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="modal-primary-button"
+                  disabled={correctionLoading}
+                >
+                  {correctionLoading ? "Saving..." : "Save correction"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
