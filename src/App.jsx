@@ -28,6 +28,7 @@ import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 import { loginUser } from "./services/api";
 
 import "./App.css";
+import "./pages/student/StudentDashboard.css";
 
 
 /* =========================================================
@@ -36,18 +37,14 @@ import "./App.css";
 
 function getSavedUser() {
   try {
-
-    const savedUser =
-      localStorage.getItem("user");
+    const savedUser = localStorage.getItem("user");
 
     if (!savedUser) {
       return null;
     }
 
     return JSON.parse(savedUser);
-
   } catch {
-
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 
@@ -61,23 +58,20 @@ function getSavedUser() {
 ========================================================= */
 
 function isAdminAuthenticated() {
-
-  const user =
-    getSavedUser();
+  const user = getSavedUser();
 
   if (!user) {
     return false;
   }
 
-  const role =
-    String(
-      user.role_name ||
-        user.role ||
-        user.roleName ||
-        ""
-    )
-      .toLowerCase()
-      .trim();
+  const role = String(
+    user.role_name ||
+      user.role ||
+      user.roleName ||
+      ""
+  )
+    .toLowerCase()
+    .trim();
 
   return (
     role === "admin" ||
@@ -91,22 +85,19 @@ function isAdminAuthenticated() {
 ========================================================= */
 
 function isLecturerAuthenticated() {
-
-  const user =
-    getSavedUser();
+  const user = getSavedUser();
 
   if (!user) {
     return false;
   }
 
-  const role =
-    String(
-      user.role_name ||
-        user.role ||
-        ""
-    )
-      .toLowerCase()
-      .trim();
+  const role = String(
+    user.role_name ||
+      user.role ||
+      ""
+  )
+    .toLowerCase()
+    .trim();
 
   return (
     role === "lecturer" ||
@@ -120,20 +111,14 @@ function isLecturerAuthenticated() {
 ========================================================= */
 
 function App() {
-
-  const location =
-    useLocation();
+  const location = useLocation();
 
 
   /* =========================================================
      REGISTER
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/register"
-  ) {
-
+  if (location.pathname === "/register") {
     return <Register />;
   }
 
@@ -142,15 +127,8 @@ function App() {
      ADMIN USERS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/users"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/users") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -162,15 +140,8 @@ function App() {
      ADMIN COURSES
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/courses"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/courses") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -188,34 +159,19 @@ function App() {
     );
 
   if (courseDetailsMatch) {
-
-    const user =
-      getSavedUser();
+    const user = getSavedUser();
 
     if (!user) {
-
       return <Login />;
     }
 
-    const role =
-      String(
-        user.role_name ||
-          user.role ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
-
-
-    /*
-      Admin OR Lecturer can open
-      course details.
-
-      This is important because
-      LecturerSections navigates to:
-
-      /admin/courses/:courseId
-    */
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
 
     if (
       role !== "admin" &&
@@ -223,7 +179,6 @@ function App() {
       role !== "lecturer" &&
       role !== "instructor"
     ) {
-
       return <Login />;
     }
 
@@ -235,15 +190,8 @@ function App() {
      ADMIN SECTIONS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/sections"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/sections") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -255,15 +203,8 @@ function App() {
      ADMIN ROOMS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/rooms"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/rooms") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -275,15 +216,8 @@ function App() {
      ADMIN TIMETABLE
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/timetable"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/timetable") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -295,15 +229,8 @@ function App() {
      ADMIN ATTENDANCE
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/attendance"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/attendance") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -315,15 +242,8 @@ function App() {
      ADMIN REPORTS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/reports"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/reports") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -335,15 +255,8 @@ function App() {
      ADMIN SETTINGS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/settings"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/settings") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -355,15 +268,8 @@ function App() {
      LECTURER ATTENDANCE SESSIONS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/lecturer/sessions"
-  ) {
-
-    if (
-      !isLecturerAuthenticated()
-    ) {
-
+  if (location.pathname === "/lecturer/sessions") {
+    if (!isLecturerAuthenticated()) {
       return <Login />;
     }
 
@@ -375,24 +281,10 @@ function App() {
      LECTURER SECTIONS
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/lecturer/sections"
-  ) {
-
-    if (
-      !isLecturerAuthenticated()
-    ) {
-
+  if (location.pathname === "/lecturer/sections") {
+    if (!isLecturerAuthenticated()) {
       return <Login />;
     }
-
-    /*
-      Lazy import is not used here
-      because LecturerSections is
-      handled below by the existing
-      application structure.
-    */
 
     return <LecturerSections />;
   }
@@ -402,32 +294,22 @@ function App() {
      STUDENT ATTENDANCE SCANNER
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/student/scan"
-  ) {
-
-    const user =
-      getSavedUser();
+  if (location.pathname === "/student/scan") {
+    const user = getSavedUser();
 
     if (!user) {
-
       return <Login />;
     }
 
-    const role =
-      String(
-        user.role_name ||
-          user.role ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
 
-    if (
-      role !== "student"
-    ) {
-
+    if (role !== "student") {
       return <Login />;
     }
 
@@ -439,32 +321,22 @@ function App() {
      STUDENT ATTENDANCE
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/student/attendance"
-  ) {
-
-    const user =
-      getSavedUser();
+  if (location.pathname === "/student/attendance") {
+    const user = getSavedUser();
 
     if (!user) {
-
       return <Login />;
     }
 
-    const role =
-      String(
-        user.role_name ||
-          user.role ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
 
-    if (
-      role !== "student"
-    ) {
-
+    if (role !== "student") {
       return <Login />;
     }
 
@@ -476,15 +348,8 @@ function App() {
      ADMIN ENROLLMENT MANAGEMENT
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/admin/enrollments"
-  ) {
-
-    if (
-      !isAdminAuthenticated()
-    ) {
-
+  if (location.pathname === "/admin/enrollments") {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -493,49 +358,37 @@ function App() {
 
 
   /* =========================================================
-     ADMIN DASHBOARD
+     DASHBOARD
   ========================================================= */
 
-  if (
-    location.pathname ===
-    "/dashboard"
-  ) {
-
-    const user =
-      getSavedUser();
+  if (location.pathname === "/dashboard") {
+    const user = getSavedUser();
 
     if (!user) {
-
       return <Login />;
     }
 
-    const role =
-      String(
-        user.role_name ||
-          user.role ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
-
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
 
     if (
       role === "admin" ||
       role === "administrator"
     ) {
-
       return <AdminDashboard />;
     }
-
 
     if (
       role === "lecturer" ||
       role === "instructor"
     ) {
-
       return <LecturerSessions />;
     }
-
 
     return <StudentDashboard />;
   }
@@ -554,9 +407,7 @@ function App() {
 ========================================================= */
 
 function Login() {
-
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
   const [
     showPassword,
@@ -579,85 +430,60 @@ function Login() {
   ] = useState(false);
 
 
-  const handleSubmit =
-    async (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      e.preventDefault();
+    if (!email || !password) {
+      alert(
+        "Please enter email and password"
+      );
 
+      return;
+    }
 
-      if (
-        !email ||
-        !password
-      ) {
+    try {
+      setLoading(true);
 
-        alert(
-          "Please enter email and password"
-        );
+      const data = await loginUser(
+        email,
+        password
+      );
 
-        return;
-      }
+      localStorage.setItem(
+        "token",
+        data.token
+      );
 
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
 
-      try {
+      console.log(
+        "Login successful:",
+        data.user
+      );
 
-        setLoading(true);
+      navigate("/dashboard");
 
+    } catch (error) {
+      console.error(
+        "Login error:",
+        error
+      );
 
-        const data =
-          await loginUser(
-            email,
-            password
-          );
+      alert(
+        error.message ||
+        "Login failed"
+      );
 
-
-        localStorage.setItem(
-          "token",
-          data.token
-        );
-
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify(
-            data.user
-          )
-        );
-
-
-        console.log(
-          "Login successful:",
-          data.user
-        );
-
-
-        navigate(
-          "/dashboard"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Login error:",
-          error
-        );
-
-
-        alert(
-          error.message ||
-          "Login failed"
-        );
-
-
-      } finally {
-
-        setLoading(false);
-      }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (
-
     <div className="login-page">
 
       {/* =====================================================
@@ -741,9 +567,7 @@ function Login() {
 
           <form
             className="login-form"
-            onSubmit={
-              handleSubmit
-            }
+            onSubmit={handleSubmit}
           >
 
             <div className="form-group">
@@ -764,9 +588,7 @@ function Login() {
                   autoComplete="username"
                   value={email}
                   onChange={(e) =>
-                    setEmail(
-                      e.target.value
-                    )
+                    setEmail(e.target.value)
                   }
                 />
 
@@ -795,13 +617,9 @@ function Login() {
                   }
                   placeholder="Password"
                   autoComplete="current-password"
-                  value={
-                    password
-                  }
+                  value={password}
                   onChange={(e) =>
-                    setPassword(
-                      e.target.value
-                    )
+                    setPassword(e.target.value)
                   }
                 />
 
@@ -815,13 +633,9 @@ function Login() {
                     )
                   }
                 >
-
-                  {
-                    showPassword
-                      ? "◉"
-                      : "◌"
-                  }
-
+                  {showPassword
+                    ? "◉"
+                    : "◌"}
                 </button>
 
               </div>
@@ -844,17 +658,13 @@ function Login() {
             <button
               type="submit"
               className="sign-in-button"
-              disabled={
-                loading
-              }
+              disabled={loading}
             >
 
               <span>
-                {
-                  loading
-                    ? "Signing In..."
-                    : "Sign In"
-                }
+                {loading
+                  ? "Signing In..."
+                  : "Sign In"}
               </span>
 
               {!loading && (
@@ -937,57 +747,71 @@ function Login() {
 ========================================================= */
 
 function StudentDashboard() {
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
-
-  const [user] =
-    useState(() => {
-      return getSavedUser();
-    });
-
-
-  const handleLogout =
-    () => {
-
-      localStorage.removeItem(
-        "token"
-      );
-
-      localStorage.removeItem(
-        "user"
-      );
-
-      navigate("/");
-    };
+  const [user] = useState(() => {
+    return getSavedUser();
+  });
 
 
   const firstName =
     user?.first_name ||
+    user?.firstName ||
     "Student";
 
   const lastName =
     user?.last_name ||
+    user?.lastName ||
     "";
+
+  const fullName =
+    `${firstName} ${lastName}`.trim();
+
+  const initial =
+    firstName
+      .charAt(0)
+      .toUpperCase();
+
+
+  const today = new Date();
+
+  const formattedDate =
+    today.toLocaleDateString(
+      "en-US",
+      {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }
+    );
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/");
+  };
 
 
   return (
-
-    <div className="dashboard-page">
+    <div className="student-dashboard">
 
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside className="dashboard-sidebar">
+      <aside className="student-sidebar">
 
-        <div className="sidebar-brand">
+        {/* Brand */}
+        <div className="student-brand">
 
-          <div className="sidebar-logo">
-            🎓
+          <div className="student-brand-logo">
+            ✓
           </div>
 
-          <div>
+          <div className="student-brand-text">
 
             <h2>
               Attendify
@@ -1002,23 +826,17 @@ function StudentDashboard() {
         </div>
 
 
-        <div className="sidebar-profile">
+        {/* Profile */}
+        <div className="student-sidebar-profile">
 
-          <div className="profile-avatar">
-
-            {
-              firstName
-                .charAt(0)
-                .toUpperCase()
-            }
-
+          <div className="student-profile-avatar">
+            {initial}
           </div>
 
-          <div className="profile-info">
+          <div className="student-profile-info">
 
             <strong>
-              {firstName}{" "}
-              {lastName}
+              {fullName}
             </strong>
 
             <span>
@@ -1030,92 +848,132 @@ function StudentDashboard() {
         </div>
 
 
-        <nav className="dashboard-nav">
+        {/* Navigation */}
+        <nav className="student-navigation">
 
           <button
-            className="nav-item active"
+            className="student-nav-item active"
+            type="button"
             onClick={() =>
-              navigate(
-                "/dashboard"
-              )
+              navigate("/dashboard")
             }
           >
 
-            <span>
-              ▦
+            <span className="student-nav-icon">
+              ⌂
             </span>
 
-            Dashboard
+            <span>
+              Dashboard
+            </span>
 
           </button>
 
 
           <button
-            className="nav-item"
+            className="student-nav-item"
+            type="button"
             onClick={() =>
-              navigate(
-                "/student/scan"
-              )
+              navigate("/student/attendance")
             }
           >
 
-            <span>
+            <span className="student-nav-icon">
               ✓
             </span>
 
-            My Attendance
-
-          </button>
-
-
-          <button
-            className="nav-item"
-          >
-
             <span>
-              ◫
+              My Attendance
             </span>
 
-            My Sessions
+          </button>
+
+
+          <button
+            className="student-nav-item"
+            type="button"
+            onClick={() =>
+              navigate("/student/scan")
+            }
+          >
+
+            <span className="student-nav-icon">
+              ▣
+            </span>
+
+            <span>
+              Scan Attendance
+            </span>
 
           </button>
 
 
           <button
-            className="nav-item"
+            className="student-nav-item"
+            type="button"
           >
 
-            <span>
+            <span className="student-nav-icon">
               ⚑
             </span>
 
-            Correction Requests
+            <span>
+              Correction Requests
+            </span>
 
           </button>
 
 
           <button
-            className="nav-item"
+            className="student-nav-item"
+            type="button"
           >
 
-            <span>
-              🔔
+            <span className="student-nav-icon">
+              ♧
             </span>
 
-            Notifications
+            <span>
+              Notifications
+            </span>
+
+            <span className="student-notification-badge">
+              3
+            </span>
 
           </button>
 
         </nav>
 
 
-        <div className="sidebar-bottom">
+        {/* Sidebar Bottom */}
+        <div className="student-sidebar-footer">
+
+          <div className="student-sidebar-tip">
+
+            <div className="student-sidebar-tip-icon">
+              ✦
+            </div>
+
+            <div>
+
+              <strong>
+                Keep going!
+              </strong>
+
+              <span>
+                Every class counts.
+              </span>
+
+            </div>
+
+          </div>
+
 
           <button
-            className="nav-item logout-button"
-            onClick={
-              handleLogout
-            }
+            className="student-logout"
+            type="button"
+            onClick={handleLogout}
           >
 
             <span>
@@ -1135,33 +993,72 @@ function StudentDashboard() {
           MAIN
       ===================================================== */}
 
-      <main className="dashboard-main">
+      <main className="student-main">
 
-        <header className="dashboard-header">
+        {/* ===================================================
+            TOP BAR
+        =================================================== */}
 
-          <div>
+        <header className="student-topbar">
 
-            <h1>
-              Student Dashboard
-            </h1>
+          <div className="student-search">
 
-            <p>
-              Welcome back,{" "}
-              {firstName} 👋
-            </p>
+            <span className="student-search-icon">
+              ⌕
+            </span>
+
+            <input
+              type="text"
+              placeholder="Search courses, sessions..."
+            />
+
+            <span className="student-search-shortcut">
+              Ctrl K
+            </span>
 
           </div>
 
 
-          <div className="dashboard-user">
+          <div className="student-topbar-right">
 
-            <div className="header-avatar">
+            <button
+              className="student-topbar-notification"
+              type="button"
+            >
 
-              {
-                firstName
-                  .charAt(0)
-                  .toUpperCase()
-              }
+              ♧
+
+              <span>
+                3
+              </span>
+
+            </button>
+
+
+            <div className="student-header-divider"></div>
+
+
+            <div className="student-header-profile">
+
+              <div className="student-header-avatar">
+                {initial}
+              </div>
+
+              <div className="student-header-user">
+
+                <strong>
+                  {fullName}
+                </strong>
+
+                <span>
+                  Student
+                </span>
+
+              </div>
+
+              <span className="student-profile-arrow">
+                ▾
+              </span>
 
             </div>
 
@@ -1170,21 +1067,85 @@ function StudentDashboard() {
         </header>
 
 
-        <section className="dashboard-content">
+        {/* ===================================================
+            CONTENT
+        =================================================== */}
+
+        <section className="student-content">
 
           {/* =================================================
-              STATS
+              HERO
           ================================================= */}
 
-          <div className="dashboard-stats">
+          <div className="student-hero">
 
-            <div className="stat-card">
+            <div className="student-hero-left">
 
-              <div className="stat-icon attendance-icon">
-                ✓
+              <div className="student-hero-icon">
+                ✦
               </div>
 
               <div>
+
+                <div className="student-hero-date">
+                  {formattedDate}
+                </div>
+
+                <h1>
+                  Good Morning, {firstName}! 👋
+                </h1>
+
+                <p>
+                  Stay consistent, keep learning,
+                  and make every class count.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="student-hero-message">
+
+              <span className="student-hero-message-icon">
+                ✦
+              </span>
+
+              <div>
+
+                <strong>
+                  Your attendance
+                </strong>
+
+                <span>
+                  is your first step
+                </span>
+
+                <b>
+                  to success.
+                </b>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* =================================================
+              STATISTICS
+          ================================================= */}
+
+          <div className="student-stats">
+
+            {/* Attendance */}
+            <div className="student-stat-card attendance">
+
+              <div className="student-stat-icon">
+                %
+              </div>
+
+              <div className="student-stat-content">
 
                 <span>
                   Attendance Rate
@@ -1194,18 +1155,27 @@ function StudentDashboard() {
                   0%
                 </strong>
 
+                <small>
+                  No attendance recorded yet
+                </small>
+
+              </div>
+
+              <div className="student-stat-decoration">
+                ↗
               </div>
 
             </div>
 
 
-            <div className="stat-card">
+            {/* Sessions */}
+            <div className="student-stat-card sessions">
 
-              <div className="stat-icon session-icon">
-                ◫
+              <div className="student-stat-icon">
+                ▣
               </div>
 
-              <div>
+              <div className="student-stat-content">
 
                 <span>
                   Total Sessions
@@ -1215,18 +1185,27 @@ function StudentDashboard() {
                   0
                 </strong>
 
+                <small>
+                  Sessions attended this semester
+                </small>
+
+              </div>
+
+              <div className="student-stat-decoration">
+                ≋
               </div>
 
             </div>
 
 
-            <div className="stat-card">
+            {/* Present */}
+            <div className="student-stat-card present">
 
-              <div className="stat-icon present-icon">
+              <div className="student-stat-icon">
                 ✓
               </div>
 
-              <div>
+              <div className="student-stat-content">
 
                 <span>
                   Present
@@ -1236,18 +1215,27 @@ function StudentDashboard() {
                   0
                 </strong>
 
+                <small>
+                  Keep building your streak
+                </small>
+
+              </div>
+
+              <div className="student-stat-decoration">
+                ✓
               </div>
 
             </div>
 
 
-            <div className="stat-card">
+            {/* Absent */}
+            <div className="student-stat-card absent">
 
-              <div className="stat-icon absent-icon">
+              <div className="student-stat-icon">
                 !
               </div>
 
-              <div>
+              <div className="student-stat-content">
 
                 <span>
                   Absent
@@ -1257,6 +1245,14 @@ function StudentDashboard() {
                   0
                 </strong>
 
+                <small>
+                  Stay consistent
+                </small>
+
+              </div>
+
+              <div className="student-stat-decoration">
+                ↘
               </div>
 
             </div>
@@ -1265,149 +1261,214 @@ function StudentDashboard() {
 
 
           {/* =================================================
-              DASHBOARD GRID
+              MAIN GRID
           ================================================= */}
 
-          <div className="dashboard-grid">
+          <div className="student-main-grid">
 
-            <div className="dashboard-panel">
+            {/* ===============================================
+                TODAY'S SESSIONS
+            =============================================== */}
 
-              <div className="panel-header">
+            <div className="student-panel sessions-panel">
 
-                <div>
+              <div className="student-panel-header">
 
-                  <h2>
-                    Today's Sessions
-                  </h2>
+                <div className="student-panel-title">
 
-                  <p>
-                    Your scheduled classes
-                  </p>
+                  <div className="student-panel-icon blue">
+                    ▣
+                  </div>
+
+                  <div>
+
+                    <h2>
+                      Today's Sessions
+                    </h2>
+
+                    <p>
+                      Your scheduled classes for today
+                    </p>
+
+                  </div>
 
                 </div>
 
-                <button>
-                  View All
+
+                <button
+                  type="button"
+                  className="student-view-all"
+                  onClick={() =>
+                    navigate("/student/attendance")
+                  }
+                >
+                  View Attendance →
                 </button>
 
               </div>
 
 
-              <div className="empty-state">
+              <div className="student-empty-session">
 
-                <div className="empty-icon">
-                  ◫
+                <div className="student-session-illustration">
+
+                  <div className="student-calendar-icon">
+                    ▣
+                  </div>
+
+                  <span>
+                    00
+                  </span>
+
                 </div>
 
                 <h3>
-                  No sessions yet
+                  No sessions today
                 </h3>
 
                 <p>
-                  Your sessions will appear here.
+                  You don't have any scheduled
+                  classes for today.
                 </p>
+
+                <button
+                  type="button"
+                  className="student-primary-button"
+                  onClick={() =>
+                    navigate("/student/scan")
+                  }
+                >
+                  <span>
+                    ▣
+                  </span>
+
+                  Scan Attendance
+                </button>
 
               </div>
 
             </div>
 
 
-            <div className="dashboard-panel">
+            {/* ===============================================
+                QUICK ACTIONS
+            =============================================== */}
 
-              <div className="panel-header">
+            <div className="student-panel quick-panel">
 
-                <div>
+              <div className="student-panel-header">
 
-                  <h2>
-                    Quick Actions
-                  </h2>
+                <div className="student-panel-title">
 
-                  <p>
-                    Frequently used actions
-                  </p>
+                  <div className="student-panel-icon purple">
+                    ⚡
+                  </div>
+
+                  <div>
+
+                    <h2>
+                      Quick Actions
+                    </h2>
+
+                    <p>
+                      Frequently used actions
+                    </p>
+
+                  </div>
 
                 </div>
 
               </div>
 
 
-              <div className="quick-actions">
+              <div className="student-quick-actions">
 
                 <button
-                  className="quick-action"
+                  className="student-action-card scan"
+                  type="button"
                   onClick={() =>
-                    navigate(
-                      "/student/scan"
-                    )
+                    navigate("/student/scan")
                   }
                 >
 
-                  <span>
+                  <div className="student-action-icon">
                     ▣
-                  </span>
+                  </div>
 
-                  <div>
+                  <div className="student-action-text">
 
                     <strong>
                       Scan QR Code
                     </strong>
 
-                    <small>
+                    <span>
                       Mark your attendance
-                    </small>
+                    </span>
 
                   </div>
+
+                  <span className="student-action-arrow">
+                    →
+                  </span>
 
                 </button>
 
 
                 <button
-                  className="quick-action"
+                  className="student-action-card history"
+                  type="button"
                   onClick={() =>
-                    navigate(
-                      "/student/attendance"
-                    )
+                    navigate("/student/attendance")
                   }
                 >
 
-                  <span>
+                  <div className="student-action-icon">
                     ✓
-                  </span>
+                  </div>
 
-                  <div>
+                  <div className="student-action-text">
 
                     <strong>
                       My Attendance
                     </strong>
 
-                    <small>
-                      View attendance history
-                    </small>
+                    <span>
+                      View your attendance history
+                    </span>
 
                   </div>
+
+                  <span className="student-action-arrow">
+                    →
+                  </span>
 
                 </button>
 
 
                 <button
-                  className="quick-action"
+                  className="student-action-card correction"
+                  type="button"
                 >
 
-                  <span>
+                  <div className="student-action-icon">
                     ⚑
-                  </span>
+                  </div>
 
-                  <div>
+                  <div className="student-action-text">
 
                     <strong>
                       Request Correction
                     </strong>
 
-                    <small>
-                      Report attendance issue
-                    </small>
+                    <span>
+                      Report an attendance issue
+                    </span>
 
                   </div>
+
+                  <span className="student-action-arrow">
+                    →
+                  </span>
 
                 </button>
 
@@ -1419,21 +1480,66 @@ function StudentDashboard() {
 
 
           {/* =================================================
-              RECENT ACTIVITY
+              BOTTOM GRID
           ================================================= */}
 
-          <div className="dashboard-panel recent-panel">
+          <div className="student-bottom-grid">
 
-            <div className="panel-header">
+            {/* ===============================================
+                RECENT ACTIVITY
+            =============================================== */}
 
-              <div>
+            <div className="student-panel recent-panel">
 
-                <h2>
-                  Recent Activity
-                </h2>
+              <div className="student-panel-header">
+
+                <div className="student-panel-title">
+
+                  <div className="student-panel-icon blue">
+                    ◷
+                  </div>
+
+                  <div>
+
+                    <h2>
+                      Recent Activity
+                    </h2>
+
+                    <p>
+                      Your latest attendance activity
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="student-view-all"
+                  onClick={() =>
+                    navigate("/student/attendance")
+                  }
+                >
+                  View All →
+                </button>
+
+              </div>
+
+
+              <div className="student-empty-activity">
+
+                <div className="student-activity-icon">
+                  ◷
+                </div>
+
+                <h3>
+                  No recent activity
+                </h3>
 
                 <p>
-                  Your latest attendance activity
+                  Your attendance records will appear
+                  here once you start attending classes.
                 </p>
 
               </div>
@@ -1441,15 +1547,184 @@ function StudentDashboard() {
             </div>
 
 
-            <div className="empty-state small-empty">
+            {/* ===============================================
+                RIGHT COLUMN
+            =============================================== */}
 
-              <div className="empty-icon">
-                ◷
+            <div className="student-right-column">
+
+              {/* Motivation */}
+              <div className="student-side-card motivation-card">
+
+                <div className="student-side-card-top">
+
+                  <div className="student-side-icon">
+                    ✦
+                  </div>
+
+                  <div>
+
+                    <strong>
+                      Stay consistent
+                    </strong>
+
+                    <span>
+                      every class
+                    </span>
+
+                    <b>
+                      matters.
+                    </b>
+
+                  </div>
+
+                </div>
+
+
+                <div className="student-motivation-art">
+                  📚
+                </div>
+
+                <p className="student-motivation-text">
+                  Regular attendance helps you
+                  stay on track and get the most
+                  out of every class.
+                </p>
+
               </div>
 
-              <p>
-                No recent activity
-              </p>
+
+              {/* Attendance Goal */}
+              <div className="student-side-card goal-card">
+
+                <div className="student-side-title">
+
+                  <span>
+                    ◎
+                  </span>
+
+                  <strong>
+                    Attendance Goal
+                  </strong>
+
+                </div>
+
+                <p>
+                  Target: 75% this semester
+                </p>
+
+
+                <div className="student-goal-wrapper">
+
+                  <div className="student-goal-circle">
+
+                    <div>
+
+                      <strong>
+                        0%
+                      </strong>
+
+                      <span>
+                        Progress
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div className="student-goal-stats">
+
+                  <div>
+                    <span className="green-dot"></span>
+                    Present
+                    <strong>
+                      0
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span className="red-dot"></span>
+                    Absent
+                    <strong>
+                      0
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span className="blue-dot"></span>
+                    Total
+                    <strong>
+                      0
+                    </strong>
+                  </div>
+
+                </div>
+
+
+                <div className="student-goal-message">
+                  💡 Regular attendance leads
+                  to better academic progress.
+                </div>
+
+              </div>
+
+
+              {/* Tips */}
+              <div className="student-side-card tips-card">
+
+                <div className="student-side-title">
+
+                  <span>
+                    💡
+                  </span>
+
+                  <strong>
+                    Attendance Tips
+                  </strong>
+
+                </div>
+
+
+                <ul>
+
+                  <li>
+                    <span>
+                      ✓
+                    </span>
+
+                    Attend classes regularly
+                  </li>
+
+                  <li>
+                    <span>
+                      ✓
+                    </span>
+
+                    Check your timetable
+                  </li>
+
+                  <li>
+                    <span>
+                      ✓
+                    </span>
+
+                    Scan the QR code on time
+                  </li>
+
+                  <li>
+                    <span>
+                      ✓
+                    </span>
+
+                    Keep track of your progress
+                  </li>
+
+                </ul>
+
+              </div>
 
             </div>
 
@@ -1468,15 +1743,7 @@ function StudentDashboard() {
    LECTURER SECTIONS
 ========================================================= */
 
-/*
-  LecturerSections is loaded lazily here.
-
-  This prevents App.jsx from breaking if the
-  component is maintained separately.
-*/
-
 function LecturerSections() {
-
   const [
     Component,
     setComponent,
@@ -1489,19 +1756,15 @@ function LecturerSections() {
 
 
   useState(() => {
-
     import(
       "./pages/lecturer/LecturerSections"
     )
       .then((module) => {
-
         setComponent(
           () => module.default
         );
-
       })
       .catch((err) => {
-
         console.error(
           "Failed to load LecturerSections:",
           err
@@ -1510,16 +1773,12 @@ function LecturerSections() {
         setError(
           "Failed to load lecturer sections."
         );
-
       });
-
   });
 
 
   if (error) {
-
     return (
-
       <div
         style={{
           minHeight: "100vh",
@@ -1529,18 +1788,14 @@ function LecturerSections() {
           color: "#991b1b",
         }}
       >
-
         {error}
-
       </div>
     );
   }
 
 
   if (!Component) {
-
     return (
-
       <div
         style={{
           minHeight: "100vh",
@@ -1550,9 +1805,7 @@ function LecturerSections() {
           color: "#64748b",
         }}
       >
-
         Loading sections...
-
       </div>
     );
   }
