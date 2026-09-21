@@ -17,6 +17,7 @@ import Rooms from "./pages/admin/Rooms";
 import Timetable from "./pages/admin/Timetable";
 import Attendance from "./pages/admin/Attendance";
 import Reports from "./pages/admin/Reports";
+import Settings from "./pages/admin/Settings";
 
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
 
@@ -327,6 +328,26 @@ function App() {
     }
 
     return <Reports />;
+  }
+
+
+  /* =========================================================
+     ADMIN SETTINGS
+  ========================================================= */
+
+  if (
+    location.pathname ===
+    "/admin/settings"
+  ) {
+
+    if (
+      !isAdminAuthenticated()
+    ) {
+
+      return <Login />;
+    }
+
+    return <Settings />;
   }
 
 
