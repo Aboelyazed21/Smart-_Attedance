@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Link,
@@ -11,24 +11,16 @@ import Register from "./Register";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import Users from "./pages/admin/Users";
 import Courses from "./pages/admin/Courses";
+import CourseDetails from "./pages/admin/CourseDetails";
 import Sections from "./pages/admin/Sections";
 import Rooms from "./pages/admin/Rooms";
 import Timetable from "./pages/admin/Timetable";
 import AttendanceSessions from "./pages/lecturer/AttendanceSessions";
-import LecturerDashboard from "./pages/lecturer/LecturerDashboard";
-import LecturerSections from "./pages/lecturer/LecturerSections";
-import LecturerAttendance from "./pages/lecturer/LecturerAttendance";
-import LecturerReports from "./pages/lecturer/LecturerReports";
 import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
-import MySessions from "./pages/student/MySessions";
-import StudentProfile from "./pages/student/StudentProfile";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 
-import {
-  loginUser,
-  getMyAttendance,
-} from "./services/api";
+import { loginUser } from "./services/api";
 
 import "./App.css";
 
@@ -67,9 +59,7 @@ function isAdminAuthenticated() {
   }
 
   return (
-    String(
-      user.role_name || ""
-    ).toLowerCase() ===
+    String(user.role_name || "").toLowerCase() ===
     "admin"
   );
 }
@@ -155,6 +145,23 @@ function App() {
   }
 
   /* =========================================================
+     ADMIN COURSE DETAILS
+  ========================================================= */
+
+  const courseDetailsMatch =
+    location.pathname.match(
+      /^\/admin\/courses\/(\d+)$/
+    );
+
+  if (courseDetailsMatch) {
+    if (!isAdminAuthenticated()) {
+      return <Login />;
+    }
+
+    return <CourseDetails />;
+  }
+
+  /* =========================================================
      ADMIN SECTIONS
   ========================================================= */
 
@@ -223,57 +230,6 @@ function App() {
   }
 
   /* =========================================================
-     LECTURER SECTIONS
-  ========================================================= */
-
-  if (
-    location.pathname ===
-    "/lecturer/sections"
-  ) {
-    if (
-      !isLecturerAuthenticated()
-    ) {
-      return <Login />;
-    }
-
-    return <LecturerSections />;
-  }
-
-  /* =========================================================
-     LECTURER ATTENDANCE
-  ========================================================= */
-
-  if (
-    location.pathname ===
-    "/lecturer/attendance"
-  ) {
-    if (
-      !isLecturerAuthenticated()
-    ) {
-      return <Login />;
-    }
-
-    return <LecturerAttendance />;
-  }
-
-  /* =========================================================
-     LECTURER REPORTS
-  ========================================================= */
-
-  if (
-    location.pathname ===
-    "/lecturer/reports"
-  ) {
-    if (
-      !isLecturerAuthenticated()
-    ) {
-      return <Login />;
-    }
-
-    return <LecturerReports />;
-  }
-
-  /* =========================================================
      STUDENT ATTENDANCE SCANNER
   ========================================================= */
 
@@ -307,70 +263,6 @@ function App() {
   }
 
   /* =========================================================
-     STUDENT PROFILE
-     ========================================================= */
-
-  if (
-    location.pathname ===
-    "/student/profile"
-  ) {
-    const user =
-      getSavedUser();
-
-    if (!user) {
-      return <Login />;
-    }
-
-    const role =
-      String(
-        user.role_name ||
-          user.role ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
-
-    if (role !== "student") {
-      return <Login />;
-    }
-
-    return <StudentProfile />;
-  }
-
-  /* =========================================================
-     STUDENT MY SESSIONS
-  ========================================================= */
-
-  if (
-    location.pathname ===
-    "/student/sessions"
-  ) {
-    const user =
-      getSavedUser();
-
-    if (!user) {
-      return <Login />;
-    }
-
-    const role =
-      String(
-        user.role_name ||
-          user.role ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
-
-    if (
-      role !== "student"
-    ) {
-      return <Login />;
-    }
-
-    return <MySessions />;
-  }
-
-  /* =========================================================
      STUDENT ATTENDANCE
   ========================================================= */
 
@@ -394,9 +286,7 @@ function App() {
         .toLowerCase()
         .trim();
 
-    if (
-      role !== "student"
-    ) {
+    if (role !== "student") {
       return <Login />;
     }
 
@@ -411,9 +301,7 @@ function App() {
     location.pathname ===
     "/admin/enrollments"
   ) {
-    if (
-      !isAdminAuthenticated()
-    ) {
+    if (!isAdminAuthenticated()) {
       return <Login />;
     }
 
@@ -421,7 +309,7 @@ function App() {
   }
 
   /* =========================================================
-     DASHBOARD
+     ADMIN DASHBOARD
   ========================================================= */
 
   if (
@@ -444,24 +332,18 @@ function App() {
         .toLowerCase()
         .trim();
 
-    /* ADMIN */
-
     if (
       role === "admin"
     ) {
       return <AdminDashboard />;
     }
 
-    /* LECTURER */
-
     if (
       role === "lecturer" ||
       role === "instructor"
     ) {
-      return <LecturerDashboard />;
+      return <AttendanceSessions />;
     }
-
-    /* STUDENT */
 
     return <StudentDashboard />;
   }
@@ -563,6 +445,10 @@ function Login() {
   return (
     <div className="login-page">
 
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
       <header className="top-header">
 
         <div className="brand">
@@ -599,6 +485,10 @@ function Login() {
         </button>
 
       </header>
+
+      {/* =====================================================
+          LOGIN
+      ===================================================== */}
 
       <main className="login-area">
 
@@ -777,6 +667,10 @@ function Login() {
 
       </main>
 
+      {/* =====================================================
+          FOOTER
+      ===================================================== */}
+
       <footer className="page-footer">
 
         <div className="tagline">
@@ -816,16 +710,6 @@ function StudentDashboard() {
       return getSavedUser();
     });
 
-  const [
-    attendance,
-    setAttendance,
-  ] = useState([]);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
   const handleLogout =
     () => {
       localStorage.removeItem(
@@ -839,116 +723,20 @@ function StudentDashboard() {
       navigate("/");
     };
 
-  const loadAttendance =
-    async () => {
-      try {
-        setLoading(true);
-
-        const data =
-          await getMyAttendance();
-
-        const records =
-          Array.isArray(data)
-            ? data
-            : Array.isArray(data?.data)
-              ? data.data
-              : Array.isArray(
-                  data?.attendance
-                )
-                ? data.attendance
-                : [];
-
-        setAttendance(
-          records
-        );
-      } catch (error) {
-        console.error(
-          "Student attendance loading error:",
-          error
-        );
-
-        setAttendance([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  useEffect(() => {
-    loadAttendance();
-  }, []);
-
   const firstName =
     user?.first_name ||
-    user?.firstName ||
     "Student";
 
   const lastName =
     user?.last_name ||
-    user?.lastName ||
     "";
-
-  const getStatus =
-    (item) =>
-      String(
-        item.status ||
-          item.attendance_status ||
-          item.validation_status ||
-          ""
-      ).toLowerCase();
-
-  const totalSessions =
-    attendance.length;
-
-  const presentCount =
-    attendance.filter(
-      (item) => {
-        const status =
-          getStatus(item);
-
-        return (
-          status ===
-            "present" ||
-          status ===
-            "accepted" ||
-          status ===
-            "on_time"
-        );
-      }
-    ).length;
-
-  const lateCount =
-    attendance.filter(
-      (item) =>
-        getStatus(item) ===
-        "late"
-    ).length;
-
-  const absentCount =
-    attendance.filter(
-      (item) =>
-        getStatus(item) ===
-        "absent"
-    ).length;
-
-  const attendanceRate =
-    totalSessions > 0
-      ? Math.round(
-          (
-            (
-              presentCount +
-              lateCount
-            ) /
-            totalSessions
-          ) *
-            100
-        )
-      : 0;
-
-  const recentAttendance =
-    attendance.slice(0, 5);
 
   return (
     <div className="dashboard-page">
+
+      {/* =====================================================
+          SIDEBAR
+      ===================================================== */}
 
       <aside className="dashboard-sidebar">
 
@@ -972,20 +760,7 @@ function StudentDashboard() {
 
         </div>
 
-        <div
-          className="sidebar-profile"
-          role="button"
-          tabIndex={0}
-          onClick={() => navigate("/student/profile")}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              navigate("/student/profile");
-            }
-          }}
-          style={{ cursor: "pointer" }}
-          title="Open Student Profile"
-        >
+        <div className="sidebar-profile">
 
           <div className="profile-avatar">
 
@@ -1020,26 +795,8 @@ function StudentDashboard() {
               )
             }
           >
-            <span>
-              ▦
-            </span>
-
+            <span>▦</span>
             Dashboard
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
-            }
-          >
-            <span>
-              ✓
-            </span>
-
-            My Attendance
           </button>
 
           <button
@@ -1050,57 +807,28 @@ function StudentDashboard() {
               )
             }
           >
-            <span>
-              ▣
-            </span>
-
-            Scan QR
+            <span>✓</span>
+            My Attendance
           </button>
 
           <button
             className="nav-item"
-            onClick={() =>
-              navigate(
-                "/student/sessions"
-              )
-            }
           >
-            <span>
-              ◫
-            </span>
-
+            <span>◫</span>
             My Sessions
           </button>
 
           <button
             className="nav-item"
-            type="button"
-            onClick={() =>
-              alert(
-                "Correction Requests page will be added next."
-              )
-            }
           >
-            <span>
-              ⚑
-            </span>
-
+            <span>⚑</span>
             Correction Requests
           </button>
 
           <button
             className="nav-item"
-            type="button"
-            onClick={() =>
-              alert(
-                "Notifications page will be added next."
-              )
-            }
           >
-            <span>
-              🔔
-            </span>
-
+            <span>🔔</span>
             Notifications
           </button>
 
@@ -1125,6 +853,10 @@ function StudentDashboard() {
 
       </aside>
 
+      {/* =====================================================
+          MAIN
+      ===================================================== */}
+
       <main className="dashboard-main">
 
         <header className="dashboard-header">
@@ -1144,32 +876,23 @@ function StudentDashboard() {
 
           <div className="dashboard-user">
 
-            <button
-              type="button"
-              className="header-avatar"
-              onClick={() => navigate("/student/profile")}
-              title="Open Student Profile"
-              aria-label="Open Student Profile"
-              style={{
-                cursor: "pointer",
-                border: "none",
-                background: "transparent",
-                padding: 0,
-                font: "inherit"
-              }}
-            >
+            <div className="header-avatar">
 
               {firstName
                 .charAt(0)
                 .toUpperCase()}
 
-            </button>
+            </div>
 
           </div>
 
         </header>
 
         <section className="dashboard-content">
+
+          {/* =================================================
+              STATS
+          ================================================= */}
 
           <div className="dashboard-stats">
 
@@ -1186,9 +909,7 @@ function StudentDashboard() {
                 </span>
 
                 <strong>
-                  {loading
-                    ? "..."
-                    : `${attendanceRate}%`}
+                  0%
                 </strong>
 
               </div>
@@ -1204,13 +925,11 @@ function StudentDashboard() {
               <div>
 
                 <span>
-                  Attendance Records
+                  Total Sessions
                 </span>
 
                 <strong>
-                  {loading
-                    ? "..."
-                    : totalSessions}
+                  0
                 </strong>
 
               </div>
@@ -1230,9 +949,7 @@ function StudentDashboard() {
                 </span>
 
                 <strong>
-                  {loading
-                    ? "..."
-                    : presentCount}
+                  0
                 </strong>
 
               </div>
@@ -1248,13 +965,11 @@ function StudentDashboard() {
               <div>
 
                 <span>
-                  Late
+                  Absent
                 </span>
 
                 <strong>
-                  {loading
-                    ? "..."
-                    : lateCount}
+                  0
                 </strong>
 
               </div>
@@ -1262,6 +977,10 @@ function StudentDashboard() {
             </div>
 
           </div>
+
+          {/* =================================================
+              DASHBOARD GRID
+          ================================================= */}
 
           <div className="dashboard-grid">
 
@@ -1272,106 +991,36 @@ function StudentDashboard() {
                 <div>
 
                   <h2>
-                    Recent Attendance
+                    Today's Sessions
                   </h2>
 
                   <p>
-                    Your attendance activity
+                    Your scheduled classes
                   </p>
 
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate(
-                      "/student/attendance"
-                    )
-                  }
-                >
+                <button>
                   View All
                 </button>
 
               </div>
 
-              {recentAttendance.length ===
-              0 ? (
+              <div className="empty-state">
 
-                <div className="empty-state">
-
-                  <div className="empty-icon">
-                    ◫
-                  </div>
-
-                  <h3>
-                    No attendance yet
-                  </h3>
-
-                  <p>
-                    Your attendance records
-                    will appear here.
-                  </p>
-
+                <div className="empty-icon">
+                  ◫
                 </div>
 
-              ) : (
+                <h3>
+                  No sessions yet
+                </h3>
 
-                <div className="recent-attendance-list">
+                <p>
+                  Your sessions will appear here.
+                </p>
 
-                  {recentAttendance
-                    .slice(0, 3)
-                    .map(
-                      (
-                        item,
-                        index
-                      ) => (
-
-                        <div
-                          className="recent-attendance-item"
-                          key={
-                            item.id ||
-                            item.attendance_id ||
-                            index
-                          }
-                        >
-
-                          <div>
-
-                            <strong>
-                              {
-                                item.course_name ||
-                                item.course ||
-                                "Course"
-                              }
-                            </strong>
-
-                            <small>
-                              {
-                                item.section_name ||
-                                item.section ||
-                                "Section"
-                              }
-                            </small>
-
-                          </div>
-
-                          <span>
-                            {
-                              item.status ||
-                              item.attendance_status ||
-                              item.validation_status ||
-                              "Recorded"
-                            }
-                          </span>
-
-                        </div>
-
-                      )
-                    )}
-
-                </div>
-
-              )}
+              </div>
 
             </div>
 
@@ -1449,28 +1098,20 @@ function StudentDashboard() {
 
                 </button>
 
-                <button
-                  className="quick-action"
-                  type="button"
-                  onClick={() =>
-                    navigate(
-                      "/student/sessions"
-                    )
-                  }
-                >
+                <button className="quick-action">
 
                   <span>
-                    ◫
+                    ⚑
                   </span>
 
                   <div>
 
                     <strong>
-                      My Sessions
+                      Request Correction
                     </strong>
 
                     <small>
-                      View your class sessions
+                      Report attendance issue
                     </small>
 
                   </div>
@@ -1482,6 +1123,10 @@ function StudentDashboard() {
             </div>
 
           </div>
+
+          {/* =================================================
+              RECENT ACTIVITY
+          ================================================= */}
 
           <div className="dashboard-panel recent-panel">
 
@@ -1499,96 +1144,19 @@ function StudentDashboard() {
 
               </div>
 
-              <button
-                type="button"
-                onClick={
-                  loadAttendance
-                }
-                disabled={
-                  loading
-                }
-              >
-
-                {loading
-                  ? "Loading..."
-                  : "Refresh"}
-
-              </button>
-
             </div>
 
-            {recentAttendance.length ===
-            0 ? (
+            <div className="empty-state small-empty">
 
-              <div className="empty-state small-empty">
-
-                <div className="empty-icon">
-                  ◷
-                </div>
-
-                <p>
-                  No recent activity
-                </p>
-
+              <div className="empty-icon">
+                ◷
               </div>
 
-            ) : (
+              <p>
+                No recent activity
+              </p>
 
-              <div className="recent-attendance-list">
-
-                {recentAttendance.map(
-                  (
-                    item,
-                    index
-                  ) => (
-
-                    <div
-                      className="recent-attendance-item"
-                      key={
-                        item.id ||
-                        item.attendance_id ||
-                        index
-                      }
-                    >
-
-                      <div>
-
-                        <strong>
-                          {
-                            item.course_name ||
-                            item.course ||
-                            "Attendance"
-                          }
-                        </strong>
-
-                        <small>
-                          {
-                            item.attendance_date ||
-                            item.session_date ||
-                            item.date ||
-                            "Recent"
-                          }
-                        </small>
-
-                      </div>
-
-                      <span>
-                        {
-                          item.status ||
-                          item.attendance_status ||
-                          item.validation_status ||
-                          "Recorded"
-                        }
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            )}
+            </div>
 
           </div>
 

@@ -1146,7 +1146,7 @@ function Courses() {
             }
           >
             <span>
-              ▦
+              D
             </span>
 
             Dashboard
@@ -1162,7 +1162,7 @@ function Courses() {
             }
           >
             <span>
-              👥
+              U
             </span>
 
             Users
@@ -1173,7 +1173,7 @@ function Courses() {
             className="nav-item active"
           >
             <span>
-              📚
+              C
             </span>
 
             Courses
@@ -1189,7 +1189,7 @@ function Courses() {
             }
           >
             <span>
-              ▤
+              S
             </span>
 
             Sections
@@ -1205,7 +1205,7 @@ function Courses() {
             }
           >
             <span>
-              🏫
+              R
             </span>
 
             Rooms
@@ -1221,7 +1221,7 @@ function Courses() {
             }
           >
             <span>
-              🗓
+              T
             </span>
 
             Timetable
@@ -1237,7 +1237,7 @@ function Courses() {
             }
           >
             <span>
-              ✓
+              A
             </span>
 
             Attendance
@@ -1269,7 +1269,7 @@ function Courses() {
             }
           >
             <span>
-              ⚙
+              S
             </span>
 
             Settings
@@ -1283,7 +1283,7 @@ function Courses() {
           onClick={handleLogout}
         >
           <span>
-            ↪
+            L
           </span>
 
           Logout
@@ -1410,7 +1410,7 @@ function Courses() {
                 <div className="users-empty">
 
                   <div className="empty-icon">
-                    📚
+                    C
                   </div>
 
                   <h3>
@@ -1474,19 +1474,19 @@ function Courses() {
                             <div
                               className="user-cell"
                               onClick={() =>
-                                openCourseStudents(
-                                  course
+                                navigate(
+                                  `/admin/courses/${course.id}`
                                 )
                               }
                               style={{
                                 cursor:
                                   "pointer",
                               }}
-                              title="View course students"
+                              title="Open course details"
                             >
 
                               <div className="user-table-avatar course-avatar">
-                                📚
+                                C
                               </div>
 
                               <div>
@@ -1577,10 +1577,6 @@ function Courses() {
                                 title="Edit course"
                               >
 
-                                <span>
-                                  ✎
-                                </span>
-
                                 Edit
 
                               </button>
@@ -1596,10 +1592,6 @@ function Courses() {
                                 }
                                 title="Delete course"
                               >
-
-                                <span>
-                                  🗑
-                                </span>
 
                                 Delete
 
@@ -1859,7 +1851,7 @@ function Courses() {
                       <span>
                         {
                           editingCourse
-                            ? "✓"
+                            ? "A"
                             : "+"
                         }
                       </span>
@@ -1924,7 +1916,7 @@ function Courses() {
               <div>
 
                 <div className="modal-title-icon">
-                  📚
+                  C
                 </div>
 
                 <div>
@@ -2376,7 +2368,7 @@ function Courses() {
               <div className="users-empty">
 
                 <div className="empty-icon">
-                  👥
+                  U
                 </div>
 
                 <h3>
@@ -2543,10 +2535,6 @@ function Courses() {
                                 }
                               >
 
-                                <span>
-                                  ✎
-                                </span>
-
                                 Edit
 
                               </button>
@@ -2561,10 +2549,6 @@ function Courses() {
                                   )
                                 }
                               >
-
-                                <span>
-                                  🗑
-                                </span>
 
                                 Remove
 
