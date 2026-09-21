@@ -24,6 +24,7 @@ import LecturerSessions from "./pages/lecturer/LecturerSessions";
 import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
 import AttendanceConfirmation from "./pages/student/AttendanceConfirmation";
+import CorrectionRequests from "./pages/student/CorrectionRequests";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 
 import { loginUser } from "./services/api";
@@ -342,6 +343,33 @@ function App() {
     }
 
     return <StudentAttendance />;
+  }
+
+
+  /* =========================================================
+     STUDENT CORRECTION REQUESTS
+  ========================================================= */
+
+  if (location.pathname === "/student/correction-requests") {
+    const user = getSavedUser();
+
+    if (!user) {
+      return <Login />;
+    }
+
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
+
+    if (role !== "student") {
+      return <Login />;
+    }
+
+    return <CorrectionRequests />;
   }
 
 
@@ -925,7 +953,11 @@ function StudentDashboard() {
               <Icon name="qr" size={18} />
               <span>Scan Attendance</span>
             </button>
-            <button className="student-nav-item" type="button">
+            <button
+              className="student-nav-item"
+              type="button"
+              onClick={() => navigate("/student/correction-requests")}
+            >
               <Icon name="clock" size={18} />
               <span>Correction Requests</span>
             </button>
@@ -1042,7 +1074,11 @@ function StudentDashboard() {
                   <div><strong>My Attendance</strong><span>View your attendance history</span></div>
                   <Icon name="arrow" size={17} />
                 </button>
-                <button className="student-action-card correction" type="button">
+                <button
+                  className="student-action-card correction"
+                  type="button"
+                  onClick={() => navigate("/student/correction-requests")}
+                >
                   <div className="student-action-icon"><Icon name="clock" size={20} /></div>
                   <div><strong>Request Correction</strong><span>Report an attendance issue</span></div>
                   <Icon name="arrow" size={17} />
