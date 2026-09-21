@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import {
   getLecturerDashboardStats,
   getLecturerSections,
@@ -24,41 +23,33 @@ export default function LecturerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  /* =========================================================
-     LOAD DASHBOARD
-  ========================================================= */
-
   async function load() {
     try {
       setLoading(true);
       setError("");
 
-      const [
-        statsResult,
-        sectionsResult,
-      ] = await Promise.all([
+      const [stats, assigned] = await Promise.all([
         getLecturerDashboardStats(),
         getLecturerSections(),
       ]);
 
-      setData(statsResult || {});
+      setData(stats || {});
 
       setSections(
-        Array.isArray(sectionsResult?.sections)
-          ? sectionsResult.sections
-          : Array.isArray(sectionsResult)
-          ? sectionsResult
-          : []
+        Array.isArray(assigned?.sections)
+          ? assigned.sections
+          : Array.isArray(assigned)
+            ? assigned
+            : []
       );
-
-    } catch (error) {
+    } catch (e) {
       console.error(
         "Lecturer dashboard error:",
-        error
+        e
       );
 
       setError(
-        error.message ||
+        e.message ||
           "Failed to load lecturer dashboard."
       );
     } finally {
@@ -70,15 +61,8 @@ export default function LecturerDashboard() {
     load();
   }, []);
 
-  /* =========================================================
-     DATA
-  ========================================================= */
-
-  const stats =
-    data?.stats || {};
-
-  const lecturer =
-    data?.lecturer || {};
+  const stats = data?.stats || {};
+  const lecturer = data?.lecturer || {};
 
   const firstName =
     user?.first_name ||
@@ -92,467 +76,881 @@ export default function LecturerDashboard() {
     lecturer.lastName ||
     "";
 
-  /* =========================================================
-     LOGOUT
-  ========================================================= */
+  const fullName =
+    `${firstName} ${lastName}`.trim();
+
+  const initials =
+    `${firstName.charAt(0)}${lastName.charAt(0)}`
+      .toUpperCase();
+
+  const totalStudents =
+    Number(stats.totalEnrolledStudents || 0);
+
+  const attendanceRate =
+    Number(stats.attendancePercentage || 0);
+
+  const activeSessions =
+    Number(stats.activeSessions || 0);
+
+  const totalSessions =
+    Number(stats.totalSessions || 0);
+
+  const totalAttendance =
+    Number(stats.totalAttendanceEvents || 0);
+
+  const pendingCorrections =
+    Number(
+      stats.correctionRequests?.pending || 0
+    );
+
+  const totalCourses =
+    Number(stats.totalCourses || 0);
+
+  const totalSections =
+    Number(
+      stats.totalSections ||
+        sections.length ||
+        0
+    );
+
+  const displayedSections = useMemo(() => {
+    return sections.slice(0, 6);
+  }, [sections]);
 
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     navigate("/");
   }
 
-  /* =========================================================
-     DASHBOARD CARDS
-  ========================================================= */
+  function goToCourse(section) {
+    const courseId =
+      section.course_id ||
+      section.courseId;
 
-  const cards = [
-    [
-      "Courses",
-      stats.totalCourses || 0,
-    ],
+    if (courseId) {
+      navigate(
+        `/admin/courses/${courseId}`
+      );
+      return;
+    }
 
-    [
-      "Sections",
-      stats.totalSections ||
-        sections.length ||
-        0,
-    ],
-
-    [
-      "Enrolled Students",
-      stats.totalEnrolledStudents ||
-        stats.totalStudents ||
-        0,
-    ],
-
-    [
-      "Attendance Rate",
-      `${stats.attendancePercentage || 0}%`,
-    ],
-
-    [
-      "Total Sessions",
-      stats.totalSessions || 0,
-    ],
-
-    [
-      "Active Sessions",
-      stats.activeSessions || 0,
-    ],
-
-    [
-      "Attendance Records",
-      stats.totalAttendanceEvents ||
-        stats.attendanceEvents ||
-        0,
-    ],
-
-    [
-      "Pending Corrections",
-      stats.correctionRequests?.pending ||
-        stats.correctionRequests ||
-        0,
-    ],
-  ];
-
-  /* =========================================================
-     UI
-  ========================================================= */
+    navigate("/lecturer/sections");
+  }
 
   return (
     <div className="lecturer-dashboard">
-
       <style>{`
 
-        .lecturer-dashboard{
-          min-height:100vh;
-          background:#f6f8fc;
-          color:#172033;
-          font-family:Arial,sans-serif;
-          display:flex;
+        * {
+          box-sizing: border-box;
         }
 
-        .ld-side{
-          width:245px;
-          background:#111827;
-          color:#fff;
-          padding:22px 14px;
-          box-sizing:border-box;
-          min-height:100vh;
+        .lecturer-dashboard {
+          min-height: 100vh;
+          display: flex;
+          background: #f5f7fb;
+          color: #172033;
+          font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
         }
 
-        .ld-brand{
-          font-size:20px;
-          font-weight:800;
-          padding:10px;
+        /* ================================
+           SIDEBAR
+        ================================= */
+
+        .ld-sidebar {
+          width: 250px;
+          min-height: 100vh;
+          background: #101828;
+          color: #ffffff;
+          padding: 24px 16px;
+          display: flex;
+          flex-direction: column;
+          position: sticky;
+          top: 0;
+          align-self: flex-start;
         }
 
-        .ld-sub{
-          display:block;
-          color:#9ca3af;
-          font-size:10px;
-          letter-spacing:1px;
-          margin-top:4px;
+        .ld-brand {
+          padding: 6px 10px 22px;
+          border-bottom: 1px solid #253044;
         }
 
-        .ld-profile{
-          border-block:1px solid #263044;
-          padding:15px 8px;
-          margin:18px 0;
-          display:flex;
-          gap:10px;
-          align-items:center;
+        .ld-brand-title {
+          font-size: 21px;
+          font-weight: 800;
+          letter-spacing: -0.3px;
         }
 
-        .ld-avatar{
-          width:40px;
-          height:40px;
-          border-radius:50%;
-          background:#2563eb;
-          display:grid;
-          place-items:center;
-          font-weight:800;
-          flex-shrink:0;
+        .ld-brand-subtitle {
+          display: block;
+          margin-top: 5px;
+          color: #94a3b8;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 1.4px;
         }
 
-        .ld-nav button{
-          width:100%;
-          border:0;
-          background:transparent;
-          color:#cbd5e1;
-          text-align:left;
-          padding:12px;
-          border-radius:9px;
-          cursor:pointer;
-          margin:3px 0;
+        .ld-profile {
+          margin: 20px 0;
+          padding: 14px 10px;
+          border-bottom: 1px solid #253044;
+          display: flex;
+          align-items: center;
+          gap: 11px;
         }
 
-        .ld-nav button:hover,
-        .ld-nav .active{
-          background:#253044;
-          color:#fff;
+        .ld-avatar {
+          width: 42px;
+          height: 42px;
+          min-width: 42px;
+          border-radius: 12px;
+          background: #2563eb;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 800;
         }
 
-        .ld-bottom{
-          margin-top:28px;
+        .ld-profile-name {
+          font-size: 14px;
+          font-weight: 700;
+          line-height: 1.35;
         }
 
-        .ld-main{
-          flex:1;
-          min-width:0;
+        .ld-profile-role {
+          margin-top: 3px;
+          color: #94a3b8;
+          font-size: 11px;
         }
 
-        .ld-head{
-          background:#fff;
-          border-bottom:1px solid #e5e7eb;
-          padding:25px 32px;
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
+        .ld-navigation {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
         }
 
-        .ld-head h1{
-          margin:0;
+        .ld-nav-button {
+          width: 100%;
+          border: 0;
+          background: transparent;
+          color: #cbd5e1;
+          padding: 12px 13px;
+          border-radius: 9px;
+          text-align: left;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 600;
+          transition:
+            background 0.2s ease,
+            color 0.2s ease;
         }
 
-        .ld-head p{
-          margin:6px 0 0;
-          color:#64748b;
+        .ld-nav-button:hover {
+          background: #1d2939;
+          color: #ffffff;
         }
 
-        .ld-refresh{
-          border:0;
-          background:#2563eb;
-          color:#fff;
-          padding:10px 18px;
-          border-radius:8px;
-          cursor:pointer;
+        .ld-nav-button.active {
+          background: #253653;
+          color: #ffffff;
         }
 
-        .ld-refresh:disabled{
-          opacity:.6;
-          cursor:not-allowed;
+        .ld-logout-area {
+          margin-top: auto;
+          padding-top: 20px;
         }
 
-        .ld-content{
-          padding:28px 32px;
+        .ld-logout-button {
+          width: 100%;
+          border: 1px solid #344054;
+          background: transparent;
+          color: #cbd5e1;
+          padding: 11px 13px;
+          border-radius: 9px;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 600;
+          text-align: left;
         }
 
-        .ld-error{
-          background:#fff1f2;
-          border:1px solid #fecdd3;
-          color:#be123c;
-          padding:12px;
-          border-radius:10px;
-          margin-bottom:18px;
+        .ld-logout-button:hover {
+          background: #1d2939;
+          color: #ffffff;
         }
 
-        .ld-cards{
-          display:grid;
+        /* ================================
+           MAIN
+        ================================= */
+
+        .ld-main {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .ld-header {
+          background: #ffffff;
+          border-bottom: 1px solid #e4e7ec;
+          padding: 25px 34px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+        }
+
+        .ld-header-title {
+          margin: 0;
+          font-size: 27px;
+          line-height: 1.2;
+          letter-spacing: -0.5px;
+          color: #101828;
+        }
+
+        .ld-header-description {
+          margin: 7px 0 0;
+          color: #667085;
+          font-size: 13px;
+        }
+
+        .ld-refresh {
+          border: 1px solid #d0d5dd;
+          background: #ffffff;
+          color: #344054;
+          padding: 10px 17px;
+          border-radius: 9px;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 600;
+          transition:
+            border-color 0.2s ease,
+            background 0.2s ease;
+        }
+
+        .ld-refresh:hover:not(:disabled) {
+          background: #f8fafc;
+          border-color: #98a2b3;
+        }
+
+        .ld-refresh:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .ld-content {
+          padding: 30px 34px 40px;
+        }
+
+        /* ================================
+           ERROR
+        ================================= */
+
+        .ld-error {
+          margin-bottom: 20px;
+          padding: 13px 15px;
+          border-radius: 10px;
+          background: #fff4f4;
+          border: 1px solid #fecdca;
+          color: #b42318;
+          font-size: 13px;
+        }
+
+        /* ================================
+           STATISTICS
+        ================================= */
+
+        .ld-stat-grid {
+          display: grid;
           grid-template-columns:
-            repeat(4,1fr);
-          gap:15px;
-          margin-bottom:20px;
+            repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
         }
 
-        .ld-card,
-        .ld-panel{
-          background:#fff;
-          border:1px solid #e5e7eb;
-          border-radius:14px;
-          padding:18px;
+        .ld-stat-card {
+          background: #ffffff;
+          border: 1px solid #e4e7ec;
+          border-radius: 14px;
+          padding: 19px;
           box-shadow:
-            0 4px 16px #0f172a0a;
+            0 2px 8px rgba(16, 24, 40, 0.03);
+          transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
         }
 
-        .ld-card span{
-          color:#64748b;
-          font-size:12px;
+        .ld-stat-card:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            0 8px 20px rgba(16, 24, 40, 0.06);
         }
 
-        .ld-card strong{
-          display:block;
-          font-size:26px;
-          margin-top:8px;
+        .ld-stat-label {
+          color: #667085;
+          font-size: 12px;
+          font-weight: 600;
         }
 
-        .ld-grid{
-          display:grid;
+        .ld-stat-value {
+          display: block;
+          margin-top: 8px;
+          color: #101828;
+          font-size: 27px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+        }
+
+        .ld-stat-description {
+          margin-top: 5px;
+          color: #98a2b3;
+          font-size: 11px;
+        }
+
+        /* ================================
+           SECONDARY STATS
+        ================================= */
+
+        .ld-secondary-grid {
+          display: grid;
           grid-template-columns:
-            1.4fr 1fr;
-          gap:18px;
+            repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
         }
 
-        .ld-panel h2{
-          margin:0;
-          font-size:17px;
+        .ld-secondary-card {
+          background: #ffffff;
+          border: 1px solid #e4e7ec;
+          border-radius: 14px;
+          padding: 17px 18px;
         }
 
-        .ld-panel p{
-          color:#64748b;
-          font-size:13px;
+        .ld-secondary-label {
+          color: #667085;
+          font-size: 12px;
         }
 
-        .ld-row{
-          display:flex;
-          justify-content:space-between;
-          gap:10px;
-          padding:13px;
-          border:1px solid #edf1f5;
-          border-radius:10px;
-          margin-top:9px;
+        .ld-secondary-value {
+          display: block;
+          margin-top: 6px;
+          color: #172033;
+          font-size: 20px;
+          font-weight: 750;
         }
 
-        .ld-row small{
-          display:block;
-          color:#64748b;
-          margin-top:4px;
-        }
+        /* ================================
+           MAIN GRID
+        ================================= */
 
-        .ld-badge{
-          background:#eff6ff;
-          color:#2563eb;
-          padding:6px 9px;
-          border-radius:8px;
-          font-size:11px;
-          white-space:nowrap;
-        }
-
-        .ld-actions{
-          display:grid;
+        .ld-main-grid {
+          display: grid;
           grid-template-columns:
-            1fr 1fr;
-          gap:10px;
+            minmax(0, 1.45fr)
+            minmax(300px, 0.85fr);
+          gap: 20px;
+          margin-bottom: 22px;
         }
 
-        .ld-action{
-          padding:14px;
-          border:1px solid #e2e8f0;
-          background:#fff;
-          border-radius:10px;
-          text-align:left;
-          cursor:pointer;
+        .ld-panel {
+          background: #ffffff;
+          border: 1px solid #e4e7ec;
+          border-radius: 15px;
+          padding: 21px;
+          box-shadow:
+            0 2px 8px rgba(16, 24, 40, 0.03);
         }
 
-        .ld-action:hover{
-          border-color:#2563eb;
+        .ld-panel-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 15px;
+          margin-bottom: 17px;
         }
 
-        @media(max-width:1000px){
+        .ld-panel-title {
+          margin: 0;
+          color: #101828;
+          font-size: 17px;
+          font-weight: 750;
+        }
 
-          .ld-cards{
+        .ld-panel-subtitle {
+          margin: 5px 0 0;
+          color: #667085;
+          font-size: 12px;
+        }
+
+        .ld-view-all {
+          border: 0;
+          background: transparent;
+          color: #2563eb;
+          padding: 5px;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 650;
+        }
+
+        .ld-view-all:hover {
+          text-decoration: underline;
+        }
+
+        /* ================================
+           SECTION LIST
+        ================================= */
+
+        .ld-section-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .ld-section-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 15px;
+          padding: 14px;
+          border: 1px solid #eaecf0;
+          border-radius: 11px;
+          background: #ffffff;
+          transition:
+            border-color 0.2s ease,
+            background 0.2s ease;
+        }
+
+        .ld-section-item:hover {
+          border-color: #cbd5e1;
+          background: #fafcff;
+        }
+
+        .ld-section-info {
+          min-width: 0;
+        }
+
+        .ld-section-code {
+          display: inline-block;
+          color: #175cd3;
+          background: #eff8ff;
+          border: 1px solid #d1e9ff;
+          padding: 4px 7px;
+          border-radius: 6px;
+          font-size: 10px;
+          font-weight: 750;
+          margin-bottom: 6px;
+        }
+
+        .ld-section-title {
+          color: #101828;
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        .ld-section-meta {
+          margin-top: 4px;
+          color: #667085;
+          font-size: 11px;
+        }
+
+        .ld-section-right {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          flex-shrink: 0;
+        }
+
+        .ld-student-count {
+          background: #f2f4f7;
+          color: #344054;
+          border-radius: 7px;
+          padding: 7px 9px;
+          font-size: 10px;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+
+        .ld-section-manage {
+          border: 1px solid #d0d5dd;
+          background: #ffffff;
+          color: #344054;
+          border-radius: 7px;
+          padding: 7px 9px;
+          cursor: pointer;
+          font-size: 10px;
+          font-weight: 650;
+          white-space: nowrap;
+        }
+
+        .ld-section-manage:hover {
+          border-color: #2563eb;
+          color: #2563eb;
+        }
+
+        /* ================================
+           QUICK ACTIONS
+        ================================= */
+
+        .ld-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 11px;
+        }
+
+        .ld-action {
+          min-height: 104px;
+          border: 1px solid #e4e7ec;
+          background: #ffffff;
+          border-radius: 11px;
+          padding: 15px;
+          text-align: left;
+          cursor: pointer;
+          transition:
+            border-color 0.2s ease,
+            background 0.2s ease,
+            transform 0.2s ease;
+        }
+
+        .ld-action:hover {
+          border-color: #b2ccff;
+          background: #f8fbff;
+          transform: translateY(-1px);
+        }
+
+        .ld-action-title {
+          display: block;
+          color: #101828;
+          font-size: 13px;
+          font-weight: 750;
+        }
+
+        .ld-action-description {
+          display: block;
+          margin-top: 7px;
+          color: #667085;
+          font-size: 11px;
+          line-height: 1.5;
+        }
+
+        /* ================================
+           ATTENDANCE SUMMARY
+        ================================= */
+
+        .ld-attendance-panel {
+          display: grid;
+          grid-template-columns:
+            minmax(220px, 0.7fr)
+            minmax(280px, 1.3fr);
+          gap: 25px;
+          align-items: center;
+        }
+
+        .ld-rate {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+        }
+
+        .ld-rate-circle {
+          width: 82px;
+          height: 82px;
+          border-radius: 50%;
+          border: 7px solid #e8eefc;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .ld-rate-circle span {
+          color: #175cd3;
+          font-size: 17px;
+          font-weight: 800;
+        }
+
+        .ld-rate-title {
+          color: #101828;
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        .ld-rate-text {
+          margin-top: 5px;
+          color: #667085;
+          font-size: 11px;
+          line-height: 1.5;
+        }
+
+        .ld-progress-area {
+          width: 100%;
+        }
+
+        .ld-progress-header {
+          display: flex;
+          justify-content: space-between;
+          color: #667085;
+          font-size: 11px;
+          margin-bottom: 7px;
+        }
+
+        .ld-progress {
+          width: 100%;
+          height: 8px;
+          background: #eaecf0;
+          border-radius: 20px;
+          overflow: hidden;
+        }
+
+        .ld-progress-bar {
+          height: 100%;
+          background: #2563eb;
+          border-radius: inherit;
+          transition: width 0.4s ease;
+        }
+
+        /* ================================
+           EMPTY / LOADING
+        ================================= */
+
+        .ld-empty {
+          padding: 35px 15px;
+          text-align: center;
+          color: #667085;
+          border: 1px dashed #d0d5dd;
+          border-radius: 10px;
+          font-size: 12px;
+        }
+
+        .ld-loading {
+          padding: 35px;
+          text-align: center;
+          color: #667085;
+          font-size: 13px;
+        }
+
+        /* ================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 1150px) {
+          .ld-stat-grid {
             grid-template-columns:
-              1fr 1fr;
+              repeat(2, minmax(0, 1fr));
           }
 
-          .ld-grid{
-            grid-template-columns:1fr;
+          .ld-secondary-grid {
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr));
           }
 
+          .ld-main-grid {
+            grid-template-columns: 1fr;
+          }
         }
 
-        @media(max-width:700px){
-
-          .ld-side{
-            width:72px;
+        @media (max-width: 800px) {
+          .lecturer-dashboard {
+            display: block;
           }
 
-          .ld-brand span,
-          .ld-sub,
-          .ld-profile div:last-child,
-          .ld-nav span:last-child{
-            display:none;
+          .ld-sidebar {
+            width: 100%;
+            min-height: auto;
+            position: relative;
+            padding: 14px;
           }
 
-          .ld-content{
-            padding:18px;
+          .ld-brand {
+            padding-bottom: 14px;
           }
 
-          .ld-head{
-            padding:20px;
+          .ld-profile {
+            margin: 12px 0;
           }
 
-          .ld-cards{
+          .ld-navigation {
+            display: grid;
             grid-template-columns:
-              1fr 1fr;
+              repeat(2, minmax(0, 1fr));
           }
 
+          .ld-logout-area {
+            margin-top: 10px;
+          }
+
+          .ld-header {
+            padding: 20px;
+          }
+
+          .ld-content {
+            padding: 20px;
+          }
+
+          .ld-attendance-panel {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .ld-header {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .ld-stat-grid,
+          .ld-secondary-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .ld-actions {
+            grid-template-columns: 1fr;
+          }
+
+          .ld-section-item {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .ld-section-right {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .ld-section-manage {
+            flex: 1;
+          }
+
+          .ld-navigation {
+            grid-template-columns: 1fr;
+          }
+
+          .ld-header-title {
+            font-size: 23px;
+          }
         }
 
       `}</style>
 
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside className="ld-side">
+      <aside className="ld-sidebar">
 
         <div className="ld-brand">
-          🎓 <span>Attendify</span>
+          <div className="ld-brand-title">
+            Attendify
+          </div>
 
-          <small className="ld-sub">
+          <span className="ld-brand-subtitle">
             LECTURER PORTAL
-          </small>
+          </span>
         </div>
 
         <div className="ld-profile">
 
           <div className="ld-avatar">
-            {firstName
-              .charAt(0)
-              .toUpperCase()}
+            {initials || "L"}
           </div>
 
           <div>
-            <strong>
-              {firstName} {lastName}
-            </strong>
+            <div className="ld-profile-name">
+              {fullName}
+            </div>
 
-            <small className="ld-sub">
+            <div className="ld-profile-role">
               Lecturer
-            </small>
+            </div>
           </div>
 
         </div>
 
-        <nav className="ld-nav">
+        <nav className="ld-navigation">
 
           <button
-            className="active"
+            className="ld-nav-button active"
+            type="button"
             onClick={() =>
               navigate("/dashboard")
             }
           >
-            ▦ <span>Dashboard</span>
+            Dashboard
           </button>
 
           <button
+            className="ld-nav-button"
+            type="button"
             onClick={() =>
-              navigate(
-                "/lecturer/sessions"
-              )
+              navigate("/lecturer/sessions")
             }
           >
-            ◫{" "}
-            <span>
-              Attendance Sessions
-            </span>
+            Attendance Sessions
           </button>
 
           <button
+            className="ld-nav-button"
+            type="button"
             onClick={() =>
-              navigate(
-                "/lecturer/sections"
-              )
+              navigate("/lecturer/sections")
             }
           >
-            ▤{" "}
-            <span>
-              My Sections
-            </span>
+            My Sections
           </button>
 
           <button
+            className="ld-nav-button"
+            type="button"
             onClick={() =>
-              navigate(
-                "/lecturer/attendance"
-              )
+              navigate("/lecturer/attendance")
             }
           >
-            ✓{" "}
-            <span>
-              Attendance
-            </span>
+            Attendance
           </button>
 
           <button
+            className="ld-nav-button"
+            type="button"
             onClick={() =>
-              navigate(
-                "/lecturer/reports"
-              )
+              navigate("/lecturer/reports")
             }
           >
-            ▥{" "}
-            <span>
-              Reports
-            </span>
+            Reports
           </button>
 
         </nav>
 
-        <div className="ld-bottom ld-nav">
+        <div className="ld-logout-area">
 
-          <button onClick={logout}>
-            ↪ <span>Logout</span>
+          <button
+            className="ld-logout-button"
+            type="button"
+            onClick={logout}
+          >
+            Logout
           </button>
 
         </div>
 
       </aside>
 
-      {/* =====================================================
-          MAIN
-      ===================================================== */}
-
       <main className="ld-main">
 
-        <header className="ld-head">
+        <header className="ld-header">
 
           <div>
-            <h1>
+            <h1 className="ld-header-title">
               Lecturer Dashboard
             </h1>
 
-            <p>
-              Manage your courses,
+            <p className="ld-header-description">
+              Manage your courses, sections,
               sessions and attendance.
             </p>
           </div>
 
           <button
             className="ld-refresh"
+            type="button"
             onClick={load}
             disabled={loading}
           >
@@ -571,197 +969,445 @@ export default function LecturerDashboard() {
             </div>
           )}
 
-          {/* =================================================
-              STATISTICS
-          ================================================= */}
+          {/* ================================
+              MAIN STATISTICS
+          ================================= */}
 
-          <div className="ld-cards">
+          <div className="ld-stat-grid">
 
-            {cards.map(
-              ([label, value]) => (
-                <div
-                  className="ld-card"
-                  key={label}
-                >
-                  <span>
-                    {label}
-                  </span>
+            <div className="ld-stat-card">
+              <span className="ld-stat-label">
+                Courses
+              </span>
 
-                  <strong>
-                    {loading
-                      ? "..."
-                      : value}
-                  </strong>
-                </div>
-              )
-            )}
+              <strong className="ld-stat-value">
+                {loading
+                  ? "..."
+                  : totalCourses}
+              </strong>
+
+              <div className="ld-stat-description">
+                Assigned courses
+              </div>
+            </div>
+
+            <div className="ld-stat-card">
+              <span className="ld-stat-label">
+                Sections
+              </span>
+
+              <strong className="ld-stat-value">
+                {loading
+                  ? "..."
+                  : totalSections}
+              </strong>
+
+              <div className="ld-stat-description">
+                Active teaching sections
+              </div>
+            </div>
+
+            <div className="ld-stat-card">
+              <span className="ld-stat-label">
+                Enrolled Students
+              </span>
+
+              <strong className="ld-stat-value">
+                {loading
+                  ? "..."
+                  : totalStudents}
+              </strong>
+
+              <div className="ld-stat-description">
+                Students across your sections
+              </div>
+            </div>
+
+            <div className="ld-stat-card">
+              <span className="ld-stat-label">
+                Attendance Rate
+              </span>
+
+              <strong className="ld-stat-value">
+                {loading
+                  ? "..."
+                  : `${attendanceRate}%`}
+              </strong>
+
+              <div className="ld-stat-description">
+                Overall attendance
+              </div>
+            </div>
 
           </div>
 
-          {/* =================================================
-              SECTIONS + ACTIONS
-          ================================================= */}
+          {/* ================================
+              SECONDARY STATISTICS
+          ================================= */}
 
-          <div className="ld-grid">
+          <div className="ld-secondary-grid">
 
-            <div className="ld-panel">
+            <div className="ld-secondary-card">
+              <span className="ld-secondary-label">
+                Total Sessions
+              </span>
 
-              <h2>
-                My Sections
-              </h2>
-
-              <p>
-                Sections assigned to you
-              </p>
-
-              {sections.length === 0 ? (
-
-                <p>
-                  No assigned sections
-                  found.
-                </p>
-
-              ) : (
-
-                sections
-                  .slice(0, 6)
-                  .map((section) => (
-
-                    <div
-                      className="ld-row"
-                      key={
-                        section.section_id ||
-                        section.id
-                      }
-                    >
-
-                      <div>
-
-                        <strong>
-                          {section.course_code ||
-                            "Course"}
-
-                          {" — "}
-
-                          Section{" "}
-
-                          {section.section_name ||
-                            "-"}
-                        </strong>
-
-                        <small>
-                          {section.course_name ||
-                            ""}
-
-                          {" · "}
-
-                          {section.academic_year ||
-                            ""}
-                        </small>
-
-                      </div>
-
-                      <span className="ld-badge">
-                        {section.enrolled_students ||
-                          0}{" "}
-                        students
-                      </span>
-
-                    </div>
-
-                  ))
-              )}
-
+              <strong className="ld-secondary-value">
+                {loading
+                  ? "..."
+                  : totalSessions}
+              </strong>
             </div>
 
+            <div className="ld-secondary-card">
+              <span className="ld-secondary-label">
+                Active Sessions
+              </span>
+
+              <strong className="ld-secondary-value">
+                {loading
+                  ? "..."
+                  : activeSessions}
+              </strong>
+            </div>
+
+            <div className="ld-secondary-card">
+              <span className="ld-secondary-label">
+                Attendance Records
+              </span>
+
+              <strong className="ld-secondary-value">
+                {loading
+                  ? "..."
+                  : totalAttendance}
+              </strong>
+            </div>
+
+            <div className="ld-secondary-card">
+              <span className="ld-secondary-label">
+                Pending Corrections
+              </span>
+
+              <strong className="ld-secondary-value">
+                {loading
+                  ? "..."
+                  : pendingCorrections}
+              </strong>
+            </div>
+
+          </div>
+
+          {/* ================================
+              SECTIONS + QUICK ACTIONS
+          ================================= */}
+
+          <div className="ld-main-grid">
+
             <div className="ld-panel">
 
-              <h2>
-                Quick Actions
-              </h2>
+              <div className="ld-panel-header">
 
-              <p>
-                Lecturer tools
-              </p>
+                <div>
+                  <h2 className="ld-panel-title">
+                    My Sections
+                  </h2>
 
-              <div className="ld-actions">
-
-                <button
-                  className="ld-action"
-                  onClick={() =>
-                    navigate(
-                      "/lecturer/sessions"
-                    )
-                  }
-                >
-                  <b>
-                    Sessions
-                  </b>
-
-                  <br />
-
-                  <small>
-                    Create QR sessions
-                  </small>
-                </button>
+                  <p className="ld-panel-subtitle">
+                    Sections assigned to you
+                  </p>
+                </div>
 
                 <button
-                  className="ld-action"
-                  onClick={() =>
-                    navigate(
-                      "/lecturer/attendance"
-                    )
-                  }
-                >
-                  <b>
-                    Attendance
-                  </b>
-
-                  <br />
-
-                  <small>
-                    Review attendance
-                  </small>
-                </button>
-
-                <button
-                  className="ld-action"
-                  onClick={() =>
-                    navigate(
-                      "/lecturer/reports"
-                    )
-                  }
-                >
-                  <b>
-                    Reports
-                  </b>
-
-                  <br />
-
-                  <small>
-                    View summaries
-                  </small>
-                </button>
-
-                <button
-                  className="ld-action"
+                  className="ld-view-all"
+                  type="button"
                   onClick={() =>
                     navigate(
                       "/lecturer/sections"
                     )
                   }
                 >
-                  <b>
-                    Sections
-                  </b>
-
-                  <br />
-
-                  <small>
-                    View assigned
-                    sections
-                  </small>
+                  View all
                 </button>
+
+              </div>
+
+              {loading ? (
+                <div className="ld-loading">
+                  Loading sections...
+                </div>
+              ) : displayedSections.length === 0 ? (
+                <div className="ld-empty">
+                  No assigned sections found.
+                </div>
+              ) : (
+                <div className="ld-section-list">
+
+                  {displayedSections.map(
+                    (section) => {
+
+                      const sectionId =
+                        section.section_id ||
+                        section.id;
+
+                      const courseCode =
+                        section.course_code ||
+                        "COURSE";
+
+                      const courseName =
+                        section.course_name ||
+                        "Course";
+
+                      const sectionName =
+                        section.section_name ||
+                        "-";
+
+                      const students =
+                        Number(
+                          section.enrolled_students ||
+                            section.student_count ||
+                            0
+                        );
+
+                      return (
+                        <div
+                          className="ld-section-item"
+                          key={sectionId}
+                        >
+
+                          <div className="ld-section-info">
+
+                            <span className="ld-section-code">
+                              {courseCode}
+                            </span>
+
+                            <div className="ld-section-title">
+                              {courseName}
+                              {" — "}
+                              Section {sectionName}
+                            </div>
+
+                            <div className="ld-section-meta">
+                              {section.academic_year ||
+                                "-"}
+                              {" · "}
+                              {section.semester ||
+                                "Current semester"}
+                            </div>
+
+                          </div>
+
+                          <div className="ld-section-right">
+
+                            <span className="ld-student-count">
+                              {students} students
+                            </span>
+
+                            <button
+                              className="ld-section-manage"
+                              type="button"
+                              onClick={() =>
+                                goToCourse(
+                                  section
+                                )
+                              }
+                            >
+                              Manage
+                            </button>
+
+                          </div>
+
+                        </div>
+                      );
+                    }
+                  )}
+
+                </div>
+              )}
+
+            </div>
+
+            <div className="ld-panel">
+
+              <div className="ld-panel-header">
+
+                <div>
+                  <h2 className="ld-panel-title">
+                    Quick Actions
+                  </h2>
+
+                  <p className="ld-panel-subtitle">
+                    Frequently used lecturer tools
+                  </p>
+                </div>
+
+              </div>
+
+              <div className="ld-actions">
+
+                <button
+                  className="ld-action"
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      "/lecturer/sessions"
+                    )
+                  }
+                >
+                  <span className="ld-action-title">
+                    Attendance Sessions
+                  </span>
+
+                  <span className="ld-action-description">
+                    Create and manage QR attendance
+                    sessions.
+                  </span>
+                </button>
+
+                <button
+                  className="ld-action"
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      "/lecturer/sections"
+                    )
+                  }
+                >
+                  <span className="ld-action-title">
+                    My Sections
+                  </span>
+
+                  <span className="ld-action-description">
+                    View your assigned sections and
+                    enrolled students.
+                  </span>
+                </button>
+
+                <button
+                  className="ld-action"
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      "/lecturer/attendance"
+                    )
+                  }
+                >
+                  <span className="ld-action-title">
+                    Attendance
+                  </span>
+
+                  <span className="ld-action-description">
+                    Review attendance records and
+                    student status.
+                  </span>
+                </button>
+
+                <button
+                  className="ld-action"
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      "/lecturer/reports"
+                    )
+                  }
+                >
+                  <span className="ld-action-title">
+                    Reports
+                  </span>
+
+                  <span className="ld-action-description">
+                    View attendance summaries and
+                    reports.
+                  </span>
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* ================================
+              ATTENDANCE SUMMARY
+          ================================= */}
+
+          <div className="ld-panel">
+
+            <div className="ld-panel-header">
+
+              <div>
+                <h2 className="ld-panel-title">
+                  Attendance Overview
+                </h2>
+
+                <p className="ld-panel-subtitle">
+                  Overall attendance performance
+                  across your sections
+                </p>
+              </div>
+
+              <button
+                className="ld-view-all"
+                type="button"
+                onClick={() =>
+                  navigate(
+                    "/lecturer/attendance"
+                  )
+                }
+              >
+                View attendance
+              </button>
+
+            </div>
+
+            <div className="ld-attendance-panel">
+
+              <div className="ld-rate">
+
+                <div className="ld-rate-circle">
+                  <span>
+                    {attendanceRate}%
+                  </span>
+                </div>
+
+                <div>
+                  <div className="ld-rate-title">
+                    Attendance Rate
+                  </div>
+
+                  <div className="ld-rate-text">
+                    Current overall attendance
+                    percentage for your students.
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="ld-progress-area">
+
+                <div className="ld-progress-header">
+                  <span>
+                    Attendance progress
+                  </span>
+
+                  <span>
+                    {attendanceRate}%
+                  </span>
+                </div>
+
+                <div className="ld-progress">
+                  <div
+                    className="ld-progress-bar"
+                    style={{
+                      width: `${Math.min(
+                        Math.max(
+                          attendanceRate,
+                          0
+                        ),
+                        100
+                      )}%`,
+                    }}
+                  />
+                </div>
 
               </div>
 

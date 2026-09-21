@@ -53,6 +53,7 @@ async function apiRequest(
   return data;
 }
 
+
 /* =========================================================
    AUTH
 ========================================================= */
@@ -73,6 +74,7 @@ export async function loginUser(
     }
   );
 }
+
 
 export async function registerUser({
   firstName,
@@ -97,6 +99,7 @@ export async function registerUser({
   );
 }
 
+
 /* =========================================================
    CURRENT USER
 ========================================================= */
@@ -106,6 +109,7 @@ export async function getCurrentUser() {
     "/me"
   );
 }
+
 
 /* =========================================================
    ADMIN DASHBOARD
@@ -117,6 +121,7 @@ export async function getDashboardReport() {
   );
 }
 
+
 /* =========================================================
    USERS
 ========================================================= */
@@ -126,6 +131,7 @@ export async function getUsers() {
     "/users"
   );
 }
+
 
 export async function createUser({
   firstName,
@@ -151,6 +157,7 @@ export async function createUser({
     }
   );
 }
+
 
 export async function updateUser(
   id,
@@ -182,6 +189,7 @@ export async function updateUser(
   );
 }
 
+
 export async function deleteUser(
   id
 ) {
@@ -193,6 +201,7 @@ export async function deleteUser(
   );
 }
 
+
 /* =========================================================
    COURSES
 ========================================================= */
@@ -202,6 +211,7 @@ export async function getCourses() {
     "/courses"
   );
 }
+
 
 export async function createCourse({
   courseCode,
@@ -223,6 +233,7 @@ export async function createCourse({
     }
   );
 }
+
 
 export async function updateCourse(
   id,
@@ -246,6 +257,7 @@ export async function updateCourse(
   );
 }
 
+
 export async function deleteCourse(
   id
 ) {
@@ -257,6 +269,7 @@ export async function deleteCourse(
   );
 }
 
+
 /* =========================================================
    SECTIONS
 ========================================================= */
@@ -266,6 +279,7 @@ export async function getSections() {
     "/sections"
   );
 }
+
 
 export async function createSection({
   courseId,
@@ -291,6 +305,7 @@ export async function createSection({
     }
   );
 }
+
 
 export async function updateSection(
   id,
@@ -320,6 +335,7 @@ export async function updateSection(
   );
 }
 
+
 export async function deleteSection(
   id
 ) {
@@ -331,6 +347,7 @@ export async function deleteSection(
   );
 }
 
+
 /* =========================================================
    ROOMS
 ========================================================= */
@@ -340,6 +357,7 @@ export async function getRooms() {
     "/rooms"
   );
 }
+
 
 export async function createRoom({
   building,
@@ -365,6 +383,7 @@ export async function createRoom({
     }
   );
 }
+
 
 export async function updateRoom(
   id,
@@ -394,6 +413,7 @@ export async function updateRoom(
   );
 }
 
+
 export async function deleteRoom(
   id
 ) {
@@ -405,6 +425,7 @@ export async function deleteRoom(
   );
 }
 
+
 /* =========================================================
    TIMETABLE
 ========================================================= */
@@ -414,6 +435,7 @@ export async function getTimetable() {
     "/timetable"
   );
 }
+
 
 export async function createTimetable({
   sectionId,
@@ -441,6 +463,7 @@ export async function createTimetable({
     }
   );
 }
+
 
 export async function updateTimetable(
   id,
@@ -472,6 +495,7 @@ export async function updateTimetable(
   );
 }
 
+
 export async function deleteTimetable(
   id
 ) {
@@ -483,6 +507,7 @@ export async function deleteTimetable(
   );
 }
 
+
 /* =========================================================
    ATTENDANCE SESSIONS
 ========================================================= */
@@ -492,6 +517,7 @@ export async function getSessions() {
     "/sessions"
   );
 }
+
 
 /* =========================================================
    MY SESSIONS
@@ -503,6 +529,7 @@ export async function getMySessions() {
     "/sessions/my"
   );
 }
+
 
 export async function createSession({
   sectionId,
@@ -527,6 +554,7 @@ export async function createSession({
   );
 }
 
+
 export async function openSession(
   id
 ) {
@@ -534,6 +562,7 @@ export async function openSession(
     `/sessions/${id}/qr`
   );
 }
+
 
 export async function refreshSessionQr(
   id
@@ -546,6 +575,7 @@ export async function refreshSessionQr(
   );
 }
 
+
 export async function closeSession(
   id
 ) {
@@ -557,6 +587,7 @@ export async function closeSession(
   );
 }
 
+
 export async function getSessionRoster(
   id
 ) {
@@ -564,6 +595,7 @@ export async function getSessionRoster(
     `/sessions/${id}/roster`
   );
 }
+
 
 /* =========================================================
    STUDENT ATTENDANCE
@@ -575,12 +607,13 @@ export async function getMyAttendance() {
   );
 }
 
+
 /* =========================================================
    ENROLLMENT MANAGEMENT
 ========================================================= */
 
 /*
-   Get all students
+  Get all students
 */
 
 export async function getStudents() {
@@ -589,8 +622,9 @@ export async function getStudents() {
   );
 }
 
+
 /*
-   Get all available sections
+  Get all available sections
 */
 
 export async function getEnrollmentSections() {
@@ -599,8 +633,9 @@ export async function getEnrollmentSections() {
   );
 }
 
+
 /*
-   Get enrollments for specific student
+  Get enrollments for specific student
 */
 
 export async function getStudentEnrollments(
@@ -611,8 +646,9 @@ export async function getStudentEnrollments(
   );
 }
 
+
 /*
-   Enroll student into section
+  Enroll student into section
 */
 
 export async function enrollStudent(
@@ -631,8 +667,9 @@ export async function enrollStudent(
   );
 }
 
+
 /*
-   Remove student enrollment
+  Remove student enrollment
 */
 
 export async function removeEnrollment(
@@ -646,6 +683,7 @@ export async function removeEnrollment(
   );
 }
 
+
 /* =========================================================
    ADMIN ENROLLMENTS
    Used by Course Students Management
@@ -656,6 +694,7 @@ export async function getAdminEnrollments() {
     "/admin/enrollments"
   );
 }
+
 
 /* =========================================================
    UPDATE STUDENT
@@ -692,6 +731,7 @@ export async function updateStudent(
   );
 }
 
+
 /* =========================================================
    DELETE STUDENT
    DELETE /api/students/:id
@@ -712,6 +752,7 @@ export async function deleteStudent(
   );
 }
 
+
 /* =========================================================
    LECTURER
 ========================================================= */
@@ -722,11 +763,91 @@ export async function getLecturerDashboardStats() {
   );
 }
 
+
 export async function getLecturerSections() {
   return apiRequest(
     "/lecturer/sections"
   );
 }
+
+
+/* =========================================================
+   LECTURER ENROLLMENT
+   Lecturer-only student management
+========================================================= */
+
+/*
+  Get sections owned by the logged-in lecturer
+
+  GET /api/lecturer/enrollment/sections
+*/
+
+export async function getLecturerEnrollmentSections() {
+  return apiRequest(
+    "/lecturer/enrollment/sections"
+  );
+}
+
+
+/*
+  Get students enrolled in one lecturer-owned section
+
+  GET /api/lecturer/enrollment/sections/:sectionId/students
+*/
+
+export async function getLecturerSectionStudents(
+  sectionId
+) {
+  return apiRequest(
+    `/lecturer/enrollment/sections/${sectionId}/students`
+  );
+}
+
+
+/*
+  Add an existing student to a lecturer-owned section by email
+
+  POST /api/lecturer/enrollment/sections/:sectionId/students
+*/
+
+export async function addStudentToLecturerSection(
+  sectionId,
+  email
+) {
+  return apiRequest(
+    `/lecturer/enrollment/sections/${sectionId}/students`,
+    {
+      method: "POST",
+
+      body: JSON.stringify({
+        email,
+      }),
+    }
+  );
+}
+
+
+/*
+  Remove a student enrollment from a lecturer-owned section
+
+  DELETE /api/lecturer/enrollment/:enrollmentId
+*/
+
+export async function removeLecturerEnrollment(
+  enrollmentId
+) {
+  return apiRequest(
+    `/lecturer/enrollment/${enrollmentId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+
+/* =========================================================
+   LECTURER ATTENDANCE REPORT
+========================================================= */
 
 export async function getLecturerAttendanceReport(
   params = {}

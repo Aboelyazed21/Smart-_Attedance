@@ -11,11 +11,10 @@ import {
   
   import {
     getCourses,
-    getAdminEnrollments,
-    getStudents,
-    getSections,
-    enrollStudent,
-    removeEnrollment,
+    getLecturerEnrollmentSections,
+    getLecturerSectionStudents,
+    addStudentToLecturerSection,
+    removeLecturerEnrollment,
   } from "../../services/api";
   
   
@@ -92,27 +91,17 @@ import {
     async function loadCourseData() {
       try {
         setLoading(true);
+        setLoadingStudents(true);
         setError("");
   
         const [
           coursesData,
-          enrollmentsData,
-          studentsData,
-          sectionsData,
+          lecturerSectionsData,
         ] = await Promise.all([
           getCourses(),
-          getAdminEnrollments(),
-          getStudents(),
-          getSections(),
+          getLecturerEnrollmentSections(),
         ]);
   
-        /*
-          Courses API may return:
-          1. Array
-          2. { courses: [] }
-          3. { data: [] }
-          4. { data: { courses: [] } }
-        */
         const courses =
           Array.isArray(coursesData)
             ? coursesData
@@ -130,69 +119,30 @@ import {
             ? coursesData.data.courses
             : [];
   
-        const allEnrollments =
-          Array.isArray(enrollmentsData)
-            ? enrollmentsData
+        const lecturerSections =
+          Array.isArray(
+            lecturerSectionsData?.sections
+          )
+            ? lecturerSectionsData.sections
             : Array.isArray(
-                enrollmentsData?.enrollments
+                lecturerSectionsData
               )
-            ? enrollmentsData.enrollments
+            ? lecturerSectionsData
             : Array.isArray(
-                enrollmentsData?.data
+                lecturerSectionsData?.data
               )
-            ? enrollmentsData.data
+            ? lecturerSectionsData.data
             : Array.isArray(
-                enrollmentsData?.data?.enrollments
+                lecturerSectionsData?.data?.sections
               )
-            ? enrollmentsData.data.enrollments
+            ? lecturerSectionsData.data.sections
             : [];
   
-        const allStudents =
-          Array.isArray(studentsData)
-            ? studentsData
-            : Array.isArray(
-                studentsData?.students
-              )
-            ? studentsData.students
-            : Array.isArray(
-                studentsData?.data
-              )
-            ? studentsData.data
-            : Array.isArray(
-                studentsData?.data?.students
-              )
-            ? studentsData.data.students
-            : [];
-  
-        const allSections =
-          Array.isArray(sectionsData)
-            ? sectionsData
-            : Array.isArray(
-                sectionsData?.sections
-              )
-            ? sectionsData.sections
-            : Array.isArray(
-                sectionsData?.data
-              )
-            ? sectionsData.data
-            : Array.isArray(
-                sectionsData?.data?.sections
-              )
-            ? sectionsData.data.sections
-            : [];
-  
-        /*
-          Find course by:
-          - id
-          - course_id
-        */
         const foundCourse =
           courses.find(
             (item) =>
-              Number(item.id) ===
-                Number(id) ||
-              Number(item.course_id) ===
-                Number(id)
+              Number(item.id) === Number(id) ||
+              Number(item.course_id) === Number(id)
           );
   
         if (!foundCourse) {
@@ -201,6 +151,8 @@ import {
           );
   
           setCourse(null);
+          setEnrollments([]);
+          setSections([]);
   
           return;
         }
@@ -211,22 +163,8 @@ import {
             foundCourse.course_id
           );
   
-        const courseEnrollments =
-          allEnrollments.filter(
-            (item) =>
-              Number(
-                item.course_id
-              ) === courseId ||
-              String(
-                item.course_code || ""
-              ).toLowerCase() ===
-                String(
-                  foundCourse.course_code || ""
-                ).toLowerCase()
-          );
-  
         const courseSections =
-          allSections.filter(
+          lecturerSections.filter(
             (section) =>
               Number(
                 section.course_id
@@ -234,17 +172,75 @@ import {
           );
   
         setCourse(foundCourse);
+        setSections(courseSections);
+  
+        if (courseSections.length === 0) {
+          setEnrollments([]);
+          setStudents([]);
+          return;
+        }
+  
+        const studentResponses =
+          await Promise.all(
+            courseSections.map(
+              (section) =>
+                getLecturerSectionStudents(
+                  section.section_id ??
+                  section.id
+                )
+            )
+          );
+  
+        const combinedEnrollments =
+          studentResponses.flatMap(
+            (response, index) => {
+              const rows =
+                Array.isArray(
+                  response?.students
+                )
+                  ? response.students
+                  : Array.isArray(
+                      response?.data?.students
+                    )
+                  ? response.data.students
+                  : Array.isArray(
+                      response?.data
+                    )
+                  ? response.data
+                  : Array.isArray(response)
+                  ? response
+                  : [];
+  
+              const section =
+                courseSections[index];
+  
+              const sectionId =
+                section.section_id ??
+                section.id;
+  
+              return rows.map(
+                (student) => ({
+                  ...student,
+  
+                  section_id:
+                    student.section_id ??
+                    sectionId,
+  
+                  section_name:
+                    student.section_name ??
+                    section.section_name ??
+                    "—",
+                })
+              );
+            }
+          );
   
         setEnrollments(
-          courseEnrollments
+          combinedEnrollments
         );
   
         setStudents(
-          allStudents
-        );
-  
-        setSections(
-          courseSections
+          combinedEnrollments
         );
   
       } catch (err) {
@@ -260,6 +256,7 @@ import {
   
       } finally {
         setLoading(false);
+        setLoadingStudents(false);
       }
     }
   
@@ -293,7 +290,9 @@ import {
   
             const email =
               String(
-                item.email || ""
+                item.email ||
+                item.student_email ||
+                ""
               ).toLowerCase();
   
             const code =
@@ -370,59 +369,12 @@ import {
         return;
       }
   
-      const student =
-        students.find(
-          (item) =>
-            String(
-              item.email || ""
-            )
-              .trim()
-              .toLowerCase() ===
-            normalizedEmail
-        );
-  
-      if (!student) {
-        setAddError(
-          "No student was found with this email address."
-        );
-  
-        return;
-      }
-  
-      const studentId =
-        Number(
-          student.student_id ??
-          student.id
-        );
-  
-      if (!studentId) {
-        setAddError(
-          "The selected student has an invalid ID."
-        );
-  
-        return;
-      }
-  
-      if (
-        enrolledStudentIds.has(
-          studentId
-        )
-      ) {
-        setAddError(
-          "This student is already enrolled in this course."
-        );
-  
-        return;
-      }
-  
       try {
         setAddingStudent(true);
   
-        await enrollStudent(
-          studentId,
-          Number(
-            selectedSectionId
-          )
+        await addStudentToLecturerSection(
+          Number(selectedSectionId),
+          normalizedEmail
         );
   
         setStudentEmail("");
@@ -474,7 +426,7 @@ import {
       try {
         setError("");
   
-        await removeEnrollment(
+        await removeLecturerEnrollment(
           enrollment.enrollment_id
         );
   
@@ -539,7 +491,9 @@ import {
               </div>
   
               <div>
-                <h2>Attendify</h2>
+                <h2>
+                  Attendify
+                </h2>
   
                 <span>
                   Smart Attendance
@@ -591,7 +545,9 @@ import {
               </div>
   
               <div>
-                <h2>Attendify</h2>
+                <h2>
+                  Attendify
+                </h2>
   
                 <span>
                   Smart Attendance
@@ -1112,11 +1068,14 @@ import {
   
                         {sections.map(
                           (section) => (
+  
                             <option
                               key={
+                                section.section_id ??
                                 section.id
                               }
                               value={
+                                section.section_id ??
                                 section.id
                               }
                             >
@@ -1124,6 +1083,7 @@ import {
                                 section.section_name
                               }
                             </option>
+  
                           )
                         )}
   

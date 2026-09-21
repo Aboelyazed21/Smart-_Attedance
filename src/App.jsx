@@ -15,7 +15,9 @@ import CourseDetails from "./pages/admin/CourseDetails";
 import Sections from "./pages/admin/Sections";
 import Rooms from "./pages/admin/Rooms";
 import Timetable from "./pages/admin/Timetable";
-import AttendanceSessions from "./pages/lecturer/AttendanceSessions";
+
+import LecturerSessions from "./pages/lecturer/LecturerSessions";
+
 import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
@@ -23,6 +25,7 @@ import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 import { loginUser } from "./services/api";
 
 import "./App.css";
+
 
 /* =========================================================
    GET SAVED USER
@@ -38,6 +41,7 @@ function getSavedUser() {
     }
 
     return JSON.parse(savedUser);
+
   } catch {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -45,6 +49,7 @@ function getSavedUser() {
     return null;
   }
 }
+
 
 /* =========================================================
    ADMIN AUTH CHECK
@@ -59,10 +64,13 @@ function isAdminAuthenticated() {
   }
 
   return (
-    String(user.role_name || "").toLowerCase() ===
+    String(
+      user.role_name || ""
+    ).toLowerCase() ===
     "admin"
   );
 }
+
 
 /* =========================================================
    LECTURER AUTH CHECK
@@ -91,6 +99,7 @@ function isLecturerAuthenticated() {
   );
 }
 
+
 /* =========================================================
    APP
 ========================================================= */
@@ -98,6 +107,7 @@ function isLecturerAuthenticated() {
 function App() {
   const location =
     useLocation();
+
 
   /* =========================================================
      REGISTER
@@ -109,6 +119,7 @@ function App() {
   ) {
     return <Register />;
   }
+
 
   /* =========================================================
      ADMIN USERS
@@ -127,6 +138,7 @@ function App() {
     return <Users />;
   }
 
+
   /* =========================================================
      ADMIN COURSES
   ========================================================= */
@@ -144,6 +156,7 @@ function App() {
     return <Courses />;
   }
 
+
   /* =========================================================
      ADMIN COURSE DETAILS
   ========================================================= */
@@ -154,12 +167,45 @@ function App() {
     );
 
   if (courseDetailsMatch) {
-    if (!isAdminAuthenticated()) {
+
+    const user =
+      getSavedUser();
+
+    if (!user) {
+      return <Login />;
+    }
+
+    const role =
+      String(
+        user.role_name ||
+          user.role ||
+          ""
+      )
+        .toLowerCase()
+        .trim();
+
+
+    /*
+      Admin OR Lecturer can open
+      course details.
+
+      This is important because
+      LecturerSections navigates to:
+
+      /admin/courses/:courseId
+    */
+
+    if (
+      role !== "admin" &&
+      role !== "lecturer" &&
+      role !== "instructor"
+    ) {
       return <Login />;
     }
 
     return <CourseDetails />;
   }
+
 
   /* =========================================================
      ADMIN SECTIONS
@@ -178,6 +224,7 @@ function App() {
     return <Sections />;
   }
 
+
   /* =========================================================
      ADMIN ROOMS
   ========================================================= */
@@ -194,6 +241,7 @@ function App() {
 
     return <Rooms />;
   }
+
 
   /* =========================================================
      ADMIN TIMETABLE
@@ -212,6 +260,7 @@ function App() {
     return <Timetable />;
   }
 
+
   /* =========================================================
      LECTURER ATTENDANCE SESSIONS
   ========================================================= */
@@ -220,14 +269,42 @@ function App() {
     location.pathname ===
     "/lecturer/sessions"
   ) {
+
     if (
       !isLecturerAuthenticated()
     ) {
       return <Login />;
     }
 
-    return <AttendanceSessions />;
+    return <LecturerSessions />;
   }
+
+
+  /* =========================================================
+     LECTURER SECTIONS
+  ========================================================= */
+
+  if (
+    location.pathname ===
+    "/lecturer/sections"
+  ) {
+
+    if (
+      !isLecturerAuthenticated()
+    ) {
+      return <Login />;
+    }
+
+    /*
+      Lazy import is not used here
+      because LecturerSections is
+      handled below by the existing
+      application structure.
+    */
+
+    return <LecturerSections />;
+  }
+
 
   /* =========================================================
      STUDENT ATTENDANCE SCANNER
@@ -237,6 +314,7 @@ function App() {
     location.pathname ===
     "/student/scan"
   ) {
+
     const user =
       getSavedUser();
 
@@ -262,6 +340,7 @@ function App() {
     return <AttendanceScanner />;
   }
 
+
   /* =========================================================
      STUDENT ATTENDANCE
   ========================================================= */
@@ -270,6 +349,7 @@ function App() {
     location.pathname ===
     "/student/attendance"
   ) {
+
     const user =
       getSavedUser();
 
@@ -286,12 +366,15 @@ function App() {
         .toLowerCase()
         .trim();
 
-    if (role !== "student") {
+    if (
+      role !== "student"
+    ) {
       return <Login />;
     }
 
     return <StudentAttendance />;
   }
+
 
   /* =========================================================
      ADMIN ENROLLMENT MANAGEMENT
@@ -301,12 +384,16 @@ function App() {
     location.pathname ===
     "/admin/enrollments"
   ) {
-    if (!isAdminAuthenticated()) {
+
+    if (
+      !isAdminAuthenticated()
+    ) {
       return <Login />;
     }
 
     return <EnrollmentManagement />;
   }
+
 
   /* =========================================================
      ADMIN DASHBOARD
@@ -316,6 +403,7 @@ function App() {
     location.pathname ===
     "/dashboard"
   ) {
+
     const user =
       getSavedUser();
 
@@ -332,21 +420,25 @@ function App() {
         .toLowerCase()
         .trim();
 
+
     if (
       role === "admin"
     ) {
       return <AdminDashboard />;
     }
 
+
     if (
       role === "lecturer" ||
       role === "instructor"
     ) {
-      return <AttendanceSessions />;
+      return <LecturerSessions />;
     }
+
 
     return <StudentDashboard />;
   }
+
 
   /* =========================================================
      LOGIN
@@ -354,6 +446,7 @@ function App() {
 
   return <Login />;
 }
+
 
 /* =========================================================
    LOGIN
@@ -383,14 +476,17 @@ function Login() {
     setLoading,
   ] = useState(false);
 
+
   const handleSubmit =
     async (e) => {
+
       e.preventDefault();
 
       if (
         !email ||
         !password
       ) {
+
         alert(
           "Please enter email and password"
         );
@@ -398,7 +494,9 @@ function Login() {
         return;
       }
 
+
       try {
+
         setLoading(true);
 
         const data =
@@ -406,6 +504,7 @@ function Login() {
             email,
             password
           );
+
 
         localStorage.setItem(
           "token",
@@ -419,15 +518,19 @@ function Login() {
           )
         );
 
+
         console.log(
           "Login successful:",
           data.user
         );
 
+
         navigate(
           "/dashboard"
         );
+
       } catch (error) {
+
         console.error(
           "Login error:",
           error
@@ -437,10 +540,14 @@ function Login() {
           error.message ||
           "Login failed"
         );
+
       } finally {
+
         setLoading(false);
+
       }
     };
+
 
   return (
     <div className="login-page">
@@ -471,10 +578,12 @@ function Login() {
 
         </div>
 
+
         <button
           type="button"
           className="language-button"
         >
+
           <span>
             English
           </span>
@@ -482,9 +591,11 @@ function Login() {
           <span className="chevron">
             ⌄
           </span>
+
         </button>
 
       </header>
+
 
       {/* =====================================================
           LOGIN
@@ -506,6 +617,7 @@ function Login() {
             Smart Attendance System
           </p>
 
+
           <div className="welcome-section">
 
             <h3>
@@ -517,6 +629,7 @@ function Login() {
             </p>
 
           </div>
+
 
           <form
             className="login-form"
@@ -553,6 +666,7 @@ function Login() {
 
             </div>
 
+
             <div className="form-group">
 
               <label>
@@ -583,6 +697,7 @@ function Login() {
                   }
                 />
 
+
                 <button
                   type="button"
                   className="show-password"
@@ -592,14 +707,17 @@ function Login() {
                     )
                   }
                 >
+
                   {showPassword
                     ? "◉"
                     : "◌"}
+
                 </button>
 
               </div>
 
             </div>
+
 
             <div className="forgot-container">
 
@@ -611,6 +729,7 @@ function Login() {
               </button>
 
             </div>
+
 
             <button
               type="submit"
@@ -634,6 +753,7 @@ function Login() {
 
             </button>
 
+
             <div className="or-divider">
 
               <span></span>
@@ -645,6 +765,7 @@ function Login() {
               <span></span>
 
             </div>
+
 
             <Link
               to="/register"
@@ -666,6 +787,7 @@ function Login() {
         </div>
 
       </main>
+
 
       {/* =====================================================
           FOOTER
@@ -697,6 +819,7 @@ function Login() {
   );
 }
 
+
 /* =========================================================
    STUDENT DASHBOARD
 ========================================================= */
@@ -710,8 +833,10 @@ function StudentDashboard() {
       return getSavedUser();
     });
 
+
   const handleLogout =
     () => {
+
       localStorage.removeItem(
         "token"
       );
@@ -723,6 +848,7 @@ function StudentDashboard() {
       navigate("/");
     };
 
+
   const firstName =
     user?.first_name ||
     "Student";
@@ -730,6 +856,7 @@ function StudentDashboard() {
   const lastName =
     user?.last_name ||
     "";
+
 
   return (
     <div className="dashboard-page">
@@ -760,6 +887,7 @@ function StudentDashboard() {
 
         </div>
 
+
         <div className="sidebar-profile">
 
           <div className="profile-avatar">
@@ -785,6 +913,7 @@ function StudentDashboard() {
 
         </div>
 
+
         <nav className="dashboard-nav">
 
           <button
@@ -799,6 +928,7 @@ function StudentDashboard() {
             Dashboard
           </button>
 
+
           <button
             className="nav-item"
             onClick={() =>
@@ -811,6 +941,7 @@ function StudentDashboard() {
             My Attendance
           </button>
 
+
           <button
             className="nav-item"
           >
@@ -818,12 +949,14 @@ function StudentDashboard() {
             My Sessions
           </button>
 
+
           <button
             className="nav-item"
           >
             <span>⚑</span>
             Correction Requests
           </button>
+
 
           <button
             className="nav-item"
@@ -834,6 +967,7 @@ function StudentDashboard() {
 
         </nav>
 
+
         <div className="sidebar-bottom">
 
           <button
@@ -842,16 +976,19 @@ function StudentDashboard() {
               handleLogout
             }
           >
+
             <span>
               ↪
             </span>
 
             Logout
+
           </button>
 
         </div>
 
       </aside>
+
 
       {/* =====================================================
           MAIN
@@ -874,6 +1011,7 @@ function StudentDashboard() {
 
           </div>
 
+
           <div className="dashboard-user">
 
             <div className="header-avatar">
@@ -887,6 +1025,7 @@ function StudentDashboard() {
           </div>
 
         </header>
+
 
         <section className="dashboard-content">
 
@@ -916,6 +1055,7 @@ function StudentDashboard() {
 
             </div>
 
+
             <div className="stat-card">
 
               <div className="stat-icon session-icon">
@@ -936,6 +1076,7 @@ function StudentDashboard() {
 
             </div>
 
+
             <div className="stat-card">
 
               <div className="stat-icon present-icon">
@@ -955,6 +1096,7 @@ function StudentDashboard() {
               </div>
 
             </div>
+
 
             <div className="stat-card">
 
@@ -977,6 +1119,7 @@ function StudentDashboard() {
             </div>
 
           </div>
+
 
           {/* =================================================
               DASHBOARD GRID
@@ -1006,6 +1149,7 @@ function StudentDashboard() {
 
               </div>
 
+
               <div className="empty-state">
 
                 <div className="empty-icon">
@@ -1024,6 +1168,7 @@ function StudentDashboard() {
 
             </div>
 
+
             <div className="dashboard-panel">
 
               <div className="panel-header">
@@ -1041,6 +1186,7 @@ function StudentDashboard() {
                 </div>
 
               </div>
+
 
               <div className="quick-actions">
 
@@ -1071,6 +1217,7 @@ function StudentDashboard() {
 
                 </button>
 
+
                 <button
                   className="quick-action"
                   onClick={() =>
@@ -1098,7 +1245,10 @@ function StudentDashboard() {
 
                 </button>
 
-                <button className="quick-action">
+
+                <button
+                  className="quick-action"
+                >
 
                   <span>
                     ⚑
@@ -1124,6 +1274,7 @@ function StudentDashboard() {
 
           </div>
 
+
           {/* =================================================
               RECENT ACTIVITY
           ================================================= */}
@@ -1146,6 +1297,7 @@ function StudentDashboard() {
 
             </div>
 
+
             <div className="empty-state small-empty">
 
               <div className="empty-icon">
@@ -1167,5 +1319,89 @@ function StudentDashboard() {
     </div>
   );
 }
+
+
+/* =========================================================
+   LECTURER SECTIONS
+========================================================= */
+
+/*
+  LecturerSections is loaded lazily here.
+
+  This prevents App.jsx from breaking if the
+  component is maintained separately.
+*/
+
+function LecturerSections() {
+  const [
+    Component,
+    setComponent,
+  ] = useState(null);
+
+  const [error, setError] =
+    useState("");
+
+
+  useState(() => {
+
+    import(
+      "./pages/lecturer/LecturerSections"
+    )
+      .then((module) => {
+        setComponent(
+          () => module.default
+        );
+      })
+      .catch((err) => {
+        console.error(
+          "Failed to load LecturerSections:",
+          err
+        );
+
+        setError(
+          "Failed to load lecturer sections."
+        );
+      });
+
+  });
+
+
+  if (error) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: "#f6f8fc",
+          color: "#991b1b",
+        }}
+      >
+        {error}
+      </div>
+    );
+  }
+
+
+  if (!Component) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: "#f6f8fc",
+          color: "#64748b",
+        }}
+      >
+        Loading sections...
+      </div>
+    );
+  }
+
+
+  return <Component />;
+}
+
 
 export default App;
