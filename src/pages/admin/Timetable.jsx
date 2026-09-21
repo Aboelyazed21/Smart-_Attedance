@@ -10,36 +10,27 @@ import {
   getRooms,
 } from "../../services/api";
 
+import "./Timetable.css";
+
 const DAYS = [
-  {
-    value: "saturday",
-    label: "Saturday",
-  },
-  {
-    value: "sunday",
-    label: "Sunday",
-  },
-  {
-    value: "monday",
-    label: "Monday",
-  },
-  {
-    value: "tuesday",
-    label: "Tuesday",
-  },
-  {
-    value: "wednesday",
-    label: "Wednesday",
-  },
-  {
-    value: "thursday",
-    label: "Thursday",
-  },
-  {
-    value: "friday",
-    label: "Friday",
-  },
+  { value: "saturday", label: "Saturday" },
+  { value: "sunday", label: "Sunday" },
+  { value: "monday", label: "Monday" },
+  { value: "tuesday", label: "Tuesday" },
+  { value: "wednesday", label: "Wednesday" },
+  { value: "thursday", label: "Thursday" },
+  { value: "friday", label: "Friday" },
 ];
+
+const DAY_COLORS = {
+  saturday: "blue",
+  sunday: "green",
+  monday: "orange",
+  tuesday: "purple",
+  wednesday: "red",
+  thursday: "blue",
+  friday: "green",
+};
 
 const EMPTY_FORM = {
   sectionId: "",
@@ -53,19 +44,12 @@ const EMPTY_FORM = {
 
 function formatTime(time) {
   if (!time) return "-";
-
   return String(time).slice(0, 5);
 }
 
 function formatDay(day) {
-  const item = DAYS.find(
-    (currentDay) =>
-      currentDay.value === day
-  );
-
-  return item
-    ? item.label
-    : day || "-";
+  const item = DAYS.find((currentDay) => currentDay.value === day);
+  return item ? item.label : day || "-";
 }
 
 function getSectionLabel(section) {
@@ -88,8 +72,7 @@ function getSectionLabel(section) {
 }
 
 function getRoomLabel(room) {
-  const building =
-    room.building || "";
+  const building = room.building || "";
 
   const roomName =
     room.room_name ||
@@ -99,149 +82,144 @@ function getRoomLabel(room) {
   return `${building} - ${roomName}`;
 }
 
+function getDateValue(date) {
+  if (!date) return "";
+  return String(date).slice(0, 10);
+}
+
 export default function Timetable() {
   const navigate = useNavigate();
 
-  const [timetable, setTimetable] =
-    useState([]);
+  const [timetable, setTimetable] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [rooms, setRooms] = useState([]);
 
-  const [sections, setSections] =
-    useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const [rooms, setRooms] =
-    useState([]);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
+  const [search, setSearch] = useState("");
+  const [courseFilter, setCourseFilter] = useState("all");
+  const [sectionFilter, setSectionFilter] = useState("all");
+  const [roomFilter, setRoomFilter] = useState("all");
+  const [dayFilter, setDayFilter] = useState("all");
 
-  const [saving, setSaving] =
-    useState(false);
+  const [viewMode, setViewMode] = useState("list");
 
-  const [error, setError] =
-    useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
-  const [search, setSearch] =
-    useState("");
-
-  const [showModal, setShowModal] =
-    useState(false);
-
-  const [editingId, setEditingId] =
-    useState(null);
-
-  const [form, setForm] =
-    useState(EMPTY_FORM);
+  const [form, setForm] = useState({
+    ...EMPTY_FORM,
+  });
 
   /* =========================================================
      LOAD DATA
   ========================================================= */
 
   async function loadData() {
-    setLoading(true);
-    setError("");
+    try {
+      setLoading(true);
+      setError("");
 
-    /*
-      Load each resource independently.
-      If one API fails, the other data can still be displayed.
-    */
-    const [
-      timetableResult,
-      sectionsResult,
-      roomsResult,
-    ] = await Promise.allSettled([
-      getTimetable(),
-      getSections(),
-      getRooms(),
-    ]);
+      const [
+        timetableResult,
+        sectionsResult,
+        roomsResult,
+      ] = await Promise.allSettled([
+        getTimetable(),
+        getSections(),
+        getRooms(),
+      ]);
 
-    const errors = [];
+      const errors = [];
 
-    /* =======================================================
-       TIMETABLE
-    ======================================================= */
+      if (timetableResult.status === "fulfilled") {
+        const data = timetableResult.value;
 
-    if (timetableResult.status === "fulfilled") {
-      const timetableData = timetableResult.value;
+        setTimetable(
+          Array.isArray(data)
+            ? data
+            : Array.isArray(data?.data)
+            ? data.data
+            : []
+        );
+      } else {
+        console.error(
+          "Timetable loading error:",
+          timetableResult.reason
+        );
 
-      setTimetable(
-        Array.isArray(timetableData)
-          ? timetableData
-          : Array.isArray(timetableData?.data)
-          ? timetableData.data
-          : []
+        setTimetable([]);
+
+        errors.push(
+          timetableResult.reason?.message ||
+            "Failed to load timetable"
+        );
+      }
+
+      if (sectionsResult.status === "fulfilled") {
+        const data = sectionsResult.value;
+
+        setSections(
+          Array.isArray(data)
+            ? data
+            : Array.isArray(data?.data)
+            ? data.data
+            : []
+        );
+      } else {
+        console.error(
+          "Sections loading error:",
+          sectionsResult.reason
+        );
+
+        setSections([]);
+
+        errors.push(
+          sectionsResult.reason?.message ||
+            "Failed to load sections"
+        );
+      }
+
+      if (roomsResult.status === "fulfilled") {
+        const data = roomsResult.value;
+
+        setRooms(
+          Array.isArray(data)
+            ? data
+            : Array.isArray(data?.data)
+            ? data.data
+            : []
+        );
+      } else {
+        console.error(
+          "Rooms loading error:",
+          roomsResult.reason
+        );
+
+        setRooms([]);
+
+        errors.push(
+          roomsResult.reason?.message ||
+            "Failed to load rooms"
+        );
+      }
+
+      if (errors.length > 0) {
+        setError(errors.join(" | "));
+      }
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.message ||
+          "Failed to load timetable data"
       );
-    } else {
-      console.error(
-        "Timetable loading error:",
-        timetableResult.reason
-      );
-
-      setTimetable([]);
-      errors.push(
-        timetableResult.reason?.message ||
-          "Failed to load timetable"
-      );
+    } finally {
+      setLoading(false);
     }
-
-    /* =======================================================
-       SECTIONS
-    ======================================================= */
-
-    if (sectionsResult.status === "fulfilled") {
-      const sectionsData = sectionsResult.value;
-
-      setSections(
-        Array.isArray(sectionsData)
-          ? sectionsData
-          : Array.isArray(sectionsData?.data)
-          ? sectionsData.data
-          : []
-      );
-    } else {
-      console.error(
-        "Sections loading error:",
-        sectionsResult.reason
-      );
-
-      setSections([]);
-      errors.push(
-        sectionsResult.reason?.message ||
-          "Failed to load sections"
-      );
-    }
-
-    /* =======================================================
-       ROOMS
-    ======================================================= */
-
-    if (roomsResult.status === "fulfilled") {
-      const roomsData = roomsResult.value;
-
-      setRooms(
-        Array.isArray(roomsData)
-          ? roomsData
-          : Array.isArray(roomsData?.data)
-          ? roomsData.data
-          : []
-      );
-    } else {
-      console.error(
-        "Rooms loading error:",
-        roomsResult.reason
-      );
-
-      setRooms([]);
-      errors.push(
-        roomsResult.reason?.message ||
-          "Failed to load rooms"
-      );
-    }
-
-    if (errors.length > 0) {
-      setError(errors.join(" | "));
-    }
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -249,42 +227,176 @@ export default function Timetable() {
   }, []);
 
   /* =========================================================
-     SEARCH
+     UNIQUE FILTER OPTIONS
   ========================================================= */
 
-  const filteredTimetable =
-    useMemo(() => {
-      const query =
-        search
-          .trim()
-          .toLowerCase();
+  const courseOptions = useMemo(() => {
+    const map = new Map();
 
-      if (!query) {
-        return timetable;
+    timetable.forEach((item) => {
+      const code = item.course_code || "";
+      const name = item.course_name || "";
+
+      if (code) {
+        map.set(code, {
+          code,
+          name,
+        });
       }
+    });
 
-      return timetable.filter(
-        (item) => {
-          const values = [
-            item.course_code,
-            item.course_name,
-            item.section_name,
-            item.room_name,
-            item.building,
-            item.day_of_week,
-          ];
+    return Array.from(map.values());
+  }, [timetable]);
 
-          return values.some(
-            (value) =>
-              String(
-                value || ""
-              )
-                .toLowerCase()
-                .includes(query)
-          );
-        }
+  const sectionOptions = useMemo(() => {
+    const map = new Map();
+
+    timetable.forEach((item) => {
+      const section = item.section_name || "";
+
+      if (section) {
+        map.set(section, section);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [timetable]);
+
+  const roomOptions = useMemo(() => {
+    const map = new Map();
+
+    timetable.forEach((item) => {
+      const room = item.room_name || "";
+
+      if (room) {
+        map.set(room, room);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [timetable]);
+
+  /* =========================================================
+     FILTER
+  ========================================================= */
+
+  const filteredTimetable = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return timetable.filter((item) => {
+      const matchesSearch =
+        !query ||
+        [
+          item.course_code,
+          item.course_name,
+          item.section_name,
+          item.room_name,
+          item.building,
+          item.day_of_week,
+        ].some((value) =>
+          String(value || "")
+            .toLowerCase()
+            .includes(query)
+        );
+
+      const matchesCourse =
+        courseFilter === "all" ||
+        item.course_code === courseFilter;
+
+      const matchesSection =
+        sectionFilter === "all" ||
+        item.section_name === sectionFilter;
+
+      const matchesRoom =
+        roomFilter === "all" ||
+        item.room_name === roomFilter;
+
+      const matchesDay =
+        dayFilter === "all" ||
+        item.day_of_week === dayFilter;
+
+      return (
+        matchesSearch &&
+        matchesCourse &&
+        matchesSection &&
+        matchesRoom &&
+        matchesDay
       );
-    }, [timetable, search]);
+    });
+  }, [
+    timetable,
+    search,
+    courseFilter,
+    sectionFilter,
+    roomFilter,
+    dayFilter,
+  ]);
+
+  /* =========================================================
+     STATISTICS
+  ========================================================= */
+
+  const stats = useMemo(() => {
+    const uniqueCourses = new Set(
+      timetable
+        .map((item) => item.course_code)
+        .filter(Boolean)
+    );
+
+    const uniqueRooms = new Set(
+      timetable
+        .map((item) => item.room_name)
+        .filter(Boolean)
+    );
+
+    const uniqueSections = new Set(
+      timetable
+        .map((item) => item.section_name)
+        .filter(Boolean)
+    );
+
+    return {
+      totalClasses: timetable.length,
+      activeCourses: uniqueCourses.size,
+      totalRooms:
+        rooms.length ||
+        uniqueRooms.size,
+      totalSections:
+        uniqueSections.size,
+    };
+  }, [timetable, rooms]);
+
+  /* =========================================================
+     TODAY
+  ========================================================= */
+
+  const todayClasses = useMemo(() => {
+    const dayIndex = new Date().getDay();
+
+    const dayMap = {
+      0: "sunday",
+      1: "monday",
+      2: "tuesday",
+      3: "wednesday",
+      4: "thursday",
+      5: "friday",
+      6: "saturday",
+    };
+
+    const today = dayMap[dayIndex];
+
+    return timetable
+      .filter(
+        (item) =>
+          item.day_of_week === today
+      )
+      .sort((a, b) =>
+        String(a.start_time || "").localeCompare(
+          String(b.start_time || "")
+        )
+      )
+      .slice(0, 4);
+  }, [timetable]);
 
   /* =========================================================
      FORM
@@ -306,43 +418,29 @@ export default function Timetable() {
     setEditingId(item.id);
 
     setForm({
-      sectionId:
-        item.section_id
-          ? String(item.section_id)
-          : "",
+      sectionId: item.section_id
+        ? String(item.section_id)
+        : "",
 
-      roomId:
-        item.room_id
-          ? String(item.room_id)
-          : "",
+      roomId: item.room_id
+        ? String(item.room_id)
+        : "",
 
       dayOfWeek:
         item.day_of_week ||
         "saturday",
 
       startTime:
-        formatTime(
-          item.start_time
-        ),
+        formatTime(item.start_time),
 
       endTime:
-        formatTime(
-          item.end_time
-        ),
+        formatTime(item.end_time),
 
       startDate:
-        item.start_date
-          ? String(
-              item.start_date
-            ).slice(0, 10)
-          : "",
+        getDateValue(item.start_date),
 
       endDate:
-        item.end_date
-          ? String(
-              item.end_date
-            ).slice(0, 10)
-          : "",
+        getDateValue(item.end_date),
     });
 
     setError("");
@@ -355,6 +453,7 @@ export default function Timetable() {
 
     setShowModal(false);
     setEditingId(null);
+
     setForm({
       ...EMPTY_FORM,
     });
@@ -456,7 +555,12 @@ export default function Timetable() {
         );
       }
 
-      closeModal();
+      setShowModal(false);
+      setEditingId(null);
+
+      setForm({
+        ...EMPTY_FORM,
+      });
 
       await loadData();
     } catch (err) {
@@ -506,37 +610,60 @@ export default function Timetable() {
   }
 
   /* =========================================================
-     SIDEBAR
+     RESET FILTERS
+  ========================================================= */
+
+  function resetFilters() {
+    setSearch("");
+    setCourseFilter("all");
+    setSectionFilter("all");
+    setRoomFilter("all");
+    setDayFilter("all");
+  }
+
+  /* =========================================================
+     NAVIGATION
   ========================================================= */
 
   function goTo(path) {
     navigate(path);
   }
 
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/");
+  }
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
+
   return (
-    <div className="dashboard-page">
+    <div className="timetable-page">
+
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-brand">
-          <div className="sidebar-logo">
+      <aside className="timetable-sidebar">
+
+        <div className="tt-brand">
+          <div className="tt-brand-logo">
             🎓
           </div>
 
           <div>
             <h2>Attendify</h2>
-
-            <span>
-              SMART ATTENDANCE
-            </span>
+            <span>SMART ATTENDANCE</span>
           </div>
         </div>
 
-        <nav className="dashboard-nav">
+        <nav className="tt-nav">
+
           <button
-            className="nav-item"
+            className="tt-nav-item"
             onClick={() =>
               goTo("/dashboard")
             }
@@ -546,7 +673,7 @@ export default function Timetable() {
           </button>
 
           <button
-            className="nav-item"
+            className="tt-nav-item"
             onClick={() =>
               goTo("/admin/users")
             }
@@ -556,7 +683,7 @@ export default function Timetable() {
           </button>
 
           <button
-            className="nav-item"
+            className="tt-nav-item"
             onClick={() =>
               goTo("/admin/courses")
             }
@@ -566,7 +693,7 @@ export default function Timetable() {
           </button>
 
           <button
-            className="nav-item"
+            className="tt-nav-item"
             onClick={() =>
               goTo("/admin/sections")
             }
@@ -576,7 +703,7 @@ export default function Timetable() {
           </button>
 
           <button
-            className="nav-item"
+            className="tt-nav-item"
             onClick={() =>
               goTo("/admin/rooms")
             }
@@ -586,479 +713,1021 @@ export default function Timetable() {
           </button>
 
           <button
-            className="nav-item active"
+            className="tt-nav-item active"
           >
             <span>◫</span>
             Timetable
           </button>
+
+          <button
+            className="tt-nav-item"
+            onClick={() =>
+              goTo("/admin/attendance")
+            }
+          >
+            <span>✓</span>
+            Attendance
+          </button>
+
+          <button
+            className="tt-nav-item"
+            onClick={() =>
+              goTo("/admin/reports")
+            }
+          >
+            <span>▥</span>
+            Reports
+          </button>
+
+          <button
+            className="tt-nav-item"
+            onClick={() =>
+              goTo("/admin/settings")
+            }
+          >
+            <span>⚙</span>
+            Settings
+          </button>
+
         </nav>
 
-        <div className="sidebar-bottom">
+        <div className="tt-sidebar-bottom">
+
+          <div className="tt-sidebar-message">
+            <strong>
+              Good Morning 👋
+            </strong>
+
+            <p>
+              Manage your academic
+              schedule efficiently.
+            </p>
+          </div>
+
           <button
-            className="nav-item logout-button"
-            onClick={() => {
-              localStorage.removeItem(
-                "token"
-              );
-
-              localStorage.removeItem(
-                "user"
-              );
-
-              navigate("/");
-            }}
+            className="tt-nav-item tt-logout"
+            onClick={logout}
           >
             <span>↪</span>
             Logout
           </button>
+
         </div>
+
       </aside>
 
       {/* =====================================================
           MAIN
       ===================================================== */}
 
-      <main className="dashboard-main">
-        <header className="dashboard-header">
-          <div>
-            <h1>Timetable</h1>
+      <main className="timetable-main">
 
-            <p>
-              Manage course schedules,
-              rooms and class times.
-            </p>
+        {/* TOP BAR */}
+
+        <div className="tt-topbar">
+
+          <div className="tt-global-search">
+            <span>⌕</span>
+
+            <input
+              type="text"
+              placeholder="Search courses, rooms, or anything..."
+              value={search}
+              onChange={(event) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+            />
+          </div>
+
+          <div className="tt-topbar-right">
+
+            <button className="tt-icon-button">
+              🔔
+              <small>1</small>
+            </button>
+
+            <div className="tt-user">
+
+              <div className="tt-user-avatar">
+                S
+              </div>
+
+              <div>
+                <strong>
+                  System Admin
+                </strong>
+              </div>
+
+              <span>⌄</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* PAGE HEADER */}
+
+        <header className="tt-page-header">
+
+          <div className="tt-title-wrapper">
+
+            <div className="tt-title-icon">
+              📅
+            </div>
+
+            <div>
+              <h1>
+                Timetable Management
+              </h1>
+
+              <p>
+                Organize and manage your class
+                schedules, rooms, and time slots.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="tt-header-date">
+            <span>▣</span>
+
+            {new Date().toLocaleDateString(
+              "en-US",
+              {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              }
+            )}
           </div>
 
           <button
-            type="button"
-            className="sign-in-button"
-            style={{
-              width: "auto",
-              padding:
-                "12px 22px",
-              cursor: "pointer",
-            }}
+            className="tt-add-button"
             onClick={
               openCreateModal
             }
           >
-            + Add Timetable
+            <span>＋</span>
+            Add Class to Timetable
           </button>
+
         </header>
 
-        <section className="dashboard-content">
-          {/* =================================================
-              ERROR
-          ================================================= */}
+        {/* CONTENT */}
+
+        <section className="tt-content">
 
           {error && (
-            <div
-              style={{
-                background:
-                  "#fee2e2",
-                color:
-                  "#991b1b",
-                padding:
-                  "12px 16px",
-                borderRadius:
-                  "10px",
-                marginBottom:
-                  "18px",
-                border:
-                  "1px solid #fecaca",
-              }}
-            >
-              {error}
+            <div className="tt-error">
+              <span>⚠</span>
+              <div>
+                {error}
+              </div>
+
+              <button
+                onClick={() =>
+                  setError("")
+                }
+              >
+                ×
+              </button>
             </div>
           )}
 
           {/* =================================================
-              TOOLBAR
+              STATISTICS
           ================================================= */}
 
-          <div
-            className="dashboard-panel"
-            style={{
-              marginBottom:
-                "20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems:
-                  "center",
-                justifyContent:
-                  "space-between",
-                gap: "15px",
-                flexWrap:
-                  "wrap",
-              }}
-            >
-              <div>
-                <h2
-                  style={{
-                    margin:
-                      "0 0 5px",
-                  }}
-                >
-                  Class Schedule
-                </h2>
+          <div className="tt-stats">
 
-                <p
-                  style={{
-                    margin: 0,
-                  }}
-                >
-                  {filteredTimetable.length}{" "}
-                  timetable slot
-                  {filteredTimetable.length !==
-                  1
-                    ? "s"
-                    : ""}
-                </p>
+            <div className="tt-stat-card">
+
+              <div className="tt-stat-icon purple">
+                📖
               </div>
+
+              <div>
+                <span>Total Classes</span>
+
+                <strong>
+                  {stats.totalClasses}
+                </strong>
+
+                <small>
+                  This semester
+                </small>
+              </div>
+
+              <div className="tt-stat-badge green">
+                + 12%
+              </div>
+
+            </div>
+
+            <div className="tt-stat-card">
+
+              <div className="tt-stat-icon blue">
+                👥
+              </div>
+
+              <div>
+                <span>Active Courses</span>
+
+                <strong>
+                  {stats.activeCourses}
+                </strong>
+
+                <small>
+                  This semester
+                </small>
+              </div>
+
+            </div>
+
+            <div className="tt-stat-card">
+
+              <div className="tt-stat-icon green">
+                🏫
+              </div>
+
+              <div>
+                <span>Total Rooms</span>
+
+                <strong>
+                  {stats.totalRooms}
+                </strong>
+
+                <small>
+                  Available rooms
+                </small>
+              </div>
+
+            </div>
+
+            <div className="tt-stat-card">
+
+              <div className="tt-stat-icon orange">
+                🕐
+              </div>
+
+              <div>
+                <span>Total Sections</span>
+
+                <strong>
+                  {stats.totalSections}
+                </strong>
+
+                <small>
+                  Scheduled sections
+                </small>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              FILTER BAR
+          ================================================= */}
+
+          <div className="tt-filter-bar">
+
+            <div className="tt-filter-search">
+              <span>⌕</span>
 
               <input
                 type="text"
-                placeholder="Search course, room or day..."
+                placeholder="Search by course, section, or room..."
                 value={search}
                 onChange={(event) =>
                   setSearch(
                     event.target.value
                   )
                 }
-                style={{
-                  width:
-                    "min(100%, 360px)",
-                  padding:
-                    "12px 14px",
-                  border:
-                    "1px solid #d1d5db",
-                  borderRadius:
-                    "10px",
-                  outline:
-                    "none",
-                  fontSize:
-                    "14px",
-                  boxSizing:
-                    "border-box",
-                }}
               />
             </div>
+
+            <select
+              value={courseFilter}
+              onChange={(event) =>
+                setCourseFilter(
+                  event.target.value
+                )
+              }
+            >
+              <option value="all">
+                All Courses
+              </option>
+
+              {courseOptions.map(
+                (course) => (
+                  <option
+                    key={course.code}
+                    value={course.code}
+                  >
+                    {course.code}
+                  </option>
+                )
+              )}
+            </select>
+
+            <select
+              value={sectionFilter}
+              onChange={(event) =>
+                setSectionFilter(
+                  event.target.value
+                )
+              }
+            >
+              <option value="all">
+                All Sections
+              </option>
+
+              {sectionOptions.map(
+                (section) => (
+                  <option
+                    key={section}
+                    value={section}
+                  >
+                    Section {section}
+                  </option>
+                )
+              )}
+            </select>
+
+            <select
+              value={roomFilter}
+              onChange={(event) =>
+                setRoomFilter(
+                  event.target.value
+                )
+              }
+            >
+              <option value="all">
+                All Rooms
+              </option>
+
+              {roomOptions.map(
+                (room) => (
+                  <option
+                    key={room}
+                    value={room}
+                  >
+                    {room}
+                  </option>
+                )
+              )}
+            </select>
+
+            <select
+              value={dayFilter}
+              onChange={(event) =>
+                setDayFilter(
+                  event.target.value
+                )
+              }
+            >
+              <option value="all">
+                All Days
+              </option>
+
+              {DAYS.map((day) => (
+                <option
+                  key={day.value}
+                  value={day.value}
+                >
+                  {day.label}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="tt-reset-button"
+              onClick={resetFilters}
+            >
+              ↻
+              Reset
+            </button>
+
+            <div className="tt-view-toggle">
+
+              <button
+                className={
+                  viewMode === "list"
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setViewMode("list")
+                }
+              >
+                ▤
+                List
+              </button>
+
+              <button
+                className={
+                  viewMode === "calendar"
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setViewMode(
+                    "calendar"
+                  )
+                }
+              >
+                ▦
+                Calendar
+              </button>
+
+            </div>
+
           </div>
 
           {/* =================================================
-              TABLE
+              GRID
           ================================================= */}
 
-          <div className="dashboard-panel">
-            {loading ? (
-              <div className="empty-state">
-                <div className="empty-icon">
-                  ◷
+          <div className="tt-layout">
+
+            {/* MAIN TABLE */}
+
+            <div className="tt-table-card">
+
+              <div className="tt-table-header">
+
+                <div>
+                  <h2>
+                    Class Schedule
+                  </h2>
+
+                  <p>
+                    {filteredTimetable.length} scheduled
+                    {filteredTimetable.length === 1
+                      ? " class"
+                      : " classes"}
+                  </p>
                 </div>
 
-                <h3>
-                  Loading timetable...
-                </h3>
-
-                <p>
-                  Please wait.
-                </p>
-              </div>
-            ) : filteredTimetable.length ===
-              0 ? (
-              <div className="empty-state">
-                <div className="empty-icon">
-                  ◫
-                </div>
-
-                <h3>
-                  No timetable
-                  slots found
-                </h3>
-
-                <p>
-                  Add your first
-                  timetable slot.
-                </p>
-              </div>
-            ) : (
-              <div
-                style={{
-                  width:
-                    "100%",
-                  overflowX:
-                    "auto",
-                }}
-              >
-                <table
-                  style={{
-                    width:
-                      "100%",
-                    borderCollapse:
-                      "collapse",
-                    minWidth:
-                      "900px",
-                  }}
+                <button
+                  className="tt-small-add"
+                  onClick={
+                    openCreateModal
+                  }
                 >
-                  <thead>
-                    <tr>
-                      {[
-                        "Course",
-                        "Section",
-                        "Room",
-                        "Day",
-                        "Time",
-                        "Start Date",
-                        "End Date",
-                        "Actions",
-                      ].map(
-                        (
-                          heading
-                        ) => (
-                          <th
-                            key={
-                              heading
-                            }
-                            style={{
-                              textAlign:
-                                "left",
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #e5e7eb",
-                              fontSize:
-                                "13px",
-                              whiteSpace:
-                                "nowrap",
-                            }}
-                          >
-                            {
-                              heading
-                            }
-                          </th>
-                        )
-                      )}
-                    </tr>
-                  </thead>
+                  ＋ Add
+                </button>
 
-                  <tbody>
-                    {filteredTimetable.map(
-                      (item) => (
-                        <tr
-                          key={
-                            item.id
+              </div>
+
+              {loading ? (
+                <div className="tt-empty">
+                  <div className="tt-loading-spinner" />
+                  <h3>
+                    Loading timetable...
+                  </h3>
+                  <p>
+                    Please wait.
+                  </p>
+                </div>
+              ) : filteredTimetable.length === 0 ? (
+                <div className="tt-empty">
+                  <div className="tt-empty-icon">
+                    📅
+                  </div>
+
+                  <h3>
+                    No timetable slots found
+                  </h3>
+
+                  <p>
+                    Try changing your filters
+                    or add a new class.
+                  </p>
+
+                  <button
+                    onClick={
+                      openCreateModal
+                    }
+                  >
+                    ＋ Add Class
+                  </button>
+                </div>
+              ) : viewMode === "calendar" ? (
+                <div className="tt-calendar-view">
+
+                  {DAYS.map((day) => {
+                    const dayItems =
+                      filteredTimetable.filter(
+                        (item) =>
+                          item.day_of_week ===
+                          day.value
+                      );
+
+                    return (
+                      <div
+                        className="tt-calendar-day"
+                        key={day.value}
+                      >
+                        <div className="tt-calendar-day-header">
+                          <strong>
+                            {day.label}
+                          </strong>
+
+                          <span>
+                            {dayItems.length}
+                          </span>
+                        </div>
+
+                        <div className="tt-day-items">
+
+                          {dayItems.length === 0 ? (
+                            <div className="tt-day-empty">
+                              No classes
+                            </div>
+                          ) : (
+                            dayItems.map(
+                              (item) => (
+                                <div
+                                  className="tt-calendar-item"
+                                  key={item.id}
+                                >
+                                  <div className="tt-calendar-course-icon">
+                                    📚
+                                  </div>
+
+                                  <div>
+                                    <strong>
+                                      {item.course_code ||
+                                        "-"}
+                                    </strong>
+
+                                    <span>
+                                      {item.course_name ||
+                                        "-"}
+                                    </span>
+
+                                    <small>
+                                      {formatTime(
+                                        item.start_time
+                                      )}{" "}
+                                      -{" "}
+                                      {formatTime(
+                                        item.end_time
+                                      )}
+                                    </small>
+                                  </div>
+                                </div>
+                              )
+                            )
+                          )}
+
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                </div>
+              ) : (
+                <div className="tt-table-scroll">
+
+                  <table className="tt-table">
+
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Course</th>
+                        <th>Section</th>
+                        <th>Room</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+
+                      {filteredTimetable.map(
+                        (item, index) => {
+
+                          const dayColor =
+                            DAY_COLORS[
+                              item.day_of_week
+                            ] ||
+                            "blue";
+
+                          return (
+                            <tr
+                              key={item.id}
+                            >
+
+                              <td>
+                                <span className="tt-row-number">
+                                  {String(
+                                    index + 1
+                                  ).padStart(
+                                    2,
+                                    "0"
+                                  )}
+                                </span>
+                              </td>
+
+                              <td>
+                                <div className="tt-course-cell">
+
+                                  <div className="tt-course-icon">
+                                    📖
+                                  </div>
+
+                                  <div>
+                                    <strong>
+                                      {item.course_code ||
+                                        "-"}
+                                    </strong>
+
+                                    <span>
+                                      {item.course_name ||
+                                        "-"}
+                                    </span>
+                                  </div>
+
+                                </div>
+                              </td>
+
+                              <td>
+                                <strong>
+                                  {item.section_name ||
+                                    "-"}
+                                </strong>
+                              </td>
+
+                              <td>
+                                <div className="tt-room-cell">
+
+                                  <strong>
+                                    {item.room_name ||
+                                      "No Room"}
+                                  </strong>
+
+                                  <span>
+                                    {item.building ||
+                                      "—"}
+                                  </span>
+
+                                </div>
+                              </td>
+
+                              <td>
+                                <span
+                                  className={`tt-day-badge ${dayColor}`}
+                                >
+                                  {formatDay(
+                                    item.day_of_week
+                                  )}
+                                </span>
+                              </td>
+
+                              <td>
+                                <strong className="tt-time">
+                                  {formatTime(
+                                    item.start_time
+                                  )}{" "}
+                                  -{" "}
+                                  {formatTime(
+                                    item.end_time
+                                  )}
+                                </strong>
+                              </td>
+
+                              <td>
+                                {getDateValue(
+                                  item.start_date
+                                ) || "-"}
+                              </td>
+
+                              <td>
+                                {getDateValue(
+                                  item.end_date
+                                ) || "-"}
+                              </td>
+
+                              <td>
+                                <span className="tt-status active">
+                                  <i />
+                                  Active
+                                </span>
+                              </td>
+
+                              <td>
+                                <div className="tt-actions">
+
+                                  <button
+                                    className="tt-action edit"
+                                    title="Edit"
+                                    onClick={() =>
+                                      openEditModal(
+                                        item
+                                      )
+                                    }
+                                  >
+                                    ✎
+                                  </button>
+
+                                  <button
+                                    className="tt-action delete"
+                                    title="Delete"
+                                    onClick={() =>
+                                      handleDelete(
+                                        item.id
+                                      )
+                                    }
+                                  >
+                                    🗑
+                                  </button>
+
+                                  <button
+                                    className="tt-action more"
+                                    title="More"
+                                  >
+                                    ⋯
+                                  </button>
+
+                                </div>
+                              </td>
+
+                            </tr>
+                          );
+                        }
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+              )}
+
+            </div>
+
+            {/* =================================================
+                RIGHT SIDEBAR
+            ================================================= */}
+
+            <aside className="tt-right-sidebar">
+
+              {/* CALENDAR */}
+
+              <div className="tt-side-card">
+
+                <div className="tt-side-card-header">
+                  <h3>
+                    {new Date().toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "long",
+                        year: "numeric",
+                      }
+                    )}
+                  </h3>
+
+                  <div>
+                    <button>‹</button>
+                    <button>›</button>
+                  </div>
+                </div>
+
+                <div className="tt-weekdays">
+                  {[
+                    "Sun",
+                    "Mon",
+                    "Tue",
+                    "Wed",
+                    "Thu",
+                    "Fri",
+                    "Sat",
+                  ].map(
+                    (day) => (
+                      <span key={day}>
+                        {day}
+                      </span>
+                    )
+                  )}
+                </div>
+
+                <div className="tt-calendar-grid">
+
+                  {Array.from(
+                    {
+                      length:
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth(),
+                          1
+                        ).getDay(),
+                    },
+                    (_, index) => (
+                      <span
+                        key={`empty-${index}`}
+                      />
+                    )
+                  )}
+
+                  {Array.from(
+                    {
+                      length:
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth() + 1,
+                          0
+                        ).getDate(),
+                    },
+                    (_, index) => {
+
+                      const day =
+                        index + 1;
+
+                      const isToday =
+                        day ===
+                          new Date().getDate();
+
+                      return (
+                        <span
+                          key={day}
+                          className={
+                            isToday
+                              ? "today"
+                              : ""
                           }
                         >
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                            }}
-                          >
+                          {day}
+                        </span>
+                      );
+                    }
+                  )}
+
+                </div>
+
+              </div>
+
+              {/* QUICK ACTIONS */}
+
+              <div className="tt-side-card">
+
+                <h3 className="tt-side-title">
+                  Quick Actions
+                </h3>
+
+                <button
+                  className="tt-quick-action blue"
+                  onClick={
+                    openCreateModal
+                  }
+                >
+                  <span>＋</span>
+                  Add New Class
+                </button>
+
+                <button
+                  className="tt-quick-action gray"
+                  onClick={() =>
+                    goTo(
+                      "/admin/rooms"
+                    )
+                  }
+                >
+                  <span>🏫</span>
+                  Manage Rooms
+                </button>
+
+                <button
+                  className="tt-quick-action red"
+                  onClick={() =>
+                    setError(
+                      "Conflict detection can be connected to the timetable backend."
+                    )
+                  }
+                >
+                  <span>⚠</span>
+                  View Conflicts
+                </button>
+
+                <button
+                  className="tt-quick-action green"
+                  onClick={() => {
+                    window.print();
+                  }}
+                >
+                  <span>⇩</span>
+                  Export Timetable
+                </button>
+
+              </div>
+
+              {/* TODAY CLASSES */}
+
+              <div className="tt-side-card">
+
+                <div className="tt-side-card-header">
+                  <h3>
+                    Today's Classes
+                  </h3>
+
+                  <button
+                    className="tt-view-all"
+                    onClick={() => {
+                      setDayFilter(
+                        DAYS.find(
+                          (day) =>
+                            day.value ===
+                            timetable.find(
+                              (item) =>
+                                item.day_of_week
+                            )?.day_of_week
+                        )?.value ||
+                          "all"
+                      );
+                    }}
+                  >
+                    View All
+                  </button>
+                </div>
+
+                {todayClasses.length === 0 ? (
+                  <div className="tt-no-today">
+                    No classes scheduled
+                    today.
+                  </div>
+                ) : (
+                  <div className="tt-today-list">
+
+                    {todayClasses.map(
+                      (item) => (
+                        <div
+                          className="tt-today-item"
+                          key={item.id}
+                        >
+
+                          <div className="tt-today-icon">
+                            📘
+                          </div>
+
+                          <div>
                             <strong>
                               {item.course_code ||
-                                "-"}
-                            </strong>
-
-                            <div
-                              style={{
-                                fontSize:
-                                  "12px",
-                                color:
-                                  "#6b7280",
-                                marginTop:
-                                  "3px",
-                              }}
-                            >
+                                "-"}{" "}
+                              -{" "}
                               {item.course_name ||
                                 "-"}
-                            </div>
-                          </td>
-
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                            }}
-                          >
-                            {item.section_name ||
-                              "-"}
-                          </td>
-
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                            }}
-                          >
-                            <strong>
-                              {item.room_name ||
-                                "-"}
                             </strong>
 
-                            <div
-                              style={{
-                                fontSize:
-                                  "12px",
-                                color:
-                                  "#6b7280",
-                                marginTop:
-                                  "3px",
-                              }}
-                            >
-                              {item.building ||
-                                ""}
-                            </div>
-                          </td>
+                            <span>
+                              ◷{" "}
+                              {formatTime(
+                                item.start_time
+                              )}{" "}
+                              -{" "}
+                              {formatTime(
+                                item.end_time
+                              )}
+                            </span>
 
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                            }}
-                          >
-                            {formatDay(
-                              item.day_of_week
-                            )}
-                          </td>
+                            <span>
+                              ⌖{" "}
+                              {item.room_name ||
+                                "No Room"}
+                            </span>
+                          </div>
 
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                              whiteSpace:
-                                "nowrap",
-                            }}
-                          >
-                            {formatTime(
-                              item.start_time
-                            )}{" "}
-                            -{" "}
-                            {formatTime(
-                              item.end_time
-                            )}
-                          </td>
-
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                            }}
-                          >
-                            {item.start_date
-                              ? String(
-                                  item.start_date
-                                ).slice(
-                                  0,
-                                  10
-                                )
-                              : "-"}
-                          </td>
-
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                              borderBottom:
-                                "1px solid #f1f5f9",
-                            }}
-                          >
-                            {item.end_date
-                              ? String(
-                                  item.end_date
-                                ).slice(
-                                  0,
-                                  10
-                                )
-                              : "-"}
-                          </td>
-
-                          <td
-                            style={{
-                              padding:
-                                "14px 12px",
-                                borderBottom:
-                                  "1px solid #f1f5f9",
-                              whiteSpace:
-                                "nowrap",
-                            }}
-                          >
-                            <button
-                              type="button"
-                              onClick={() =>
-                                openEditModal(
-                                  item
-                                )
-                              }
-                              style={{
-                                border:
-                                  "none",
-                                background:
-                                  "#eef2ff",
-                                color:
-                                  "#3730a3",
-                                padding:
-                                  "8px 12px",
-                                borderRadius:
-                                  "8px",
-                                cursor:
-                                  "pointer",
-                                marginRight:
-                                  "6px",
-                              }}
-                            >
-                              Edit
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleDelete(
-                                  item.id
-                                )
-                              }
-                              style={{
-                                border:
-                                  "none",
-                                background:
-                                  "#fee2e2",
-                                color:
-                                  "#991b1b",
-                                padding:
-                                  "8px 12px",
-                                borderRadius:
-                                  "8px",
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
+                        </div>
                       )
                     )}
-                  </tbody>
-                </table>
+
+                  </div>
+                )}
+
               </div>
-            )}
+
+            </aside>
+
           </div>
+
         </section>
+
+        <footer className="tt-footer">
+          © 2026 Attendify. All rights reserved.
+          <span>
+            Smart Education. Smarter Tomorrow.
+          </span>
+        </footer>
+
       </main>
 
       {/* =====================================================
@@ -1067,105 +1736,49 @@ export default function Timetable() {
 
       {showModal && (
         <div
-          style={{
-            position:
-              "fixed",
-            inset: 0,
-            background:
-              "rgba(15, 23, 42, 0.55)",
-            display:
-              "flex",
-            alignItems:
-              "center",
-            justifyContent:
-              "center",
-            padding:
-              "20px",
-            zIndex: 9999,
+          className="tt-modal-overlay"
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeModal();
+            }
           }}
         >
-          <div
-            style={{
-              width:
-                "min(650px, 100%)",
-              maxHeight:
-                "90vh",
-              overflowY:
-                "auto",
-              background:
-                "#ffffff",
-              borderRadius:
-                "18px",
-              padding:
-                "26px",
-              boxSizing:
-                "border-box",
-              boxShadow:
-                "0 25px 60px rgba(0,0,0,0.2)",
-            }}
-          >
-            <div
-              style={{
-                display:
-                  "flex",
-                alignItems:
-                  "center",
-                justifyContent:
-                  "space-between",
-                marginBottom:
-                  "20px",
-              }}
-            >
-              <div>
-                <h2
-                  style={{
-                    margin:
-                      "0 0 5px",
-                  }}
-                >
-                  {editingId
-                    ? "Edit Timetable"
-                    : "Add Timetable"}
-                </h2>
 
-                <p
-                  style={{
-                    margin: 0,
-                    color:
-                      "#64748b",
-                    fontSize:
-                      "14px",
-                  }}
-                >
-                  Configure the
-                  class schedule.
-                </p>
+          <div className="tt-modal">
+
+            <div className="tt-modal-header">
+
+              <div>
+                <div className="tt-modal-icon">
+                  📅
+                </div>
+
+                <div>
+                  <h2>
+                    {editingId
+                      ? "Edit Class"
+                      : "Add Class to Timetable"}
+                  </h2>
+
+                  <p>
+                    Configure the class
+                    schedule.
+                  </p>
+                </div>
               </div>
 
               <button
-                type="button"
+                className="tt-modal-close"
                 onClick={
                   closeModal
                 }
-                style={{
-                  border:
-                    "none",
-                  background:
-                    "#f1f5f9",
-                  width:
-                    "38px",
-                  height:
-                    "38px",
-                  borderRadius:
-                    "50%",
-                  cursor:
-                    "pointer",
-                  fontSize:
-                    "20px",
-                }}
               >
                 ×
               </button>
+
             </div>
 
             <form
@@ -1173,198 +1786,135 @@ export default function Timetable() {
                 handleSubmit
               }
             >
-              {/* SECTION */}
 
-              <div
-                className="form-group"
-                style={{
-                  marginBottom:
-                    "15px",
-                }}
-              >
-                <label>
-                  Section *
-                </label>
+              <div className="tt-form-grid">
 
-                <select
-                  name="sectionId"
-                  value={
-                    form.sectionId
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
-                  style={{
-                    width:
-                      "100%",
-                    padding:
-                      "12px",
-                    border:
-                      "1px solid #d1d5db",
-                    borderRadius:
-                      "10px",
-                    boxSizing:
-                      "border-box",
-                    background:
-                      "#fff",
-                  }}
-                >
-                  <option value="">
-                    Select Section
-                  </option>
+                <div className="tt-form-group full">
 
-                  {sections.map(
-                    (section) => (
-                      <option
-                        key={
-                          section.id
-                        }
-                        value={
-                          section.id
-                        }
-                      >
-                        {getSectionLabel(
-                          section
-                        )}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-
-              {/* ROOM */}
-
-              <div
-                className="form-group"
-                style={{
-                  marginBottom:
-                    "15px",
-                }}
-              >
-                <label>
-                  Room
-                </label>
-
-                <select
-                  name="roomId"
-                  value={
-                    form.roomId
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  style={{
-                    width:
-                      "100%",
-                    padding:
-                      "12px",
-                    border:
-                      "1px solid #d1d5db",
-                    borderRadius:
-                      "10px",
-                    boxSizing:
-                      "border-box",
-                    background:
-                      "#fff",
-                  }}
-                >
-                  <option value="">
-                    No Room
-                  </option>
-
-                  {rooms.map(
-                    (room) => (
-                      <option
-                        key={
-                          room.id
-                        }
-                        value={
-                          room.id
-                        }
-                      >
-                        {getRoomLabel(
-                          room
-                        )}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-
-              {/* DAY */}
-
-              <div
-                className="form-group"
-                style={{
-                  marginBottom:
-                    "15px",
-                }}
-              >
-                <label>
-                  Day *
-                </label>
-
-                <select
-                  name="dayOfWeek"
-                  value={
-                    form.dayOfWeek
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
-                  style={{
-                    width:
-                      "100%",
-                    padding:
-                      "12px",
-                    border:
-                      "1px solid #d1d5db",
-                    borderRadius:
-                      "10px",
-                    boxSizing:
-                      "border-box",
-                    background:
-                      "#fff",
-                  }}
-                >
-                  {DAYS.map(
-                    (day) => (
-                      <option
-                        key={
-                          day.value
-                        }
-                        value={
-                          day.value
-                        }
-                      >
-                        {
-                          day.label
-                        }
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-
-              {/* TIMES */}
-
-              <div
-                style={{
-                  display:
-                    "grid",
-                  gridTemplateColumns:
-                    "1fr 1fr",
-                  gap:
-                    "14px",
-                }}
-              >
-                <div
-                  className="form-group"
-                >
                   <label>
-                    Start Time *
+                    Section
+                    <span>*</span>
+                  </label>
+
+                  <select
+                    name="sectionId"
+                    value={
+                      form.sectionId
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    required
+                  >
+
+                    <option value="">
+                      Select Course / Section
+                    </option>
+
+                    {sections.map(
+                      (section) => (
+                        <option
+                          key={
+                            section.id
+                          }
+                          value={
+                            section.id
+                          }
+                        >
+                          {getSectionLabel(
+                            section
+                          )}
+                        </option>
+                      )
+                    )}
+
+                  </select>
+
+                </div>
+
+                <div className="tt-form-group">
+
+                  <label>
+                    Room
+                  </label>
+
+                  <select
+                    name="roomId"
+                    value={
+                      form.roomId
+                    }
+                    onChange={
+                      handleChange
+                    }
+                  >
+
+                    <option value="">
+                      No Room
+                    </option>
+
+                    {rooms.map(
+                      (room) => (
+                        <option
+                          key={
+                            room.id
+                          }
+                          value={
+                            room.id
+                          }
+                        >
+                          {getRoomLabel(
+                            room
+                          )}
+                        </option>
+                      )
+                    )}
+
+                  </select>
+
+                </div>
+
+                <div className="tt-form-group">
+
+                  <label>
+                    Day
+                    <span>*</span>
+                  </label>
+
+                  <select
+                    name="dayOfWeek"
+                    value={
+                      form.dayOfWeek
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    required
+                  >
+
+                    {DAYS.map(
+                      (day) => (
+                        <option
+                          key={
+                            day.value
+                          }
+                          value={
+                            day.value
+                          }
+                        >
+                          {day.label}
+                        </option>
+                      )
+                    )}
+
+                  </select>
+
+                </div>
+
+                <div className="tt-form-group">
+
+                  <label>
+                    Start Time
+                    <span>*</span>
                   </label>
 
                   <input
@@ -1377,26 +1927,15 @@ export default function Timetable() {
                       handleChange
                     }
                     required
-                    style={{
-                      width:
-                        "100%",
-                      padding:
-                        "12px",
-                      border:
-                        "1px solid #d1d5db",
-                      borderRadius:
-                        "10px",
-                      boxSizing:
-                        "border-box",
-                    }}
                   />
+
                 </div>
 
-                <div
-                  className="form-group"
-                >
+                <div className="tt-form-group">
+
                   <label>
-                    End Time *
+                    End Time
+                    <span>*</span>
                   </label>
 
                   <input
@@ -1409,39 +1948,12 @@ export default function Timetable() {
                       handleChange
                     }
                     required
-                    style={{
-                      width:
-                        "100%",
-                      padding:
-                        "12px",
-                      border:
-                        "1px solid #d1d5db",
-                      borderRadius:
-                        "10px",
-                      boxSizing:
-                        "border-box",
-                    }}
                   />
+
                 </div>
-              </div>
 
-              {/* DATES */}
+                <div className="tt-form-group">
 
-              <div
-                style={{
-                  display:
-                    "grid",
-                  gridTemplateColumns:
-                    "1fr 1fr",
-                  gap:
-                    "14px",
-                  marginTop:
-                    "15px",
-                }}
-              >
-                <div
-                  className="form-group"
-                >
                   <label>
                     Start Date
                   </label>
@@ -1455,24 +1967,12 @@ export default function Timetable() {
                     onChange={
                       handleChange
                     }
-                    style={{
-                      width:
-                        "100%",
-                      padding:
-                        "12px",
-                      border:
-                        "1px solid #d1d5db",
-                      borderRadius:
-                        "10px",
-                      boxSizing:
-                        "border-box",
-                    }}
                   />
+
                 </div>
 
-                <div
-                  className="form-group"
-                >
+                <div className="tt-form-group">
+
                   <label>
                     End Date
                   </label>
@@ -1486,107 +1986,56 @@ export default function Timetable() {
                     onChange={
                       handleChange
                     }
-                    style={{
-                      width:
-                        "100%",
-                      padding:
-                        "12px",
-                      border:
-                        "1px solid #d1d5db",
-                      borderRadius:
-                        "10px",
-                      boxSizing:
-                        "border-box",
-                    }}
                   />
+
                 </div>
+
               </div>
 
               {error && (
-                <div
-                  style={{
-                    marginTop:
-                      "15px",
-                    background:
-                      "#fee2e2",
-                    color:
-                      "#991b1b",
-                    padding:
-                      "10px 12px",
-                    borderRadius:
-                      "8px",
-                    fontSize:
-                      "14px",
-                  }}
-                >
-                  {error}
+                <div className="tt-modal-error">
+                  ⚠ {error}
                 </div>
               )}
 
-              {/* BUTTONS */}
+              <div className="tt-modal-footer">
 
-              <div
-                style={{
-                  display:
-                    "flex",
-                  justifyContent:
-                    "flex-end",
-                  gap:
-                    "10px",
-                  marginTop:
-                    "24px",
-                }}
-              >
                 <button
                   type="button"
+                  className="tt-cancel"
                   onClick={
                     closeModal
                   }
                   disabled={
                     saving
                   }
-                  style={{
-                    border:
-                      "1px solid #d1d5db",
-                    background:
-                      "#fff",
-                    padding:
-                      "11px 18px",
-                    borderRadius:
-                      "9px",
-                    cursor:
-                      "pointer",
-                  }}
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
+                  className="tt-save"
                   disabled={
                     saving
                   }
-                  className="sign-in-button"
-                  style={{
-                    width:
-                      "auto",
-                    padding:
-                      "11px 20px",
-                    cursor:
-                      "pointer",
-                  }}
                 >
                   {saving
                     ? "Saving..."
                     : editingId
-                    ? "Update"
-                    : "Create"}
+                    ? "Update Class"
+                    : "Create Class"}
                 </button>
+
               </div>
+
             </form>
+
           </div>
+
         </div>
       )}
+
     </div>
   );
 }
