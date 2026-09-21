@@ -1,4 +1,4 @@
-﻿import "./Attendance.css";
+import "./Attendance.css";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -693,7 +693,7 @@ export default function Attendance() {
         <div className="attendance-brand">
 
           <div className="attendance-brand-icon">
-            ðŸŽ“
+            🎓
           </div>
 
           <div>
@@ -717,7 +717,7 @@ export default function Attendance() {
               )
             }
           >
-            â–¦
+            ▦
             <span>
               Dashboard
             </span>
@@ -730,7 +730,7 @@ export default function Attendance() {
               )
             }
           >
-            ðŸ‘¤
+            👤
             <span>
               Users
             </span>
@@ -743,7 +743,7 @@ export default function Attendance() {
               )
             }
           >
-            â–¤
+            ▤
             <span>
               Courses
             </span>
@@ -756,7 +756,7 @@ export default function Attendance() {
               )
             }
           >
-            Â§
+            §
             <span>
               Sections
             </span>
@@ -769,7 +769,7 @@ export default function Attendance() {
               )
             }
           >
-            âŒ‚
+            ⌂
             <span>
               Rooms
             </span>
@@ -782,14 +782,14 @@ export default function Attendance() {
               )
             }
           >
-            â–¦
+            ▦
             <span>
               Timetable
             </span>
           </button>
 
           <button className="active">
-            âœ“
+            ✓
             <span>
               Attendance
             </span>
@@ -802,7 +802,7 @@ export default function Attendance() {
               )
             }
           >
-            â–¥
+            ▥
             <span>
               Reports
             </span>
@@ -815,7 +815,7 @@ export default function Attendance() {
               )
             }
           >
-            âš™
+            ⚙
             <span>
               Settings
             </span>
@@ -828,7 +828,7 @@ export default function Attendance() {
           <div className="attendance-good-morning">
 
             <strong>
-              Good Morning ðŸ‘‹
+              Good Morning 👋
             </strong>
 
             <span>
@@ -854,7 +854,7 @@ export default function Attendance() {
               );
             }}
           >
-            â†ª
+            ↪
             Logout
           </button>
 
@@ -873,7 +873,7 @@ export default function Attendance() {
         <header className="attendance-topbar">
 
           <div className="attendance-global-search">
-            ðŸ”Ž
+            🔎
             <input
               placeholder="Search students, courses, sections, or rooms..."
               value={search}
@@ -888,7 +888,7 @@ export default function Attendance() {
           <div className="attendance-user">
 
             <span className="attendance-notification">
-              ðŸ””
+              🔔
               <b>3</b>
             </span>
 
@@ -922,7 +922,7 @@ export default function Attendance() {
             </div>
 
             <span>
-              â–¾
+              ▾
             </span>
 
           </div>
@@ -936,7 +936,7 @@ export default function Attendance() {
           <div className="attendance-title">
 
             <div className="attendance-title-icon">
-              ðŸ‘¥
+              👥
             </div>
 
             <div>
@@ -980,7 +980,7 @@ export default function Attendance() {
         <section className="attendance-stats">
 
           <StatCard
-            icon="ðŸ‘¥"
+            icon="👥"
             title="Total Students"
             value={
               statistics.students
@@ -990,7 +990,7 @@ export default function Attendance() {
           />
 
           <StatCard
-            icon="âœ“"
+            icon="✓"
             title="Present Today"
             value={
               statistics.present
@@ -1000,7 +1000,7 @@ export default function Attendance() {
           />
 
           <StatCard
-            icon="Ã—"
+            icon="×"
             title="Absent Today"
             value={
               statistics.absent
@@ -1010,7 +1010,7 @@ export default function Attendance() {
           />
 
           <StatCard
-            icon="â—·"
+            icon="◷"
             title="Late Today"
             value={
               statistics.late
@@ -1027,7 +1027,7 @@ export default function Attendance() {
 
           <div className="attendance-search">
 
-            ðŸ”Ž
+            🔎
 
             <input
               placeholder="Search by student name, ID, or course..."
@@ -1146,7 +1146,7 @@ export default function Attendance() {
               resetFilters
             }
           >
-            â†» Reset
+            ↻ Reset
           </button>
 
           <button
@@ -1155,7 +1155,7 @@ export default function Attendance() {
               exportAttendance
             }
           >
-            â†“ Export
+            ↓ Export
           </button>
 
         </section>
@@ -1191,7 +1191,7 @@ export default function Attendance() {
                   loadAttendance
                 }
               >
-                â†» Refresh
+                ↻ Refresh
               </button>
 
             </div>
@@ -1426,7 +1426,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  ðŸ‘
+                                  👁
                                 </button>
 
                                 <button
@@ -1437,7 +1437,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  âœŽ
+                                  ✎
                                 </button>
 
                                 <button
@@ -1454,7 +1454,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  â‹¯
+                                  ⋯
                                 </button>
 
                               </div>
@@ -1587,7 +1587,7 @@ export default function Attendance() {
                     >
 
                       <div className="attendance-class-icon">
-                        â–£
+                        ▣
                       </div>
 
                       <div>
@@ -1637,7 +1637,7 @@ export default function Attendance() {
                     )
                   }
                 >
-                  ðŸ‘¥ Take Attendance
+                  👥 Take Attendance
                 </button>
 
                 <button
@@ -1645,7 +1645,7 @@ export default function Attendance() {
                     exportAttendance
                   }
                 >
-                  â†“ Export CSV
+                  ↓ Export CSV
                 </button>
 
                 <button
@@ -1655,7 +1655,7 @@ export default function Attendance() {
                     )
                   }
                 >
-                  â–¥ View Reports
+                  ▥ View Reports
                 </button>
 
                 <button
@@ -1665,7 +1665,7 @@ export default function Attendance() {
                     )
                   }
                 >
-                  â–£ Manage Sessions
+                  ▣ Manage Sessions
                 </button>
 
               </div>
@@ -1754,7 +1754,7 @@ export default function Attendance() {
                       )
                     }
                   >
-                    Ã—
+                    ×
                   </button>
 
                 </div>
@@ -1880,7 +1880,7 @@ export default function Attendance() {
                       )
                     }
                   >
-                    Ã—
+                    ×
                   </button>
 
                 </div>
