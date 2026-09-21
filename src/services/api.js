@@ -598,6 +598,35 @@ export async function getSessionRoster(
 
 
 /* =========================================================
+   MANUAL ATTENDANCE CORRECTION
+========================================================= */
+
+export async function updateAttendanceCorrection(
+  eventId,
+  {
+    sessionId,
+    studentId,
+    status,
+    reason,
+  }
+) {
+  return apiRequest(
+    `/corrections/${eventId}`,
+    {
+      method: "PATCH",
+
+      body: JSON.stringify({
+        sessionId,
+        studentId,
+        status,
+        reason,
+      }),
+    }
+  );
+}
+
+
+/* =========================================================
    STUDENT ATTENDANCE
 ========================================================= */
 
@@ -876,57 +905,94 @@ export async function getLecturerAttendanceReport(
     `/reports/attendance${suffix}`
   );
 }
-// ============================================================
-// ATTENDANCE REPORTS
-// ============================================================
 
-export async function getAttendanceReport(params = {}) {
-  const query = new URLSearchParams();
 
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      query.set(key, value);
+/* ============================================================
+   ATTENDANCE REPORTS
+============================================================ */
+
+export async function getAttendanceReport(
+  params = {}
+) {
+  const query =
+    new URLSearchParams();
+
+  Object.entries(params).forEach(
+    ([key, value]) => {
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        query.set(key, value);
+      }
     }
-  });
+  );
 
-  const queryString = query.toString();
+  const queryString =
+    query.toString();
 
   return apiRequest(
-    `/reports/attendance${queryString ? `?${queryString}` : ""}`
+    `/reports/attendance${
+      queryString
+        ? `?${queryString}`
+        : ""
+    }`
   );
 }
 
-export async function exportAttendanceReport(params = {}) {
-  const query = new URLSearchParams();
 
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      query.set(key, value);
+export async function exportAttendanceReport(
+  params = {}
+) {
+  const query =
+    new URLSearchParams();
+
+  Object.entries(params).forEach(
+    ([key, value]) => {
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        query.set(key, value);
+      }
     }
-  });
+  );
 
-  const queryString = query.toString();
+  const queryString =
+    query.toString();
 
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("token");
 
   const response = await fetch(
     `${API_URL}/reports/attendance/export${
-      queryString ? `?${queryString}` : ""
+      queryString
+        ? `?${queryString}`
+        : ""
     }`,
     {
       method: "GET",
+
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization:
+          `Bearer ${token}`,
       },
     }
   );
 
   if (!response.ok) {
-    let message = "Failed to export attendance report";
+    let message =
+      "Failed to export attendance report";
 
     try {
-      const errorData = await response.json();
-      message = errorData.message || message;
+      const errorData =
+        await response.json();
+
+      message =
+        errorData.message ||
+        message;
     } catch {
       // Response is not JSON
     }
@@ -934,16 +1000,24 @@ export async function exportAttendanceReport(params = {}) {
     throw new Error(message);
   }
 
-  const blob = await response.blob();
+  const blob =
+    await response.blob();
 
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const url =
+    window.URL.createObjectURL(blob);
+
+  const link =
+    document.createElement("a");
 
   link.href = url;
-  link.download = "attendance-report.csv";
+
+  link.download =
+    "attendance-report.csv";
 
   document.body.appendChild(link);
+
   link.click();
+
   link.remove();
 
   window.URL.revokeObjectURL(url);
