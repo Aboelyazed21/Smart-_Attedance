@@ -6,7 +6,7 @@ import {
   refreshSessionQr,
   closeSession,
   getSessionRoster,
-  getSections,
+  getLecturerSections,
   getRooms,
   getLecturerSectionStudents,
   addStudentToLecturerSection,
@@ -154,8 +154,6 @@ function AttendanceSessions() {
   const [correctionStatus, setCorrectionStatus] = useState("present");
   const [correctionReason, setCorrectionReason] = useState("");
   const [correctionLoading, setCorrectionLoading] = useState(false);
-  const [rosterSearch, setRosterSearch] = useState("");
-  const [rosterStatusFilter, setRosterStatusFilter] = useState("all");
 
   const [showStudentsModal, setShowStudentsModal] = useState(false);
   const [sectionStudents, setSectionStudents] = useState([]);
@@ -212,7 +210,7 @@ function AttendanceSessions() {
       const [sessionsResult, sectionsResult, roomsResult] =
         await Promise.all([
           getSessions(),
-          getSections(),
+          getLecturerSections(),
           getRooms(),
         ]);
 
@@ -461,8 +459,6 @@ function AttendanceSessions() {
 
       setSelectedSession(session);
       setRoster(normalizeRoster(data));
-      setRosterSearch("");
-      setRosterStatusFilter("all");
       setShowRosterModal(true);
     } catch (err) {
       console.error("Roster error:", err);
@@ -470,77 +466,6 @@ function AttendanceSessions() {
     } finally {
       setActionLoading(false);
     }
-  }
-
-  async function handleRefreshRoster() {
-    if (!selectedSession?.id) return;
-
-    try {
-      setActionLoading(true);
-      const data = await getSessionRoster(selectedSession.id);
-      setRoster(normalizeRoster(data));
-      showToast("success", "Roster refreshed.");
-    } catch (err) {
-      console.error("Refresh roster error:", err);
-      showToast("error", err.message || "Failed to refresh roster.");
-    } finally {
-      setActionLoading(false);
-    }
-  }
-
-  function handleExportRoster() {
-    if (!roster.length || !selectedSession) return;
-
-    const escapeCsv = (value) => {
-      const text = String(value ?? "");
-      return `"${text.replace(/"/g, '""')}"`;
-    };
-
-    const rows = roster.map((student) => [
-      student.student_code || "",
-      `${student.first_name || ""} ${student.last_name || ""}`.trim(),
-      student.email || "",
-      student.attendance_status || "absent",
-      student.scanned_at
-        ? new Date(student.scanned_at).toLocaleString()
-        : "",
-      student.source || "",
-      student.qr_version || "",
-      student.notes || "",
-    ]);
-
-    const csv = [
-      [
-        "Student Code",
-        "Student Name",
-        "Email",
-        "Attendance",
-        "Scanned At",
-        "Source",
-        "QR Version",
-        "Notes",
-      ],
-      ...rows,
-    ]
-      .map((row) => row.map(escapeCsv).join(","))
-      .join("\r\n");
-
-    const blob = new Blob([`\uFEFF${csv}`], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const course = selectedSession.course_code || "session";
-    const date = String(selectedSession.session_date || "").slice(0, 10) || "roster";
-
-    link.href = url;
-    link.download = `${course}-${date}-attendance.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-
-    showToast("success", "Roster exported successfully.");
   }
 
   function handleOpenCorrection(student) {
@@ -812,37 +737,6 @@ function AttendanceSessions() {
             100
         )
       : 0;
-
-  const filteredRoster = useMemo(() => {
-    const query = rosterSearch.trim().toLowerCase();
-
-    return roster.filter((student) => {
-      const status = String(
-        student.attendance_status || student.status || "absent"
-      ).toLowerCase();
-
-      if (rosterStatusFilter !== "all" && status !== rosterStatusFilter) {
-        return false;
-      }
-
-      if (!query) return true;
-
-      const haystack = [
-        student.student_code,
-        student.student_name,
-        student.first_name,
-        student.last_name,
-        student.email,
-        status,
-        student.source,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(query);
-    });
-  }, [roster, rosterSearch, rosterStatusFilter]);
 
   return (
     <div className="lecturer-sessions-page">
@@ -1756,184 +1650,47 @@ function AttendanceSessions() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="roster-modal-header">
-              <div className="roster-header-main">
-                <div className="roster-header-icon">✓</div>
-                <div>
-                  <span className="section-kicker">SESSION ROSTER</span>
-                  <h2>Student attendance</h2>
-                  <p>
-                    {selectedSession?.course_code || "Course"}{" "}
-                    {selectedSession?.section_name
-                      ? `— Section ${selectedSession.section_name}`
-                      : ""}
-                    {selectedSession?.session_date
-                      ? ` · ${formatDate(selectedSession.session_date)}`
-                      : ""}
-                  </p>
-                </div>
-              </div>
-
-              <div className="roster-header-actions">
-                <button
-                  type="button"
-                  className="roster-header-button"
-                  onClick={handleRefreshRoster}
-                  disabled={actionLoading}
-                  title="Refresh roster"
-                >
-                  ↻ <span>Refresh</span>
-                </button>
-                <button
-                  type="button"
-                  className="roster-header-button roster-export-button"
-                  onClick={handleExportRoster}
-                  disabled={!roster.length}
-                  title="Export attendance CSV"
-                >
-                  ↓ <span>Export CSV</span>
-                </button>
-                <button
-                  type="button"
-                  className="modal-close"
-                  onClick={closeRosterModal}
-                  disabled={actionLoading}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-
-            <div className="roster-overview">
-              <div className="roster-overview-copy">
-                <span className="section-kicker">LIVE ATTENDANCE OVERVIEW</span>
-                <strong>{rosterAttendanceRate}%</strong>
+              <div>
+                <span className="section-kicker">SESSION ROSTER</span>
+                <h2>Student attendance</h2>
                 <p>
-                  {rosterStats.present + rosterStats.late} of{" "}
-                  {rosterStats.total} students counted as present or late.
+                  {selectedSession?.course_code || "Course"}{" "}
+                  {selectedSession?.section_name
+                    ? `â€” Section ${selectedSession.section_name}`
+                    : ""}
                 </p>
               </div>
-              <div className="roster-progress">
-                <div className="roster-progress-track">
-                  <span
-                    style={{ width: `${rosterAttendanceRate}%` }}
-                  />
-                </div>
-                <div className="roster-progress-labels">
-                  <span>Attendance rate</span>
-                  <strong>{rosterAttendanceRate}%</strong>
-                </div>
-              </div>
+
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeRosterModal}
+              >
+                Close
+              </button>
             </div>
 
             <div className="roster-stat-grid">
-              <button
-                type="button"
-                className={`roster-stat-card roster-stat-all ${
-                  rosterStatusFilter === "all" ? "is-selected" : ""
-                }`}
-                onClick={() => setRosterStatusFilter("all")}
-              >
+              <div>
                 <span>Total students</span>
                 <strong>{rosterStats.total}</strong>
-                <small>Active roster</small>
-              </button>
-              <button
-                type="button"
-                className={`roster-stat-card roster-stat-present ${
-                  rosterStatusFilter === "present" ? "is-selected" : ""
-                }`}
-                onClick={() => setRosterStatusFilter("present")}
-              >
+              </div>
+              <div className="roster-stat-present">
                 <span>Present</span>
                 <strong>{rosterStats.present}</strong>
-                <small>Confirmed attendance</small>
-              </button>
-              <button
-                type="button"
-                className={`roster-stat-card roster-stat-late ${
-                  rosterStatusFilter === "late" ? "is-selected" : ""
-                }`}
-                onClick={() => setRosterStatusFilter("late")}
-              >
+              </div>
+              <div className="roster-stat-late">
                 <span>Late</span>
                 <strong>{rosterStats.late}</strong>
-                <small>Arrived late</small>
-              </button>
-              <button
-                type="button"
-                className={`roster-stat-card roster-stat-absent ${
-                  rosterStatusFilter === "absent" ? "is-selected" : ""
-                }`}
-                onClick={() => setRosterStatusFilter("absent")}
-              >
+              </div>
+              <div className="roster-stat-absent">
                 <span>Absent</span>
                 <strong>{rosterStats.absent}</strong>
-                <small>No attendance record</small>
-              </button>
-              <button
-                type="button"
-                className={`roster-stat-card roster-stat-excused ${
-                  rosterStatusFilter === "excused" ? "is-selected" : ""
-                }`}
-                onClick={() => setRosterStatusFilter("excused")}
-              >
-                <span>Excused</span>
-                <strong>{rosterStats.excused}</strong>
-                <small>Approved exception</small>
-              </button>
-            </div>
-
-            <div className="roster-toolbar">
-              <div className="roster-search">
-                <span>⌕</span>
-                <input
-                  value={rosterSearch}
-                  onChange={(event) => setRosterSearch(event.target.value)}
-                  placeholder="Search student name, code, email..."
-                  aria-label="Search roster"
-                />
-                {rosterSearch && (
-                  <button
-                    type="button"
-                    onClick={() => setRosterSearch("")}
-                    aria-label="Clear roster search"
-                  >
-                    ×
-                  </button>
-                )}
               </div>
-
-              <select
-                value={rosterStatusFilter}
-                onChange={(event) => setRosterStatusFilter(event.target.value)}
-                aria-label="Filter attendance status"
-              >
-                <option value="all">All attendance</option>
-                <option value="present">Present</option>
-                <option value="late">Late</option>
-                <option value="absent">Absent</option>
-                <option value="excused">Excused</option>
-              </select>
-
-              <div className="roster-results">
-                <strong>{filteredRoster.length}</strong>
-                <span>
-                  {filteredRoster.length === 1 ? "student" : "students"} shown
-                </span>
+              <div className="roster-stat-rate">
+                <span>Attendance rate</span>
+                <strong>{rosterAttendanceRate}%</strong>
               </div>
-
-              {(rosterSearch || rosterStatusFilter !== "all") && (
-                <button
-                  type="button"
-                  className="roster-clear-button"
-                  onClick={() => {
-                    setRosterSearch("");
-                    setRosterStatusFilter("all");
-                  }}
-                >
-                  Clear filters
-                </button>
-              )}
             </div>
 
             <div className="roster-table-wrap">
@@ -1945,24 +1702,6 @@ function AttendanceSessions() {
                     There are no active enrollments returned for this session.
                   </p>
                 </div>
-              ) : filteredRoster.length === 0 ? (
-                <div className="sessions-empty roster-empty">
-                  <div className="empty-visual">⌕</div>
-                  <h3>No matching students</h3>
-                  <p>
-                    Try another student name, code, email, or attendance
-                    status.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRosterSearch("");
-                      setRosterStatusFilter("all");
-                    }}
-                  >
-                    Reset filters
-                  </button>
-                </div>
               ) : (
                 <table className="roster-table">
                   <thead>
@@ -1970,25 +1709,18 @@ function AttendanceSessions() {
                       <th>Student</th>
                       <th>Student code</th>
                       <th>Attendance</th>
-                      <th>Scan details</th>
+                      <th>Scanned at</th>
                       <th>Source</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredRoster.map((student) => {
+                    {roster.map((student) => {
                       const status = String(
                         student.attendance_status ||
                           student.status ||
                           "absent"
                       ).toLowerCase();
-
-                      const studentName =
-                        student.student_name ||
-                        `${student.first_name || ""} ${
-                          student.last_name || ""
-                        }`.trim() ||
-                        "Student";
 
                       return (
                         <tr key={student.student_id || student.id}>
@@ -2001,60 +1733,37 @@ function AttendanceSessions() {
                                 )}
                               </div>
                               <div>
-                                <strong>{studentName}</strong>
+                                <strong>
+                                  {student.student_name ||
+                                    `${student.first_name || ""} ${
+                                      student.last_name || ""
+                                    }`.trim() ||
+                                    "Student"}
+                                </strong>
                                 <span>
                                   {student.email || "Student account"}
                                 </span>
                               </div>
                             </div>
                           </td>
-                          <td>
-                            <span className="roster-code">
-                              {student.student_code || "-"}
-                            </span>
-                          </td>
+                          <td>{student.student_code || "-"}</td>
                           <td>
                             <span
                               className={`roster-status ${getRosterStatusClass(
                                 status
                               )}`}
                             >
-                              <span className="status-dot" />
                               {status}
                             </span>
                           </td>
                           <td>
-                            <div className="roster-scan-details">
-                              <strong>
-                                {student.scanned_at
-                                  ? new Date(
-                                      student.scanned_at
-                                    ).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })
-                                  : "Not scanned"}
-                              </strong>
-                              <span>
-                                {student.scanned_at
-                                  ? new Date(
-                                      student.scanned_at
-                                    ).toLocaleDateString("en-GB", {
-                                      day: "2-digit",
-                                      month: "short",
-                                    })
-                                  : "Manual / pending"}
-                              </span>
-                              {student.qr_version && (
-                                <small>QR v{student.qr_version}</small>
-                              )}
-                            </div>
+                            {student.scanned_at
+                              ? new Date(
+                                  student.scanned_at
+                                ).toLocaleString()
+                              : "-"}
                           </td>
-                          <td>
-                            <span className="roster-source">
-                              {student.source || "—"}
-                            </span>
-                          </td>
+                          <td>{student.source || "-"}</td>
                           <td>
                             <button
                               type="button"
