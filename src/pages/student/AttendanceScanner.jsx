@@ -12,6 +12,8 @@ function AttendanceScanner() {
   const processingRef = useRef(false);
   const startingRef = useRef(false);
   const stopRequestedRef = useRef(false);
+  const mountedRef = useRef(false);
+  const startPromiseRef = useRef(null);
 
   const [scanResult, setScanResult] = useState(null);
   const [error, setError] = useState("");
@@ -22,182 +24,191 @@ function AttendanceScanner() {
   ========================================================= */
 
   async function startScanner() {
-    if (startingRef.current) {
+    if (startingRef.current || isScanningRef.current) {
       return;
     }
 
-    if (
-      isScanningRef.current ||
-      scannerRef.current?.isScanning
-    ) {
+    if (scannerRef.current?.isScanning) {
+      isScanningRef.current = true;
       return;
     }
 
     startingRef.current = true;
     stopRequestedRef.current = false;
 
-    try {
-      setError("");
+    const startPromise = (async () => {
+      try {
+        setError("");
 
-      if (
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
-      ) {
-        throw new Error(
-          "Camera access is not supported by this browser."
-        );
-      }
-
-      /*
-       * getCameras() asks the browser for camera permission first.
-       * This also lets us choose the rear camera when available.
-       */
-      const cameras =
-        await Html5Qrcode.getCameras();
-
-      if (!cameras || cameras.length === 0) {
-        throw new Error(
-          "No camera was found on this device."
-        );
-      }
-
-      const rearCamera =
-        cameras.find((camera) => {
-          const label =
-            String(
-              camera.label || ""
-            ).toLowerCase();
-
-          return (
-            label.includes("back") ||
-            label.includes("rear") ||
-            label.includes("environment")
+        if (
+          !navigator.mediaDevices ||
+          !navigator.mediaDevices.getUserMedia
+        ) {
+          throw new Error(
+            "Camera access is not supported by this browser."
           );
-        }) || cameras[0];
+        }
 
-      const scanner =
-        new Html5Qrcode(
+        const reader = document.getElementById(
           "attendance-qr-reader"
         );
 
-      scannerRef.current = scanner;
+        if (!reader) {
+          throw new Error(
+            "Scanner element is not ready. Please try again."
+          );
+        }
 
-      if (stopRequestedRef.current) {
-        scannerRef.current = null;
-        try {
-          scanner.clear();
-        } catch {}
-        return;
-      }
+        /*
+         * IMPORTANT:
+         * Do not call Html5Qrcode.getCameras() here.
+         * On some Android/Chrome devices it can create a camera
+         * permission/stream race when React mounts/unmounts quickly.
+         *
+         * facingMode: environment lets html5-qrcode request the
+         * rear camera directly.
+         */
+        const scanner = new Html5Qrcode(
+          "attendance-qr-reader"
+        );
 
-      await scanner.start(
-        rearCamera.id,
-        {
-          fps: 10,
-          qrbox: {
-            width: 280,
-            height: 280,
-          },
-          aspectRatio: 1,
-        },
-        async (decodedText) => {
-          if (
-            processingRef.current
-          ) {
-            return;
+        scannerRef.current = scanner;
+
+        if (stopRequestedRef.current || !mountedRef.current) {
+          try {
+            scanner.clear();
+          } catch {}
+
+          if (scannerRef.current === scanner) {
+            scannerRef.current = null;
           }
 
-          processingRef.current =
-            true;
-
-          await handleScan(
-            decodedText
-          );
-        },
-        () => {
-          // Ignore normal scanner frame errors.
+          return;
         }
-      );
 
-      isScanningRef.current =
-        true;
+        await scanner.start(
+          { facingMode: { ideal: "environment" } },
+          {
+            fps: 10,
+            qrbox: {
+              width: 280,
+              height: 280,
+            },
+            aspectRatio: 1,
+          },
+          async (decodedText) => {
+            if (processingRef.current) {
+              return;
+            }
 
-      setScannerStarted(
-        true
-      );
+            processingRef.current = true;
 
-    } catch (err) {
-      console.error(
-        "QR scanner start error:",
-        err
-      );
+            await handleScan(decodedText);
+          },
+          () => {
+            // Ignore normal scanner frame errors.
+          }
+        );
 
-      isScanningRef.current =
-        false;
+        /*
+         * React can unmount the component while scanner.start()
+         * is waiting for the camera. If that happened, immediately
+         * release the stream instead of leaving the camera locked.
+         */
+        if (
+          stopRequestedRef.current ||
+          !mountedRef.current ||
+          scannerRef.current !== scanner
+        ) {
+          try {
+            if (scanner.isScanning) {
+              await scanner.stop();
+            }
+          } catch {}
 
-      scannerRef.current =
-        null;
+          try {
+            scanner.clear();
+          } catch {}
 
-      let message =
-        "Unable to access the camera.";
+          if (scannerRef.current === scanner) {
+            scannerRef.current = null;
+          }
 
-      if (
-        err?.name ===
-        "NotAllowedError"
-      ) {
-        message =
-          "Camera permission was denied. Please allow camera access for localhost and try again.";
-      } else if (
-        err?.name ===
-        "NotFoundError"
-      ) {
-        message =
-          "No camera was found on this device.";
-      } else if (
-        err?.name ===
-        "NotReadableError"
-      ) {
-        message =
-          "The camera is already being used by another application.";
-      } else if (
-        err?.name ===
-        "OverconstrainedError"
-      ) {
-        message =
-          "The selected camera is not available. Please try again.";
-      } else if (
-        err?.message
-      ) {
-        message =
-          err.message;
+          isScanningRef.current = false;
+          return;
+        }
+
+        isScanningRef.current = true;
+        setScannerStarted(true);
+      } catch (err) {
+        console.error(
+          "QR scanner start error:",
+          err
+        );
+
+        isScanningRef.current = false;
+
+        const scanner = scannerRef.current;
+
+        if (scanner) {
+          try {
+            if (scanner.isScanning) {
+              await scanner.stop();
+            }
+          } catch {}
+
+          try {
+            scanner.clear();
+          } catch {}
+        }
+
+        scannerRef.current = null;
+
+        let message =
+          "Unable to access the camera.";
+
+        if (err?.name === "NotAllowedError") {
+          message =
+            "Camera permission was denied. Please allow camera access for this website and try again.";
+        } else if (err?.name === "NotFoundError") {
+          message =
+            "No camera was found on this device.";
+        } else if (err?.name === "NotReadableError") {
+          message =
+            "The camera could not be opened. Close Camera/WhatsApp/Instagram and try again.";
+        } else if (err?.name === "OverconstrainedError") {
+          message =
+            "The rear camera is not available. Please try again.";
+        } else if (err?.message) {
+          message = err.message;
+        }
+
+        if (mountedRef.current) {
+          setScannerStarted(false);
+          setError(message);
+        }
+      } finally {
+        startingRef.current = false;
+        startPromiseRef.current = null;
       }
+    })();
 
-      setScannerStarted(
-        false
-      );
-
-      setError(message);
-    } finally {
-      startingRef.current = false;
-    }
+    startPromiseRef.current = startPromise;
+    return startPromise;
   }
 
   useEffect(() => {
-    let mounted = true;
+    mountedRef.current = true;
 
-    const run = async () => {
-      if (!mounted) {
-        return;
+    const timer = window.setTimeout(() => {
+      if (mountedRef.current) {
+        startScanner();
       }
-
-      await startScanner();
-    };
-
-    run();
+    }, 100);
 
     return () => {
-      mounted = false;
-
+      mountedRef.current = false;
+      window.clearTimeout(timer);
       stopScanner();
     };
   }, []);
@@ -209,24 +220,30 @@ function AttendanceScanner() {
   async function stopScanner() {
     stopRequestedRef.current = true;
 
-    const scanner =
-      scannerRef.current;
+    /*
+     * If scanner.start() is still waiting for the camera,
+     * wait for it to finish before trying another start.
+     */
+    const pendingStart = startPromiseRef.current;
+
+    if (pendingStart) {
+      try {
+        await pendingStart;
+      } catch {}
+    }
+
+    const scanner = scannerRef.current;
 
     if (!scanner) {
-      isScanningRef.current =
-        false;
-
-      setScannerStarted(
-        false
-      );
-
+      isScanningRef.current = false;
+      if (mountedRef.current) {
+        setScannerStarted(false);
+      }
       return;
     }
 
     try {
-      if (
-        isScanningRef.current
-      ) {
+      if (scanner.isScanning) {
         await scanner.stop();
       }
     } catch (err) {
@@ -245,55 +262,77 @@ function AttendanceScanner() {
       );
     }
 
-    isScanningRef.current =
-      false;
+    /*
+     * Extra safety: release any MediaStream tracks that the
+     * browser still has attached to the scanner video element.
+     */
+    try {
+      const video = document.querySelector(
+        "#attendance-qr-reader video"
+      );
 
-    scannerRef.current =
-      null;
+      const stream = video?.srcObject;
 
-    setScannerStarted(
-      false
-    );
+      if (stream?.getTracks) {
+        stream.getTracks().forEach((track) => {
+          try {
+            track.stop();
+          } catch {}
+        });
+
+        video.srcObject = null;
+      }
+    } catch {}
+
+    isScanningRef.current = false;
+
+    if (scannerRef.current === scanner) {
+      scannerRef.current = null;
+    }
+
+    if (mountedRef.current) {
+      setScannerStarted(false);
+    }
   }
 
   /* =========================================================
      HANDLE QR SCAN
   ========================================================= */
 
-  async function handleScan(
-    token
-  ) {
+  async function handleScan(token) {
     try {
       setError("");
       setScanResult(null);
 
-      const response =
-        await fetch(
-          "http://localhost:5000/api/attendance/scan",
-          {
-            method: "POST",
+      const apiBase =
+        import.meta.env.VITE_API_URL ||
+        "http://localhost:5000/api";
 
-            headers: {
-              "Content-Type":
-                "application/json",
+      const response = await fetch(
+        `${apiBase}/attendance/scan`,
+        {
+          method: "POST",
 
-              Authorization:
-                `Bearer ${localStorage.getItem(
-                  "token"
-                )}`,
-            },
+          headers: {
+            "Content-Type":
+              "application/json",
 
-            body: JSON.stringify({
-              token,
-            }),
-          }
-        );
+            Authorization:
+              `Bearer ${localStorage.getItem(
+                "token"
+              )}`,
+          },
+
+          body: JSON.stringify({
+            token,
+          }),
+        }
+      );
 
       let data = {};
 
       try {
-        data =
-          await response.json();
+        data = await response.json();
       } catch {
         data = {};
       }
@@ -331,8 +370,7 @@ function AttendanceScanner() {
           "Unable to record attendance."
       );
 
-      processingRef.current =
-        false;
+      processingRef.current = false;
     }
   }
 
@@ -343,22 +381,27 @@ function AttendanceScanner() {
   async function handleRetry() {
     setError("");
     setScanResult(null);
-    processingRef.current =
-      false;
+    processingRef.current = false;
 
     /*
-     * Completely clean the previous scanner before
-     * creating a new camera stream.
+     * Fully release the previous scanner before requesting
+     * another camera stream.
      */
     await stopScanner();
 
     /*
-     * Give the DOM a moment to recreate the
-     * attendance-qr-reader element.
+     * Re-enable starting after cleanup.
      */
-    setTimeout(() => {
-      startScanner();
-    }, 150);
+    stopRequestedRef.current = false;
+
+    /*
+     * Wait for React to recreate the reader element.
+     */
+    window.setTimeout(() => {
+      if (mountedRef.current) {
+        startScanner();
+      }
+    }, 300);
   }
 
   /* =========================================================
@@ -366,13 +409,10 @@ function AttendanceScanner() {
   ========================================================= */
 
   function handleLogout() {
-    localStorage.removeItem(
-      "token"
-    );
+    stopScanner();
 
-    localStorage.removeItem(
-      "user"
-    );
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
     navigate("/");
   }
@@ -385,21 +425,17 @@ function AttendanceScanner() {
 
   try {
     user = JSON.parse(
-      localStorage.getItem(
-        "user"
-      ) || "null"
+      localStorage.getItem("user") || "null"
     );
   } catch {
     user = null;
   }
 
   const firstName =
-    user?.first_name ||
-    "Student";
+    user?.first_name || "Student";
 
   const lastName =
-    user?.last_name ||
-    "";
+    user?.last_name || "";
 
   /* =========================================================
      RENDER
@@ -417,7 +453,7 @@ function AttendanceScanner() {
         <div className="sidebar-brand">
 
           <div className="sidebar-logo">
-            🎓
+            ðŸŽ“
           </div>
 
           <div>
@@ -465,14 +501,14 @@ function AttendanceScanner() {
               )
             }
           >
-            <span>▦</span>
+            <span>â–¦</span>
             Dashboard
           </button>
 
           <button
             className="nav-item active"
           >
-            <span>▣</span>
+            <span>â–£</span>
             Scan Attendance
           </button>
 
@@ -484,14 +520,14 @@ function AttendanceScanner() {
               )
             }
           >
-            <span>✓</span>
+            <span>âœ“</span>
             My Attendance
           </button>
 
           <button
             className="nav-item"
           >
-            <span>⚑</span>
+            <span>âš‘</span>
             Correction Requests
           </button>
 
@@ -506,7 +542,7 @@ function AttendanceScanner() {
             }
           >
             <span>
-              ↪
+              â†ª
             </span>
 
             Logout
@@ -713,7 +749,7 @@ function AttendanceScanner() {
                       "10px",
                   }}
                 >
-                  ✓
+                  âœ“
                 </div>
 
                 <h2>
