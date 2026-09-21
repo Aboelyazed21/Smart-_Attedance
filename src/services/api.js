@@ -167,7 +167,7 @@ export async function updateUser(
   return apiRequest(
     `/users/${id}`,
     {
-      method: "PUT",
+      method: "PATCH",
 
       body: JSON.stringify({
         firstName,
@@ -235,7 +235,7 @@ export async function updateCourse(
   return apiRequest(
     `/courses/${id}`,
     {
-      method: "PUT",
+      method: "PATCH",
 
       body: JSON.stringify({
         courseName,
@@ -579,17 +579,29 @@ export async function getMyAttendance() {
    ENROLLMENT MANAGEMENT
 ========================================================= */
 
+/*
+   Get all students
+*/
+
 export async function getStudents() {
   return apiRequest(
     "/students"
   );
 }
 
+/*
+   Get all available sections
+*/
+
 export async function getEnrollmentSections() {
   return apiRequest(
     "/students/sections/available"
   );
 }
+
+/*
+   Get enrollments for specific student
+*/
 
 export async function getStudentEnrollments(
   studentId
@@ -598,6 +610,10 @@ export async function getStudentEnrollments(
     `/students/${studentId}/enrollments`
   );
 }
+
+/*
+   Enroll student into section
+*/
 
 export async function enrollStudent(
   studentId,
@@ -615,11 +631,81 @@ export async function enrollStudent(
   );
 }
 
+/*
+   Remove student enrollment
+*/
+
 export async function removeEnrollment(
   enrollmentId
 ) {
   return apiRequest(
     `/students/enrollments/${enrollmentId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+/* =========================================================
+   ADMIN ENROLLMENTS
+   Used by Course Students Management
+========================================================= */
+
+export async function getAdminEnrollments() {
+  return apiRequest(
+    "/admin/enrollments"
+  );
+}
+
+/* =========================================================
+   UPDATE STUDENT
+   PUT /api/students/:id
+========================================================= */
+
+export async function updateStudent(
+  id,
+  {
+    firstName,
+    lastName,
+    email,
+    phone,
+    studentCode,
+    status,
+    password,
+  }
+) {
+  return apiRequest(
+    `/students/${id}`,
+    {
+      method: "PUT",
+
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        phone,
+        studentCode,
+        status,
+        password,
+      }),
+    }
+  );
+}
+
+/* =========================================================
+   DELETE STUDENT
+   DELETE /api/students/:id
+
+   NOTE:
+   This deletes the student account itself.
+   Course page will NOT use this for "Remove".
+========================================================= */
+
+export async function deleteStudent(
+  id
+) {
+  return apiRequest(
+    `/students/${id}`,
     {
       method: "DELETE",
     }
@@ -645,7 +731,8 @@ export async function getLecturerSections() {
 export async function getLecturerAttendanceReport(
   params = {}
 ) {
-  const query = new URLSearchParams();
+  const query =
+    new URLSearchParams();
 
   Object.entries(params).forEach(
     ([key, value]) => {
