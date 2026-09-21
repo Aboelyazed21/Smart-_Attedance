@@ -2,7 +2,162 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getMyAttendance } from "../../services/api";
+
 import "../../App.css";
+import "./StudentAttendance.css";
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
+function formatTime(value) {
+  if (!value) return "-";
+
+  const text = String(value);
+
+  if (text.includes("T")) {
+    const date = new Date(value);
+
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+  }
+
+  const match = text.match(/(\d{1,2}):(\d{2})/);
+
+  if (!match) return text;
+
+  let hour = Number(match[1]);
+  const minute = match[2];
+
+  const suffix = hour >= 12 ? "PM" : "AM";
+
+  if (hour === 0) hour = 12;
+  if (hour > 12) hour -= 12;
+
+  return `${hour}:${minute} ${suffix}`;
+}
+
+function formatDateTime(value) {
+  if (!value) return "-";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function normalizeStatus(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function statusLabel(status) {
+  const normalized = normalizeStatus(status);
+
+  if (normalized === "present") return "Present";
+  if (normalized === "absent") return "Absent";
+  if (normalized === "late") return "Late";
+  if (normalized === "excused") return "Excused";
+
+  return status || "Unknown";
+}
+
+function statusClass(status) {
+  const normalized = normalizeStatus(status);
+
+  if (normalized === "present") return "attendance-status-present";
+  if (normalized === "absent") return "attendance-status-absent";
+  if (normalized === "late") return "attendance-status-late";
+  if (normalized === "excused") return "attendance-status-excused";
+
+  return "attendance-status-default";
+}
+
+function getCourseName(item) {
+  return (
+    item.course_name ||
+    item.course_title ||
+    item.courseName ||
+    item.course_code ||
+    item.courseCode ||
+    "Unknown Course"
+  );
+}
+
+function getSectionName(item) {
+  return (
+    item.section_name ||
+    item.sectionName ||
+    item.section ||
+    "-"
+  );
+}
+
+function getSessionDate(item) {
+  return (
+    item.session_date ||
+    item.sessionDate ||
+    item.date ||
+    item.attendance_date ||
+    item.created_at
+  );
+}
+
+function getMarkedAt(item) {
+  return (
+    item.scanned_at ||
+    item.marked_at ||
+    item.markedAt ||
+    item.created_at
+  );
+}
+
+function getSource(item) {
+  return item.source || item.attendance_source || "QR";
+}
+
+function escapeCsv(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+/* =========================================================
+   STUDENT ATTENDANCE
+========================================================= */
 
 function StudentAttendance() {
   const navigate = useNavigate();
@@ -10,81 +165,119 @@ function StudentAttendance() {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
 
-  // ============================================================
-  // LOAD ATTENDANCE
-  // ============================================================
+  const [courseFilter, setCourseFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
-  const loadAttendance = async (isRefresh = false) => {
+  const [page, setPage] = useState(1);
+
+  const rowsPerPage = 10;
+
+  const user = useMemo(() => getUser(), []);
+
+  const firstName =
+    user?.first_name ||
+    user?.firstName ||
+    user?.name?.split(" ")?.[0] ||
+    "Student";
+
+  const lastName =
+    user?.last_name ||
+    user?.lastName ||
+    "";
+
+  const fullName =
+    `${firstName} ${lastName}`.trim();
+
+  const initial = firstName
+    .charAt(0)
+    .toUpperCase();
+
+  async function loadAttendance() {
     try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
+      setLoading(true);
       setError("");
 
-      const response = await getMyAttendance();
+      const data = await getMyAttendance();
 
-      const data = Array.isArray(response)
-        ? response
-        : response?.data ||
-          response?.attendance ||
+      const rows = Array.isArray(data)
+        ? data
+        : data?.rows ||
+          data?.attendance ||
+          data?.records ||
+          data?.data ||
           [];
 
-      setAttendance(Array.isArray(data) ? data : []);
+      setAttendance(
+        Array.isArray(rows) ? rows : []
+      );
     } catch (err) {
-      console.error("Load my attendance error:", err);
+      console.error(
+        "My attendance error:",
+        err
+      );
 
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to load attendance"
+        err?.message ||
+          "Failed to load your attendance records."
       );
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  };
+  }
 
   useEffect(() => {
     loadAttendance();
   }, []);
 
-  // ============================================================
-  // STATISTICS
-  // ============================================================
+  const courseOptions = useMemo(() => {
+    const values = attendance
+      .map((item) => getCourseName(item))
+      .filter(Boolean);
 
-  const statistics = useMemo(() => {
+    return [...new Set(values)].sort(
+      (a, b) =>
+        String(a).localeCompare(String(b))
+    );
+  }, [attendance]);
+
+  const stats = useMemo(() => {
     const total = attendance.length;
 
     const present = attendance.filter(
       (item) =>
-        String(item.status || "").toLowerCase() === "present"
+        normalizeStatus(item.status) ===
+        "present"
     ).length;
 
     const late = attendance.filter(
       (item) =>
-        String(item.status || "").toLowerCase() === "late"
+        normalizeStatus(item.status) ===
+        "late"
     ).length;
 
     const absent = attendance.filter(
       (item) =>
-        String(item.status || "").toLowerCase() === "absent"
+        normalizeStatus(item.status) ===
+        "absent"
     ).length;
 
     const excused = attendance.filter(
       (item) =>
-        String(item.status || "").toLowerCase() === "excused"
+        normalizeStatus(item.status) ===
+        "excused"
     ).length;
 
-    const attended = present + late;
+    const attended =
+      present + late + excused;
 
     const rate =
       total > 0
-        ? Math.round((attended / total) * 100)
+        ? Math.round(
+            (attended / total) * 100
+          )
         : 0;
 
     return {
@@ -97,192 +290,391 @@ function StudentAttendance() {
     };
   }, [attendance]);
 
-  // ============================================================
-  // FORMAT DATE
-  // ============================================================
+  const filteredAttendance = useMemo(() => {
+    return attendance.filter((item) => {
+      const course = getCourseName(item);
+      const status = normalizeStatus(
+        item.status
+      );
 
-  const formatDate = (value) => {
-    if (!value) return "-";
+      const rawDate = getSessionDate(item);
 
-    const date = new Date(value);
+      let matchesCourse =
+        courseFilter === "all" ||
+        course === courseFilter;
 
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
+      let matchesStatus =
+        statusFilter === "all" ||
+        status === statusFilter;
 
-    return date.toLocaleDateString("en-GB");
-  };
+      let matchesFrom = true;
+      let matchesTo = true;
 
-  // ============================================================
-  // FORMAT TIME
-  // ============================================================
+      if (rawDate) {
+        const date = new Date(rawDate);
 
-  const formatTime = (value) => {
-    if (!value) return "-";
+        if (!Number.isNaN(date.getTime())) {
+          const dateOnly = date
+            .toISOString()
+            .slice(0, 10);
 
-    const date = new Date(value);
+          if (fromDate) {
+            matchesFrom =
+              dateOnly >= fromDate;
+          }
 
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
+          if (toDate) {
+            matchesTo =
+              dateOnly <= toDate;
+          }
+        }
+      }
 
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+      return (
+        matchesCourse &&
+        matchesStatus &&
+        matchesFrom &&
+        matchesTo
+      );
     });
-  };
+  }, [
+    attendance,
+    courseFilter,
+    statusFilter,
+    fromDate,
+    toDate,
+  ]);
 
-  // ============================================================
-  // STATUS CLASS
-  // ============================================================
+  useEffect(() => {
+    setPage(1);
+  }, [
+    courseFilter,
+    statusFilter,
+    fromDate,
+    toDate,
+  ]);
 
-  const getStatusClass = (status) => {
-    const normalized = String(
-      status || ""
-    ).toLowerCase();
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredAttendance.length /
+        rowsPerPage
+    )
+  );
 
-    if (normalized === "present") {
-      return "status-badge status-present";
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
     }
+  }, [page, totalPages]);
 
-    if (normalized === "late") {
-      return "status-badge status-late";
-    }
+  const paginatedAttendance = useMemo(() => {
+    const start =
+      (page - 1) * rowsPerPage;
 
-    if (normalized === "absent") {
-      return "status-badge status-absent";
-    }
-
-    if (normalized === "excused") {
-      return "status-badge status-excused";
-    }
-
-    return "status-badge";
-  };
-
-  // ============================================================
-  // STATUS TEXT
-  // ============================================================
-
-  const getStatusText = (status) => {
-    if (!status) return "-";
-
-    const value = String(status);
-
-    return (
-      value.charAt(0).toUpperCase() +
-      value.slice(1).toLowerCase()
+    return filteredAttendance.slice(
+      start,
+      start + rowsPerPage
     );
-  };
+  }, [
+    filteredAttendance,
+    page,
+  ]);
 
-  // ============================================================
-  // LOGOUT
-  // ============================================================
+  const courseSummary = useMemo(() => {
+    const map = new Map();
 
-  const handleLogout = () => {
+    attendance.forEach((item) => {
+      const course = getCourseName(item);
+      const status = normalizeStatus(
+        item.status
+      );
+
+      if (!map.has(course)) {
+        map.set(course, {
+          course,
+          total: 0,
+          attended: 0,
+          present: 0,
+          absent: 0,
+        });
+      }
+
+      const current = map.get(course);
+
+      current.total += 1;
+
+      if (
+        status === "present" ||
+        status === "late" ||
+        status === "excused"
+      ) {
+        current.attended += 1;
+      }
+
+      if (status === "present") {
+        current.present += 1;
+      }
+
+      if (status === "absent") {
+        current.absent += 1;
+      }
+    });
+
+    return [...map.values()]
+      .map((item) => ({
+        ...item,
+        rate:
+          item.total > 0
+            ? Math.round(
+                (item.attended /
+                  item.total) *
+                  100
+              )
+            : 0,
+      }))
+      .sort(
+        (a, b) =>
+          b.rate - a.rate
+      )
+      .slice(0, 5);
+  }, [attendance]);
+
+  const overview = useMemo(() => {
+    const buckets = [
+      {
+        label: "Week 1",
+        present: 0,
+        absent: 0,
+      },
+      {
+        label: "Week 2",
+        present: 0,
+        absent: 0,
+      },
+      {
+        label: "Week 3",
+        present: 0,
+        absent: 0,
+      },
+      {
+        label: "Week 4",
+        present: 0,
+        absent: 0,
+      },
+    ];
+
+    attendance.forEach((item) => {
+      const dateValue = getSessionDate(item);
+
+      if (!dateValue) return;
+
+      const date = new Date(dateValue);
+
+      if (Number.isNaN(date.getTime())) {
+        return;
+      }
+
+      const day = date.getDate();
+
+      let index = 0;
+
+      if (day >= 8 && day <= 14) {
+        index = 1;
+      } else if (day >= 15 && day <= 21) {
+        index = 2;
+      } else if (day >= 22) {
+        index = 3;
+      }
+
+      const status = normalizeStatus(
+        item.status
+      );
+
+      if (
+        status === "present" ||
+        status === "late" ||
+        status === "excused"
+      ) {
+        buckets[index].present += 1;
+      }
+
+      if (status === "absent") {
+        buckets[index].absent += 1;
+      }
+    });
+
+    return buckets;
+  }, [attendance]);
+
+  const maxOverviewValue = Math.max(
+    1,
+    ...overview.map((item) =>
+      Math.max(
+        item.present,
+        item.absent
+      )
+    )
+  );
+
+  function resetFilters() {
+    setCourseFilter("all");
+    setStatusFilter("all");
+    setFromDate("");
+    setToDate("");
+    setPage(1);
+  }
+
+  function exportAttendance() {
+    if (!filteredAttendance.length) {
+      return;
+    }
+
+    const header = [
+      "Date",
+      "Course",
+      "Section",
+      "Status",
+      "Marked At",
+      "Source",
+    ];
+
+    const rows = filteredAttendance.map(
+      (item) => [
+        formatDate(
+          getSessionDate(item)
+        ),
+        getCourseName(item),
+        getSectionName(item),
+        statusLabel(item.status),
+        formatDateTime(
+          getMarkedAt(item)
+        ),
+        getSource(item),
+      ]
+    );
+
+    const csv = [
+      header,
+      ...rows,
+    ]
+      .map((row) =>
+        row.map(escapeCsv).join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const link =
+      document.createElement("a");
+
+    link.href = url;
+    link.download =
+      "my-attendance.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+  }
+
+  function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
     navigate("/");
-  };
-
-  // ============================================================
-  // RENDER
-  // ============================================================
+  }
 
   return (
-    <div className="dashboard-page">
-      {/* ======================================================
+    <div className="attendance-page">
+      {/* =====================================================
           SIDEBAR
-      ======================================================= */}
+      ===================================================== */}
 
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-brand">
-          <div className="sidebar-logo">
-            SA
+      <aside className="attendance-sidebar">
+        <div>
+          <div className="attendance-brand">
+            <div className="attendance-brand-logo">
+              ✓
+            </div>
+
+            <div>
+              <strong>Attendify</strong>
+              <span>SMART ATTENDANCE</span>
+            </div>
           </div>
 
-          <div>
-            <h2>Smart Attendance</h2>
-            <span>Student Portal</span>
+          <div className="attendance-profile">
+            <div className="attendance-profile-avatar">
+              {initial}
+            </div>
+
+            <div>
+              <strong>{fullName}</strong>
+              <span>Student</span>
+            </div>
           </div>
+
+          <nav className="attendance-nav">
+            <button
+              type="button"
+              onClick={() =>
+                navigate("/dashboard")
+              }
+            >
+              <span>⌂</span>
+              Dashboard
+            </button>
+
+            <button
+              type="button"
+              className="active"
+            >
+              <span>▥</span>
+              My Attendance
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate("/student/scan")
+              }
+            >
+              <span>▦</span>
+              Scan Attendance
+            </button>
+
+            <button type="button">
+              <span>▤</span>
+              Correction Requests
+            </button>
+
+            <button type="button">
+              <span>♧</span>
+              Notifications
+              <b>3</b>
+            </button>
+          </nav>
         </div>
 
-        <div className="sidebar-profile">
-          <div className="profile-avatar">
-            S
+        <div className="attendance-sidebar-bottom">
+          <div className="attendance-sidebar-tip">
+            <span>✦</span>
+            <div>
+              <strong>Keep going!</strong>
+              <small>Every class counts.</small>
+            </div>
           </div>
 
-          <div>
-            <strong>Student</strong>
-            <span>Student Account</span>
-          </div>
-        </div>
-
-        <nav className="dashboard-nav">
           <button
             type="button"
-            className="nav-item"
-            onClick={() => navigate("/dashboard")}
-          >
-            <span>▣</span>
-            Dashboard
-          </button>
-
-          <button
-            type="button"
-            className="nav-item active"
-            onClick={() =>
-              navigate("/student/attendance")
-            }
-          >
-            <span>✓</span>
-            My Attendance
-          </button>
-
-          <button
-            type="button"
-            className="nav-item"
-            onClick={() =>
-              navigate("/student/scan")
-            }
-          >
-            <span>▦</span>
-            Scan QR
-          </button>
-
-          <button
-            type="button"
-            className="nav-item"
-            onClick={() => {}}
-          >
-            <span>◷</span>
-            My Sessions
-          </button>
-
-          <button
-            type="button"
-            className="nav-item"
-            onClick={() => {}}
-          >
-            <span>!</span>
-            Correction Requests
-          </button>
-
-          <button
-            type="button"
-            className="nav-item"
-            onClick={() => {}}
-          >
-            <span>🔔</span>
-            Notifications
-          </button>
-        </nav>
-
-        <div className="sidebar-bottom">
-          <button
-            type="button"
-            className="nav-item logout-item"
+            className="attendance-logout"
             onClick={handleLogout}
           >
             <span>↪</span>
@@ -291,372 +683,798 @@ function StudentAttendance() {
         </div>
       </aside>
 
-      {/* ======================================================
+      {/* =====================================================
           MAIN
-      ======================================================= */}
+      ===================================================== */}
 
-      <main className="dashboard-main">
-        {/* HEADER */}
-
-        <header className="dashboard-header">
-          <div>
-            <h1>My Attendance</h1>
-
-            <p>
-              Track your attendance records and
-              attendance rate.
-            </p>
+      <main className="attendance-main">
+        <header className="attendance-topbar">
+          <div className="attendance-search">
+            <span>⌕</span>
+            <input
+              type="text"
+              placeholder="Search courses, sessions, or anything..."
+            />
+            <small>Ctrl + K</small>
           </div>
 
-          <div className="dashboard-header-actions">
+          <div className="attendance-topbar-right">
             <button
               type="button"
-              className="secondary-btn"
-              onClick={() =>
-                loadAttendance(true)
-              }
-              disabled={refreshing}
+              className="attendance-bell"
             >
-              {refreshing
-                ? "Refreshing..."
-                : "Refresh"}
+              ♧
+              <b>3</b>
             </button>
 
-            <button
-              type="button"
-              className="primary-btn"
-              onClick={() =>
-                navigate("/student/scan")
-              }
-            >
-              Scan QR
-            </button>
+            <div className="attendance-header-user">
+              <div>{initial}</div>
+
+              <section>
+                <strong>{fullName}</strong>
+                <span>Student</span>
+              </section>
+
+              <span>⌄</span>
+            </div>
           </div>
         </header>
 
-        <section className="dashboard-content">
-          {/* ERROR */}
+        <section className="attendance-content">
+          {/* =================================================
+              PAGE HERO
+          ================================================= */}
 
-          {error && (
-            <div
-              className="alert alert-error"
-              style={{
-                marginBottom: "20px",
-              }}
-            >
-              {error}
-            </div>
-          )}
-
-          {/* ==================================================
-              STATISTICS
-          =================================================== */}
-
-          <div className="dashboard-stats">
-            <div className="stat-card">
-              <div className="stat-icon">
-                📚
+          <div className="attendance-page-hero">
+            <div className="attendance-page-title">
+              <div className="attendance-page-title-icon">
+                ▥
               </div>
 
               <div>
-                <span>Total Sessions</span>
-                <strong>
-                  {statistics.total}
-                </strong>
+                <span>Attendance</span>
+
+                <h1>My Attendance</h1>
+
+                <p>
+                  Track your attendance records and
+                  stay on top of your academic journey.
+                </p>
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-icon">
+            <div className="attendance-breadcrumb">
+              <span
+                onClick={() =>
+                  navigate("/dashboard")
+                }
+              >
+                Dashboard
+              </span>
+              <b>›</b>
+              <strong>My Attendance</strong>
+            </div>
+
+            <div className="attendance-hero-art">
+              <div className="attendance-art-calendar">
+                ▣
+              </div>
+
+              <div className="attendance-art-check">
+                ✓
+              </div>
+
+              <p>
+                Consistency
+                <br />
+                today, success
+                <br />
+                tomorrow.
+              </p>
+            </div>
+          </div>
+
+          {/* =================================================
+              METRICS
+          ================================================= */}
+
+          <div className="attendance-metrics">
+            <div className="attendance-metric-card present">
+              <div className="attendance-metric-icon">
                 ✓
               </div>
 
               <div>
                 <span>Present</span>
-                <strong>
-                  {statistics.present}
-                </strong>
+                <strong>{stats.present}</strong>
+                <small>
+                  {stats.total
+                    ? `${Math.round(
+                        (stats.present /
+                          stats.total) *
+                          100
+                      )}% attendance rate`
+                    : "No records yet"}
+                </small>
               </div>
+
+              <i>↗</i>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-icon">
-                ⏰
-              </div>
-
-              <div>
-                <span>Late</span>
-                <strong>
-                  {statistics.late}
-                </strong>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon">
-                ✕
+            <div className="attendance-metric-card absent">
+              <div className="attendance-metric-icon">
+                !
               </div>
 
               <div>
                 <span>Absent</span>
-                <strong>
-                  {statistics.absent}
-                </strong>
+                <strong>{stats.absent}</strong>
+                <small>
+                  {stats.total
+                    ? `${Math.round(
+                        (stats.absent /
+                          stats.total) *
+                          100
+                      )}% absence rate`
+                    : "No records yet"}
+                </small>
               </div>
+
+              <i>↗</i>
+            </div>
+
+            <div className="attendance-metric-card total">
+              <div className="attendance-metric-icon">
+                ▤
+              </div>
+
+              <div>
+                <span>Total Sessions</span>
+                <strong>{stats.total}</strong>
+                <small>This semester</small>
+              </div>
+
+              <i>☷</i>
+            </div>
+
+            <div className="attendance-metric-card rate">
+              <div className="attendance-metric-icon">
+                %
+              </div>
+
+              <div>
+                <span>Attendance Rate</span>
+                <strong>{stats.rate}%</strong>
+                <small>
+                  {stats.rate >= 75
+                    ? "On track"
+                    : "Keep improving"}
+                </small>
+              </div>
+
+              <i>↗</i>
             </div>
           </div>
 
-          {/* ==================================================
-              ATTENDANCE RATE
-          =================================================== */}
+          {/* =================================================
+              FILTERS
+          ================================================= */}
 
-          <div className="dashboard-grid">
-            <section className="dashboard-panel">
-              <div className="panel-header">
+          <div className="attendance-filters">
+            <div className="attendance-filter-field">
+              <label>Semester</label>
+
+              <select defaultValue="fall-2026">
+                <option value="fall-2026">
+                  Fall 2026
+                </option>
+                <option value="spring-2026">
+                  Spring 2026
+                </option>
+              </select>
+            </div>
+
+            <div className="attendance-filter-field">
+              <label>Course</label>
+
+              <select
+                value={courseFilter}
+                onChange={(event) =>
+                  setCourseFilter(
+                    event.target.value
+                  )
+                }
+              >
+                <option value="all">
+                  All Courses
+                </option>
+
+                {courseOptions.map(
+                  (course) => (
+                    <option
+                      key={course}
+                      value={course}
+                    >
+                      {course}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            <div className="attendance-filter-field">
+              <label>Status</label>
+
+              <select
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(
+                    event.target.value
+                  )
+                }
+              >
+                <option value="all">All</option>
+                <option value="present">
+                  Present
+                </option>
+                <option value="late">
+                  Late
+                </option>
+                <option value="absent">
+                  Absent
+                </option>
+                <option value="excused">
+                  Excused
+                </option>
+              </select>
+            </div>
+
+            <div className="attendance-filter-field">
+              <label>From</label>
+
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(event) =>
+                  setFromDate(
+                    event.target.value
+                  )
+                }
+              />
+            </div>
+
+            <div className="attendance-filter-field">
+              <label>To</label>
+
+              <input
+                type="date"
+                value={toDate}
+                onChange={(event) =>
+                  setToDate(
+                    event.target.value
+                  )
+                }
+              />
+            </div>
+
+            <button
+              type="button"
+              className="attendance-filter-button"
+              onClick={() => setPage(1)}
+            >
+              ⌕
+              Filter
+            </button>
+
+            <button
+              type="button"
+              className="attendance-reset-button"
+              onClick={resetFilters}
+            >
+              ↻
+              Reset
+            </button>
+          </div>
+
+          {/* =================================================
+              MAIN DATA GRID
+          ================================================= */}
+
+          <div className="attendance-data-grid">
+            {/* Records */}
+            <div className="attendance-records-card">
+              <div className="attendance-card-header">
                 <div>
-                  <h2>Attendance Rate</h2>
+                  <div className="attendance-card-title">
+                    <span>▣</span>
+                    <h2>Attendance Records</h2>
+                  </div>
 
                   <p>
-                    Your current attendance
-                    percentage.
+                    Your detailed attendance history
                   </p>
                 </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "30px",
-                  padding: "25px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "130px",
-                    height: "130px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: `conic-gradient(#2563eb ${statistics.rate}%, #e5e7eb ${statistics.rate}% 100%)`,
-                    position: "relative",
-                    flexShrink: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "96px",
-                      height: "96px",
-                      borderRadius: "50%",
-                      background: "#ffffff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "24px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    {statistics.rate}%
-                  </div>
-                </div>
-
-                <div>
-                  <h3
-                    style={{
-                      margin: "0 0 8px",
-                    }}
-                  >
-                    Attendance Overview
-                  </h3>
-
-                  <p
-                    style={{
-                      margin: "0 0 8px",
-                      color: "#6b7280",
-                    }}
-                  >
-                    Present:{" "}
-                    {statistics.present}
-                  </p>
-
-                  <p
-                    style={{
-                      margin: "0 0 8px",
-                      color: "#6b7280",
-                    }}
-                  >
-                    Late:{" "}
-                    {statistics.late}
-                  </p>
-
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#6b7280",
-                    }}
-                  >
-                    Excused:{" "}
-                    {statistics.excused}
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* ==================================================
-              ATTENDANCE HISTORY
-          =================================================== */}
-
-          <section className="dashboard-panel recent-panel">
-            <div className="panel-header">
-              <div>
-                <h2>Attendance History</h2>
-
-                <p>
-                  All your attendance records.
-                </p>
-              </div>
-            </div>
-
-            {loading ? (
-              <div className="empty-state">
-                <div className="empty-state-icon">
-                  ⏳
-                </div>
-
-                <h3>
-                  Loading attendance...
-                </h3>
-
-                <p>
-                  Please wait.
-                </p>
-              </div>
-            ) : attendance.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon">
-                  📋
-                </div>
-
-                <h3>
-                  No attendance records
-                </h3>
-
-                <p>
-                  You do not have any attendance
-                  records yet.
-                </p>
 
                 <button
                   type="button"
-                  className="primary-btn"
-                  onClick={() =>
-                    navigate("/student/scan")
+                  className="attendance-export-button"
+                  onClick={exportAttendance}
+                  disabled={
+                    !filteredAttendance.length
                   }
-                  style={{
-                    marginTop: "15px",
-                  }}
                 >
-                  Scan QR
+                  ↓
+                  Export
                 </button>
               </div>
-            ) : (
-              <div
-                className="table-container"
-                style={{
-                  overflowX: "auto",
-                }}
-              >
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Course</th>
-                      <th>Section</th>
-                      <th>Date</th>
-                      <th>Time</th>
-                      <th>Status</th>
-                      <th>Source</th>
-                    </tr>
-                  </thead>
 
-                  <tbody>
-                    {attendance.map(
-                      (item, index) => (
-                        <tr
-                          key={
-                            item.id ||
-                            item.attendance_id ||
-                            item.event_id ||
-                            index
-                          }
-                        >
-                          <td>{index + 1}</td>
+              {error && (
+                <div className="attendance-error">
+                  <strong>Unable to load attendance</strong>
+                  <span>{error}</span>
 
-                          <td>
-                            {item.course_code ||
-                              item.course_name ||
-                              item.course ||
-                              "-"}
-                          </td>
+                  <button
+                    type="button"
+                    onClick={loadAttendance}
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
 
-                          <td>
-                            {item.section_name ||
-                              item.section ||
-                              "-"}
-                          </td>
+              {loading ? (
+                <div className="attendance-state">
+                  <div className="attendance-spinner" />
+                  <h3>Loading attendance...</h3>
+                  <p>
+                    We're getting your latest
+                    attendance records.
+                  </p>
+                </div>
+              ) : !filteredAttendance.length ? (
+                <div className="attendance-state">
+                  <div className="attendance-state-icon">
+                    ▥
+                  </div>
 
-                          <td>
-                            {formatDate(
-                              item.session_date ||
-                                item.attendance_date ||
-                                item.date ||
-                                item.created_at
-                            )}
-                          </td>
+                  <h3>
+                    No attendance records found
+                  </h3>
 
-                          <td>
-                            {formatTime(
-                              item.actual_start ||
-                                item.session_start ||
-                                item.created_at
-                            )}
-                          </td>
+                  <p>
+                    Your attendance records will
+                    appear here once you attend
+                    classes.
+                  </p>
 
-                          <td>
-                            <span
-                              className={getStatusClass(
-                                item.status
-                              )}
-                            >
-                              {getStatusText(
-                                item.status
-                              )}
-                            </span>
-                          </td>
-
-                          <td>
-                            {item.source
-                              ? String(
-                                  item.source
-                                )
-                                  .charAt(0)
-                                  .toUpperCase() +
-                                String(
-                                  item.source
-                                ).slice(1)
-                              : "-"}
-                          </td>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(
+                        "/student/scan"
+                      )
+                    }
+                  >
+                    Scan Attendance QR
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="attendance-table-wrap">
+                    <table className="attendance-table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Date</th>
+                          <th>Course</th>
+                          <th>Section</th>
+                          <th>Status</th>
+                          <th>Marked At</th>
                         </tr>
+                      </thead>
+
+                      <tbody>
+                        {paginatedAttendance.map(
+                          (item, index) => {
+                            const status =
+                              normalizeStatus(
+                                item.status
+                              );
+
+                            return (
+                              <tr
+                                key={
+                                  item.id ||
+                                  item.attendance_id ||
+                                  `${getSessionDate(
+                                    item
+                                  )}-${index}`
+                                }
+                              >
+                                <td>
+                                  {(page - 1) *
+                                    rowsPerPage +
+                                    index +
+                                    1}
+                                </td>
+
+                                <td>
+                                  <strong>
+                                    {formatDate(
+                                      getSessionDate(
+                                        item
+                                      )
+                                    )}
+                                  </strong>
+                                </td>
+
+                                <td>
+                                  <div className="attendance-course">
+                                    <strong>
+                                      {getCourseName(
+                                        item
+                                      )}
+                                    </strong>
+
+                                    {item.course_code &&
+                                      item.course_name && (
+                                        <small>
+                                          {
+                                            item.course_code
+                                          }
+                                        </small>
+                                      )}
+                                  </div>
+                                </td>
+
+                                <td>
+                                  {getSectionName(
+                                    item
+                                  )}
+                                </td>
+
+                                <td>
+                                  <span
+                                    className={`attendance-status ${statusClass(
+                                      status
+                                    )}`}
+                                  >
+                                    <i />
+                                    {statusLabel(
+                                      status
+                                    )}
+                                  </span>
+                                </td>
+
+                                <td>
+                                  {formatDateTime(
+                                    getMarkedAt(
+                                      item
+                                    )
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          }
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="attendance-table-footer">
+                    <span>
+                      Showing{" "}
+                      {Math.min(
+                        (page - 1) *
+                          rowsPerPage +
+                          1,
+                        filteredAttendance.length
+                      )}{" "}
+                      to{" "}
+                      {Math.min(
+                        page *
+                          rowsPerPage,
+                        filteredAttendance.length
+                      )}{" "}
+                      of{" "}
+                      {filteredAttendance.length}{" "}
+                      records
+                    </span>
+
+                    <div className="attendance-pagination">
+                      <button
+                        type="button"
+                        disabled={page === 1}
+                        onClick={() =>
+                          setPage(
+                            (value) =>
+                              Math.max(
+                                1,
+                                value - 1
+                              )
+                          )
+                        }
+                      >
+                        ‹
+                      </button>
+
+                      {Array.from(
+                        {
+                          length: Math.min(
+                            totalPages,
+                            4
+                          ),
+                        },
+                        (_, index) => {
+                          const pageNumber =
+                            index + 1;
+
+                          return (
+                            <button
+                              type="button"
+                              key={pageNumber}
+                              className={
+                                page ===
+                                pageNumber
+                                  ? "active"
+                                  : ""
+                              }
+                              onClick={() =>
+                                setPage(
+                                  pageNumber
+                                )
+                              }
+                            >
+                              {pageNumber}
+                            </button>
+                          );
+                        }
+                      )}
+
+                      <button
+                        type="button"
+                        disabled={
+                          page === totalPages
+                        }
+                        onClick={() =>
+                          setPage(
+                            (value) =>
+                              Math.min(
+                                totalPages,
+                                value + 1
+                              )
+                          )
+                        }
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Right column */}
+            <aside className="attendance-side-column">
+              {/* Overview */}
+              <div className="attendance-side-card">
+                <div className="attendance-side-card-header">
+                  <div>
+                    <span>▥</span>
+                    <strong>
+                      Attendance Overview
+                    </strong>
+                  </div>
+
+                  <select defaultValue="30">
+                    <option value="30">
+                      Last 30 Days
+                    </option>
+                    <option value="semester">
+                      This Semester
+                    </option>
+                  </select>
+                </div>
+
+                <div className="attendance-chart">
+                  <div className="attendance-chart-y">
+                    <span>10</span>
+                    <span>8</span>
+                    <span>6</span>
+                    <span>4</span>
+                    <span>2</span>
+                    <span>0</span>
+                  </div>
+
+                  <div className="attendance-chart-area">
+                    <div className="attendance-chart-grid">
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+
+                    <div className="attendance-chart-bars">
+                      {overview.map(
+                        (item) => (
+                          <div
+                            className="attendance-chart-group"
+                            key={item.label}
+                          >
+                            <div className="attendance-bars">
+                              <span
+                                className="present-bar"
+                                style={{
+                                  height: `${
+                                    Math.max(
+                                      item.present
+                                        ? 10
+                                        : 0,
+                                      (item.present /
+                                        maxOverviewValue) *
+                                        100
+                                    ) || 2
+                                  }%`,
+                                }}
+                              />
+
+                              <span
+                                className="absent-bar"
+                                style={{
+                                  height: `${
+                                    Math.max(
+                                      item.absent
+                                        ? 10
+                                        : 0,
+                                      (item.absent /
+                                        maxOverviewValue) *
+                                        100
+                                    ) || 2
+                                  }%`,
+                                }}
+                              />
+                            </div>
+
+                            <small>
+                              {item.label}
+                            </small>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="attendance-chart-legend">
+                  <span>
+                    <i className="legend-present" />
+                    Present
+                  </span>
+
+                  <span>
+                    <i className="legend-absent" />
+                    Absent
+                  </span>
+                </div>
+              </div>
+
+              {/* Course-wise */}
+              <div className="attendance-side-card">
+                <div className="attendance-side-card-title">
+                  <div>
+                    <span>◷</span>
+                    <strong>
+                      Course-wise Attendance
+                    </strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCourseFilter("all");
+                      setStatusFilter("all");
+                    }}
+                  >
+                    View All
+                  </button>
+                </div>
+
+                {courseSummary.length ? (
+                  <div className="course-progress-list">
+                    {courseSummary.map(
+                      (course) => (
+                        <div
+                          className="course-progress-row"
+                          key={course.course}
+                        >
+                          <span>
+                            {course.course}
+                          </span>
+
+                          <div>
+                            <i>
+                              <b
+                                style={{
+                                  width: `${course.rate}%`,
+                                }}
+                              />
+                            </i>
+
+                            <strong>
+                              {course.rate}%
+                            </strong>
+
+                            <small>
+                              {course.attended}/
+                              {course.total}
+                            </small>
+                          </div>
+                        </div>
                       )
                     )}
-                  </tbody>
-                </table>
+                  </div>
+                ) : (
+                  <div className="side-empty">
+                    No course data yet.
+                  </div>
+                )}
               </div>
-            )}
-          </section>
+
+              {/* Tips */}
+              <div className="attendance-side-card attendance-tips-card">
+                <div className="attendance-side-card-title">
+                  <div>
+                    <span>💡</span>
+                    <strong>
+                      Tips for Better Attendance
+                    </strong>
+                  </div>
+                </div>
+
+                <ul>
+                  <li>
+                    <span>✓</span>
+                    Attend classes regularly
+                  </li>
+
+                  <li>
+                    <span>✓</span>
+                    Check your timetable
+                  </li>
+
+                  <li>
+                    <span>✓</span>
+                    Scan the QR code on time
+                  </li>
+
+                  <li>
+                    <span>✓</span>
+                    Keep track of your progress
+                  </li>
+                </ul>
+
+                <div className="attendance-quote">
+                  “Discipline is the bridge
+                  between goals and achievement.”
+                </div>
+              </div>
+            </aside>
+          </div>
         </section>
+
+        <footer className="attendance-footer">
+          <span>Attendify</span>
+          <b>•</b>
+          <span>Port Said University</span>
+          <b>•</b>
+          <span>
+            A Smarter Campus for a Brighter Tomorrow
+          </span>
+
+          <small>v1.0.0</small>
+        </footer>
       </main>
     </div>
   );
