@@ -453,7 +453,7 @@ function AttendanceScanner() {
         <div className="sidebar-brand">
 
           <div className="sidebar-logo">
-            ðŸŽ“
+            🎓
           </div>
 
           <div>
@@ -501,14 +501,14 @@ function AttendanceScanner() {
               )
             }
           >
-            <span>â–¦</span>
+            <span>▦</span>
             Dashboard
           </button>
 
           <button
             className="nav-item active"
           >
-            <span>â–£</span>
+            <span>◫</span>
             Scan Attendance
           </button>
 
@@ -520,14 +520,14 @@ function AttendanceScanner() {
               )
             }
           >
-            <span>âœ“</span>
+            <span>✓</span>
             My Attendance
           </button>
 
           <button
             className="nav-item"
           >
-            <span>âš‘</span>
+            <span>⚑</span>
             Correction Requests
           </button>
 
@@ -542,7 +542,7 @@ function AttendanceScanner() {
             }
           >
             <span>
-              â†ª
+              ↪
             </span>
 
             Logout
@@ -749,7 +749,7 @@ function AttendanceScanner() {
                       "10px",
                   }}
                 >
-                  âœ“
+                  ✓
                 </div>
 
                 <h2>
