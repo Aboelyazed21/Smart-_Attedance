@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
-  getSessions,
+  getSessionById,
   openSession,
   refreshSessionQr,
   closeSession,
@@ -215,24 +215,24 @@ export default function LecturerQRSession() {
       setLoading(true);
       setError("");
 
-      const data = await getSessions();
+      const data = await getSessionById(sessionId);
 
-      const sessions = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.sessions)
-          ? data.sessions
-          : Array.isArray(data?.data)
-            ? data.data
-            : Array.isArray(data?.data?.sessions)
-              ? data.data.sessions
-              : [];
+      if (!data) {
+        throw new Error(
+          "Attendance session was not found."
+        );
+      }
 
-      const found = sessions.find(
-        (item) => Number(item.id) === Number(sessionId)
-      );
+      const found =
+        data?.session ||
+        data?.data?.session ||
+        data?.data ||
+        data;
 
-      if (!found) {
-        throw new Error("Attendance session was not found.");
+      if (!found?.id) {
+        throw new Error(
+          "Attendance session was not found."
+        );
       }
 
       setSession(found);
@@ -243,7 +243,9 @@ export default function LecturerQRSession() {
         found.qrDataUrl
       ) {
         setQrDataUrl(found.qrDataUrl);
-        setQrExpiresAt(found.expiresAt || null);
+        setQrExpiresAt(
+          found.expiresAt || null
+        );
 
         startCountdown(
           found.expiresAt,
@@ -253,7 +255,11 @@ export default function LecturerQRSession() {
 
       await loadRoster(found.id);
     } catch (err) {
-      console.error("Load lecturer session error:", err);
+      console.error(
+        "Load lecturer session error:",
+        err
+      );
+
       setError(
         err.message ||
           "Failed to load the attendance session."
