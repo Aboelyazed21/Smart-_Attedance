@@ -22,6 +22,8 @@ import Settings from "./pages/admin/Settings";
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
 import LecturerQRSession from "./pages/lecturer/LecturerQRSession";
 import LecturerLayout from "./components/lecturer/LecturerLayout";
+import LecturerAttendance from "./pages/lecturer/LecturerAttendance";
+import LecturerReports from "./pages/lecturer/LecturerReports";
 
 import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
@@ -316,6 +318,32 @@ function App() {
     }
 
     return <LecturerSections />;
+  }
+
+
+  /* =========================================================
+     LECTURER ATTENDANCE
+  ========================================================= */
+
+  if (location.pathname === "/lecturer/attendance") {
+    if (!isLecturerAuthenticated()) {
+      return <Login />;
+    }
+
+    return <LecturerAttendance />;
+  }
+
+
+  /* =========================================================
+     LECTURER REPORTS
+  ========================================================= */
+
+  if (location.pathname === "/lecturer/reports") {
+    if (!isLecturerAuthenticated()) {
+      return <Login />;
+    }
+
+    return <LecturerReports />;
   }
 
 
