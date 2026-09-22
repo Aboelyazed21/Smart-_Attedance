@@ -126,11 +126,11 @@ function AttendanceScanner() {
       await scanner.start(
         rearCamera.id,
         {
-          fps: 10,
+          fps: 15,
 
           qrbox: {
-            width: 280,
-            height: 280,
+            width: 320,
+            height: 320,
           },
 
           aspectRatio: 1,
