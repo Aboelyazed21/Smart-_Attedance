@@ -1,0 +1,156 @@
+/* ============================================================
+   ADMIN DASHBOARD — FIXED + RESPONSIVE SIDEBAR
+   This file only controls the dashboard shell/navigation.
+   Existing card and content styling can remain in global styles.
+============================================================ */
+
+.admin-dashboard {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.admin-dashboard .dashboard-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 194px;
+  height: 100vh;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 1100;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-dashboard .dashboard-main {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 194px;
+  width: calc(100% - 194px);
+}
+
+.admin-dashboard .dashboard-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-dashboard .dashboard-sidebar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+}
+
+.admin-mobile-menu-button,
+.admin-sidebar-overlay {
+  display: none;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .admin-dashboard .dashboard-sidebar {
+    width: 220px;
+  }
+
+  .admin-dashboard .dashboard-main {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+}
+
+/* Mobile / small tablets */
+@media (max-width: 768px) {
+  .admin-dashboard .dashboard-sidebar {
+    width: min(82vw, 300px);
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
+    box-shadow: 18px 0 45px rgba(0, 0, 0, 0.18);
+  }
+
+  .admin-dashboard.sidebar-is-open .dashboard-sidebar {
+    transform: translateX(0);
+  }
+
+  .admin-dashboard .dashboard-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .admin-mobile-menu-button {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+    cursor: pointer;
+    z-index: 1200;
+  }
+
+  .admin-mobile-menu-button span {
+    display: block;
+    width: 19px;
+    height: 2px;
+    border-radius: 999px;
+    background: #123b73;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .admin-dashboard.sidebar-is-open .admin-mobile-menu-button span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .admin-dashboard.sidebar-is-open .admin-mobile-menu-button span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .admin-dashboard.sidebar-is-open .admin-mobile-menu-button span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .admin-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(8, 25, 52, 0.42);
+    backdrop-filter: blur(2px);
+    z-index: 1050;
+    cursor: pointer;
+  }
+
+  .admin-dashboard .dashboard-header {
+    padding-left: 72px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .admin-dashboard .dashboard-sidebar {
+    width: min(88vw, 290px);
+  }
+
+  .admin-dashboard .dashboard-header {
+    padding-left: 68px;
+  }
+
+  .admin-mobile-menu-button {
+    top: 10px;
+    left: 10px;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* Prevent the background page from moving while the mobile drawer is open. */
+body.admin-sidebar-open {
+  overflow: hidden;
+}

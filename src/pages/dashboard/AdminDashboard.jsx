@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDashboardReport } from "../../services/api";
-
+import "./AdminDashboard.css";
 function Icon({ type, size = 22 }) {
   const common = {
     width: size,
