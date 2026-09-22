@@ -520,6 +520,19 @@ export async function getSessions() {
 
 
 /* =========================================================
+   GET ATTENDANCE SESSION BY ID
+========================================================= */
+
+export async function getSessionById(
+  id
+) {
+  return apiRequest(
+    `/sessions/${id}`
+  );
+}
+
+
+/* =========================================================
    MY SESSIONS
    STUDENT
 ========================================================= */
