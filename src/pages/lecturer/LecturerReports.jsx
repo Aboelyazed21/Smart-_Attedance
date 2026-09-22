@@ -8,7 +8,6 @@ import "./LecturerReports.css";
 
 export default function LecturerReports() {
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
@@ -198,86 +197,8 @@ export default function LecturerReports() {
     );
   }
 
-  function handleMobileNavigation(path) {
-    navigate(path);
-    setMobileMenuOpen(false);
-  }
-
-  function closeMobileMenu() {
-    setMobileMenuOpen(false);
-  }
-
-  function handleLogout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    navigate("/login");
-    setMobileMenuOpen(false);
-  }
-
-  const lecturerName =
-    user?.name ||
-    `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
-    user?.email ||
-    "Lecturer";
-
-  const lecturerInitials =
-    `${String(user?.first_name || user?.name?.split(" ")?.[0] || "").charAt(0)}${String(user?.last_name || user?.name?.split(" ")?.slice(1)?.join(" ") || "").charAt(0)}`.toUpperCase() ||
-    "LE";
-
   return (
-    <div className={`lecturer-reports-page${mobileMenuOpen ? " mobile-menu-open" : ""}`}>
-      <header className="reports-mobile-header">
-        <button
-          type="button"
-          className="reports-mobile-menu-button"
-          onClick={() => setMobileMenuOpen(true)}
-          aria-label="Open navigation"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <button
-          type="button"
-          className="reports-mobile-brand"
-          onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-        >
-          Attendify
-        </button>
-
-        <div className="reports-mobile-avatar">{lecturerInitials}</div>
-      </header>
-
-      <div className="reports-mobile-overlay" onClick={closeMobileMenu} aria-hidden="true" />
-
-      <aside className={`lecturer-reports-sidebar${mobileMenuOpen ? " mobile-open" : ""}`}>
-        <div className="reports-sidebar-brand">
-          <button type="button" className="reports-brand-button" onClick={() => handleMobileNavigation("/lecturer/dashboard")}>
-            <span className="reports-brand-mark">A</span>
-            <span><strong>Attendify</strong><small>LECTURER PORTAL</small></span>
-          </button>
-          <button type="button" className="reports-mobile-close" onClick={closeMobileMenu} aria-label="Close navigation">×</button>
-        </div>
-
-        <div className="reports-sidebar-profile">
-          <div className="reports-profile-avatar">{lecturerInitials}</div>
-          <div><strong>{lecturerName}</strong><span>Lecturer account</span></div>
-        </div>
-
-        <nav className="reports-sidebar-nav" aria-label="Lecturer navigation">
-          <button type="button" onClick={() => handleMobileNavigation("/lecturer/dashboard")}><span>DB</span>Dashboard</button>
-          <button type="button" onClick={() => handleMobileNavigation("/lecturer/sessions")}><span>AS</span>Attendance Sessions</button>
-          <button type="button" onClick={() => handleMobileNavigation("/lecturer/sections")}><span>MS</span>My Sections</button>
-          <button type="button" onClick={() => handleMobileNavigation("/lecturer/attendance")}><span>AT</span>Attendance</button>
-          <button type="button" className="active" onClick={() => handleMobileNavigation("/lecturer/reports")}><span>RP</span>Reports</button>
-        </nav>
-
-        <div className="reports-sidebar-footer">
-          <button type="button" onClick={handleLogout}><span>LO</span>Logout</button>
-        </div>
-      </aside>
-
+    <div className="lecturer-reports-page">
       <div className="lecturer-reports-main">
         <header className="lecturer-reports-header">
           <div>
@@ -295,7 +216,7 @@ export default function LecturerReports() {
             <button
               type="button"
               className="reports-secondary-button"
-              onClick={() => handleMobileNavigation("/lecturer/attendance")}
+              onClick={() => navigate("/lecturer/attendance")}
             >
               Attendance
             </button>

@@ -15,8 +15,9 @@
   --reports-page: #f5f7fb;
   --reports-sidebar: #172033;
 
-  min-height: 100vh;
-  display: flex;
+  width: 100%;
+  min-height: 100%;
+  display: block;
   background: var(--reports-page);
   color: var(--reports-text);
   font-family:
@@ -33,278 +34,6 @@
 .lecturer-reports-page *::before,
 .lecturer-reports-page *::after {
   box-sizing: border-box;
-}
-
-/* =========================================================
-   MOBILE HEADER
-========================================================= */
-
-.reports-mobile-header {
-  display: none;
-}
-
-.reports-mobile-menu-button,
-.reports-mobile-brand {
-  border: 0;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
-}
-
-.reports-mobile-menu-button {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  gap: 4px;
-  padding: 9px;
-  border: 1px solid var(--reports-border);
-  border-radius: 10px;
-  background: #fff;
-}
-
-.reports-mobile-menu-button span {
-  width: 19px;
-  height: 2px;
-  display: block;
-  border-radius: 2px;
-  background: #334155;
-}
-
-.reports-mobile-brand {
-  padding: 0;
-  color: #172033;
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.reports-mobile-avatar {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #dbeafe;
-  border-radius: 50%;
-  background: var(--reports-primary-soft);
-  color: var(--reports-primary);
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.reports-mobile-overlay {
-  display: none;
-}
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.lecturer-reports-sidebar {
-  width: 258px;
-  min-height: 100vh;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  align-self: flex-start;
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 258px;
-  padding: 20px 16px;
-  overflow-y: auto;
-  background: var(--reports-sidebar);
-  color: #fff;
-  border-right: 1px solid #243044;
-}
-
-.reports-sidebar-brand {
-  min-height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 0 4px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.reports-brand-button {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #fff;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.reports-brand-mark {
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  background: #2563eb;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.reports-brand-button strong {
-  display: block;
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.2;
-}
-
-.reports-brand-button small {
-  display: block;
-  margin-top: 4px;
-  color: #94a3b8;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.9px;
-}
-
-.reports-mobile-close {
-  display: none;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
-  font-size: 21px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/* =========================================================
-   PROFILE / NAV
-========================================================= */
-
-.reports-sidebar-profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 18px 4px 16px;
-  padding: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.045);
-}
-
-.reports-profile-avatar {
-  width: 39px;
-  height: 39px;
-  flex: 0 0 39px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #dbeafe;
-  color: #1d4ed8;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.reports-sidebar-profile > div:last-child {
-  min-width: 0;
-}
-
-.reports-sidebar-profile strong {
-  display: block;
-  overflow: hidden;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.reports-sidebar-profile span {
-  display: block;
-  margin-top: 3px;
-  color: #94a3b8;
-  font-size: 10px;
-}
-
-.reports-sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.reports-sidebar-nav button,
-.reports-sidebar-footer button {
-  width: 100%;
-  min-height: 43px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 10px;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  background: transparent;
-  color: #94a3b8;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background-color 0.18s ease,
-    color 0.18s ease,
-    border-color 0.18s ease;
-}
-
-.reports-sidebar-nav button:hover {
-  background: rgba(255, 255, 255, 0.055);
-  color: #fff;
-}
-
-.reports-sidebar-nav button.active {
-  border-color: rgba(96, 165, 250, 0.16);
-  background: rgba(37, 99, 235, 0.18);
-  color: #fff;
-}
-
-.reports-sidebar-nav button span,
-.reports-sidebar-footer button span {
-  width: 29px;
-  height: 29px;
-  flex: 0 0 29px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.055);
-  color: #cbd5e1;
-  font-size: 8px;
-  font-weight: 800;
-}
-
-.reports-sidebar-nav button.active span {
-  background: var(--reports-primary);
-  color: #fff;
-}
-
-.reports-sidebar-footer {
-  margin-top: auto;
-  padding-top: 18px;
-}
-
-.reports-sidebar-footer button {
-  border-color: rgba(248, 113, 113, 0.12);
-  background: rgba(239, 68, 68, 0.04);
-  color: #fca5a5;
-}
-
-.reports-sidebar-footer button:hover {
-  background: rgba(239, 68, 68, 0.09);
-  color: #fecaca;
 }
 
 /* =========================================================
@@ -844,10 +573,6 @@
 ========================================================= */
 
 @media (max-width: 1180px) {
-  .lecturer-reports-sidebar {
-    width: 232px;
-    flex-basis: 232px;
-  }
 
   .lecturer-reports-header {
     padding-left: 28px;
@@ -897,73 +622,6 @@
     display: block;
   }
 
-  .reports-mobile-header {
-    height: 62px;
-    position: sticky;
-    top: 0;
-    z-index: 90;
-    display: grid;
-    grid-template-columns: 40px 1fr 36px;
-    align-items: center;
-    gap: 12px;
-    padding: 0 16px;
-    background: #fff;
-    border-bottom: 1px solid var(--reports-border);
-  }
-
-  .reports-mobile-brand {
-    justify-self: center;
-  }
-
-  .lecturer-reports-sidebar {
-    width: min(286px, 86vw);
-    min-height: 100vh;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 200;
-    flex: none;
-    padding: 18px 15px;
-    overflow-y: auto;
-    transform: translateX(-105%);
-    transition: transform 0.22s ease;
-    box-shadow: 8px 0 25px rgba(15, 23, 42, 0.12);
-  }
-
-  .lecturer-reports-sidebar.mobile-open {
-    transform: translateX(0);
-  }
-
-  .reports-mobile-close {
-    display: grid;
-    place-items: center;
-  }
-
-  .reports-mobile-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 150;
-    display: block;
-    background: rgba(15, 23, 42, 0.36);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      opacity 0.22s ease,
-      visibility 0.22s ease;
-  }
-
-  .lecturer-reports-page.mobile-menu-open .reports-mobile-overlay {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  .lecturer-reports-main {
-    min-height: calc(100vh - 62px);
-  }
-
   .lecturer-reports-header {
     min-height: auto;
     padding: 18px 20px;
@@ -1006,9 +664,6 @@
 }
 
 @media (max-width: 480px) {
-  .reports-mobile-header {
-    padding: 0 12px;
-  }
 
   .lecturer-reports-header {
     padding: 16px;
@@ -1085,24 +740,6 @@
 }
 
 @media (max-width: 340px) {
-  .reports-mobile-header {
-    grid-template-columns: 38px 1fr 34px;
-    gap: 8px;
-  }
-
-  .reports-mobile-menu-button {
-    width: 38px;
-    height: 38px;
-  }
-
-  .reports-mobile-avatar {
-    width: 34px;
-    height: 34px;
-  }
-
-  .reports-mobile-brand {
-    font-size: 16px;
-  }
 
   .lecturer-reports-header h1 {
     font-size: 19px;
