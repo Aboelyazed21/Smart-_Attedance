@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -10,146 +10,206 @@ import {
   updateAttendanceCorrection,
 } from "../../services/api";
 
+import LecturerLayout from "../../components/lecturer/LecturerLayout";
 import "./LecturerQRSession.css";
 
-function normalizeArray(data, key) {
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (Array.isArray(data?.[key])) {
-    return data[key];
-  }
-
-  return [];
-}
-
-function formatDate(date) {
-  if (!date) return "-";
-
+function getSavedUser() {
   try {
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    return JSON.parse(localStorage.getItem("user") || "null");
   } catch {
-    return date;
+    return null;
   }
 }
 
-function formatTime(time) {
-  if (!time) return "-";
+function getInitials(firstName = "", lastName = "") {
+  const first = String(firstName).trim().charAt(0);
+  const last = String(lastName).trim().charAt(0);
 
-  try {
-    return new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return time;
-  }
+  return `${first}${last}`.toUpperCase() || "L";
 }
 
-function getAttendanceStatus(row) {
-  const status = row?.attendance?.status;
+function formatDate(value) {
+  if (!value) return "-";
 
-  if (!status) {
-    return "absent";
-  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
 
-  return String(status).toLowerCase();
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatTime(value) {
+  if (!value) return "-";
+  return String(value).slice(0, 5);
+}
+
+function normalizeRoster(data) {
+  const rows = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.rows)
+      ? data.rows
+      : Array.isArray(data?.roster)
+        ? data.roster
+        : Array.isArray(data?.students)
+          ? data.students
+          : [];
+
+  return rows.map((student) => ({
+    ...student,
+    student_id:
+      student.student_id ??
+      student.studentId ??
+      student.id ??
+      null,
+    student_code:
+      student.student_code ??
+      student.studentCode ??
+      "-",
+    first_name:
+      student.first_name ??
+      student.firstName ??
+      "",
+    last_name:
+      student.last_name ??
+      student.lastName ??
+      "",
+    email: student.email ?? "",
+    attendance_id:
+      student.attendance_id ??
+      student.attendance?.id ??
+      null,
+    attendance_status: String(
+      student.attendance_status ??
+        student.attendance?.status ??
+        student.status ??
+        "absent"
+    ).toLowerCase(),
+    scanned_at:
+      student.scanned_at ??
+      student.attendance?.scannedAt ??
+      null,
+    source:
+      student.source ??
+      student.attendance?.source ??
+      null,
+  }));
 }
 
 function getStatusLabel(status) {
-  switch (status) {
-    case "present":
-      return "Present";
+  const value = String(status || "absent").toLowerCase();
 
-    case "late":
-      return "Late";
+  if (value === "present") return "Present";
+  if (value === "late") return "Late";
+  if (value === "excused") return "Excused";
 
-    case "excused":
-      return "Excused";
-
-    case "absent":
-    default:
-      return "Absent";
-  }
+  return "Absent";
 }
 
 function getStatusClass(status) {
-  switch (status) {
-    case "present":
-      return "status-present";
+  const value = String(status || "absent").toLowerCase();
 
-    case "late":
-      return "status-late";
+  if (value === "present") return "status-present";
+  if (value === "late") return "status-late";
+  if (value === "excused") return "status-excused";
 
-    case "excused":
-      return "status-excused";
-
-    case "absent":
-    default:
-      return "status-absent";
-  }
+  return "status-absent";
 }
 
 export default function LecturerQRSession() {
   const navigate = useNavigate();
+  const { sessionId } = useParams();
 
-  const params = useParams();
-
-  const sessionId =
-    params.sessionId ||
-    params.id;
+  const savedUser = useMemo(() => getSavedUser(), []);
 
   const [session, setSession] = useState(null);
-
-  const [qrDataUrl, setQrDataUrl] = useState("");
-
-  const [qrExpiresAt, setQrExpiresAt] = useState(null);
-
-  const [qrVersion, setQrVersion] = useState(null);
-
-  const [countdown, setCountdown] = useState(0);
-
   const [roster, setRoster] = useState([]);
 
-  const [search, setSearch] = useState("");
-
   const [loading, setLoading] = useState(true);
-
-  const [loadingRoster, setLoadingRoster] = useState(false);
-
-  const [refreshingQr, setRefreshingQr] = useState(false);
-
-  const [closingSession, setClosingSession] = useState(false);
+  const [rosterLoading, setRosterLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const [error, setError] = useState("");
+  const [toast, setToast] = useState("");
 
-  const [success, setSuccess] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
+  const [qrExpiresAt, setQrExpiresAt] = useState(null);
+  const [countdown, setCountdown] = useState(0);
 
-  const [showCorrectionModal, setShowCorrectionModal] =
-    useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
-  const [selectedStudent, setSelectedStudent] =
+  const [correctionStudent, setCorrectionStudent] =
     useState(null);
-
   const [correctionStatus, setCorrectionStatus] =
     useState("present");
-
   const [correctionReason, setCorrectionReason] =
     useState("");
-
-  const [savingCorrection, setSavingCorrection] =
+  const [correctionLoading, setCorrectionLoading] =
     useState(false);
 
-  /*
-   * ==========================================================
-   * LOAD SESSION
-   * ==========================================================
-   */
+  const timerRef = useRef(null);
+  const rosterTimerRef = useRef(null);
+
+  const firstName =
+    savedUser?.first_name ||
+    savedUser?.firstName ||
+    "Lecturer";
+
+  const lastName =
+    savedUser?.last_name ||
+    savedUser?.lastName ||
+    "";
+
+  const initials = getInitials(firstName, lastName);
+
+  const pageSize = 8;
+
+  function showToast(message) {
+    setToast(message);
+
+    window.setTimeout(() => {
+      setToast("");
+    }, 3000);
+  }
+
+  function clearTimer() {
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  function startCountdown(expiresAt, currentSessionId) {
+    clearTimer();
+
+    if (!expiresAt) {
+      setCountdown(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        Math.ceil(
+          (new Date(expiresAt).getTime() - Date.now()) /
+            1000
+        )
+      );
+
+      setCountdown(remaining);
+
+      if (remaining === 0) {
+        clearTimer();
+        refreshQr(currentSessionId, true);
+      }
+    };
+
+    tick();
+    timerRef.current = window.setInterval(tick, 1000);
+  }
 
   async function loadSession() {
     try {
@@ -158,226 +218,98 @@ export default function LecturerQRSession() {
 
       const data = await getSessions();
 
-      const sessions = normalizeArray(
-        data,
-        "sessions"
-      );
+      const sessions = Array.isArray(data)
+        ? data
+        : data?.sessions || [];
 
       const found = sessions.find(
-        (item) =>
-          String(item.id) === String(sessionId)
+        (item) => Number(item.id) === Number(sessionId)
       );
 
       if (!found) {
-        throw new Error(
-          "Attendance session was not found."
-        );
+        throw new Error("Attendance session was not found.");
       }
 
       setSession(found);
 
-      /*
-       * If the session is already active,
-       * try to open it and retrieve the current QR.
-       */
       if (
-        found.status === "active" ||
-        found.status === "open"
+        String(found.status || "").toLowerCase() ===
+          "active" &&
+        found.qrDataUrl
       ) {
-        const opened = await openSession(
+        setQrDataUrl(found.qrDataUrl);
+        setQrExpiresAt(found.expiresAt || null);
+
+        startCountdown(
+          found.expiresAt,
           found.id
         );
-
-        const qr = opened?.qr || {};
-
-        setQrDataUrl(
-          qr.qrDataUrl ||
-            opened?.qrDataUrl ||
-            ""
-        );
-
-        setQrExpiresAt(
-          qr.expiresAt ||
-            opened?.expiresAt ||
-            null
-        );
-
-        setQrVersion(
-          qr.version ||
-            opened?.version ||
-            null
-        );
-
-        setSession((previous) => ({
-          ...(previous || found),
-          ...found,
-          status: "active",
-        }));
       }
-    } catch (err) {
-      console.error(
-        "Load QR session error:",
-        err
-      );
 
+      await loadRoster(found.id);
+    } catch (err) {
+      console.error("Load lecturer session error:", err);
       setError(
         err.message ||
-          "Failed to load attendance session."
+          "Failed to load the attendance session."
       );
     } finally {
       setLoading(false);
     }
   }
 
-  /*
-   * ==========================================================
-   * LOAD ROSTER
-   * ==========================================================
-   */
-
-  async function loadRoster(showLoader = true) {
-    if (!sessionId) {
-      return;
-    }
-
+  async function loadRoster(id = sessionId) {
     try {
-      if (showLoader) {
-        setLoadingRoster(true);
-      }
+      setRosterLoading(true);
 
-      const data =
-        await getSessionRoster(
-          sessionId
-        );
-
-      const rows = normalizeArray(
-        data,
-        "roster"
-      );
-
-      setRoster(rows);
+      const data = await getSessionRoster(id);
+      setRoster(normalizeRoster(data));
     } catch (err) {
-      console.error(
-        "Load roster error:",
-        err
-      );
-
-      setError(
-        err.message ||
-          "Failed to load attendance roster."
+      console.error("Load session roster error:", err);
+      showToast(
+        err.message || "Failed to load registered students."
       );
     } finally {
-      if (showLoader) {
-        setLoadingRoster(false);
-      }
+      setRosterLoading(false);
     }
   }
-
-  /*
-   * ==========================================================
-   * INITIAL LOAD
-   * ==========================================================
-   */
 
   useEffect(() => {
-    if (!sessionId) {
-      setError(
-        "No attendance session ID was provided."
-      );
-
-      setLoading(false);
-
-      return;
-    }
-
     loadSession();
-    loadRoster();
+
+    return () => {
+      clearTimer();
+
+      if (rosterTimerRef.current) {
+        window.clearInterval(rosterTimerRef.current);
+      }
+    };
   }, [sessionId]);
 
-  /*
-   * ==========================================================
-   * LIVE ROSTER REFRESH
-   * ==========================================================
-   */
-
   useEffect(() => {
-    if (!sessionId) {
-      return undefined;
-    }
+    if (!session?.id) return undefined;
 
-    const timer = setInterval(() => {
-      loadRoster(false);
+    rosterTimerRef.current = window.setInterval(() => {
+      loadRoster(session.id);
     }, 5000);
 
     return () => {
-      clearInterval(timer);
+      if (rosterTimerRef.current) {
+        window.clearInterval(rosterTimerRef.current);
+        rosterTimerRef.current = null;
+      }
     };
-  }, [sessionId]);
+  }, [session?.id]);
 
-  /*
-   * ==========================================================
-   * QR COUNTDOWN
-   * ==========================================================
-   */
+  async function handleGenerateQr() {
+    if (!session?.id) return;
 
-  useEffect(() => {
-    if (!qrExpiresAt) {
-      setCountdown(0);
-      return undefined;
-    }
-
-    function updateCountdown() {
-      const expiration =
-        new Date(
-          qrExpiresAt
-        ).getTime();
-
-      const remaining = Math.max(
-        0,
-        Math.ceil(
-          (expiration -
-            Date.now()) /
-            1000
-        )
-      );
-
-      setCountdown(
-        remaining
-      );
-    }
-
-    updateCountdown();
-
-    const timer =
-      setInterval(
-        updateCountdown,
-        1000
-      );
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [qrExpiresAt]);
-
-  /*
-   * ==========================================================
-   * REFRESH QR
-   * ==========================================================
-   */
-
-  async function handleRefreshQr() {
     try {
-      setRefreshingQr(true);
-      setError("");
-      setSuccess("");
+      setActionLoading(true);
 
-      const data =
-        await refreshSessionQr(
-          sessionId
-        );
+      const data = await openSession(session.id);
 
-      const qr =
-        data?.qr || {};
+      const qr = data?.qr || data || {};
 
       setQrDataUrl(
         qr.qrDataUrl ||
@@ -391,1219 +323,749 @@ export default function LecturerQRSession() {
           null
       );
 
-      setQrVersion(
-        qr.version ||
-          data?.version ||
-          null
+      setSession((current) => ({
+        ...current,
+        status: "active",
+      }));
+
+      startCountdown(
+        qr.expiresAt ||
+          data?.expiresAt ||
+          null,
+        session.id
       );
 
-      setSuccess(
-        "QR code refreshed successfully."
-      );
+      showToast("QR code generated.");
     } catch (err) {
-      console.error(
-        "Refresh QR error:",
-        err
-      );
-
-      setError(
-        err.message ||
-          "Failed to refresh QR code."
+      console.error("Generate QR error:", err);
+      showToast(
+        err.message || "Failed to generate QR code."
       );
     } finally {
-      setRefreshingQr(false);
+      setActionLoading(false);
     }
   }
 
-  /*
-   * ==========================================================
-   * CLOSE SESSION
-   * ==========================================================
-   */
-
-  async function handleCloseSession() {
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to close this attendance session?"
-      );
-
-    if (!confirmed) {
-      return;
-    }
+  async function refreshQr(id = session?.id, silent = false) {
+    if (!id) return;
 
     try {
-      setClosingSession(true);
-      setError("");
-      setSuccess("");
+      const data = await refreshSessionQr(id);
 
-      await closeSession(
-        sessionId
+      const qr = data?.qr || data || {};
+
+      setQrDataUrl(
+        qr.qrDataUrl ||
+          data?.qrDataUrl ||
+          ""
       );
 
-      setSession((previous) => ({
-        ...(previous || {}),
+      setQrExpiresAt(
+        qr.expiresAt ||
+          data?.expiresAt ||
+          null
+      );
+
+      startCountdown(
+        qr.expiresAt ||
+          data?.expiresAt ||
+          null,
+        id
+      );
+
+      if (!silent) {
+        showToast("QR code refreshed.");
+      }
+    } catch (err) {
+      console.error("Refresh QR error:", err);
+      clearTimer();
+
+      if (!silent) {
+        showToast(
+          err.message || "Failed to refresh QR code."
+        );
+      }
+    }
+  }
+
+  async function handleEndSession() {
+    if (!session?.id) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to end this attendance session?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setActionLoading(true);
+
+      await closeSession(session.id);
+
+      clearTimer();
+
+      setSession((current) => ({
+        ...current,
         status: "closed",
       }));
 
       setQrDataUrl("");
-
+      setQrExpiresAt(null);
       setCountdown(0);
 
-      setSuccess(
-        "Attendance session closed successfully."
-      );
+      showToast("Session ended successfully.");
     } catch (err) {
-      console.error(
-        "Close session error:",
-        err
-      );
-
-      setError(
-        err.message ||
-          "Failed to close attendance session."
+      console.error("Close session error:", err);
+      showToast(
+        err.message || "Failed to end session."
       );
     } finally {
-      setClosingSession(false);
+      setActionLoading(false);
     }
   }
 
-  /*
-   * ==========================================================
-   * OPEN CORRECTION MODAL
-   * ==========================================================
-   */
-
-  function handleEditAttendance(student) {
-    const currentStatus =
-      getAttendanceStatus(
-        student
-      );
-
-    setSelectedStudent(
-      student
-    );
+  function openCorrection(student) {
+    setCorrectionStudent(student);
 
     setCorrectionStatus(
-      currentStatus
+      ["present", "absent", "late", "excused"].includes(
+        student.attendance_status
+      )
+        ? student.attendance_status
+        : "present"
     );
 
     setCorrectionReason("");
-
-    setError("");
-
-    setSuccess("");
-
-    setShowCorrectionModal(
-      true
-    );
   }
 
-  /*
-   * ==========================================================
-   * SAVE ATTENDANCE CORRECTION
-   * ==========================================================
-   */
+  function closeCorrection() {
+    setCorrectionStudent(null);
+    setCorrectionStatus("present");
+    setCorrectionReason("");
+  }
 
-  async function handleSaveCorrection(
-    event
-  ) {
+  async function saveCorrection(event) {
     event.preventDefault();
 
-    if (!selectedStudent) {
+    if (!session?.id || !correctionStudent?.student_id) {
+      showToast("Session or student information is missing.");
       return;
     }
 
-    if (
-      !correctionReason.trim()
-    ) {
-      setError(
-        "Please enter a reason for the attendance correction."
-      );
+    const reason = correctionReason.trim();
 
+    if (!reason) {
+      showToast("Please enter a reason for the correction.");
       return;
     }
 
     try {
-      setSavingCorrection(true);
-
-      setError("");
-      setSuccess("");
-
-      const eventId =
-        selectedStudent?.attendance
-          ?.id || 0;
+      setCorrectionLoading(true);
 
       await updateAttendanceCorrection(
-        eventId,
+        correctionStudent.attendance_id || "new",
         {
-          sessionId,
-          studentId:
-            selectedStudent.studentId,
-          status:
-            correctionStatus,
-          reason:
-            correctionReason.trim(),
+          sessionId: session.id,
+          studentId: correctionStudent.student_id,
+          status: correctionStatus,
+          reason,
         }
       );
 
-      setShowCorrectionModal(
-        false
-      );
+      await loadRoster(session.id);
 
-      setSelectedStudent(
-        null
-      );
-
-      setCorrectionReason("");
-
-      await loadRoster(false);
-
-      setSuccess(
-        "Attendance updated successfully."
-      );
+      closeCorrection();
+      showToast("Attendance updated successfully.");
     } catch (err) {
-      console.error(
-        "Attendance correction error:",
-        err
-      );
-
-      setError(
-        err.message ||
-          "Failed to update attendance."
+      console.error("Attendance correction error:", err);
+      showToast(
+        err.message || "Failed to update attendance."
       );
     } finally {
-      setSavingCorrection(false);
+      setCorrectionLoading(false);
     }
   }
 
-  /*
-   * ==========================================================
-   * FILTER
-   * ==========================================================
-   */
+  const filteredRoster = useMemo(() => {
+    const query = search.trim().toLowerCase();
 
-  const filteredRoster =
-    useMemo(() => {
-      const query =
-        search
+    if (!query) return roster;
+
+    return roster.filter((student) => {
+      const name =
+        `${student.first_name} ${student.last_name}`
           .trim()
           .toLowerCase();
 
-      if (!query) {
-        return roster;
-      }
+      return [
+        name,
+        student.student_code,
+        student.email,
+        student.attendance_status,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [roster, search]);
 
-      return roster.filter(
-        (student) => {
-          const values = [
-            student.studentCode,
-            student.universityId,
-            student.firstName,
-            student.lastName,
-            student.email,
-          ];
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredRoster.length / pageSize)
+  );
 
-          return values.some(
-            (value) =>
-              String(
-                value || ""
-              )
-                .toLowerCase()
-                .includes(query)
-          );
-        }
-      );
-    }, [roster, search]);
+  const currentPage = Math.min(page, totalPages);
 
-  /*
-   * ==========================================================
-   * STATISTICS
-   * ==========================================================
-   */
+  const paginatedRoster = filteredRoster.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const stats = useMemo(() => {
-    let present = 0;
-    let absent = 0;
-    let late = 0;
-    let excused = 0;
-
-    roster.forEach(
-      (student) => {
-        const status =
-          getAttendanceStatus(
-            student
-          );
-
-        if (status === "present") {
-          present++;
-        } else if (
-          status === "late"
-        ) {
-          late++;
-        } else if (
-          status === "excused"
-        ) {
-          excused++;
-        } else {
-          absent++;
-        }
-      }
+    const values = roster.map((student) =>
+      String(
+        student.attendance_status || "absent"
+      ).toLowerCase()
     );
 
     return {
       total: roster.length,
-      present,
-      absent,
-      late,
-      excused,
+      present: values.filter(
+        (value) => value === "present"
+      ).length,
+      absent: values.filter(
+        (value) => value === "absent"
+      ).length,
+      late: values.filter(
+        (value) => value === "late"
+      ).length,
     };
   }, [roster]);
 
-  /*
-   * ==========================================================
-   * RENDER
-   * ==========================================================
-   */
+  function handleSearch(value) {
+    setSearch(value);
+    setPage(1);
+  }
 
   if (loading) {
     return (
-      <div className="qr-session-page">
-        <div className="qr-loading">
-          <div className="qr-spinner" />
-          <h2>
-            Loading attendance session...
-          </h2>
-          <p>
-            Please wait while the session
-            information is loaded.
-          </p>
+      <LecturerLayout>
+        <div className="lecturer-session-loading">
+          <div className="loading-spinner" />
+          <strong>Loading session...</strong>
+          <span>Please wait.</span>
         </div>
-      </div>
+      </LecturerLayout>
     );
   }
 
-  if (!session) {
+  if (error || !session) {
     return (
-      <div className="qr-session-page">
-        <div className="qr-error-card">
-          <div className="qr-error-icon">
-            !
-          </div>
-
-          <h2>
-            Attendance Session
-          </h2>
-
+      <LecturerLayout>
+        <div className="lecturer-session-error">
+          <div className="error-icon">!</div>
+          <h2>Session unavailable</h2>
           <p>
             {error ||
-              "Session not found."}
+              "We could not find this attendance session."}
           </p>
-
           <button
             type="button"
-            className="qr-secondary-button"
-            onClick={() =>
-              navigate(
-                "/lecturer/sessions"
-              )
-            }
+            onClick={() => navigate("/lecturer/sessions")}
           >
             Back to Sessions
           </button>
         </div>
-      </div>
+      </LecturerLayout>
     );
   }
 
-  const sessionClosed =
-    session.status ===
-      "closed";
+  const sessionStatus = String(
+    session.status || "scheduled"
+  ).toLowerCase();
+
+  const minutes = Math.floor(countdown / 60);
+  const seconds = String(countdown % 60).padStart(2, "0");
 
   return (
-    <div className="qr-session-page">
-
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
-
-      <header className="qr-session-header">
-
-        <div className="qr-header-left">
-
-          <button
-            type="button"
-            className="qr-back-button"
-            onClick={() =>
-              navigate(
-                "/lecturer/sessions"
-              )
-            }
-          >
-            ←
-          </button>
-
+    <LecturerLayout>
+      <div className="lecturer-session-page">
+        <header className="session-page-header">
           <div>
-            <div className="qr-eyebrow">
-              ATTENDANCE SESSION
+            <button
+              type="button"
+              className="back-button"
+              onClick={() =>
+                navigate("/lecturer/sessions")
+              }
+            >
+              ← Sessions
+            </button>
+
+            <h1>My Session</h1>
+          </div>
+
+          <div className="session-user">
+            <div className="session-user-avatar">
+              {initials}
             </div>
 
-            <h1>
-              {session.sectionName ||
-                session.courseName ||
-                session.courseCode ||
-                "Attendance Session"}
-            </h1>
+            <div>
+              <strong>
+                {firstName} {lastName}
+              </strong>
+              <span>Lecturer</span>
+            </div>
+          </div>
+        </header>
 
-            <div className="qr-session-meta">
+        <section className="session-summary-card">
+          <div className="session-summary-icon">
+            CAL
+          </div>
 
+          <div className="session-summary-info">
+            <div className="session-title-row">
+              <h2>
+                {session.course_name ||
+                  session.course_code ||
+                  "Course"}{" "}
+                -{" "}
+                {session.section_name ||
+                  "Section"}
+              </h2>
+
+              <span
+                className={`session-status ${sessionStatus}`}
+              >
+                {sessionStatus}
+              </span>
+            </div>
+
+            <div className="session-meta">
               <span>
-                {formatDate(
-                  session.sessionDate
-                )}
+                CAL {formatDate(session.session_date)}
               </span>
 
               <span>
-                {formatTime(
-                  session.scheduledStart
-                )}
-                {" - "}
-                {formatTime(
-                  session.scheduledEnd
-                )}
+                TIME {formatTime(session.scheduled_start)} -{" "}
+                {formatTime(session.scheduled_end)}
               </span>
 
-              {session.roomName && (
-                <span>
-                  {session.roomName}
-                </span>
-              )}
-
+              <span>
+                ROOM{" "}
+                {session.room_name ||
+                  session.room ||
+                  "Room not assigned"}
+              </span>
             </div>
           </div>
 
-        </div>
-
-        <div className="qr-header-actions">
-
-          <span
-            className={
-              `session-status ${
-                sessionClosed
-                  ? "closed"
-                  : "active"
-              }`
-            }
-          >
-            <span className="status-dot" />
-
-            {sessionClosed
-              ? "Closed"
-              : "Live"}
-          </span>
-
           <button
             type="button"
-            className="qr-secondary-button"
-            onClick={() =>
-              navigate(
-                "/lecturer/sessions"
-              )
+            className="generate-qr-button"
+            onClick={handleGenerateQr}
+            disabled={
+              actionLoading ||
+              sessionStatus === "closed"
             }
           >
-            Sessions
+            QR
+            <span>Generate QR Code</span>
           </button>
+        </section>
 
-        </div>
-
-      </header>
-
-      {/* =====================================================
-          ALERTS
-      ====================================================== */}
-
-      {(error || success) && (
-        <div
-          className={
-            error
-              ? "qr-alert qr-alert-error"
-              : "qr-alert qr-alert-success"
-          }
-        >
-          <span>
-            {error || success}
-          </span>
-
-          <button
-            type="button"
-            onClick={() => {
-              setError("");
-              setSuccess("");
-            }}
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      {/* =====================================================
-          MAIN
-      ====================================================== */}
-
-      <main className="qr-session-content">
-
-        <section className="qr-top-grid">
-
-          {/* QR CARD */}
-
-          <div className="qr-code-card">
-
+        <section className="session-main-grid">
+          <div className="qr-card">
             <div className="card-heading">
-
               <div>
-                <span className="card-kicker">
-                  STUDENT SCAN
-                </span>
-
-                <h2>
-                  Session QR Code
-                </h2>
+                <span className="card-icon">QR</span>
+                <div>
+                  <h3>Session QR Code</h3>
+                  <p>
+                    Students scan this code to mark
+                    attendance.
+                  </p>
+                </div>
               </div>
-
-              {!sessionClosed && (
-                <span className="live-pill">
-                  ● LIVE
-                </span>
-              )}
-
             </div>
 
             <div className="qr-display">
-
-              {sessionClosed ? (
-                <div className="qr-closed-state">
-
-                  <div className="qr-closed-icon">
-                    ✓
-                  </div>
-
-                  <h3>
-                    Session Closed
-                  </h3>
-
-                  <p>
-                    This QR code is no
-                    longer active.
-                  </p>
-
-                </div>
-              ) : qrDataUrl ? (
-
+              {qrDataUrl ? (
                 <img
                   src={qrDataUrl}
-                  alt="Attendance QR Code"
-                  className="qr-image"
+                  alt="Attendance session QR code"
                 />
-
               ) : (
-
-                <div className="qr-empty-state">
-
-                  <div className="qr-empty-icon">
-                    QR
-                  </div>
-
-                  <p>
-                    QR code is not
-                    available.
-                  </p>
-
-                  <button
-                    type="button"
-                    className="qr-primary-button"
-                    onClick={
-                      handleRefreshQr
-                    }
-                    disabled={
-                      refreshingQr
-                    }
-                  >
-                    {refreshingQr
-                      ? "Refreshing..."
-                      : "Generate QR"}
-                  </button>
-
+                <div className="qr-placeholder">
+                  <strong>QR</strong>
+                  <span>
+                    Generate the QR code to start
+                    attendance.
+                  </span>
                 </div>
-
               )}
-
             </div>
 
-            {!sessionClosed && (
+            {qrDataUrl && (
               <>
+                <div className="qr-session-code">
+                  SESSION #{session.id}
+                </div>
 
-                <div className="qr-countdown">
-
-                  <span>
-                    QR expires in
-                  </span>
-
-                  <strong>
-                    {countdown > 0
-                      ? `${countdown}s`
-                      : "Expired"}
-                  </strong>
-
+                <div className="qr-validity">
+                  <span className="live-dot" />
+                  {countdown > 0
+                    ? `Valid for ${minutes}:${seconds}`
+                    : "QR expired — refreshing..."}
                 </div>
 
                 <button
                   type="button"
-                  className="qr-refresh-button"
-                  onClick={
-                    handleRefreshQr
+                  className="refresh-qr-button"
+                  onClick={() =>
+                    refreshQr(session.id)
                   }
-                  disabled={
-                    refreshingQr
-                  }
+                  disabled={actionLoading}
                 >
-                  ↻{" "}
-                  {refreshingQr
-                    ? "Refreshing..."
-                    : "Refresh QR"}
+                  Refresh QR
                 </button>
-
-                {qrVersion && (
-                  <div className="qr-version">
-                    QR Version:{" "}
-                    {qrVersion}
-                  </div>
-                )}
-
               </>
             )}
 
+            <button
+              type="button"
+              className="end-session-button"
+              onClick={handleEndSession}
+              disabled={
+                actionLoading ||
+                sessionStatus === "closed"
+              }
+            >
+              End Session
+            </button>
           </div>
 
-          {/* STATS */}
-
-          <div className="attendance-overview">
-
-            <div className="card-heading">
-
+          <div className="students-card">
+            <div className="students-card-header">
               <div>
-                <span className="card-kicker">
-                  LIVE OVERVIEW
-                </span>
-
-                <h2>
-                  Attendance
-                </h2>
+                <h3>
+                  Registered Students ({stats.total})
+                </h3>
+                <p>
+                  Live attendance updates every few
+                  seconds.
+                </p>
               </div>
 
               <button
                 type="button"
-                className="icon-refresh-button"
-                onClick={() =>
-                  loadRoster()
-                }
-                disabled={
-                  loadingRoster
-                }
+                className="refresh-students-button"
+                onClick={() => loadRoster(session.id)}
+                disabled={rosterLoading}
               >
-                ↻
-              </button>
-
-            </div>
-
-            <div className="stats-grid">
-
-              <div className="stat-card stat-total">
-                <span className="stat-number">
-                  {stats.total}
-                </span>
-
-                <span className="stat-label">
-                  Students
-                </span>
-              </div>
-
-              <div className="stat-card stat-present">
-                <span className="stat-number">
-                  {stats.present}
-                </span>
-
-                <span className="stat-label">
-                  Present
-                </span>
-              </div>
-
-              <div className="stat-card stat-absent">
-                <span className="stat-number">
-                  {stats.absent}
-                </span>
-
-                <span className="stat-label">
-                  Absent
-                </span>
-              </div>
-
-              <div className="stat-card stat-late">
-                <span className="stat-number">
-                  {stats.late}
-                </span>
-
-                <span className="stat-label">
-                  Late
-                </span>
-              </div>
-
-            </div>
-
-            <div className="attendance-progress">
-
-              <div className="progress-header">
-                <span>
-                  Attendance rate
-                </span>
-
-                <strong>
-                  {stats.total > 0
-                    ? Math.round(
-                        ((stats.present +
-                          stats.late +
-                          stats.excused) /
-                          stats.total) *
-                          100
-                      )
-                    : 0}
-                  %
-                </strong>
-              </div>
-
-              <div className="progress-track">
-                <div
-                  className="progress-fill"
-                  style={{
-                    width:
-                      `${
-                        stats.total > 0
-                          ? Math.round(
-                              ((stats.present +
-                                stats.late +
-                                stats.excused) /
-                                stats.total) *
-                                100
-                            )
-                          : 0
-                      }%`,
-                  }}
-                />
-              </div>
-
-            </div>
-
-            <div className="overview-footer">
-
-              <span>
-                Excused
-              </span>
-
-              <strong>
-                {stats.excused}
-              </strong>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* ===================================================
-            ROSTER
-        ==================================================== */}
-
-        <section className="roster-card">
-
-          <div className="roster-header">
-
-            <div>
-
-              <span className="card-kicker">
-                LIVE ROSTER
-              </span>
-
-              <h2>
-                Student Attendance
-              </h2>
-
-              <p>
-                Attendance updates automatically
-                every 5 seconds.
-              </p>
-
-            </div>
-
-            <div className="roster-tools">
-
-              <div className="search-box">
-
-                <span>
-                  ⌕
-                </span>
-
-                <input
-                  type="text"
-                  placeholder="Search student..."
-                  value={search}
-                  onChange={(event) =>
-                    setSearch(
-                      event.target.value
-                    )
-                  }
-                />
-
-              </div>
-
-              <button
-                type="button"
-                className="qr-secondary-button"
-                onClick={() =>
-                  loadRoster()
-                }
-                disabled={
-                  loadingRoster
-                }
-              >
-                {loadingRoster
-                  ? "Loading..."
+                {rosterLoading
+                  ? "Refreshing..."
                   : "Refresh"}
               </button>
-
             </div>
 
-          </div>
-
-          <div className="roster-table-wrapper">
-
-            {filteredRoster.length === 0 ? (
-
-              <div className="empty-roster">
-
-                <div className="empty-roster-icon">
-                  👥
-                </div>
-
-                <h3>
-                  No students found
-                </h3>
-
-                <p>
-                  {search
-                    ? "Try another search."
-                    : "No students are enrolled in this section yet."}
-                </p>
-
+            <div className="student-stats">
+              <div>
+                <strong>{stats.present}</strong>
+                <span>Present</span>
               </div>
 
-            ) : (
+              <div>
+                <strong>{stats.absent}</strong>
+                <span>Absent</span>
+              </div>
 
-              <table className="roster-table">
+              <div>
+                <strong>{stats.late}</strong>
+                <span>Late</span>
+              </div>
+            </div>
 
+            <div className="student-search">
+              <span>⌕</span>
+              <input
+                value={search}
+                onChange={(event) =>
+                  handleSearch(event.target.value)
+                }
+                placeholder="Search by name or ID..."
+              />
+            </div>
+
+            <div className="students-table-wrap">
+              <table className="students-table">
                 <thead>
                   <tr>
-
-                    <th>
-                      Student
-                    </th>
-
-                    <th>
-                      University ID
-                    </th>
-
-                    <th>
-                      Attendance
-                    </th>
-
-                    <th>
-                      Source
-                    </th>
-
-                    <th>
-                      Scanned At
-                    </th>
-
-                    <th>
-                      Action
-                    </th>
-
+                    <th>#</th>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
 
                 <tbody>
+                  {paginatedRoster.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="empty-table"
+                      >
+                        No registered students found.
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedRoster.map(
+                      (student, index) => {
+                        const name =
+                          `${student.first_name} ${student.last_name}`
+                            .trim() ||
+                          "Student";
 
-                  {filteredRoster.map(
-                    (student) => {
+                        return (
+                          <tr
+                            key={
+                              student.student_id ||
+                              student.id ||
+                              index
+                            }
+                          >
+                            <td>
+                              {(currentPage - 1) *
+                                pageSize +
+                                index +
+                                1}
+                            </td>
 
-                      const status =
-                        getAttendanceStatus(
-                          student
+                            <td>
+                              <strong className="student-code">
+                                {student.student_code}
+                              </strong>
+                            </td>
+
+                            <td>
+                              <div className="student-name-cell">
+                                <div className="student-mini-avatar">
+                                  {getInitials(
+                                    student.first_name,
+                                    student.last_name
+                                  )}
+                                </div>
+
+                                <div>
+                                  <strong>{name}</strong>
+                                  <span>
+                                    {student.email ||
+                                      "Student account"}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td>
+                              <span
+                                className={`attendance-status ${getStatusClass(
+                                  student.attendance_status
+                                )}`}
+                              >
+                                {getStatusLabel(
+                                  student.attendance_status
+                                )}
+                              </span>
+                            </td>
+
+                            <td>
+                              <button
+                                type="button"
+                                className="edit-attendance-button"
+                                onClick={() =>
+                                  openCorrection(student)
+                                }
+                              >
+                                Edit
+                              </button>
+                            </td>
+                          </tr>
                         );
-
-                      return (
-                        <tr
-                          key={
-                            student.studentId
-                          }
-                        >
-
-                          <td>
-
-                            <div className="student-cell">
-
-                              <div className="student-avatar">
-                                {String(
-                                  student.firstName ||
-                                    "S"
-                                )
-                                  .charAt(0)
-                                  .toUpperCase()}
-                              </div>
-
-                              <div>
-
-                                <strong>
-                                  {
-                                    student.firstName
-                                  }{" "}
-                                  {
-                                    student.lastName
-                                  }
-                                </strong>
-
-                                <span>
-                                  {
-                                    student.studentCode ||
-                                      "-"
-                                  }
-                                </span>
-
-                              </div>
-
-                            </div>
-
-                          </td>
-
-                          <td>
-                            {
-                              student.universityId ||
-                                "-"
-                            }
-                          </td>
-
-                          <td>
-
-                            <span
-                              className={
-                                `attendance-status ${getStatusClass(
-                                  status
-                                )}`
-                              }
-                            >
-                              <span className="attendance-status-dot" />
-
-                              {
-                                getStatusLabel(
-                                  status
-                                )
-                              }
-                            </span>
-
-                          </td>
-
-                          <td>
-                            {
-                              student
-                                ?.attendance
-                                ?.source ||
-                                "-"
-                            }
-                          </td>
-
-                          <td>
-
-                            {student
-                              ?.attendance
-                              ?.scannedAt
-                              ? new Date(
-                                  student
-                                    .attendance
-                                    .scannedAt
-                                ).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour:
-                                      "2-digit",
-                                    minute:
-                                      "2-digit",
-                                  }
-                                )
-                              : "-"}
-
-                          </td>
-
-                          <td>
-
-                            <button
-                              type="button"
-                              className="edit-attendance-button"
-                              onClick={() =>
-                                handleEditAttendance(
-                                  student
-                                )
-                              }
-                            >
-                              Edit
-                            </button>
-
-                          </td>
-
-                        </tr>
-                      );
-                    }
+                      }
+                    )
                   )}
-
                 </tbody>
-
               </table>
+            </div>
 
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPage((value) =>
+                      Math.max(1, value - 1)
+                    )
+                  }
+                  disabled={currentPage === 1}
+                >
+                  ←
+                </button>
+
+                {Array.from(
+                  { length: totalPages },
+                  (_, index) => index + 1
+                ).map((number) => (
+                  <button
+                    type="button"
+                    key={number}
+                    className={
+                      number === currentPage
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() => setPage(number)}
+                  >
+                    {number}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPage((value) =>
+                      Math.min(totalPages, value + 1)
+                    )
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  →
+                </button>
+              </div>
             )}
-
           </div>
-
         </section>
 
-        {/* ===================================================
-            SESSION ACTIONS
-        ==================================================== */}
-
-        <section className="session-actions-card">
-
-          <div>
-
-            <span className="card-kicker">
-              SESSION CONTROL
-            </span>
-
-            <h3>
-              Attendance Session
-            </h3>
-
-            <p>
-              Close the session when the
-              attendance window is finished.
-            </p>
-
+        {toast && (
+          <div className="session-toast">
+            {toast}
           </div>
+        )}
 
-          <div className="session-actions">
-
-            <button
-              type="button"
-              className="qr-secondary-button"
-              onClick={() =>
-                navigate(
-                  "/lecturer/sessions"
-                )
-              }
-            >
-              Back to Sessions
-            </button>
-
-            {!sessionClosed && (
-              <button
-                type="button"
-                className="qr-danger-button"
-                onClick={
-                  handleCloseSession
-                }
-                disabled={
-                  closingSession
-                }
-              >
-                {closingSession
-                  ? "Closing..."
-                  : "Close Session"}
-              </button>
-            )}
-
-          </div>
-
-        </section>
-
-      </main>
-
-      {/* =====================================================
-          CORRECTION MODAL
-      ====================================================== */}
-
-      {showCorrectionModal &&
-        selectedStudent && (
+        {correctionStudent && (
           <div
             className="correction-overlay"
-            onMouseDown={(event) => {
-              if (
-                event.target ===
-                event.currentTarget
-              ) {
-                setShowCorrectionModal(
-                  false
-                );
-              }
-            }}
+            onClick={closeCorrection}
           >
-
-            <div className="correction-modal">
-
-              <div className="correction-modal-header">
-
+            <div
+              className="correction-modal"
+              onClick={(event) =>
+                event.stopPropagation()
+              }
+            >
+              <div className="correction-header">
                 <div>
-
-                  <span className="card-kicker">
-                    ATTENDANCE CORRECTION
-                  </span>
-
-                  <h2>
-                    Edit Attendance
-                  </h2>
-
-                  <p>
-                    {
-                      selectedStudent.firstName
-                    }{" "}
-                    {
-                      selectedStudent.lastName
-                    }
-                  </p>
-
+                  <span>ATTENDANCE EDIT</span>
+                  <h3>Edit attendance</h3>
                 </div>
 
                 <button
                   type="button"
-                  className="modal-close-button"
-                  onClick={() =>
-                    setShowCorrectionModal(
-                      false
-                    )
-                  }
+                  onClick={closeCorrection}
+                  disabled={correctionLoading}
                 >
                   ×
                 </button>
-
               </div>
 
-              <form
-                onSubmit={
-                  handleSaveCorrection
-                }
-              >
+              <div className="correction-student">
+                <div className="student-mini-avatar">
+                  {getInitials(
+                    correctionStudent.first_name,
+                    correctionStudent.last_name
+                  )}
+                </div>
 
+                <div>
+                  <strong>
+                    {correctionStudent.first_name}{" "}
+                    {correctionStudent.last_name}
+                  </strong>
+
+                  <span>
+                    {correctionStudent.student_code}
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={saveCorrection}>
                 <label>
-                  Attendance Status
-
+                  Attendance status
                   <select
-                    value={
-                      correctionStatus
-                    }
+                    value={correctionStatus}
                     onChange={(event) =>
                       setCorrectionStatus(
                         event.target.value
                       )
                     }
+                    disabled={correctionLoading}
                   >
                     <option value="present">
                       Present
                     </option>
-
                     <option value="absent">
                       Absent
                     </option>
-
                     <option value="late">
                       Late
                     </option>
-
                     <option value="excused">
                       Excused
                     </option>
                   </select>
-
                 </label>
 
                 <label>
                   Reason
-
                   <textarea
-                    value={
-                      correctionReason
-                    }
+                    value={correctionReason}
                     onChange={(event) =>
                       setCorrectionReason(
                         event.target.value
                       )
                     }
-                    placeholder="Enter the reason for this attendance correction..."
-                    maxLength={500}
-                    rows={5}
-                    required
+                    placeholder="Why are you changing this attendance?"
+                    rows="4"
+                    disabled={correctionLoading}
                   />
-
-                  <span className="textarea-counter">
-                    {
-                      correctionReason.length
-                    }
-                    /500
-                  </span>
-
                 </label>
 
-                <div className="correction-modal-actions">
-
+                <div className="correction-actions">
                   <button
                     type="button"
-                    className="qr-secondary-button"
-                    onClick={() =>
-                      setShowCorrectionModal(
-                        false
-                      )
-                    }
-                    disabled={
-                      savingCorrection
-                    }
+                    onClick={closeCorrection}
+                    disabled={correctionLoading}
                   >
                     Cancel
                   </button>
 
                   <button
                     type="submit"
-                    className="qr-primary-button"
-                    disabled={
-                      savingCorrection ||
-                      !correctionReason.trim()
-                    }
+                    disabled={correctionLoading}
                   >
-                    {savingCorrection
+                    {correctionLoading
                       ? "Saving..."
-                      : "Save Attendance"}
+                      : "Save Changes"}
                   </button>
-
                 </div>
-
               </form>
-
             </div>
-
           </div>
         )}
-
-    </div>
+      </div>
+    </LecturerLayout>
   );
 }
