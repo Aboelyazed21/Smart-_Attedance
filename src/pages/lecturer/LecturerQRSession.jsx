@@ -219,7 +219,13 @@ export default function LecturerQRSession() {
 
       const sessions = Array.isArray(data)
         ? data
-        : data?.sessions || [];
+        : Array.isArray(data?.sessions)
+          ? data.sessions
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.data?.sessions)
+              ? data.data.sessions
+              : [];
 
       const found = sessions.find(
         (item) => Number(item.id) === Number(sessionId)
