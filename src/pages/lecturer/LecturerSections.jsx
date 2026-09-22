@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getLecturerSections } from "../../services/api";
 import "./LecturerSections.css";
 
@@ -37,6 +38,7 @@ function getStudentCount(section) {
 }
 
 export default function LecturerSections() {
+  const navigate = useNavigate();
 
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +102,10 @@ export default function LecturerSections() {
       return searchableText.includes(query);
     });
   }, [sections, search]);
+
+  function handleManageSessions() {
+    navigate("/lecturer/sessions");
+  }
 
   const totalStudents = useMemo(() => {
     return sections.reduce(
