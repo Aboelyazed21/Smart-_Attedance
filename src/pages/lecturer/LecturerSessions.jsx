@@ -16,7 +16,6 @@ import {
   } from "../../services/api";
   
   import { useNavigate } from "react-router-dom";
-import LecturerLayout from "../../components/lecturer/LecturerLayout";
   
   
   /* =========================================================
@@ -799,7 +798,6 @@ import LecturerLayout from "../../components/lecturer/LecturerLayout";
     if (loading) {
   
       return (
-        <LecturerLayout>
           <div style={page}>
   
           <header style={header}>
@@ -842,7 +840,6 @@ import LecturerLayout from "../../components/lecturer/LecturerLayout";
           </main>
   
         </div>
-        </LecturerLayout>
       );
     }
   
@@ -853,7 +850,6 @@ import LecturerLayout from "../../components/lecturer/LecturerLayout";
   
     return (
   
-      <LecturerLayout>
         <div style={page}>
   
         {/* ===================================================
@@ -1821,7 +1817,6 @@ import LecturerLayout from "../../components/lecturer/LecturerLayout";
         )}
   
       </div>
-      </LecturerLayout>
     );
   }
   

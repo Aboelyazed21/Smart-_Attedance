@@ -3,7 +3,6 @@ import {
   getLecturerAttendanceReport,
   getLecturerSections,
 } from "../../services/api";
-import LecturerLayout from "../../components/lecturer/LecturerLayout";
 import "./LecturerReports.css";
 
 export default function LecturerReports() {
@@ -197,8 +196,7 @@ export default function LecturerReports() {
   }
 
   return (
-    <LecturerLayout>
-      <div className="lecturer-reports-page">
+    <div className="lecturer-reports-page">
         <header className="lecturer-reports-header">
           <div>
             <div className="lecturer-reports-eyebrow">
@@ -470,8 +468,7 @@ export default function LecturerReports() {
             )}
           </section>
         </main>
-      </div>
-    </LecturerLayout>
+    </div>
   );
 }
 

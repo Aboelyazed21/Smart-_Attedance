@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { getLecturerAttendanceReport, getLecturerSections } from "../../services/api";
-import LecturerLayout from "../../components/lecturer/LecturerLayout";
 import "./LecturerAttendance.css";
 
 function normalizeArray(data) {
@@ -231,8 +230,7 @@ export default function LecturerAttendance() {
   }
 
   return (
-    <LecturerLayout>
-      <div className="lecturer-attendance-page">
+    <div className="lecturer-attendance-page">
         <main className="lecturer-attendance-main">
           <header className="lecturer-attendance-topbar">
             <div>
@@ -735,7 +733,6 @@ export default function LecturerAttendance() {
             </section>
           </section>
         </main>
-      </div>
-    </LecturerLayout>
+    </div>
   );
 }

@@ -10,7 +10,6 @@ import {
   updateAttendanceCorrection,
 } from "../../services/api";
 
-import LecturerLayout from "../../components/lecturer/LecturerLayout";
 import "./LecturerQRSession.css";
 
 function getSavedUser() {
@@ -550,34 +549,30 @@ export default function LecturerQRSession() {
 
   if (loading) {
     return (
-      <LecturerLayout>
-        <div className="lecturer-session-loading">
-          <div className="loading-spinner" />
-          <strong>Loading session...</strong>
-          <span>Please wait.</span>
-        </div>
-      </LecturerLayout>
+      <div className="lecturer-session-loading">
+        <div className="loading-spinner" />
+        <strong>Loading session...</strong>
+        <span>Please wait.</span>
+      </div>
     );
   }
 
   if (error || !session) {
     return (
-      <LecturerLayout>
-        <div className="lecturer-session-error">
-          <div className="error-icon">!</div>
-          <h2>Session unavailable</h2>
-          <p>
-            {error ||
-              "We could not find this attendance session."}
-          </p>
-          <button
-            type="button"
-            onClick={() => navigate("/lecturer/sessions")}
-          >
-            Back to Sessions
-          </button>
-        </div>
-      </LecturerLayout>
+      <div className="lecturer-session-error">
+        <div className="error-icon">!</div>
+        <h2>Session unavailable</h2>
+        <p>
+          {error ||
+            "We could not find this attendance session."}
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate("/lecturer/sessions")}
+        >
+          Back to Sessions
+        </button>
+      </div>
     );
   }
 
@@ -589,8 +584,7 @@ export default function LecturerQRSession() {
   const seconds = String(countdown % 60).padStart(2, "0");
 
   return (
-    <LecturerLayout>
-      <div className="lecturer-session-page">
+    <div className="lecturer-session-page">
         <header className="session-page-header">
           <div>
             <button
@@ -1065,7 +1059,6 @@ export default function LecturerQRSession() {
             </div>
           </div>
         )}
-      </div>
-    </LecturerLayout>
+    </div>
   );
 }

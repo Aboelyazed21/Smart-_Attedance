@@ -1,0 +1,642 @@
+/* =========================================================
+   LECTURER LAYOUT
+   Fixed Sidebar + Scrollable Content
+========================================================= */
+
+.lecturer-layout {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #132d57;
+}
+
+/* =========================================================
+   FIXED SIDEBAR
+========================================================= */
+
+.lecturer-layout-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  width: 290px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  padding: 24px 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #071f4d 0%,
+      #082b67 48%,
+      #06347d 100%
+    );
+
+  color: #ffffff;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  z-index: 1000;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.lecturer-layout-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.lecturer-layout-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lecturer-layout-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.lecturer-layout-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 0 8px;
+
+  margin-bottom: 28px;
+
+  flex-shrink: 0;
+}
+
+.lecturer-layout-brand-mark {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2388ff,
+      #1261d8
+    );
+
+  color: #ffffff;
+
+  font-size: 21px;
+  font-weight: 900;
+
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.lecturer-layout-brand-text {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.lecturer-layout-brand-text strong {
+  color: #ffffff;
+
+  font-size: 17px;
+  font-weight: 800;
+
+  line-height: 1.1;
+
+  white-space: nowrap;
+}
+
+.lecturer-layout-brand-text span {
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 1.25px;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.lecturer-layout-profile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 12px;
+
+  margin-bottom: 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  flex-shrink: 0;
+}
+
+.lecturer-layout-profile-avatar {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2b8cff,
+      #155dcc
+    );
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.16);
+}
+
+.lecturer-layout-profile-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.lecturer-layout-profile-info strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lecturer-layout-profile-info span {
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.lecturer-layout-nav {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+.lecturer-layout-nav-item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 48px;
+
+  padding: 9px 11px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.63);
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+
+  font-family: inherit;
+}
+
+.lecturer-layout-nav-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  color: #ffffff;
+
+  transform: translateX(2px);
+}
+
+.lecturer-layout-nav-item.active {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(42, 137, 255, 0.22),
+      rgba(42, 137, 255, 0.08)
+    );
+
+  border-color: rgba(76, 157, 255, 0.18);
+
+  color: #ffffff;
+
+  box-shadow:
+    inset 3px 0 0 #2388ff;
+}
+
+.lecturer-layout-nav-icon {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.3px;
+}
+
+.lecturer-layout-nav-item.active
+.lecturer-layout-nav-icon {
+  background: #2388ff;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 5px 14px rgba(35, 136, 255, 0.28);
+}
+
+.lecturer-layout-nav-label {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.lecturer-layout-footer {
+  margin-top: auto;
+
+  padding-top: 22px;
+
+  flex-shrink: 0;
+}
+
+.lecturer-layout-workspace {
+  padding: 13px;
+
+  margin-bottom: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.lecturer-layout-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 7px;
+
+  color: #7fd8a0;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.8px;
+}
+
+.lecturer-layout-live span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #51d88a;
+
+  box-shadow:
+    0 0 0 4px rgba(81, 216, 138, 0.09);
+}
+
+.lecturer-layout-workspace strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.lecturer-layout-workspace p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.47);
+
+  font-size: 9px;
+
+  line-height: 1.5;
+}
+
+.lecturer-layout-logout {
+  width: 100%;
+
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 8px 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: rgba(255, 255, 255, 0.62);
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 750;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.lecturer-layout-logout:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #ffffff;
+}
+
+.lecturer-layout-logout-icon {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  font-size: 8px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.lecturer-layout-content {
+  width: calc(100% - 290px);
+
+  min-height: 100vh;
+
+  margin-left: 290px;
+
+  box-sizing: border-box;
+
+  min-width: 0;
+
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1200px) {
+  .lecturer-layout-sidebar {
+    width: 250px;
+  }
+
+  .lecturer-layout-content {
+    width: calc(100% - 250px);
+
+    margin-left: 250px;
+  }
+}
+
+/* =========================================================
+   SMALL LAPTOP / TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .lecturer-layout-sidebar {
+    width: 230px;
+
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .lecturer-layout-content {
+    width: calc(100% - 230px);
+
+    margin-left: 230px;
+  }
+
+  .lecturer-layout-brand-text {
+    display: none;
+  }
+
+  .lecturer-layout-nav-label {
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .lecturer-layout-sidebar {
+    width: 72px;
+
+    padding: 18px 9px;
+  }
+
+  .lecturer-layout-content {
+    width: calc(100% - 72px);
+
+    margin-left: 72px;
+  }
+
+  .lecturer-layout-brand {
+    justify-content: center;
+
+    padding: 0;
+
+    margin-bottom: 22px;
+  }
+
+  .lecturer-layout-brand-mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  .lecturer-layout-profile {
+    justify-content: center;
+
+    padding: 7px;
+
+    background: transparent;
+
+    border-color: transparent;
+  }
+
+  .lecturer-layout-profile-info {
+    display: none;
+  }
+
+  .lecturer-layout-profile-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .lecturer-layout-nav {
+    align-items: center;
+  }
+
+  .lecturer-layout-nav-item {
+    width: 52px;
+
+    justify-content: center;
+
+    padding: 8px;
+
+    gap: 0;
+  }
+
+  .lecturer-layout-nav-label {
+    display: none;
+  }
+
+  .lecturer-layout-nav-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .lecturer-layout-workspace {
+    display: none;
+  }
+
+  .lecturer-layout-footer {
+    padding-top: 15px;
+  }
+
+  .lecturer-layout-logout {
+    width: 52px;
+
+    justify-content: center;
+
+    padding: 8px;
+
+    margin: 0 auto;
+  }
+
+  .lecturer-layout-logout span:last-child {
+    display: none;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .lecturer-layout-sidebar {
+    width: 64px;
+
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .lecturer-layout-content {
+    width: calc(100% - 64px);
+
+    margin-left: 64px;
+  }
+
+  .lecturer-layout-nav-item {
+    width: 48px;
+  }
+
+  .lecturer-layout-logout {
+    width: 48px;
+  }
+}

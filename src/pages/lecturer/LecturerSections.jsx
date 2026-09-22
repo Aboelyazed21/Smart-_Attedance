@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLecturerSections } from "../../services/api";
-import LecturerLayout from "../../components/lecturer/LecturerLayout";
 import "./LecturerSections.css";
 
 function normalizeSections(data) {
@@ -117,8 +116,7 @@ export default function LecturerSections() {
   }
 
   return (
-    <LecturerLayout>
-      <div className="lecturer-sections-page">
+    <div className="lecturer-sections-page">
         <main className="lecturer-sections-main">
           <header className="lecturer-sections-topbar">
             <div>
@@ -422,7 +420,6 @@ export default function LecturerSections() {
             </section>
           </section>
         </main>
-      </div>
-    </LecturerLayout>
+    </div>
   );
 }
