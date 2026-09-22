@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { getLecturerAttendanceReport, getLecturerSections } from "../../services/api";
 import "./LecturerAttendance.css";
 
@@ -76,8 +75,6 @@ function getSectionLabel(section) {
 }
 
 export default function LecturerAttendance() {
-  const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const savedUser = useMemo(() => {
     try {
@@ -103,22 +100,6 @@ export default function LecturerAttendance() {
     .map((part) => part[0])
     .join("")
     .toUpperCase() || "L";
-
-  const handleMobileNavigation = (path) => {
-    navigate(path);
-    setMobileMenuOpen(false);
-  };
-
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setMobileMenuOpen(false);
-    navigate("/login");
-  };
 
   const [records, setRecords] = useState([]);
   const [sections, setSections] = useState([]);
@@ -276,134 +257,8 @@ export default function LecturerAttendance() {
 
   return (
     <div
-      className={`lecturer-attendance-page${
-        mobileMenuOpen ? " mobile-menu-open" : ""
-      }`}
+      className="lecturer-attendance-page"
     >
-      <header className="attendance-mobile-header">
-        <button
-          type="button"
-          className="attendance-mobile-menu-button"
-          onClick={() => setMobileMenuOpen(true)}
-          aria-label="Open navigation"
-          aria-expanded={mobileMenuOpen}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <button
-          type="button"
-          className="attendance-mobile-brand"
-          onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-        >
-          Attendify
-        </button>
-
-        <div className="attendance-mobile-avatar">
-          {lecturerInitials}
-        </div>
-      </header>
-
-      <div
-        className="attendance-mobile-overlay"
-        onClick={closeMobileMenu}
-        aria-hidden="true"
-      />
-
-      <aside
-        className={`lecturer-attendance-sidebar${
-          mobileMenuOpen ? " mobile-open" : ""
-        }`}
-      >
-        <div className="attendance-sidebar-brand">
-          <button
-            type="button"
-            className="attendance-brand-button"
-            onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-          >
-            <span className="attendance-brand-mark">A</span>
-            <span>
-              <strong>Attendify</strong>
-              <small>LECTURER PORTAL</small>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="attendance-mobile-close"
-            onClick={closeMobileMenu}
-            aria-label="Close navigation"
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="attendance-sidebar-profile">
-          <div className="attendance-profile-avatar">
-            {lecturerInitials}
-          </div>
-          <div>
-            <strong>{lecturerName}</strong>
-            <span>Lecturer account</span>
-          </div>
-        </div>
-
-        <nav
-          className="attendance-sidebar-nav"
-          aria-label="Lecturer navigation"
-        >
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-          >
-            <span>DB</span>
-            Dashboard
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/sessions")}
-          >
-            <span>AS</span>
-            Attendance Sessions
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/sections")}
-          >
-            <span>MS</span>
-            My Sections
-          </button>
-
-          <button
-            type="button"
-            className="active"
-            onClick={() => handleMobileNavigation("/lecturer/attendance")}
-          >
-            <span>AT</span>
-            Attendance
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/reports")}
-          >
-            <span>RP</span>
-            Reports
-          </button>
-        </nav>
-
-        <div className="attendance-sidebar-footer">
-          <button type="button" onClick={handleLogout}>
-            <span>LO</span>
-            Logout
-          </button>
-        </div>
-      </aside>
-
       <main className="lecturer-attendance-main">
           <header className="lecturer-attendance-topbar">
             <div>
