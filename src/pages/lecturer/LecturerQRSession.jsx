@@ -494,7 +494,7 @@ export default function LecturerQRSession() {
       setCorrectionLoading(true);
 
       await updateAttendanceCorrection(
-        correctionStudent.attendance_id || null,
+        correctionStudent.attendance_id || 0,
         {
           sessionId: session.id,
           studentId: correctionStudent.student_id,
