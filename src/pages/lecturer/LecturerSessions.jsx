@@ -16,6 +16,7 @@ import {
   } from "../../services/api";
   
   import { useNavigate } from "react-router-dom";
+import LecturerLayout from "../../components/lecturer/LecturerLayout";
   
   
   /* =========================================================
@@ -798,7 +799,8 @@ import {
     if (loading) {
   
       return (
-        <div style={page}>
+        <LecturerLayout>
+          <div style={page}>
   
           <header style={header}>
   
@@ -840,6 +842,7 @@ import {
           </main>
   
         </div>
+        </LecturerLayout>
       );
     }
   
@@ -850,7 +853,8 @@ import {
   
     return (
   
-      <div style={page}>
+      <LecturerLayout>
+        <div style={page}>
   
         {/* ===================================================
             HEADER
@@ -1817,6 +1821,7 @@ import {
         )}
   
       </div>
+      </LecturerLayout>
     );
   }
   
@@ -1826,7 +1831,8 @@ import {
   ========================================================= */
   
   const page = {
-    minHeight: "100vh",
+    width: "100%",
+    minHeight: "100%",
     background: "#f6f8fc",
     color: "#172033",
     fontFamily:
@@ -1837,6 +1843,7 @@ import {
     background: "#ffffff",
     borderBottom: "1px solid #e5eaf1",
     padding: "28px 36px",
+    boxSizing: "border-box",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -1876,6 +1883,7 @@ import {
     maxWidth: 1400,
     margin: "0 auto",
     padding: "30px 36px 50px",
+    boxSizing: "border-box",
   };
   
   const filterCard = {

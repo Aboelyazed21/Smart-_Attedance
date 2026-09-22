@@ -21,6 +21,7 @@ import Settings from "./pages/admin/Settings";
 
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
 import LecturerQRSession from "./pages/lecturer/LecturerQRSession";
+import LecturerLayout from "./components/lecturer/LecturerLayout";
 
 import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
@@ -280,7 +281,11 @@ function App() {
       return <Login />;
     }
 
-    return <LecturerQRSession />;
+    return (
+      <LecturerLayout>
+        <LecturerQRSession />
+      </LecturerLayout>
+    );
   }
 
 
@@ -293,7 +298,11 @@ function App() {
       return <Login />;
     }
 
-    return <LecturerSessions />;
+    return (
+      <LecturerLayout>
+        <LecturerSessions />
+      </LecturerLayout>
+    );
   }
 
 
@@ -461,7 +470,11 @@ function App() {
       role === "lecturer" ||
       role === "instructor"
     ) {
-      return <LecturerSessions />;
+      return (
+        <LecturerLayout>
+          <LecturerSessions />
+        </LecturerLayout>
+      );
     }
 
     return <StudentDashboard />;
