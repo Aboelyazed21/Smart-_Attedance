@@ -43,6 +43,7 @@
   color: #fff;
   z-index: 20;
   box-shadow: 10px 0 30px rgba(18, 52, 98, .08);
+  transition: transform 0.3s ease; /* إضافة حركة سلسة */
 }
 
 .student-dashboard .student-brand {
@@ -228,6 +229,7 @@
   min-height: 100vh;
   margin-left: 244px;
   background: var(--sd-bg);
+  transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 .student-dashboard .student-topbar {
@@ -242,6 +244,23 @@
   background: rgba(255,255,255,.96);
   border-bottom: 1px solid var(--sd-border);
   backdrop-filter: blur(10px);
+}
+
+/* زرار الناف بار للموبايل (مخفي في الشاشات الكبيرة) */
+.student-dashboard .mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--sd-text);
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.student-dashboard .topbar-left-section {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .student-dashboard .student-search {
@@ -282,6 +301,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  margin-left: auto;
 }
 
 .student-dashboard .student-notification-button {
@@ -559,27 +579,69 @@
 }
 
 @media (max-width: 720px) {
-  .student-dashboard .student-sidebar { width: 72px; padding: 18px 9px; }
-  .student-dashboard .student-main { width: calc(100% - 72px); margin-left: 72px; }
+  /* خلفية مظللة عند فتح الناف بار في الموبايل */
+  .student-dashboard .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 19;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+
+  .student-dashboard .sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* إخفاء الناف بار يسار الشاشة */
+  .student-dashboard .student-sidebar { 
+    width: 250px; 
+    transform: translateX(-100%); 
+    padding: 20px 15px;
+  }
+  
+  /* إظهار الناف بار لما ياخد كلاس open */
+  .student-dashboard .student-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* جعل الشاشة الرئيسية تاخد المساحة كلها */
+  .student-dashboard .student-main { 
+    width: 100%; 
+    margin-left: 0; 
+  }
+  
+  /* إظهار زرار الموبايل */
+  .student-dashboard .mobile-menu-btn {
+    display: block;
+  }
+
   .student-dashboard .student-brand { justify-content: center; padding-left: 0; padding-right: 0; }
-  .student-dashboard .student-brand > div:last-child,
+  
+  /* إخفاء نصوص القائمة الجانبية إذا أردت إبقاء الأيقونات فقط (حسب تفضيلك) */
+  /* .student-dashboard .student-brand > div:last-child,
   .student-dashboard .student-profile-copy,
   .student-dashboard .student-nav-item > span,
   .student-dashboard .student-sidebar-tip,
   .student-dashboard .student-logout { font-size: 0; }
   .student-dashboard .student-brand > div:last-child,
-  .student-dashboard .student-profile-copy { display: none; }
+  .student-dashboard .student-profile-copy { display: none; } */
+  
   .student-dashboard .student-profile-card { justify-content: center; padding: 8px; }
   .student-dashboard .student-nav-item { justify-content: center; padding: 0; }
   .student-dashboard .student-nav-item > svg { margin: 0; }
   .student-dashboard .student-notification-badge { position: absolute; right: 5px; top: 3px; font-size: 7px; }
   .student-dashboard .student-sidebar-bottom .student-logout { display: flex; justify-content: center; padding: 7px; }
+  
   .student-dashboard .student-topbar { padding: 0 14px; }
-  .student-dashboard .student-search { width: 58%; }
+  .student-dashboard .student-search { width: 100%; }
   .student-dashboard .student-search > span { display: none; }
   .student-dashboard .student-header-profile > div:nth-child(2),
   .student-dashboard .student-header-chevron,
   .student-dashboard .student-header-divider { display: none; }
+  
   .student-dashboard .student-content { padding: 16px 14px; }
   .student-dashboard .student-hero { min-height: 145px; padding: 19px; }
   .student-dashboard .student-hero h1 { font-size: 20px; }
@@ -589,7 +651,6 @@
 
 @media (max-width: 520px) {
   .student-dashboard .student-stats { grid-template-columns: 1fr; }
-  .student-dashboard .student-search { width: 52%; }
   .student-dashboard .student-search input { font-size: 9px; }
   .student-dashboard .student-header-avatar { width: 32px; height: 32px; }
   .student-dashboard .student-topbar { height: 62px; }
