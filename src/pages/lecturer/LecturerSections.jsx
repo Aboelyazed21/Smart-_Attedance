@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { getLecturerSections } from "../../services/api";
 import "./LecturerSections.css";
 
@@ -37,43 +36,13 @@ function getStudentCount(section) {
   );
 }
 
-function getSavedUser() {
-  try {
-    const raw = localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function getInitials(user) {
-  const name =
-    user?.name ||
-    user?.full_name ||
-    user?.fullName ||
-    user?.username ||
-    user?.email ||
-    "Lecturer";
-
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
-
 export default function LecturerSections() {
-  const navigate = useNavigate();
-  const savedUser = useMemo(() => getSavedUser(), []);
 
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   async function loadSections(showRefreshState = false) {
     try {
@@ -140,154 +109,9 @@ export default function LecturerSections() {
     );
   }, [sections]);
 
-  function handleManageSessions() {
-    navigate("/lecturer/sessions");
-    setMobileMenuOpen(false);
-  }
-
-  function handleMobileNavigation(path) {
-    navigate(path);
-    setMobileMenuOpen(false);
-  }
-
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  }
-
   return (
-    <div
-      className={`lecturer-sections-page${
-        mobileMenuOpen ? " mobile-menu-open" : ""
-      }`}
-    >
-      <header className="sections-mobile-header">
-        <button
-          type="button"
-          className="sections-mobile-menu-button"
-          onClick={() => setMobileMenuOpen(true)}
-          aria-label="Open navigation menu"
-          aria-expanded={mobileMenuOpen}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <button
-          type="button"
-          className="sections-mobile-brand"
-          onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-        >
-          Attendify
-        </button>
-
-        <div className="sections-mobile-avatar" aria-label="Lecturer profile">
-          {getInitials(savedUser)}
-        </div>
-      </header>
-
-      <div
-        className="sections-mobile-overlay"
-        onClick={() => setMobileMenuOpen(false)}
-        aria-hidden="true"
-      />
-
-      <aside
-        className={`lecturer-sections-sidebar${
-          mobileMenuOpen ? " mobile-open" : ""
-        }`}
-      >
-        <div className="sections-sidebar-brand">
-          <button
-            type="button"
-            className="sections-brand-button"
-            onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-          >
-            <span className="sections-brand-mark">A</span>
-            <span>
-              <strong>Attendify</strong>
-              <small>Lecturer Portal</small>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="sections-mobile-close"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close navigation menu"
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="sections-sidebar-profile">
-          <div className="sections-profile-avatar">
-            {getInitials(savedUser)}
-          </div>
-          <div>
-            <strong>
-              {savedUser?.name ||
-                savedUser?.full_name ||
-                savedUser?.fullName ||
-                "Lecturer"}
-            </strong>
-            <span>Lecturer account</span>
-          </div>
-        </div>
-
-        <nav className="sections-sidebar-nav" aria-label="Lecturer navigation">
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/dashboard")}
-          >
-            <span className="sections-nav-icon">D</span>
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/sessions")}
-          >
-            <span className="sections-nav-icon">S</span>
-            <span>Attendance Sessions</span>
-          </button>
-
-          <button
-            type="button"
-            className="active"
-            onClick={() => handleMobileNavigation("/lecturer/sections")}
-          >
-            <span className="sections-nav-icon">C</span>
-            <span>My Sections</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/attendance")}
-          >
-            <span className="sections-nav-icon">A</span>
-            <span>Attendance</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleMobileNavigation("/lecturer/reports")}
-          >
-            <span className="sections-nav-icon">R</span>
-            <span>Reports</span>
-          </button>
-        </nav>
-
-        <div className="sections-sidebar-footer">
-          <button type="button" onClick={handleLogout}>
-            <span className="sections-nav-icon">↪</span>
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-        <main className="lecturer-sections-main">
+    <div className="lecturer-sections-page">
+      <main className="lecturer-sections-main">
           <header className="lecturer-sections-topbar">
             <div>
               <span className="topbar-label">
