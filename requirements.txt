@@ -1,5 +1,8 @@
 fastapi
-uvicorn
+uvicorn[standard]
 mysql-connector-python
 pandas
-pydantic
+numpy
+scikit-learn
+joblib
+python-dotenv
