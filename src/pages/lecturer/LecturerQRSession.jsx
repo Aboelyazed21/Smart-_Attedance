@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
-  getSessionById,
+  getSessions,
   openSession,
   refreshSessionQr,
   closeSession,
@@ -119,7 +119,7 @@ function getStatusClass(status) {
 
 export default function LecturerQRSession() {
   const navigate = useNavigate();
-  const { sessionId } = useParams();
+  const { id: sessionId } = useParams();
 
   const savedUser = useMemo(() => getSavedUser(), []);
 
@@ -215,24 +215,24 @@ export default function LecturerQRSession() {
       setLoading(true);
       setError("");
 
-      const data = await getSessionById(sessionId);
+      const data = await getSessions();
 
-      if (!data) {
-        throw new Error(
-          "Attendance session was not found."
-        );
-      }
+      const sessions = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.sessions)
+          ? data.sessions
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.data?.sessions)
+              ? data.data.sessions
+              : [];
 
-      const found =
-        data?.session ||
-        data?.data?.session ||
-        data?.data ||
-        data;
+      const found = sessions.find(
+        (item) => Number(item.id) === Number(sessionId)
+      );
 
-      if (!found?.id) {
-        throw new Error(
-          "Attendance session was not found."
-        );
+      if (!found) {
+        throw new Error("Attendance session was not found.");
       }
 
       setSession(found);
@@ -243,9 +243,7 @@ export default function LecturerQRSession() {
         found.qrDataUrl
       ) {
         setQrDataUrl(found.qrDataUrl);
-        setQrExpiresAt(
-          found.expiresAt || null
-        );
+        setQrExpiresAt(found.expiresAt || null);
 
         startCountdown(
           found.expiresAt,
@@ -255,11 +253,7 @@ export default function LecturerQRSession() {
 
       await loadRoster(found.id);
     } catch (err) {
-      console.error(
-        "Load lecturer session error:",
-        err
-      );
-
+      console.error("Load lecturer session error:", err);
       setError(
         err.message ||
           "Failed to load the attendance session."
