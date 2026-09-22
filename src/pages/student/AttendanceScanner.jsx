@@ -129,8 +129,8 @@ function AttendanceScanner() {
           fps: 15,
 
           qrbox: {
-            width: 320,
-            height: 320,
+            width: 340,
+            height: 340,
           },
 
           aspectRatio: 1,
