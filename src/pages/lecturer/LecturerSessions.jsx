@@ -420,90 +420,63 @@ import {
   
   
     /* =======================================================
-       OPEN SESSION / QR
+       OPEN SESSION / QR PAGE
     ======================================================= */
-  
+
     async function handleOpenSession(
       session
     ) {
-  
+
       try {
-  
+
         setLoadingAction(true);
-  
+
         setError("");
-  
-        const data =
-          await openSession(
-            session.id
-          );
-  
-  
-        const qr =
-          data?.qr || {};
-  
-  
-        setSelectedSession({
-          ...session,
-          status: "active",
-        });
-  
-  
-        setQrDataUrl(
-          qr.qrDataUrl ||
-          data?.qrDataUrl ||
-          ""
-        );
-  
-  
-        setQrExpiresAt(
-          qr.expiresAt ||
-          data?.expiresAt ||
-          null
-        );
-  
-  
-        setQrVersion(
-          qr.version ||
-          data?.version ||
-          null
-        );
-  
-  
-        setShowQrModal(
-          true
-        );
-  
-  
-        await loadData();
-  
-  
-        startQrCountdown(
-          qr.expiresAt ||
-          data?.expiresAt,
+
+        /*
+         * Open the attendance session first.
+         * The backend generates/activates the QR token.
+         */
+        await openSession(
           session.id
         );
-  
+
+
+        /*
+         * Refresh the sessions list so the
+         * session status becomes active locally.
+         */
+        await loadData();
+
+
+        /*
+         * Navigate to the professional
+         * QR attendance page.
+         */
+        navigate(
+          `/lecturer/sessions/${session.id}`
+        );
+
       } catch (err) {
-  
+
         console.error(
           "Open session error:",
           err
         );
-  
+
         setError(
           err.message ||
             "Failed to open attendance session."
         );
-  
+
       } finally {
-  
+
         setLoadingAction(false);
-  
+
       }
     }
-  
-  
+
+
     /* =======================================================
        QR COUNTDOWN
     ======================================================= */

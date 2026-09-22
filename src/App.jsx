@@ -20,6 +20,7 @@ import Reports from "./pages/admin/Reports";
 import Settings from "./pages/admin/Settings";
 
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
+import LecturerQRSession from "./pages/lecturer/LecturerQRSession";
 
 import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
@@ -263,6 +264,23 @@ function App() {
     }
 
     return <Settings />;
+  }
+
+
+  /* =========================================================
+     LECTURER QR ATTENDANCE SESSION
+  ========================================================= */
+
+  if (
+    location.pathname.startsWith(
+      "/lecturer/sessions/"
+    )
+  ) {
+    if (!isLecturerAuthenticated()) {
+      return <Login />;
+    }
+
+    return <LecturerQRSession />;
   }
 
 

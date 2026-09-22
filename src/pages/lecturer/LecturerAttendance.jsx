@@ -1,1007 +1,865 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLecturerAttendanceReport } from "../../services/api";
+import {
+  getLecturerAttendanceReport,
+  getLecturerSections,
+} from "../../services/api";
+
+function getSavedUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function getInitials(firstName = "", lastName = "") {
+  const first = String(firstName).trim().charAt(0);
+  const last = String(lastName).trim().charAt(0);
+
+  return `${first}${last}`.toUpperCase() || "L";
+}
+
+function normalizeArray(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data?.rows)) {
+    return data.rows;
+  }
+
+  if (Array.isArray(data?.records)) {
+    return data.records;
+  }
+
+  if (Array.isArray(data?.attendance)) {
+    return data.attendance;
+  }
+
+  if (Array.isArray(data?.data)) {
+    return data.data;
+  }
+
+  return [];
+}
+
+function getAttendanceStatus(row) {
+  return String(
+    row?.attendance_status ??
+      row?.attendanceStatus ??
+      row?.status ??
+      "absent"
+  ).toLowerCase();
+}
+
+function getStudentName(row) {
+  return (
+    row?.student_name ||
+    row?.studentName ||
+    `${row?.first_name || ""} ${row?.last_name || ""}`.trim() ||
+    "Student"
+  );
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "-";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value).slice(0, 10);
+  }
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatTime(value) {
+  if (!value) {
+    return "-";
+  }
+
+  return String(value).substring(0, 5);
+}
 
 export default function LecturerAttendance() {
   const navigate = useNavigate();
 
-  const [user] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user") || "null");
-    } catch {
-      return null;
-    }
-  });
+  const savedUser = useMemo(() => getSavedUser(), []);
 
-  const [data, setData] = useState({});
+  const [records, setRecords] = useState([]);
+  const [sections, setSections] = useState([]);
+
   const [loading, setLoading] = useState(true);
+  const [sectionsLoading, setSectionsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
   const [error, setError] = useState("");
+  const [sectionsError, setSectionsError] = useState("");
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sectionFilter, setSectionFilter] = useState("all");
 
-  async function load() {
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const firstName =
+    savedUser?.first_name ||
+    savedUser?.firstName ||
+    "Lecturer";
+
+  const lastName =
+    savedUser?.last_name ||
+    savedUser?.lastName ||
+    "";
+
+  const initials = getInitials(firstName, lastName);
+
+  async function loadSections() {
     try {
-      setLoading(true);
+      setSectionsLoading(true);
+      setSectionsError("");
+
+      const data = await getLecturerSections();
+
+      setSections(normalizeArray(data));
+    } catch (err) {
+      console.error("Lecturer sections error:", err);
+
+      setSectionsError(
+        err?.message ||
+          "Failed to load lecturer sections."
+      );
+    } finally {
+      setSectionsLoading(false);
+    }
+  }
+
+  async function loadAttendance(showRefreshState = false) {
+    try {
+      if (showRefreshState) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       setError("");
 
-      const result = await getLecturerAttendanceReport({
-        lecturerId: user?.id,
-      });
+      const filters = {};
 
-      setData(result || {});
-    } catch (e) {
-      console.error("Lecturer attendance error:", e);
-      setError(e.message || "Failed to load attendance.");
+      if (sectionFilter !== "all") {
+        filters.sectionId = Number(sectionFilter);
+      }
+
+      if (statusFilter !== "all") {
+        filters.status = statusFilter;
+      }
+
+      if (startDate) {
+        filters.startDate = startDate;
+      }
+
+      if (endDate) {
+        filters.endDate = endDate;
+      }
+
+      const data = await getLecturerAttendanceReport(
+        filters
+      );
+
+      setRecords(normalizeArray(data));
+    } catch (err) {
+      console.error("Lecturer attendance error:", err);
+
+      setError(
+        err?.message ||
+          "Failed to load attendance records."
+      );
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }
 
   useEffect(() => {
-    load();
+    loadSections();
   }, []);
 
-  const rows = Array.isArray(data?.rows)
-    ? data.rows
-    : Array.isArray(data?.attendance)
-      ? data.attendance
-      : Array.isArray(data)
-        ? data
-        : [];
+  useEffect(() => {
+    loadAttendance();
+  }, [
+    sectionFilter,
+    statusFilter,
+    startDate,
+    endDate,
+  ]);
 
-  const summary = data?.summary || {};
+  const filteredRecords = useMemo(() => {
+    const query = search.trim().toLowerCase();
 
-  const filteredRows = useMemo(() => {
-    const searchValue = search.trim().toLowerCase();
+    if (!query) {
+      return records;
+    }
 
-    return rows.filter((row) => {
-      const student = String(
-        row.student_name ||
-          row.studentName ||
-          row.student_code ||
-          row.studentCode ||
-          ""
-      ).toLowerCase();
+    return records.filter((row) => {
+      const searchableText = [
+        getStudentName(row),
+        row?.student_code,
+        row?.studentCode,
+        row?.university_id,
+        row?.course_code,
+        row?.courseCode,
+        row?.course_name,
+        row?.courseName,
+        row?.section_name,
+        row?.sectionName,
+        row?.source,
+        getAttendanceStatus(row),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
-      const course = String(
-        row.course_code ||
-          row.course_name ||
-          ""
-      ).toLowerCase();
-
-      const section = String(
-        row.section_name ||
-          row.section ||
-          ""
-      ).toLowerCase();
-
-      const status = String(
-        row.attendance_status ||
-          row.status ||
-          ""
-      ).toLowerCase();
-
-      const matchesSearch =
-        !searchValue ||
-        student.includes(searchValue) ||
-        course.includes(searchValue) ||
-        section.includes(searchValue);
-
-      const matchesStatus =
-        statusFilter === "all" ||
-        status === statusFilter.toLowerCase();
-
-      return matchesSearch && matchesStatus;
+      return searchableText.includes(query);
     });
-  }, [rows, search, statusFilter]);
+  }, [records, search]);
 
-  const presentCount =
-    summary.present ??
-    rows.filter((row) =>
-      ["present", "late"].includes(
-        String(
-          row.attendance_status || row.status || ""
-        ).toLowerCase()
-      )
+  const stats = useMemo(() => {
+    const statuses = filteredRecords.map(
+      getAttendanceStatus
+    );
+
+    const present = statuses.filter(
+      (status) => status === "present"
     ).length;
 
-  const lateCount =
-    summary.late ??
-    rows.filter(
-      (row) =>
-        String(
-          row.attendance_status || row.status || ""
-        ).toLowerCase() === "late"
+    const late = statuses.filter(
+      (status) => status === "late"
     ).length;
 
-  const absentCount =
-    summary.absent ??
-    rows.filter(
-      (row) =>
-        String(
-          row.attendance_status || row.status || ""
-        ).toLowerCase() === "absent"
+    const absent = statuses.filter(
+      (status) => status === "absent"
     ).length;
 
-  const attendanceRate =
-    summary.attendancePercentage ??
-    (rows.length
-      ? Math.round(
-          ((presentCount / rows.length) * 100) * 100
-        ) / 100
-      : 0);
+    const excused = statuses.filter(
+      (status) => status === "excused"
+    ).length;
+
+    const total = statuses.length;
+
+    const attendanceRate =
+      total > 0
+        ? Math.round(
+            ((present + late) / total) * 100
+          )
+        : 0;
+
+    return {
+      total,
+      present,
+      late,
+      absent,
+      excused,
+      attendanceRate,
+    };
+  }, [filteredRecords]);
+
+  function clearFilters() {
+    setSearch("");
+    setStatusFilter("all");
+    setSectionFilter("all");
+    setStartDate("");
+    setEndDate("");
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/");
+  }
 
   return (
-    <div style={page}>
-      {/* HEADER */}
-      <header style={header}>
-        <div>
-          <h1 style={title}>Attendance</h1>
+    <div className="lecturer-attendance-page">
+      <aside className="lecturer-attendance-sidebar">
+        <div className="lecturer-attendance-brand">
+          <div className="brand-mark">
+            A
+          </div>
 
-          <p style={subtitle}>
-            Attendance records for your teaching sections
-          </p>
+          <div>
+            <strong>Attendify</strong>
+            <span>SMART ATTENDANCE</span>
+          </div>
         </div>
 
-        <div style={headerActions}>
+        <div className="lecturer-attendance-profile">
+          <div className="profile-avatar">
+            {initials}
+          </div>
+
+          <div>
+            <strong>
+              {firstName} {lastName}
+            </strong>
+
+            <span>Lecturer</span>
+          </div>
+        </div>
+
+        <nav className="lecturer-attendance-nav">
           <button
-            style={secondaryButton}
+            type="button"
             onClick={() => navigate("/dashboard")}
           >
+            <span>DB</span>
             Dashboard
           </button>
 
           <button
-            style={secondaryButton}
-            onClick={() => navigate("/lecturer/sessions")}
+            type="button"
+            onClick={() =>
+              navigate("/lecturer/sessions")
+            }
           >
-            Sessions
+            <span>AS</span>
+            Attendance Sessions
           </button>
 
           <button
-            style={primaryButton}
-            onClick={load}
-            disabled={loading}
+            type="button"
+            onClick={() =>
+              navigate("/lecturer/sections")
+            }
           >
-            {loading ? "Refreshing..." : "Refresh"}
+            <span>SC</span>
+            My Sections
+          </button>
+
+          <button
+            type="button"
+            className="active"
+            onClick={() =>
+              navigate("/lecturer/attendance")
+            }
+          >
+            <span>AT</span>
+            Attendance
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/lecturer/reports")
+            }
+          >
+            <span>RP</span>
+            Reports
+          </button>
+        </nav>
+
+        <div className="lecturer-attendance-sidebar-footer">
+          <div className="sidebar-info">
+            <span className="live-badge">
+              LIVE
+            </span>
+
+            <strong>
+              Attendance monitoring
+            </strong>
+
+            <p>
+              Review attendance records from your
+              assigned sections.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="logout-button"
+            onClick={handleLogout}
+          >
+            <span>LO</span>
+            Logout
           </button>
         </div>
-      </header>
+      </aside>
 
-      <main style={main}>
-        {/* ERROR */}
-        {error && (
-          <div style={errorBox}>
-            <strong>Unable to load attendance</strong>
-            <span>{error}</span>
+      <main className="lecturer-attendance-main">
+        <header className="lecturer-attendance-topbar">
+          <div>
+            <span className="topbar-label">
+              LECTURER PORTAL
+            </span>
+
+            <h1>Attendance</h1>
+
+            <p>
+              Review attendance records for your
+              assigned sections.
+            </p>
           </div>
-        )}
 
-        {/* STATISTICS */}
-        <section style={statsGrid}>
-          <StatCard
-            title="Total Records"
-            value={summary.totalRecords ?? rows.length}
-            description="Attendance records"
-          />
-
-          <StatCard
-            title="Present"
-            value={presentCount}
-            description="Students present"
-          />
-
-          <StatCard
-            title="Late"
-            value={lateCount}
-            description="Late attendance"
-          />
-
-          <StatCard
-            title="Absent"
-            value={absentCount}
-            description="Absent students"
-          />
-
-          <StatCard
-            title="Attendance Rate"
-            value={`${attendanceRate}%`}
-            description="Overall attendance"
-          />
-        </section>
-
-        {/* MAIN CARD */}
-        <section style={mainCard}>
-          {/* CARD HEADER */}
-          <div style={cardHeader}>
+          <div className="topbar-user">
             <div>
-              <h2 style={sectionTitle}>Attendance Records</h2>
+              <strong>
+                {firstName} {lastName}
+              </strong>
 
-              <p style={sectionSubtitle}>
-                View attendance activity for your assigned sections.
+              <span>Lecturer</span>
+            </div>
+
+            <div className="topbar-avatar">
+              {initials}
+            </div>
+          </div>
+        </header>
+
+        <section className="lecturer-attendance-content">
+          <div className="attendance-hero">
+            <div>
+              <span className="hero-label">
+                ATTENDANCE MONITORING
+              </span>
+
+              <h2>
+                Attendance records
+              </h2>
+
+              <p>
+                Filter and review attendance activity
+                across your teaching sections.
               </p>
             </div>
 
-            <div style={recordCount}>
-              {filteredRows.length} record
-              {filteredRows.length !== 1 ? "s" : ""}
-            </div>
-          </div>
-
-          {/* FILTERS */}
-          <div style={filters}>
-            <div style={searchWrapper}>
-              <span style={searchIcon}>⌕</span>
-
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search student, course or section..."
-                style={searchInput}
-              />
-            </div>
-
-            <select
-              value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
+            <button
+              type="button"
+              className="attendance-refresh-button"
+              onClick={() =>
+                loadAttendance(true)
               }
-              style={select}
+              disabled={refreshing}
             >
-              <option value="all">All Statuses</option>
-              <option value="present">Present</option>
-              <option value="late">Late</option>
-              <option value="absent">Absent</option>
-              <option value="excused">Excused</option>
-            </select>
+              {refreshing
+                ? "Refreshing..."
+                : "Refresh"}
+            </button>
           </div>
 
-          {/* CONTENT */}
-          {loading ? (
-            <LoadingState />
-          ) : filteredRows.length === 0 ? (
-            <EmptyState
-              hasFilters={
-                search.trim() !== "" ||
-                statusFilter !== "all"
-              }
-            />
-          ) : (
-            <div style={tableWrapper}>
-              <table style={table}>
-                <thead>
-                  <tr>
-                    <th style={th}>Student</th>
-                    <th style={th}>Course</th>
-                    <th style={th}>Section</th>
-                    <th style={th}>Date</th>
-                    <th style={th}>Status</th>
-                    <th style={th}>Source</th>
-                  </tr>
-                </thead>
+          {error && (
+            <div className="attendance-alert">
+              <div className="alert-icon">
+                !
+              </div>
 
-                <tbody>
-                  {filteredRows.map((row, index) => {
-                    const status = String(
-                      row.attendance_status ||
-                        row.status ||
-                        ""
-                    ).toLowerCase();
+              <div>
+                <strong>
+                  Unable to load attendance
+                </strong>
 
-                    return (
-                      <tr
-                        key={
-                          row.attendance_id ||
-                          row.attendanceId ||
-                          row.id ||
-                          index
-                        }
-                        style={tableRow}
-                      >
-                        {/* STUDENT */}
-                        <td style={td}>
-                          <div style={studentCell}>
-                            <div style={avatar}>
-                              {getInitials(
-                                row.student_name ||
-                                  row.studentName ||
-                                  row.student_code ||
-                                  "S"
-                              )}
-                            </div>
+                <p>{error}</p>
+              </div>
 
-                            <div>
-                              <div style={studentName}>
-                                {row.student_name ||
-                                  row.studentName ||
-                                  "-"}
-                              </div>
-
-                              <div style={studentCode}>
-                                {row.student_code ||
-                                  row.studentCode ||
-                                  "Student"}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* COURSE */}
-                        <td style={td}>
-                          <div style={courseCell}>
-                            <strong>
-                              {row.course_code || "-"}
-                            </strong>
-
-                            <span>
-                              {row.course_name || ""}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* SECTION */}
-                        <td style={td}>
-                          <span style={sectionBadge}>
-                            {row.section_name ||
-                              row.section ||
-                              "-"}
-                          </span>
-                        </td>
-
-                        {/* DATE */}
-                        <td style={td}>
-                          <div style={dateCell}>
-                            {formatDate(
-                              row.session_date ||
-                                row.sessionDate ||
-                                row.scanned_at ||
-                                row.scannedAt
-                            )}
-                          </div>
-                        </td>
-
-                        {/* STATUS */}
-                        <td style={td}>
-                          <StatusBadge status={status} />
-                        </td>
-
-                        {/* SOURCE */}
-                        <td style={td}>
-                          <span style={sourceText}>
-                            {formatSource(
-                              row.source
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <button
+                type="button"
+                onClick={() =>
+                  loadAttendance(true)
+                }
+              >
+                Retry
+              </button>
             </div>
           )}
+
+          <div className="attendance-stat-grid">
+            <div className="attendance-stat-card">
+              <div className="stat-icon">
+                AT
+              </div>
+
+              <div>
+                <span>Total records</span>
+                <strong>{stats.total}</strong>
+                <small>
+                  Records matching the current filters
+                </small>
+              </div>
+            </div>
+
+            <div className="attendance-stat-card">
+              <div className="stat-icon">
+                PR
+              </div>
+
+              <div>
+                <span>Present</span>
+                <strong>{stats.present}</strong>
+                <small>
+                  Students marked present
+                </small>
+              </div>
+            </div>
+
+            <div className="attendance-stat-card">
+              <div className="stat-icon">
+                LT
+              </div>
+
+              <div>
+                <span>Late</span>
+                <strong>{stats.late}</strong>
+                <small>
+                  Students marked late
+                </small>
+              </div>
+            </div>
+
+            <div className="attendance-stat-card">
+              <div className="stat-icon">
+                AR
+              </div>
+
+              <div>
+                <span>Attendance rate</span>
+                <strong>
+                  {stats.attendanceRate}%
+                </strong>
+                <small>
+                  Present + late records
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <section className="attendance-panel">
+            <div className="attendance-panel-header">
+              <div>
+                <span className="panel-label">
+                  RECORD FILTERS
+                </span>
+
+                <h3>
+                  Attendance history
+                </h3>
+
+                <p>
+                  Use the filters to inspect specific
+                  attendance records.
+                </p>
+              </div>
+            </div>
+
+            <div className="attendance-filters">
+              <div className="attendance-search">
+                <span>Q</span>
+
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(event.target.value)
+                  }
+                  placeholder="Search student, course or section..."
+                />
+              </div>
+
+              <div className="attendance-filter-field">
+                <label>Section</label>
+
+                <select
+                  value={sectionFilter}
+                  onChange={(event) =>
+                    setSectionFilter(
+                      event.target.value
+                    )
+                  }
+                  disabled={sectionsLoading}
+                >
+                  <option value="all">
+                    All sections
+                  </option>
+
+                  {sections.map((section) => {
+                    const id =
+                      section?.section_id ??
+                      section?.sectionId ??
+                      section?.id;
+
+                    return (
+                      <option
+                        key={id}
+                        value={id}
+                      >
+                        {section?.course_code ||
+                          section?.courseCode ||
+                          "Course"}{" "}
+                        -{" "}
+                        {section?.section_name ||
+                          section?.sectionName ||
+                          `Section ${id}`}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="attendance-filter-field">
+                <label>Status</label>
+
+                <select
+                  value={statusFilter}
+                  onChange={(event) =>
+                    setStatusFilter(
+                      event.target.value
+                    )
+                  }
+                >
+                  <option value="all">
+                    All statuses
+                  </option>
+
+                  <option value="present">
+                    Present
+                  </option>
+
+                  <option value="late">
+                    Late
+                  </option>
+
+                  <option value="absent">
+                    Absent
+                  </option>
+
+                  <option value="excused">
+                    Excused
+                  </option>
+                </select>
+              </div>
+
+              <div className="attendance-filter-field">
+                <label>From</label>
+
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(event) =>
+                    setStartDate(
+                      event.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="attendance-filter-field">
+                <label>To</label>
+
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(event) =>
+                    setEndDate(
+                      event.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <button
+                type="button"
+                className="clear-attendance-filters"
+                onClick={clearFilters}
+              >
+                Clear
+              </button>
+            </div>
+
+            {sectionsError && (
+              <div className="sections-inline-warning">
+                {sectionsError}
+              </div>
+            )}
+
+            <div className="attendance-table-wrap">
+              {loading ? (
+                <div className="attendance-loading">
+                  <div className="loading-spinner" />
+
+                  <strong>
+                    Loading attendance records
+                  </strong>
+
+                  <span>
+                    Reading attendance data...
+                  </span>
+                </div>
+              ) : filteredRecords.length === 0 ? (
+                <div className="attendance-empty">
+                  <div className="empty-icon">
+                    AT
+                  </div>
+
+                  <h3>
+                    No attendance records
+                  </h3>
+
+                  <p>
+                    No records match the current
+                    filters.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              ) : (
+                <table className="lecturer-attendance-table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Course</th>
+                      <th>Section</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                      <th>Source</th>
+                      <th>Validation</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {filteredRecords.map(
+                      (row, index) => {
+                        const status =
+                          getAttendanceStatus(
+                            row
+                          );
+
+                        const studentName =
+                          getStudentName(row);
+
+                        const rowKey =
+                          row?.attendance_id ??
+                          row?.attendanceId ??
+                          `${row?.student_code || index}-${row?.session_date || index}`;
+
+                        return (
+                          <tr key={rowKey}>
+                            <td>
+                              <div className="attendance-student">
+                                <div className="student-avatar">
+                                  {getInitials(
+                                    row?.first_name,
+                                    row?.last_name
+                                  )}
+                                </div>
+
+                                <div>
+                                  <strong>
+                                    {studentName}
+                                  </strong>
+
+                                  <span>
+                                    {row?.student_code ||
+                                      row?.studentCode ||
+                                      row?.email ||
+                                      "Student"}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td>
+                              <div className="course-info">
+                                <strong>
+                                  {row?.course_code ||
+                                    row?.courseCode ||
+                                    "-"}
+                                </strong>
+
+                                <span>
+                                  {row?.course_name ||
+                                    row?.courseName ||
+                                    "Course"}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td>
+                              {row?.section_name ||
+                                row?.sectionName ||
+                                "-"}
+                            </td>
+
+                            <td>
+                              {formatDate(
+                                row?.session_date ||
+                                  row?.sessionDate
+                              )}
+                            </td>
+
+                            <td>
+                              <div className="time-info">
+                                <strong>
+                                  {formatTime(
+                                    row?.scheduled_start ||
+                                      row?.scheduledStart
+                                  )}
+                                </strong>
+
+                                <span>
+                                  {formatTime(
+                                    row?.scheduled_end ||
+                                      row?.scheduledEnd
+                                  )}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td>
+                              <span
+                                className={`attendance-status attendance-status-${status}`}
+                              >
+                                <span className="status-dot" />
+
+                                {status}
+                              </span>
+                            </td>
+
+                            <td>
+                              <span className="source-badge">
+                                {row?.source ||
+                                  "-"}
+                              </span>
+                            </td>
+
+                            <td>
+                              <span className="validation-badge">
+                                {row?.validation_status ||
+                                  row?.validationStatus ||
+                                  "-"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      }
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </section>
         </section>
       </main>
     </div>
   );
 }
-
-/* =========================================================
-   STAT CARD
-========================================================= */
-
-function StatCard({
-  title,
-  value,
-  description,
-}) {
-  return (
-    <div style={statCard}>
-      <div style={statTop}>
-        <span style={statTitle}>{title}</span>
-
-        <span style={statDot} />
-      </div>
-
-      <strong style={statValue}>{value}</strong>
-
-      <span style={statDescription}>
-        {description}
-      </span>
-    </div>
-  );
-}
-
-/* =========================================================
-   STATUS BADGE
-========================================================= */
-
-function StatusBadge({ status }) {
-  const config = {
-    present: {
-      label: "Present",
-      background: "#ecfdf3",
-      color: "#15803d",
-      border: "#bbf7d0",
-    },
-
-    late: {
-      label: "Late",
-      background: "#fff7ed",
-      color: "#c2410c",
-      border: "#fed7aa",
-    },
-
-    absent: {
-      label: "Absent",
-      background: "#fef2f2",
-      color: "#b91c1c",
-      border: "#fecaca",
-    },
-
-    excused: {
-      label: "Excused",
-      background: "#eff6ff",
-      color: "#1d4ed8",
-      border: "#bfdbfe",
-    },
-  };
-
-  const current =
-    config[status] || {
-      label: status
-        ? capitalize(status)
-        : "Unknown",
-      background: "#f8fafc",
-      color: "#475569",
-      border: "#e2e8f0",
-    };
-
-  return (
-    <span
-      style={{
-        ...statusBadge,
-        background: current.background,
-        color: current.color,
-        borderColor: current.border,
-      }}
-    >
-      <span
-        style={{
-          ...statusDot,
-          background: current.color,
-        }}
-      />
-
-      {current.label}
-    </span>
-  );
-}
-
-/* =========================================================
-   LOADING
-========================================================= */
-
-function LoadingState() {
-  return (
-    <div style={loadingState}>
-      <div style={spinner} />
-
-      <p style={{ margin: 0 }}>
-        Loading attendance records...
-      </p>
-    </div>
-  );
-}
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-function EmptyState({ hasFilters }) {
-  return (
-    <div style={emptyState}>
-      <div style={emptyIcon}>—</div>
-
-      <h3 style={emptyTitle}>
-        {hasFilters
-          ? "No matching records"
-          : "No attendance records"}
-      </h3>
-
-      <p style={emptyText}>
-        {hasFilters
-          ? "Try changing your search or status filter."
-          : "Attendance records will appear here after students check in."}
-      </p>
-    </div>
-  );
-}
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function getInitials(name) {
-  if (!name) return "S";
-
-  const parts = String(name)
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (parts.length === 1) {
-    return parts[0].slice(0, 2).toUpperCase();
-  }
-
-  return (
-    parts[0][0] +
-    parts[parts.length - 1][0]
-  ).toUpperCase();
-}
-
-function capitalize(value) {
-  if (!value) return "";
-
-  return (
-    value.charAt(0).toUpperCase() +
-    value.slice(1)
-  );
-}
-
-function formatDate(value) {
-  if (!value) return "-";
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatSource(source) {
-  if (!source) return "-";
-
-  const value = String(source);
-
-  return value
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (letter) =>
-      letter.toUpperCase()
-    );
-}
-
-/* =========================================================
-   PAGE
-========================================================= */
-
-const page = {
-  minHeight: "100vh",
-  background: "#f6f8fc",
-  color: "#17233c",
-};
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-const header = {
-  background: "#ffffff",
-  borderBottom: "1px solid #e7ebf2",
-  padding: "30px 36px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 24,
-  flexWrap: "wrap",
-};
-
-const title = {
-  margin: 0,
-  fontSize: 32,
-  fontWeight: 750,
-  letterSpacing: "-0.7px",
-  color: "#13213a",
-};
-
-const subtitle = {
-  margin: "7px 0 0",
-  color: "#718096",
-  fontSize: 14,
-};
-
-const headerActions = {
-  display: "flex",
-  gap: 9,
-  flexWrap: "wrap",
-};
-
-const secondaryButton = {
-  border: "1px solid #dce3ec",
-  background: "#ffffff",
-  color: "#17233c",
-  borderRadius: 9,
-  padding: "10px 15px",
-  cursor: "pointer",
-  fontSize: 14,
-  fontWeight: 500,
-};
-
-const primaryButton = {
-  border: "1px solid #2563eb",
-  background: "#2563eb",
-  color: "#ffffff",
-  borderRadius: 9,
-  padding: "10px 17px",
-  cursor: "pointer",
-  fontSize: 14,
-  fontWeight: 600,
-};
-
-/* =========================================================
-   MAIN
-========================================================= */
-
-const main = {
-  padding: "32px 36px 50px",
-  maxWidth: 1500,
-  margin: "0 auto",
-  boxSizing: "border-box",
-};
-
-/* =========================================================
-   ERROR
-========================================================= */
-
-const errorBox = {
-  background: "#fff7f7",
-  border: "1px solid #fecaca",
-  color: "#991b1b",
-  borderRadius: 12,
-  padding: "13px 16px",
-  marginBottom: 20,
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-  fontSize: 13,
-};
-
-/* =========================================================
-   STATISTICS
-========================================================= */
-
-const statsGrid = {
-  display: "grid",
-  gridTemplateColumns:
-    "repeat(auto-fit, minmax(190px, 1fr))",
-  gap: 16,
-  marginBottom: 22,
-};
-
-const statCard = {
-  background: "#ffffff",
-  border: "1px solid #e5eaf1",
-  borderRadius: 14,
-  padding: "19px 20px",
-  minHeight: 116,
-  boxSizing: "border-box",
-  boxShadow:
-    "0 2px 7px rgba(15, 23, 42, 0.025)",
-};
-
-const statTop = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
-const statTitle = {
-  color: "#6b7a90",
-  fontSize: 13,
-  fontWeight: 500,
-};
-
-const statDot = {
-  width: 7,
-  height: 7,
-  borderRadius: "50%",
-  background: "#3b82f6",
-};
-
-const statValue = {
-  display: "block",
-  marginTop: 11,
-  color: "#15223b",
-  fontSize: 27,
-  lineHeight: 1,
-  fontWeight: 750,
-};
-
-const statDescription = {
-  display: "block",
-  marginTop: 9,
-  color: "#94a3b8",
-  fontSize: 11.5,
-};
-
-/* =========================================================
-   MAIN CARD
-========================================================= */
-
-const mainCard = {
-  background: "#ffffff",
-  border: "1px solid #e5eaf1",
-  borderRadius: 15,
-  overflow: "hidden",
-  boxShadow:
-    "0 3px 12px rgba(15, 23, 42, 0.025)",
-};
-
-const cardHeader = {
-  padding: "22px 23px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 15,
-  borderBottom: "1px solid #edf0f4",
-  flexWrap: "wrap",
-};
-
-const sectionTitle = {
-  margin: 0,
-  color: "#17233c",
-  fontSize: 20,
-  fontWeight: 700,
-};
-
-const sectionSubtitle = {
-  margin: "5px 0 0",
-  color: "#8190a5",
-  fontSize: 13,
-};
-
-const recordCount = {
-  background: "#f1f5f9",
-  color: "#475569",
-  borderRadius: 20,
-  padding: "7px 12px",
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-/* =========================================================
-   FILTERS
-========================================================= */
-
-const filters = {
-  padding: "16px 23px",
-  display: "flex",
-  gap: 12,
-  borderBottom: "1px solid #edf0f4",
-  flexWrap: "wrap",
-};
-
-const searchWrapper = {
-  position: "relative",
-  flex: "1 1 300px",
-  minWidth: 240,
-};
-
-const searchIcon = {
-  position: "absolute",
-  left: 13,
-  top: "50%",
-  transform: "translateY(-52%)",
-  color: "#8b98aa",
-  fontSize: 20,
-  pointerEvents: "none",
-};
-
-const searchInput = {
-  width: "100%",
-  height: 42,
-  boxSizing: "border-box",
-  border: "1px solid #dfe5ed",
-  borderRadius: 9,
-  padding: "0 14px 0 38px",
-  outline: "none",
-  fontSize: 13,
-  color: "#17233c",
-  background: "#ffffff",
-};
-
-const select = {
-  height: 42,
-  minWidth: 150,
-  border: "1px solid #dfe5ed",
-  borderRadius: 9,
-  padding: "0 12px",
-  outline: "none",
-  color: "#334155",
-  background: "#ffffff",
-  cursor: "pointer",
-  fontSize: 13,
-};
-
-/* =========================================================
-   TABLE
-========================================================= */
-
-const tableWrapper = {
-  width: "100%",
-  overflowX: "auto",
-};
-
-const table = {
-  width: "100%",
-  minWidth: 850,
-  borderCollapse: "collapse",
-  fontSize: 13,
-};
-
-const th = {
-  textAlign: "left",
-  padding: "14px 20px",
-  background: "#fafbfc",
-  borderBottom: "1px solid #e8edf3",
-  color: "#68778d",
-  fontSize: 11.5,
-  fontWeight: 650,
-  textTransform: "uppercase",
-  letterSpacing: "0.3px",
-  whiteSpace: "nowrap",
-};
-
-const tableRow = {
-  borderBottom: "1px solid #eef1f5",
-};
-
-const td = {
-  padding: "15px 20px",
-  color: "#334155",
-  verticalAlign: "middle",
-  whiteSpace: "nowrap",
-};
-
-const studentCell = {
-  display: "flex",
-  alignItems: "center",
-  gap: 11,
-};
-
-const avatar = {
-  width: 36,
-  height: 36,
-  borderRadius: "50%",
-  background: "#eef4ff",
-  color: "#2563eb",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: 11,
-  fontWeight: 700,
-  flexShrink: 0,
-};
-
-const studentName = {
-  color: "#1e293b",
-  fontWeight: 600,
-  fontSize: 13,
-};
-
-const studentCode = {
-  marginTop: 3,
-  color: "#94a3b8",
-  fontSize: 11,
-};
-
-const courseCell = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 3,
-};
-
-const sectionBadge = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minWidth: 30,
-  padding: "5px 9px",
-  borderRadius: 7,
-  background: "#f1f5f9",
-  color: "#475569",
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-const dateCell = {
-  color: "#64748b",
-  fontSize: 12.5,
-};
-
-const sourceText = {
-  color: "#64748b",
-  fontSize: 12,
-};
-
-const statusBadge = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  border: "1px solid",
-  borderRadius: 20,
-  padding: "5px 9px",
-  fontSize: 11.5,
-  fontWeight: 650,
-};
-
-const statusDot = {
-  width: 6,
-  height: 6,
-  borderRadius: "50%",
-};
-
-/* =========================================================
-   EMPTY / LOADING
-========================================================= */
-
-const loadingState = {
-  minHeight: 230,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  gap: 12,
-  color: "#718096",
-  fontSize: 13,
-};
-
-const spinner = {
-  width: 26,
-  height: 26,
-  border: "3px solid #e5e7eb",
-  borderTop: "3px solid #2563eb",
-  borderRadius: "50%",
-};
-
-const emptyState = {
-  minHeight: 260,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  padding: 30,
-  textAlign: "center",
-};
-
-const emptyIcon = {
-  width: 44,
-  height: 44,
-  borderRadius: "50%",
-  background: "#f1f5f9",
-  color: "#94a3b8",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: 22,
-  marginBottom: 12,
-};
-
-const emptyTitle = {
-  margin: 0,
-  color: "#334155",
-  fontSize: 16,
-};
-
-const emptyText = {
-  margin: "7px 0 0",
-  color: "#94a3b8",
-  fontSize: 13,
-};
