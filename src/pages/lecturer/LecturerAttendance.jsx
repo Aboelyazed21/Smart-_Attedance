@@ -620,3 +620,4 @@ function getStudentName(row) {
   );
 
 }
+export default LecturerAttendance;
