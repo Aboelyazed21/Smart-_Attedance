@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import {
   getSessions,
+  getSessionById,
   openSession,
   refreshSessionQr,
   closeSession,
@@ -215,24 +216,47 @@ export default function LecturerQRSession() {
       setLoading(true);
       setError("");
 
-      const data = await getSessions();
+      let found = null;
 
-      const sessions = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.sessions)
-          ? data.sessions
-          : Array.isArray(data?.data)
-            ? data.data
-            : Array.isArray(data?.data?.sessions)
-              ? data.data.sessions
-              : [];
+      // Try the dedicated endpoint first.
+      try {
+        const data = await getSessionById(sessionId);
 
-      const found = sessions.find(
-        (item) => Number(item.id) === Number(sessionId)
-      );
+        found =
+          data?.session ||
+          data?.data?.session ||
+          data?.data ||
+          data;
+      } catch (directError) {
+        console.warn(
+          "Direct session lookup failed, falling back to sessions list:",
+          directError
+        );
+      }
+
+      // Fallback to the sessions list, which is already working.
+      if (!found || Number(found.id) !== Number(sessionId)) {
+        const data = await getSessions();
+
+        const sessions = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.sessions)
+            ? data.sessions
+            : Array.isArray(data?.data)
+              ? data.data
+              : Array.isArray(data?.data?.sessions)
+                ? data.data.sessions
+                : [];
+
+        found = sessions.find(
+          (item) => Number(item.id) === Number(sessionId)
+        );
+      }
 
       if (!found) {
-        throw new Error("Attendance session was not found.");
+        throw new Error(
+          `Attendance session ${sessionId} was not found.`
+        );
       }
 
       setSession(found);
