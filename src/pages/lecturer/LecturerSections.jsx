@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLecturerSections } from "../../services/api";
-
+import "./LecturerSections.css";
 function getSavedUser() {
   try {
     return JSON.parse(localStorage.getItem("user") || "null");
