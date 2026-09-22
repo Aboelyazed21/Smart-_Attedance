@@ -1,41 +1,77 @@
 /* =========================================================
    LECTURER LAYOUT
-   Fixed Sidebar + Scrollable Content
+   Modern / Clean / Responsive
 ========================================================= */
 
 .lecturer-layout {
+  --layout-sidebar: 268px;
+
+  --layout-navy: #172338;
+  --layout-navy-soft: #20304a;
+
+  --layout-primary: #3568e8;
+  --layout-primary-soft: #edf3ff;
+
+  --layout-bg: #f6f8fc;
+  --layout-card: #ffffff;
+  --layout-border: #e5eaf2;
+
+  --layout-text: #172033;
+  --layout-text-soft: #647089;
+  --layout-text-muted: #8b96a9;
+
+  --layout-success: #18a66a;
+
   width: 100%;
   min-height: 100vh;
-  background: #f5f7fb;
-  color: #132d57;
+
+  background: var(--layout-bg);
+  color: var(--layout-text);
 }
 
 /* =========================================================
-   FIXED SIDEBAR
+   MOBILE HEADER
+========================================================= */
+
+.lecturer-layout-mobile-header {
+  display: none;
+}
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.lecturer-layout-overlay {
+  display: none;
+}
+
+/* =========================================================
+   SIDEBAR
 ========================================================= */
 
 .lecturer-layout-sidebar {
   position: fixed;
+
   top: 0;
   left: 0;
   bottom: 0;
 
-  width: 290px;
+  width: var(--layout-sidebar);
   height: 100vh;
+
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
 
-  box-sizing: border-box;
-
-  padding: 24px 18px;
+  padding: 22px 16px;
 
   background:
     linear-gradient(
       180deg,
-      #071f4d 0%,
-      #082b67 48%,
-      #06347d 100%
+      #172338 0%,
+      #142136 55%,
+      #101b2d 100%
     );
 
   color: #ffffff;
@@ -43,14 +79,16 @@
   overflow-x: hidden;
   overflow-y: auto;
 
-  z-index: 1000;
+  z-index: 1100;
+
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
 }
 
 .lecturer-layout-sidebar::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 
 .lecturer-layout-sidebar::-webkit-scrollbar-track {
@@ -58,7 +96,7 @@
 }
 
 .lecturer-layout-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.16);
   border-radius: 999px;
 }
 
@@ -69,18 +107,43 @@
 .lecturer-layout-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
 
-  padding: 0 8px;
+  gap: 10px;
 
-  margin-bottom: 28px;
+  padding: 2px 7px 20px;
+
+  margin-bottom: 8px;
 
   flex-shrink: 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lecturer-layout-brand-button {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  min-width: 0;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: inherit;
+
+  cursor: pointer;
+
+  text-align: left;
 }
 
 .lecturer-layout-brand-mark {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
 
   display: flex;
   align-items: center;
@@ -88,22 +151,22 @@
 
   flex-shrink: 0;
 
-  border-radius: 13px;
+  border-radius: 12px;
 
   background:
     linear-gradient(
       135deg,
-      #2388ff,
-      #1261d8
+      #4d7cff 0%,
+      #315ee9 100%
     );
 
   color: #ffffff;
 
-  font-size: 21px;
-  font-weight: 900;
+  font-size: 18px;
+  font-weight: 800;
 
   box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.18);
+    0 8px 22px rgba(43, 91, 218, 0.28);
 }
 
 .lecturer-layout-brand-text {
@@ -118,8 +181,8 @@
 .lecturer-layout-brand-text strong {
   color: #ffffff;
 
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 750;
 
   line-height: 1.1;
 
@@ -127,14 +190,45 @@
 }
 
 .lecturer-layout-brand-text span {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.46);
 
   font-size: 8px;
-  font-weight: 800;
+  font-weight: 700;
 
-  letter-spacing: 1.25px;
+  letter-spacing: 1.1px;
 
   white-space: nowrap;
+}
+
+.lecturer-layout-mobile-close {
+  display: none;
+
+  width: 34px;
+  height: 34px;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: rgba(255, 255, 255, 0.82);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lecturer-layout-mobile-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 /* =========================================================
@@ -144,24 +238,24 @@
 .lecturer-layout-profile {
   display: flex;
   align-items: center;
-  gap: 11px;
 
-  padding: 12px;
+  gap: 10px;
 
-  margin-bottom: 20px;
+  padding: 10px;
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 14px 0 20px;
 
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 13px;
 
-  background: rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.045);
 
   flex-shrink: 0;
 }
 
 .lecturer-layout-profile-avatar {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -174,17 +268,17 @@
   background:
     linear-gradient(
       135deg,
-      #2b8cff,
-      #155dcc
+      #5b7fff,
+      #315ee8
     );
 
   color: #ffffff;
 
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 12px;
+  font-weight: 800;
 
   box-shadow:
-    0 5px 14px rgba(0, 0, 0, 0.16);
+    0 6px 15px rgba(38, 82, 194, 0.28);
 }
 
 .lecturer-layout-profile-info {
@@ -193,14 +287,14 @@
   display: flex;
   flex-direction: column;
 
-  gap: 4px;
+  gap: 3px;
 }
 
 .lecturer-layout-profile-info strong {
   color: #ffffff;
 
-  font-size: 12px;
-  font-weight: 750;
+  font-size: 11px;
+  font-weight: 700;
 
   line-height: 1.2;
 
@@ -211,9 +305,9 @@
 }
 
 .lecturer-layout-profile-info span {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.45);
 
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
 }
 
@@ -225,45 +319,46 @@
   display: flex;
   flex-direction: column;
 
-  gap: 6px;
+  gap: 4px;
 
   flex-shrink: 0;
 }
 
 .lecturer-layout-nav-item {
+  position: relative;
+
   width: 100%;
+  min-height: 45px;
 
   display: flex;
   align-items: center;
 
-  gap: 12px;
+  gap: 11px;
 
-  min-height: 48px;
-
-  padding: 9px 11px;
+  padding: 7px 10px;
 
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: 11px;
 
   background: transparent;
 
-  color: rgba(255, 255, 255, 0.63);
+  color: rgba(255, 255, 255, 0.62);
 
   cursor: pointer;
 
   text-align: left;
 
-  transition:
-    background 0.18s ease,
-    color 0.18s ease,
-    border-color 0.18s ease,
-    transform 0.18s ease;
-
   font-family: inherit;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .lecturer-layout-nav-item:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.055);
 
   color: #ffffff;
 
@@ -274,21 +369,21 @@
   background:
     linear-gradient(
       90deg,
-      rgba(42, 137, 255, 0.22),
-      rgba(42, 137, 255, 0.08)
+      rgba(67, 113, 232, 0.27),
+      rgba(67, 113, 232, 0.11)
     );
 
-  border-color: rgba(76, 157, 255, 0.18);
+  border-color: rgba(111, 145, 232, 0.15);
 
   color: #ffffff;
 
   box-shadow:
-    inset 3px 0 0 #2388ff;
+    inset 3px 0 0 #4d7cff;
 }
 
 .lecturer-layout-nav-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
 
   display: flex;
   align-items: center;
@@ -298,24 +393,23 @@
 
   border-radius: 9px;
 
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.055);
 
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.66);
 
-  font-size: 9px;
-  font-weight: 900;
-
-  letter-spacing: 0.3px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .lecturer-layout-nav-item.active
 .lecturer-layout-nav-icon {
-  background: #2388ff;
+  background: rgba(77, 124, 255, 0.95);
 
   color: #ffffff;
 
   box-shadow:
-    0 5px 14px rgba(35, 136, 255, 0.28);
+    0 5px 14px rgba(77, 124, 255, 0.24);
 }
 
 .lecturer-layout-nav-label {
@@ -327,7 +421,7 @@
   white-space: nowrap;
 
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 650;
 }
 
 /* =========================================================
@@ -343,28 +437,28 @@
 }
 
 .lecturer-layout-workspace {
-  padding: 13px;
+  padding: 12px;
 
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 13px;
 
-  border-radius: 14px;
-
-  background: rgba(255, 255, 255, 0.045);
+  background: rgba(255, 255, 255, 0.035);
 }
 
 .lecturer-layout-live {
   display: inline-flex;
   align-items: center;
+
   gap: 6px;
 
-  margin-bottom: 7px;
+  margin-bottom: 6px;
 
-  color: #7fd8a0;
+  color: #7fd5a4;
 
   font-size: 8px;
-  font-weight: 900;
+  font-weight: 800;
 
   letter-spacing: 0.8px;
 }
@@ -375,27 +469,27 @@
 
   border-radius: 50%;
 
-  background: #51d88a;
+  background: #51d38a;
 
   box-shadow:
-    0 0 0 4px rgba(81, 216, 138, 0.09);
+    0 0 0 4px rgba(81, 211, 138, 0.08);
 }
 
 .lecturer-layout-workspace strong {
   display: block;
 
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 
   color: #ffffff;
 
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .lecturer-layout-workspace p {
   margin: 0;
 
-  color: rgba(255, 255, 255, 0.47);
+  color: rgba(255, 255, 255, 0.43);
 
   font-size: 9px;
 
@@ -404,38 +498,39 @@
 
 .lecturer-layout-logout {
   width: 100%;
-
-  min-height: 44px;
+  min-height: 42px;
 
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: 9px;
 
-  padding: 8px 11px;
+  padding: 7px 10px;
 
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
 
-  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.025);
 
-  background: rgba(255, 255, 255, 0.035);
-
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.58);
 
   cursor: pointer;
 
   font-family: inherit;
 
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 650;
 
   transition:
-    background 0.18s ease,
-    color 0.18s ease;
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .lecturer-layout-logout:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.1);
 
   color: #ffffff;
 }
@@ -452,10 +547,9 @@
 
   border-radius: 8px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.055);
 
-  font-size: 8px;
-  font-weight: 900;
+  font-size: 16px;
 }
 
 /* =========================================================
@@ -463,11 +557,11 @@
 ========================================================= */
 
 .lecturer-layout-content {
-  width: calc(100% - 290px);
+  width: calc(100% - var(--layout-sidebar));
 
   min-height: 100vh;
 
-  margin-left: 290px;
+  margin-left: var(--layout-sidebar);
 
   box-sizing: border-box;
 
@@ -480,38 +574,14 @@
    TABLET
 ========================================================= */
 
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
+  .lecturer-layout {
+    --layout-sidebar: 245px;
+  }
+
   .lecturer-layout-sidebar {
-    width: 250px;
-  }
-
-  .lecturer-layout-content {
-    width: calc(100% - 250px);
-
-    margin-left: 250px;
-  }
-}
-
-/* =========================================================
-   SMALL LAPTOP / TABLET
-========================================================= */
-
-@media (max-width: 900px) {
-  .lecturer-layout-sidebar {
-    width: 230px;
-
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-
-  .lecturer-layout-content {
-    width: calc(100% - 230px);
-
-    margin-left: 230px;
-  }
-
-  .lecturer-layout-brand-text {
-    display: none;
+    padding-left: 13px;
+    padding-right: 13px;
   }
 
   .lecturer-layout-nav-label {
@@ -520,70 +590,310 @@
 }
 
 /* =========================================================
+   SMALL LAPTOP / TABLET
+========================================================= */
+
+@media (max-width: 850px) {
+  .lecturer-layout {
+    --layout-sidebar: 225px;
+  }
+
+  .lecturer-layout-brand-text {
+    display: block;
+  }
+
+  .lecturer-layout-profile {
+    padding: 9px;
+  }
+}
+
+/* =========================================================
    MOBILE
 ========================================================= */
 
 @media (max-width: 700px) {
-  .lecturer-layout-sidebar {
-    width: 72px;
-
-    padding: 18px 9px;
+  .lecturer-layout {
+    --layout-mobile-header: 62px;
   }
 
-  .lecturer-layout-content {
-    width: calc(100% - 72px);
+  /*
+  ----------------------------------------------------------
+  Mobile Header
+  ----------------------------------------------------------
+  */
 
-    margin-left: 72px;
+  .lecturer-layout-mobile-header {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: var(--layout-mobile-header);
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 14px;
+
+    box-sizing: border-box;
+
+    background: rgba(255, 255, 255, 0.94);
+
+    border-bottom: 1px solid #e9edf4;
+
+    box-shadow:
+      0 4px 18px rgba(22, 37, 65, 0.06);
+
+    backdrop-filter: blur(14px);
+
+    z-index: 1000;
   }
 
-  .lecturer-layout-brand {
+  .lecturer-layout-mobile-menu {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
     justify-content: center;
+
+    flex-shrink: 0;
+
+    border: 1px solid #e3e8f1;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #26344c;
+
+    cursor: pointer;
+
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .lecturer-layout-mobile-menu:hover {
+    background: #f5f7fb;
+
+    border-color: #d9e0eb;
+  }
+
+  .lecturer-layout-mobile-menu:active {
+    transform: scale(0.95);
+  }
+
+  .lecturer-layout-mobile-brand {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-left: 10px;
 
     padding: 0;
 
-    margin-bottom: 22px;
-  }
-
-  .lecturer-layout-brand-mark {
-    width: 42px;
-    height: 42px;
-  }
-
-  .lecturer-layout-profile {
-    justify-content: center;
-
-    padding: 7px;
+    border: 0;
 
     background: transparent;
 
-    border-color: transparent;
+    color: #172033;
+
+    cursor: pointer;
+
+    text-align: left;
   }
 
-  .lecturer-layout-profile-info {
-    display: none;
+  .lecturer-layout-mobile-brand .lecturer-layout-brand-mark {
+    width: 32px;
+    height: 32px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
   }
 
-  .lecturer-layout-profile-avatar {
-    width: 38px;
-    height: 38px;
+  .lecturer-layout-mobile-brand-text {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
   }
+
+  .lecturer-layout-mobile-brand-text strong {
+    font-size: 13px;
+    font-weight: 800;
+
+    line-height: 1;
+  }
+
+  .lecturer-layout-mobile-brand-text small {
+    color: #7c8799;
+
+    font-size: 7px;
+    font-weight: 700;
+
+    letter-spacing: 0.7px;
+
+    white-space: nowrap;
+  }
+
+  .lecturer-layout-mobile-user {
+    margin-left: auto;
+  }
+
+  .lecturer-layout-mobile-avatar {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+      linear-gradient(
+        135deg,
+        #5278f5,
+        #315ee8
+      );
+
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    box-shadow:
+      0 4px 12px rgba(49, 94, 232, 0.18);
+  }
+
+  /*
+  ----------------------------------------------------------
+  Overlay
+  ----------------------------------------------------------
+  */
+
+  .lecturer-layout-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    display: block;
+
+    padding: 0;
+
+    border: 0;
+
+    background: rgba(13, 23, 39, 0.38);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    cursor: pointer;
+
+    transition:
+      opacity 0.25s ease,
+      visibility 0.25s ease;
+
+    z-index: 1050;
+
+    backdrop-filter: blur(2px);
+  }
+
+  .lecturer-layout-overlay.visible {
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+  }
+
+  /*
+  ----------------------------------------------------------
+  Sidebar becomes drawer
+  ----------------------------------------------------------
+  */
+
+  .lecturer-layout-sidebar {
+    width: min(280px, 82vw);
+
+    padding: 18px 14px;
+
+    transform: translateX(-105%);
+
+    box-shadow:
+      12px 0 35px rgba(8, 18, 35, 0.18);
+
+    transition:
+      transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .lecturer-layout-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .lecturer-layout-mobile-close {
+    display: flex;
+  }
+
+  /*
+  ----------------------------------------------------------
+  Brand
+  ----------------------------------------------------------
+  */
+
+  .lecturer-layout-brand {
+    padding:
+      2px
+      2px
+      18px;
+
+    margin-bottom: 6px;
+  }
+
+  .lecturer-layout-brand-text {
+    display: flex;
+  }
+
+  /*
+  ----------------------------------------------------------
+  Profile
+  ----------------------------------------------------------
+  */
+
+  .lecturer-layout-profile {
+    padding: 10px;
+
+    margin-top: 14px;
+    margin-bottom: 18px;
+  }
+
+  /*
+  ----------------------------------------------------------
+  Navigation
+  ----------------------------------------------------------
+  */
 
   .lecturer-layout-nav {
-    align-items: center;
+    gap: 4px;
   }
 
   .lecturer-layout-nav-item {
-    width: 52px;
+    min-height: 46px;
 
-    justify-content: center;
+    padding: 7px 9px;
 
-    padding: 8px;
-
-    gap: 0;
-  }
-
-  .lecturer-layout-nav-label {
-    display: none;
+    border-radius: 11px;
   }
 
   .lecturer-layout-nav-icon {
@@ -591,52 +901,133 @@
     height: 34px;
   }
 
-  .lecturer-layout-workspace {
-    display: none;
+  .lecturer-layout-nav-label {
+    display: block;
+
+    font-size: 11px;
   }
 
-  .lecturer-layout-footer {
-    padding-top: 15px;
+  /*
+  ----------------------------------------------------------
+  Footer
+  ----------------------------------------------------------
+  */
+
+  .lecturer-layout-workspace {
+    display: block;
   }
 
   .lecturer-layout-logout {
-    width: 52px;
-
-    justify-content: center;
-
-    padding: 8px;
-
-    margin: 0 auto;
+    min-height: 43px;
   }
 
-  .lecturer-layout-logout span:last-child {
-    display: none;
+  /*
+  ----------------------------------------------------------
+  Content
+  ----------------------------------------------------------
+  */
+
+  .lecturer-layout-content {
+    width: 100%;
+
+    min-height: 100vh;
+
+    margin-left: 0;
+
+    padding-top: var(--layout-mobile-header);
   }
 }
 
 /* =========================================================
-   VERY SMALL MOBILE
+   SMALL PHONES
 ========================================================= */
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
+  .lecturer-layout {
+    --layout-mobile-header: 58px;
+  }
+
+  .lecturer-layout-mobile-header {
+    height: var(--layout-mobile-header);
+
+    padding: 0 11px;
+  }
+
+  .lecturer-layout-mobile-menu {
+    width: 36px;
+    height: 36px;
+  }
+
+  .lecturer-layout-mobile-brand {
+    margin-left: 8px;
+  }
+
+  .lecturer-layout-mobile-brand .lecturer-layout-brand-mark {
+    width: 30px;
+    height: 30px;
+  }
+
+  .lecturer-layout-mobile-brand-text strong {
+    font-size: 12px;
+  }
+
+  .lecturer-layout-mobile-brand-text small {
+    font-size: 6.5px;
+  }
+
+  .lecturer-layout-mobile-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
   .lecturer-layout-sidebar {
-    width: 64px;
+    width: min(270px, 84vw);
+  }
+}
 
-    padding-left: 6px;
-    padding-right: 6px;
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 340px) {
+  .lecturer-layout-mobile-brand-text {
+    display: none;
   }
 
-  .lecturer-layout-content {
-    width: calc(100% - 64px);
-
-    margin-left: 64px;
+  .lecturer-layout-mobile-brand {
+    margin-left: 8px;
   }
 
-  .lecturer-layout-nav-item {
-    width: 48px;
+  .lecturer-layout-sidebar {
+    width: min(260px, 86vw);
   }
+}
 
-  .lecturer-layout-logout {
-    width: 48px;
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.lecturer-layout-nav-item:focus-visible,
+.lecturer-layout-logout:focus-visible,
+.lecturer-layout-mobile-menu:focus-visible,
+.lecturer-layout-mobile-close:focus-visible,
+.lecturer-layout-mobile-brand:focus-visible {
+  outline: 2px solid #6f92ff;
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .lecturer-layout-sidebar,
+  .lecturer-layout-overlay,
+  .lecturer-layout-nav-item,
+  .lecturer-layout-nav-icon,
+  .lecturer-layout-mobile-menu,
+  .lecturer-layout-mobile-close {
+    transition: none;
   }
 }

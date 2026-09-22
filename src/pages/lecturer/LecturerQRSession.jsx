@@ -126,6 +126,7 @@ export default function LecturerQRSession() {
     pathname.match(/^\/lecturer\/sessions\/(\d+)\/?$/)?.[1] || "";
 
   const savedUser = useMemo(() => getSavedUser(), []);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [session, setSession] = useState(null);
   const [roster, setRoster] = useState([]);
@@ -580,31 +581,206 @@ export default function LecturerQRSession() {
     setPage(1);
   }
 
+  function handleMobileNavigation(path) {
+    navigate(path);
+    setMobileMenuOpen(false);
+  }
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login");
+    setMobileMenuOpen(false);
+  }
+
+  function renderNavigation() {
+    return (
+      <>
+        <header className="session-mobile-header">
+          <button
+            type="button"
+            className="session-mobile-menu-button"
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open navigation"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+
+          <button
+            type="button"
+            className="session-mobile-brand"
+            onClick={() =>
+              handleMobileNavigation("/lecturer/dashboard")
+            }
+          >
+            Attendify
+          </button>
+
+          <div className="session-mobile-avatar">
+            {initials}
+          </div>
+        </header>
+
+        <div
+          className="session-mobile-overlay"
+          onClick={closeMobileMenu}
+          aria-hidden="true"
+        />
+
+        <aside
+          className={`lecturer-session-sidebar${
+            mobileMenuOpen ? " mobile-open" : ""
+          }`}
+        >
+          <div className="session-sidebar-brand">
+            <button
+              type="button"
+              className="session-brand-button"
+              onClick={() =>
+                handleMobileNavigation("/lecturer/dashboard")
+              }
+            >
+              <span className="session-brand-mark">A</span>
+
+              <span>
+                <strong>Attendify</strong>
+                <small>LECTURER PORTAL</small>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="session-mobile-close"
+              onClick={closeMobileMenu}
+              aria-label="Close navigation"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="session-sidebar-profile">
+            <div className="session-profile-avatar">
+              {initials}
+            </div>
+
+            <div>
+              <strong>
+                {firstName} {lastName}
+              </strong>
+              <span>Lecturer account</span>
+            </div>
+          </div>
+
+          <nav
+            className="session-sidebar-nav"
+            aria-label="Lecturer navigation"
+          >
+            <button
+              type="button"
+              onClick={() =>
+                handleMobileNavigation("/lecturer/dashboard")
+              }
+            >
+              <span>DB</span>
+              Dashboard
+            </button>
+
+            <button
+              type="button"
+              className="active"
+              onClick={() =>
+                handleMobileNavigation("/lecturer/sessions")
+              }
+            >
+              <span>AS</span>
+              Attendance Sessions
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleMobileNavigation("/lecturer/sections")
+              }
+            >
+              <span>MS</span>
+              My Sections
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleMobileNavigation("/lecturer/attendance")
+              }
+            >
+              <span>AT</span>
+              Attendance
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleMobileNavigation("/lecturer/reports")
+              }
+            >
+              <span>RP</span>
+              Reports
+            </button>
+          </nav>
+
+          <div className="session-sidebar-footer">
+            <button type="button" onClick={handleLogout}>
+              <span>LO</span>
+              Logout
+            </button>
+          </div>
+        </aside>
+      </>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="lecturer-session-loading">
-        <div className="loading-spinner" />
-        <strong>Loading session...</strong>
-        <span>Please wait.</span>
+      <div className="lecturer-session-shell">
+        {renderNavigation()}
+
+        <main className="lecturer-session-main">
+          <div className="lecturer-session-loading">
+            <div className="loading-spinner" />
+            <strong>Loading session...</strong>
+            <span>Please wait.</span>
+          </div>
+        </main>
       </div>
     );
   }
 
   if (error || !session) {
     return (
-      <div className="lecturer-session-error">
-        <div className="error-icon">!</div>
-        <h2>Session unavailable</h2>
-        <p>
-          {error ||
-            "We could not find this attendance session."}
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate("/lecturer/sessions")}
-        >
-          Back to Sessions
-        </button>
+      <div className="lecturer-session-shell">
+        {renderNavigation()}
+
+        <main className="lecturer-session-main">
+          <div className="lecturer-session-error">
+            <div className="error-icon">!</div>
+            <h2>Session unavailable</h2>
+            <p>
+              {error ||
+                "We could not find this attendance session."}
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate("/lecturer/sessions")}
+            >
+              Back to Sessions
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
@@ -617,8 +793,12 @@ export default function LecturerQRSession() {
   const seconds = String(countdown % 60).padStart(2, "0");
 
   return (
-    <div className="lecturer-session-page">
-        <header className="session-page-header">
+    <div className="lecturer-session-shell">
+      {renderNavigation()}
+
+      <main className="lecturer-session-main">
+        <div className="lecturer-session-page">
+          <header className="session-page-header">
           <div>
             <button
               type="button"
@@ -1092,6 +1272,8 @@ export default function LecturerQRSession() {
             </div>
           </div>
         )}
+        </div>
+      </main>
     </div>
   );
 }

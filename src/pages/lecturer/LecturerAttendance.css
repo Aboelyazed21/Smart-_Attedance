@@ -1,268 +1,719 @@
 /* =========================================================
    LECTURER ATTENDANCE
-   ========================================================= */
+   Modern Professional Responsive UI
+========================================================= */
 
 .lecturer-attendance-page {
+  --attendance-primary: #2563eb;
+  --attendance-primary-dark: #1d4ed8;
+  --attendance-primary-soft: #eff6ff;
+  --attendance-text: #172033;
+  --attendance-muted: #64748b;
+  --attendance-subtle: #94a3b8;
+  --attendance-border: #e2e8f0;
+  --attendance-border-soft: #edf1f6;
+  --attendance-page: #f5f7fb;
+  --attendance-sidebar: #172033;
+
   min-height: 100vh;
-  padding: 32px;
-  background:
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 30%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  color: #172033;
+  display: flex;
+  background: var(--attendance-page);
+  color: var(--attendance-text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.lecturer-attendance-page *,
+.lecturer-attendance-page *::before,
+.lecturer-attendance-page *::after {
   box-sizing: border-box;
 }
 
-/* =========================
-   Header
-   ========================= */
+/* =========================================================
+   MOBILE HEADER
+========================================================= */
 
-.lecturer-attendance-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 28px;
+.attendance-mobile-header {
+  display: none;
 }
 
-.lecturer-attendance-header-content {
-  min-width: 0;
-}
-
-.lecturer-attendance-eyebrow {
-  margin: 0 0 8px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #64748b;
-}
-
-.lecturer-attendance-title {
-  margin: 0;
-  font-size: clamp(28px, 3vw, 42px);
-  line-height: 1.1;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #111827;
-}
-
-.lecturer-attendance-subtitle {
-  margin: 10px 0 0;
-  max-width: 760px;
-  color: #64748b;
-  font-size: 15px;
-  line-height: 1.7;
-}
-
-.lecturer-attendance-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-/* =========================
-   Buttons
-   ========================= */
-
-.lecturer-attendance-btn {
-  min-height: 42px;
-  padding: 0 16px;
-  border: 1px solid #d7dee8;
-  border-radius: 11px;
-  background: #ffffff;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 700;
+.attendance-mobile-menu-button,
+.attendance-mobile-brand {
+  border: 0;
+  background: transparent;
+  font: inherit;
   cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease;
 }
 
-.lecturer-attendance-btn:hover {
-  transform: translateY(-1px);
-  border-color: #b9c5d6;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-}
-
-.lecturer-attendance-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.lecturer-attendance-btn.primary {
-  border-color: #2563eb;
-  background: #2563eb;
-  color: #ffffff;
-}
-
-.lecturer-attendance-btn.primary:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-}
-
-/* =========================
-   Stats
-   ========================= */
-
-.lecturer-attendance-stats {
+.attendance-mobile-menu-button {
+  width: 40px;
+  height: 40px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.lecturer-attendance-stat-card {
-  min-width: 0;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.055);
-}
-
-.lecturer-attendance-stat-label {
-  margin-bottom: 8px;
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.lecturer-attendance-stat-value {
-  color: #0f172a;
-  font-size: 28px;
-  line-height: 1;
-  font-weight: 800;
-}
-
-.lecturer-attendance-stat-meta {
-  margin-top: 8px;
-  color: #94a3b8;
-  font-size: 12px;
-}
-
-/* =========================
-   Filters
-   ========================= */
-
-.lecturer-attendance-filters {
-  display: grid;
-  grid-template-columns: minmax(190px, 1.3fr) minmax(150px, 0.9fr) minmax(145px, 0.8fr) minmax(145px, 0.8fr) auto;
-  align-items: end;
-  gap: 14px;
-  margin-bottom: 24px;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.045);
-}
-
-.lecturer-attendance-filter-group {
-  min-width: 0;
-}
-
-.lecturer-attendance-filter-label {
-  display: block;
-  margin-bottom: 7px;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-filter-input,
-.lecturer-attendance-filter-select {
-  width: 100%;
-  height: 42px;
-  padding: 0 12px;
-  border: 1px solid #d8e0ea;
+  place-items: center;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid var(--attendance-border);
   border-radius: 10px;
-  outline: none;
-  background: #f8fafc;
-  color: #1e293b;
-  font-size: 14px;
-  box-sizing: border-box;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease;
+  background: #fff;
 }
 
-.lecturer-attendance-filter-input:focus,
-.lecturer-attendance-filter-select:focus {
-  border-color: #60a5fa;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+.attendance-mobile-menu-button span {
+  width: 19px;
+  height: 2px;
+  display: block;
+  border-radius: 2px;
+  background: #334155;
 }
 
-.lecturer-attendance-search-wrap {
-  position: relative;
-}
-
-.lecturer-attendance-search-wrap .lecturer-attendance-filter-input {
-  padding-left: 38px;
-}
-
-.lecturer-attendance-search-icon {
-  position: absolute;
-  left: 13px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 14px;
-  pointer-events: none;
-}
-
-.lecturer-attendance-filter-actions {
-  display: flex;
-  gap: 8px;
-}
-
-/* =========================
-   Table Card
-   ========================= */
-
-.lecturer-attendance-table-card {
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.055);
-}
-
-.lecturer-attendance-table-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 22px;
-  border-bottom: 1px solid #edf1f5;
-}
-
-.lecturer-attendance-table-title {
-  margin: 0;
+.attendance-mobile-brand {
+  padding: 0;
   color: #172033;
   font-size: 17px;
   font-weight: 800;
 }
 
-.lecturer-attendance-table-count {
+.attendance-mobile-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dbeafe;
+  border-radius: 50%;
+  background: var(--attendance-primary-soft);
+  color: var(--attendance-primary);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.attendance-mobile-overlay {
+  display: none;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.lecturer-attendance-sidebar {
+  width: 258px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 258px;
+  padding: 20px 16px;
+  overflow-y: auto;
+  background: var(--attendance-sidebar);
+  color: #fff;
+  border-right: 1px solid #243044;
+}
+
+.attendance-sidebar-brand {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.attendance-brand-button {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.attendance-brand-mark {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.attendance-brand-button strong {
+  display: block;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.attendance-brand-button small {
+  display: block;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+}
+
+.attendance-mobile-close {
+  display: none;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* =========================================================
+   PROFILE / NAV
+========================================================= */
+
+.attendance-sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 4px 16px;
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.attendance-profile-avatar {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.attendance-sidebar-profile > div:last-child {
+  min-width: 0;
+}
+
+.attendance-sidebar-profile strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendance-sidebar-profile span {
+  display: block;
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.attendance-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.attendance-sidebar-nav button,
+.attendance-sidebar-footer button {
+  width: 100%;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.attendance-sidebar-nav button:hover {
+  background: rgba(255, 255, 255, 0.055);
+  color: #fff;
+}
+
+.attendance-sidebar-nav button.active {
+  border-color: rgba(96, 165, 250, 0.16);
+  background: rgba(37, 99, 235, 0.18);
+  color: #fff;
+}
+
+.attendance-sidebar-nav button span,
+.attendance-sidebar-footer button span {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #cbd5e1;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.attendance-sidebar-nav button.active span {
+  background: var(--attendance-primary);
+  color: #fff;
+}
+
+.attendance-sidebar-footer {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.attendance-sidebar-footer button {
+  border-color: rgba(248, 113, 113, 0.12);
+  background: rgba(239, 68, 68, 0.04);
+  color: #fca5a5;
+}
+
+.attendance-sidebar-footer button:hover {
+  background: rgba(239, 68, 68, 0.09);
+  color: #fecaca;
+}
+
+/* =========================================================
+   MAIN / TOPBAR
+========================================================= */
+
+.lecturer-attendance-main {
+  min-width: 0;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.lecturer-attendance-topbar {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 17px 36px;
+  background: #fff;
+  border-bottom: 1px solid var(--attendance-border-soft);
+}
+
+.topbar-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--attendance-primary);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.lecturer-attendance-topbar h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.45px;
+}
+
+.lecturer-attendance-topbar p {
+  margin: 4px 0 0;
+  color: var(--attendance-muted);
+  font-size: 11px;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-user-context {
   color: #64748b;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 600;
 }
 
-.lecturer-attendance-table-scroll {
+.topbar-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dbeafe;
+  border-radius: 50%;
+  background: var(--attendance-primary-soft);
+  color: var(--attendance-primary);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   CONTENT / HERO
+========================================================= */
+
+.lecturer-attendance-content {
+  width: min(1400px, 100%);
+  margin: 0 auto;
+  padding: 28px 36px 48px;
+}
+
+.attendance-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 19px;
+  padding: 24px 26px;
+  border: 1px solid #dfe6ef;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.025);
+}
+
+.hero-label,
+.panel-label {
+  display: block;
+  color: var(--attendance-primary);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.15px;
+}
+
+.attendance-hero h2 {
+  margin: 7px 0 5px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.attendance-hero p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--attendance-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.attendance-refresh-button {
+  min-height: 40px;
+  flex: 0 0 auto;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--attendance-primary);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendance-refresh-button:hover:not(:disabled) {
+  background: var(--attendance-primary-dark);
+}
+
+.attendance-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* =========================================================
+   ALERT / STATS
+========================================================= */
+
+.attendance-alert {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 19px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 11px;
+  background: #fff8f8;
+  color: #991b1b;
+}
+
+.alert-icon {
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.alert-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.alert-content strong {
+  display: block;
+  font-size: 11px;
+}
+
+.alert-content p {
+  margin: 3px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.attendance-alert > button {
+  min-height: 33px;
+  padding: 0 11px;
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  background: #fff;
+  color: #991b1b;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendance-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 19px;
+}
+
+.attendance-stat-card {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid var(--attendance-border);
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.02);
+}
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--attendance-primary-soft);
+  color: var(--attendance-primary);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.attendance-stat-card:nth-child(2) .stat-icon {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.attendance-stat-card:nth-child(3) .stat-icon {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.attendance-stat-card:nth-child(4) .stat-icon {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.attendance-stat-card span {
+  display: block;
+  color: var(--attendance-muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.attendance-stat-card strong {
+  display: block;
+  margin-top: 2px;
+  color: #111827;
+  font-size: 20px;
+}
+
+.attendance-stat-card small {
+  display: block;
+  margin-top: 3px;
+  color: var(--attendance-subtle);
+  font-size: 8px;
+}
+
+/* =========================================================
+   PANEL / FILTERS
+========================================================= */
+
+.attendance-panel {
+  overflow: hidden;
+  border: 1px solid var(--attendance-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.02);
+}
+
+.attendance-panel-header {
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--attendance-border-soft);
+}
+
+.attendance-panel-header h3 {
+  margin: 5px 0 3px;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.attendance-panel-header p {
+  margin: 0;
+  color: var(--attendance-muted);
+  font-size: 10px;
+}
+
+.attendance-filters {
+  display: grid;
+  grid-template-columns: minmax(210px, 1.4fr) repeat(4, minmax(125px, 0.8fr)) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 15px 22px;
+  border-bottom: 1px solid var(--attendance-border-soft);
+  background: #fbfcfe;
+}
+
+.attendance-search {
+  min-width: 0;
+  position: relative;
+}
+
+.attendance-search > span {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  border-radius: 6px;
+  background: var(--attendance-primary-soft);
+  color: var(--attendance-primary);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.attendance-search input,
+.attendance-filter-field select,
+.attendance-filter-field input {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #1e293b;
+  font: inherit;
+  font-size: 10px;
+}
+
+.attendance-search input {
+  padding-left: 42px;
+}
+
+.attendance-search input::placeholder {
+  color: #94a3b8;
+}
+
+.attendance-search input:focus,
+.attendance-filter-field select:focus,
+.attendance-filter-field input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.07);
+}
+
+.attendance-filter-field {
+  min-width: 0;
+}
+
+.attendance-filter-field label {
+  display: block;
+  margin-bottom: 5px;
+  color: #64748b;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.clear-attendance-filters {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clear-attendance-filters:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.sections-inline-warning {
+  margin: 12px 22px 0;
+  padding: 9px 11px;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 9px;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.attendance-table-wrap {
+  width: 100%;
+}
+
+.attendance-desktop-table {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .lecturer-attendance-table {
@@ -272,427 +723,568 @@
 }
 
 .lecturer-attendance-table th {
-  padding: 14px 18px;
+  padding: 13px 16px;
   background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--attendance-border);
   color: #64748b;
-  font-size: 11px;
+  font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .lecturer-attendance-table td {
-  padding: 16px 18px;
-  border-bottom: 1px solid #edf1f5;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--attendance-border-soft);
   color: #334155;
-  font-size: 13px;
+  font-size: 10px;
   vertical-align: middle;
 }
 
-.lecturer-attendance-table tbody tr {
-  transition: background 0.16s ease;
-}
-
 .lecturer-attendance-table tbody tr:hover {
-  background: #f8fbff;
+  background: #fbfdff;
 }
 
 .lecturer-attendance-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
-/* =========================
-   Student
-   ========================= */
-
-.lecturer-attendance-student {
+.attendance-student {
+  min-width: 165px;
   display: flex;
   align-items: center;
-  gap: 11px;
-  min-width: 180px;
+  gap: 9px;
 }
 
-.lecturer-attendance-student-avatar {
+.student-avatar {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
   border-radius: 50%;
-  background: #e8f0ff;
-  color: #2563eb;
-  font-size: 12px;
+  background: var(--attendance-primary-soft);
+  color: var(--attendance-primary);
+  font-size: 9px;
   font-weight: 800;
 }
 
-.lecturer-attendance-student-info {
+.attendance-student > div:last-child {
   min-width: 0;
 }
 
-.lecturer-attendance-student-name {
+.attendance-student strong {
+  display: block;
   overflow: hidden;
   color: #172033;
+  font-size: 10px;
   font-weight: 750;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.lecturer-attendance-student-id {
-  margin-top: 3px;
+.attendance-student span {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
   color: #94a3b8;
-  font-size: 11px;
-}
-
-/* =========================
-   Status
-   ========================= */
-
-.lecturer-attendance-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 28px;
-  padding: 0 9px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 8px;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.lecturer-attendance-status-dot {
-  width: 6px;
-  height: 6px;
+.course-info strong,
+.time-info strong {
+  display: block;
+  color: #334155;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.course-info span,
+.time-info span {
+  display: block;
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 8px;
+}
+
+.attendance-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
 }
 
-.lecturer-attendance-status.present {
+.attendance-status-present {
   background: #ecfdf5;
   color: #047857;
 }
 
-.lecturer-attendance-status.late {
+.attendance-status-late {
   background: #fffbeb;
   color: #b45309;
 }
 
-.lecturer-attendance-status.absent {
+.attendance-status-absent {
   background: #fef2f2;
   color: #dc2626;
 }
 
-.lecturer-attendance-status.excused {
+.attendance-status-excused {
   background: #eff6ff;
   color: #2563eb;
 }
 
-.lecturer-attendance-status.unknown {
+.attendance-status-unknown {
   background: #f1f5f9;
   color: #64748b;
 }
 
-/* =========================
-   Source / Validation
-   ========================= */
-
-.lecturer-attendance-source {
+.source-badge,
+.validation-badge {
   display: inline-flex;
   align-items: center;
-  min-height: 27px;
-  padding: 0 8px;
-  border-radius: 8px;
+  min-height: 23px;
+  padding: 0 7px;
+  border-radius: 7px;
   background: #f1f5f9;
   color: #475569;
-  font-size: 11px;
+  font-size: 8px;
   font-weight: 700;
 }
 
-.lecturer-attendance-validation {
-  color: #64748b;
-  font-size: 12px;
+/* =========================================================
+   MOBILE LIST / STATES
+========================================================= */
+
+.attendance-mobile-list {
+  display: none;
+  padding: 13px;
 }
 
-.lecturer-attendance-validation.valid {
-  color: #047857;
-  font-weight: 700;
+.attendance-mobile-card {
+  margin-bottom: 11px;
+  padding: 14px;
+  border: 1px solid var(--attendance-border);
+  border-radius: 11px;
+  background: #fff;
 }
 
-.lecturer-attendance-validation.invalid {
-  color: #dc2626;
-  font-weight: 700;
+.attendance-mobile-card:last-child {
+  margin-bottom: 0;
 }
 
-/* =========================
-   Empty / Error / Loading
-   ========================= */
-
-.lecturer-attendance-state {
+.attendance-mobile-card-header {
   display: flex;
-  min-height: 280px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+
+.attendance-mobile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  padding-top: 12px;
+  border-top: 1px solid var(--attendance-border-soft);
+}
+
+.attendance-mobile-grid > div {
+  min-width: 0;
+}
+
+.attendance-mobile-grid span {
+  display: block;
+  margin-bottom: 3px;
+  color: #94a3b8;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.attendance-mobile-grid strong {
+  display: block;
+  overflow: hidden;
+  color: #334155;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendance-loading,
+.attendance-empty {
+  min-height: 290px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px;
+  padding: 30px;
   text-align: center;
 }
 
-.lecturer-attendance-state-inner {
-  max-width: 500px;
-}
-
-.lecturer-attendance-state-icon {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 16px;
-  border-radius: 16px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-state-title {
-  margin: 0;
-  color: #172033;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-state-text {
-  margin: 8px 0 18px;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.lecturer-attendance-spinner {
-  width: 32px;
-  height: 32px;
-  margin: 0 auto 14px;
-  border: 3px solid #dbeafe;
-  border-top-color: #2563eb;
+.loading-spinner {
+  width: 29px;
+  height: 29px;
+  margin-bottom: 8px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--attendance-primary);
   border-radius: 50%;
-  animation: lecturerAttendanceSpin 0.8s linear infinite;
+  animation: attendance-spin 0.75s linear infinite;
 }
 
-@keyframes lecturerAttendanceSpin {
+@keyframes attendance-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* =========================
-   Mobile Cards
-   ========================= */
-
-.lecturer-attendance-mobile-list {
-  display: none;
-  padding: 14px;
-}
-
-.lecturer-attendance-mobile-card {
-  margin-bottom: 12px;
-  padding: 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  background: #ffffff;
-}
-
-.lecturer-attendance-mobile-card:last-child {
-  margin-bottom: 0;
-}
-
-.lecturer-attendance-mobile-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.lecturer-attendance-mobile-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.lecturer-attendance-mobile-field {
-  min-width: 0;
-}
-
-.lecturer-attendance-mobile-label {
-  margin-bottom: 4px;
-  color: #94a3b8;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.lecturer-attendance-mobile-value {
-  overflow: hidden;
+.attendance-loading strong {
   color: #334155;
   font-size: 12px;
-  font-weight: 650;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* =========================
-   Responsive
-   ========================= */
+.attendance-loading span {
+  margin-top: 5px;
+  color: #94a3b8;
+  font-size: 9px;
+}
 
-@media (max-width: 1200px) {
-  .lecturer-attendance-page {
-    padding: 26px;
+.empty-icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: var(--attendance-primary-soft);
+  color: var(--attendance-primary);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.attendance-empty h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.attendance-empty p {
+  margin: 6px 0 13px;
+  color: var(--attendance-muted);
+  font-size: 10px;
+}
+
+.attendance-empty button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #dbe2ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lecturer-attendance-page button:focus-visible,
+.lecturer-attendance-page input:focus-visible,
+.lecturer-attendance-page select:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1180px) {
+  .lecturer-attendance-sidebar {
+    width: 232px;
+    flex-basis: 232px;
   }
 
-  .lecturer-attendance-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .lecturer-attendance-content {
+    padding-left: 28px;
+    padding-right: 28px;
   }
 
-  .lecturer-attendance-filters {
+  .lecturer-attendance-topbar {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .attendance-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .lecturer-attendance-filter-actions {
+  .attendance-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-search {
     grid-column: 1 / -1;
-    justify-content: flex-end;
-  }
-}
-
-@media (max-width: 900px) {
-  .lecturer-attendance-page {
-    padding: 22px;
   }
 
-  .lecturer-attendance-header {
-    flex-direction: column;
-  }
-
-  .lecturer-attendance-header-actions {
+  .clear-attendance-filters {
     width: 100%;
   }
-
-  .lecturer-attendance-header-actions .lecturer-attendance-btn {
-    flex: 1;
-  }
-
-  .lecturer-attendance-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 780px) {
   .lecturer-attendance-page {
-    padding: 16px;
-  }
-
-  .lecturer-attendance-title {
-    font-size: 28px;
-  }
-
-  .lecturer-attendance-subtitle {
-    font-size: 13px;
-  }
-
-  .lecturer-attendance-stats {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .lecturer-attendance-stat-card {
-    padding: 15px;
-  }
-
-  .lecturer-attendance-stat-value {
-    font-size: 24px;
-  }
-
-  .lecturer-attendance-filters {
-    grid-template-columns: 1fr;
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .lecturer-attendance-filter-actions {
-    grid-column: auto;
-    justify-content: stretch;
-  }
-
-  .lecturer-attendance-filter-actions .lecturer-attendance-btn {
-    flex: 1;
-  }
-
-  .lecturer-attendance-table-scroll {
-    display: none;
-  }
-
-  .lecturer-attendance-mobile-list {
     display: block;
   }
 
-  .lecturer-attendance-table-header {
-    padding: 16px;
+  .attendance-mobile-header {
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    display: grid;
+    grid-template-columns: 40px 1fr 36px;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    background: #fff;
+    border-bottom: 1px solid var(--attendance-border);
+  }
+
+  .attendance-mobile-brand {
+    justify-self: center;
+  }
+
+  .lecturer-attendance-sidebar {
+    width: min(286px, 86vw);
+    min-height: 100vh;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    flex: none;
+    padding: 18px 15px;
+    overflow-y: auto;
+    transform: translateX(-105%);
+    transition: transform 0.22s ease;
+    box-shadow: 8px 0 25px rgba(15, 23, 42, 0.12);
+  }
+
+  .lecturer-attendance-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .attendance-mobile-close {
+    display: grid;
+    place-items: center;
+  }
+
+  .attendance-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: block;
+    background: rgba(15, 23, 42, 0.36);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.22s ease,
+      visibility 0.22s ease;
+  }
+
+  .lecturer-attendance-page.mobile-menu-open .attendance-mobile-overlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .lecturer-attendance-page.mobile-menu-open {
+    overflow: hidden;
+  }
+
+  .lecturer-attendance-main {
+    min-height: calc(100vh - 62px);
+  }
+
+  .lecturer-attendance-topbar {
+    min-height: auto;
+    padding: 18px 20px;
+  }
+
+  .topbar-user {
+    display: none;
+  }
+
+  .lecturer-attendance-content {
+    padding: 20px 16px 35px;
+  }
+
+  .attendance-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .attendance-refresh-button {
+    width: 100%;
+  }
+
+  .attendance-stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .attendance-panel-header {
+    padding: 18px;
+  }
+
+  .attendance-filters {
+    grid-template-columns: 1fr;
+    padding: 14px 18px;
+  }
+
+  .attendance-search {
+    grid-column: auto;
+  }
+
+  .attendance-desktop-table {
+    display: none;
+  }
+
+  .attendance-mobile-list {
+    display: block;
   }
 }
 
 @media (max-width: 480px) {
-  .lecturer-attendance-page {
-    padding: 12px;
+  .attendance-mobile-header {
+    padding: 0 12px;
   }
 
-  .lecturer-attendance-header {
-    margin-bottom: 20px;
+  .lecturer-attendance-topbar {
+    padding: 16px;
   }
 
-  .lecturer-attendance-title {
-    font-size: 24px;
+  .lecturer-attendance-topbar h1 {
+    font-size: 20px;
   }
 
-  .lecturer-attendance-header-actions {
-    flex-direction: column;
+  .lecturer-attendance-topbar p {
+    max-width: 300px;
+    font-size: 10px;
+    line-height: 1.45;
   }
 
-  .lecturer-attendance-header-actions .lecturer-attendance-btn {
-    width: 100%;
+  .lecturer-attendance-content {
+    padding: 16px 12px 30px;
   }
 
-  .lecturer-attendance-stats {
-    grid-template-columns: 1fr 1fr;
+  .attendance-hero {
+    padding: 18px;
+    border-radius: 13px;
   }
 
-  .lecturer-attendance-stat-card {
-    padding: 13px;
+  .attendance-hero h2 {
+    font-size: 19px;
   }
 
-  .lecturer-attendance-stat-label {
+  .attendance-hero p {
     font-size: 10px;
   }
 
-  .lecturer-attendance-stat-value {
-    font-size: 21px;
+  .attendance-alert {
+    align-items: flex-start;
   }
 
-  .lecturer-attendance-mobile-fields {
+  .attendance-alert > button {
+    flex: 0 0 auto;
+  }
+
+  .attendance-stat-grid {
+    gap: 9px;
+  }
+
+  .attendance-stat-card {
+    padding: 14px;
+  }
+
+  .attendance-stat-card strong {
+    font-size: 18px;
+  }
+
+  .attendance-panel-header {
+    padding: 16px;
+  }
+
+  .attendance-filters {
+    padding: 13px;
+  }
+
+  .attendance-mobile-card-header {
+    align-items: flex-start;
+  }
+
+  .attendance-mobile-grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 340px) {
-  .lecturer-attendance-page {
-    padding: 9px;
+@media (max-width: 360px) {
+  .attendance-mobile-header {
+    grid-template-columns: 38px 1fr 34px;
+    gap: 8px;
   }
 
-  .lecturer-attendance-stats {
+  .attendance-mobile-menu-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .attendance-mobile-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .attendance-mobile-brand {
+    font-size: 16px;
+  }
+
+  .lecturer-attendance-topbar h1 {
+    font-size: 19px;
+  }
+
+  .attendance-hero h2 {
+    font-size: 18px;
+  }
+
+  .attendance-stat-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .lecturer-attendance-mobile-card {
-    padding: 13px;
+@media (prefers-reduced-motion: reduce) {
+  .lecturer-attendance-page *,
+  .lecturer-attendance-page *::before,
+  .lecturer-attendance-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

@@ -135,6 +135,7 @@ function AttendanceSessions() {
   const [rooms, setRooms] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState(null);
@@ -708,7 +709,17 @@ function AttendanceSessions() {
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     navigate("/");
+  }
+
+  function handleMobileNavigation(path) {
+    navigate(path);
+    setMobileMenuOpen(false);
+  }
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
   }
 
   const rosterStats = useMemo(() => {
@@ -739,14 +750,82 @@ function AttendanceSessions() {
       : 0;
 
   return (
-    <div className="lecturer-sessions-page">
-      <aside className="lecturer-sidebar">
-        <div className="lecturer-brand">
-          <div className="lecturer-brand-mark">A</div>
-          <div>
+    <div
+      className={
+        mobileMenuOpen
+          ? "lecturer-sessions-page mobile-menu-open"
+          : "lecturer-sessions-page"
+      }
+    >
+      <header className="sessions-mobile-header">
+        <button
+          type="button"
+          className="sessions-mobile-menu-button"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open navigation"
+          aria-expanded={mobileMenuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <button
+          type="button"
+          className="sessions-mobile-brand"
+          onClick={() => handleMobileNavigation("/lecturer/sessions")}
+        >
+          <span className="sessions-mobile-brand-mark">A</span>
+          <span>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
-          </div>
+            <small>Smart Attendance</small>
+          </span>
+        </button>
+
+        <div className="sessions-mobile-avatar">{initials}</div>
+      </header>
+
+      <button
+        type="button"
+        className={
+          mobileMenuOpen
+            ? "sessions-mobile-overlay visible"
+            : "sessions-mobile-overlay"
+        }
+        onClick={closeMobileMenu}
+        aria-label="Close navigation"
+        tabIndex={mobileMenuOpen ? 0 : -1}
+      />
+
+      <aside
+        className={
+          mobileMenuOpen
+            ? "lecturer-sidebar mobile-open"
+            : "lecturer-sidebar"
+        }
+      >
+        <div className="lecturer-brand">
+          <button
+            type="button"
+            className="lecturer-brand-button"
+            onClick={() => handleMobileNavigation("/lecturer/sessions")}
+            aria-label="Go to attendance sessions"
+          >
+            <div className="lecturer-brand-mark">A</div>
+            <div>
+              <strong>Attendify</strong>
+              <span>SMART ATTENDANCE</span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            className="lecturer-mobile-close"
+            onClick={closeMobileMenu}
+            aria-label="Close navigation"
+          >
+            ×
+          </button>
         </div>
 
         <div className="lecturer-profile">
@@ -762,7 +841,7 @@ function AttendanceSessions() {
         <nav className="lecturer-nav">
           <button
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => handleMobileNavigation("/dashboard")}
           >
             <span className="nav-icon">D</span>
             Dashboard
@@ -771,7 +850,7 @@ function AttendanceSessions() {
           <button
             type="button"
             className="active"
-            onClick={() => navigate("/lecturer/sessions")}
+            onClick={() => handleMobileNavigation("/lecturer/sessions")}
           >
             <span className="nav-icon">S</span>
             Attendance Sessions
@@ -779,7 +858,7 @@ function AttendanceSessions() {
 
           <button
             type="button"
-            onClick={() => navigate("/lecturer/attendance")}
+            onClick={() => handleMobileNavigation("/lecturer/attendance")}
           >
             <span className="nav-icon">A</span>
             Attendance
@@ -787,7 +866,7 @@ function AttendanceSessions() {
 
           <button
             type="button"
-            onClick={() => navigate("/lecturer/reports")}
+            onClick={() => handleMobileNavigation("/lecturer/reports")}
           >
             <span className="nav-icon">R</span>
             Reports
@@ -795,12 +874,6 @@ function AttendanceSessions() {
         </nav>
 
         <div className="lecturer-sidebar-footer">
-          <div className="lecturer-sidebar-note">
-            <span className="note-badge">LIVE</span>
-            <strong>Smart attendance</strong>
-            <p>Manage sessions and track attendance in real time.</p>
-          </div>
-
           <button
             type="button"
             className="lecturer-logout"
@@ -847,7 +920,6 @@ function AttendanceSessions() {
               className="hero-create-button"
               onClick={() => setShowCreateModal(true)}
             >
-              <span>+</span>
               New Session
             </button>
           </div>

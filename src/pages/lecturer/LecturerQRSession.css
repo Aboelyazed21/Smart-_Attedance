@@ -1012,3 +1012,591 @@
     border-radius: 17px;
   }
 }
+
+/* =========================================================
+   ATTENDIFY LECTURER SESSION - SHARED RESPONSIVE UI
+   Final override layer
+========================================================= */
+
+.lecturer-session-shell {
+  --session-primary: #2563eb;
+  --session-primary-dark: #1d4ed8;
+  --session-primary-soft: #eff6ff;
+  --session-text: #172033;
+  --session-muted: #64748b;
+  --session-border: #e2e8f0;
+  --session-page: #f5f7fb;
+  --session-sidebar: #172033;
+
+  min-height: 100vh;
+  display: flex;
+  background: var(--session-page);
+  color: var(--session-text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.lecturer-session-shell *,
+.lecturer-session-shell *::before,
+.lecturer-session-shell *::after {
+  box-sizing: border-box;
+}
+
+/* Remove the old decorative background. */
+.lecturer-session-page {
+  min-height: 100%;
+  padding: 28px 36px 48px;
+  background: var(--session-page);
+}
+
+/* =========================================================
+   MOBILE HEADER
+========================================================= */
+
+.session-mobile-header {
+  display: none;
+}
+
+.session-mobile-menu-button,
+.session-mobile-brand {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.session-mobile-menu-button {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid var(--session-border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.session-mobile-menu-button span {
+  width: 19px;
+  height: 2px;
+  display: block;
+  border-radius: 2px;
+  background: #334155;
+}
+
+.session-mobile-brand {
+  padding: 0;
+  color: #172033;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.session-mobile-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dbeafe;
+  border-radius: 50%;
+  background: var(--session-primary-soft);
+  color: var(--session-primary);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.session-mobile-overlay {
+  display: none;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.lecturer-session-sidebar {
+  width: 258px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 258px;
+  padding: 20px 16px;
+  overflow-y: auto;
+  background: var(--session-sidebar);
+  color: #fff;
+  border-right: 1px solid #243044;
+}
+
+.session-sidebar-brand {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.session-brand-button {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-brand-mark {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.session-brand-button strong {
+  display: block;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.session-brand-button small {
+  display: block;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+}
+
+.session-mobile-close {
+  display: none;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.session-sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 4px 16px;
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.session-profile-avatar {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.session-sidebar-profile > div:last-child {
+  min-width: 0;
+}
+
+.session-sidebar-profile strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-sidebar-profile span {
+  display: block;
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.session-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.session-sidebar-nav button,
+.session-sidebar-footer button {
+  width: 100%;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.session-sidebar-nav button:hover {
+  background: rgba(255, 255, 255, 0.055);
+  color: #fff;
+}
+
+.session-sidebar-nav button.active {
+  border-color: rgba(96, 165, 250, 0.16);
+  background: rgba(37, 99, 235, 0.18);
+  color: #fff;
+}
+
+.session-sidebar-nav button span,
+.session-sidebar-footer button span {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #cbd5e1;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.session-sidebar-nav button.active span {
+  background: var(--session-primary);
+  color: #fff;
+}
+
+.session-sidebar-footer {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.session-sidebar-footer button {
+  border-color: rgba(248, 113, 113, 0.12);
+  background: rgba(239, 68, 68, 0.04);
+  color: #fca5a5;
+}
+
+.session-sidebar-footer button:hover {
+  background: rgba(239, 68, 68, 0.09);
+  color: #fecaca;
+}
+
+/* =========================================================
+   MAIN AREA
+========================================================= */
+
+.lecturer-session-main {
+  min-width: 0;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.lecturer-session-main .lecturer-session-page {
+  width: min(1500px, 100%);
+  margin: 0 auto;
+}
+
+/* Calm down old effects without changing the existing structure. */
+.session-user,
+.session-summary-card,
+.qr-card,
+.students-card,
+.lecturer-session-error {
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.025);
+}
+
+.session-user {
+  border-radius: 12px;
+}
+
+.session-summary-card,
+.qr-card,
+.students-card,
+.lecturer-session-error {
+  border-radius: 14px;
+}
+
+.generate-qr-button {
+  box-shadow: none;
+  border-radius: 8px;
+}
+
+.qr-display {
+  background: #f8fafc;
+  box-shadow: none;
+  border-radius: 14px;
+}
+
+.live-dot {
+  box-shadow: none;
+}
+
+.correction-overlay {
+  backdrop-filter: none;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.correction-modal {
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.16);
+  border-radius: 14px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1180px) {
+  .lecturer-session-sidebar {
+    width: 232px;
+    flex-basis: 232px;
+  }
+
+  .lecturer-session-page {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+@media (max-width: 780px) {
+  .lecturer-session-shell {
+    display: block;
+  }
+
+  .session-mobile-header {
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    display: grid;
+    grid-template-columns: 40px 1fr 36px;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    background: #fff;
+    border-bottom: 1px solid var(--session-border);
+  }
+
+  .session-mobile-brand {
+    justify-self: center;
+  }
+
+  .lecturer-session-sidebar {
+    width: min(286px, 86vw);
+    min-height: 100vh;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    flex: none;
+    padding: 18px 15px;
+    overflow-y: auto;
+    transform: translateX(-105%);
+    transition: transform 0.22s ease;
+    box-shadow: 8px 0 25px rgba(15, 23, 42, 0.12);
+  }
+
+  .lecturer-session-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .session-mobile-close {
+    display: grid;
+    place-items: center;
+  }
+
+  .session-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: block;
+    background: rgba(15, 23, 42, 0.36);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.22s ease,
+      visibility 0.22s ease;
+  }
+
+  .lecturer-session-shell.mobile-menu-open .session-mobile-overlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .lecturer-session-main {
+    min-height: calc(100vh - 62px);
+  }
+
+  .lecturer-session-page {
+    padding: 20px 16px 32px;
+  }
+
+  .session-page-header {
+    margin-bottom: 18px;
+  }
+
+  .session-user {
+    display: none;
+  }
+
+  .session-summary-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .generate-qr-button {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .students-card-header {
+    padding: 18px;
+  }
+
+  .student-stats,
+  .student-search {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .student-stats {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .pagination {
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .session-mobile-header {
+    padding: 0 12px;
+  }
+
+  .lecturer-session-page {
+    padding: 16px 12px 28px;
+  }
+
+  .session-page-header h1 {
+    font-size: 26px;
+  }
+
+  .session-summary-card {
+    padding: 16px;
+  }
+
+  .session-summary-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .session-title-row h2 {
+    font-size: 17px;
+  }
+
+  .session-meta {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .qr-card {
+    padding: 17px;
+  }
+
+  .student-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .students-table th,
+  .students-table td {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .correction-overlay {
+    padding: 12px;
+  }
+
+  .correction-modal {
+    padding: 18px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .session-mobile-header {
+    grid-template-columns: 38px 1fr 34px;
+    gap: 8px;
+  }
+
+  .session-mobile-menu-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .session-mobile-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .session-mobile-brand {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lecturer-session-shell *,
+  .lecturer-session-shell *::before,
+  .lecturer-session-shell *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

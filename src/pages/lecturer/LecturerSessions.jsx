@@ -16,6 +16,7 @@ import {
   } from "../../services/api";
   
   import { useNavigate } from "react-router-dom";
+import "./LecturerSession.css";
   
   
   /* =========================================================
@@ -798,9 +799,9 @@ import {
     if (loading) {
   
       return (
-          <div style={page}>
+          <div className="lecturer-session-page" style={page}>
   
-          <header style={header}>
+          <header className="lecturer-session-header" style={header}>
   
             <div>
               <div style={eyebrow}>
@@ -820,9 +821,9 @@ import {
           </header>
   
   
-          <main style={main}>
+          <main className="lecturer-session-main" style={main}>
   
-            <div style={loadingCard}>
+            <div className="lecturer-session-loading-card" style={loadingCard}>
   
               <div style={spinner}></div>
   
@@ -850,13 +851,13 @@ import {
   
     return (
   
-        <div style={page}>
+        <div className="lecturer-session-page" style={page}>
   
         {/* ===================================================
             HEADER
         =================================================== */}
   
-        <header style={header}>
+        <header className="lecturer-session-header" style={header}>
   
           <div>
   
@@ -876,7 +877,7 @@ import {
           </div>
   
   
-          <div style={headerActions}>
+          <div className="lecturer-session-header-actions" style={headerActions}>
   
             <button
               type="button"
@@ -921,7 +922,7 @@ import {
             MAIN
         =================================================== */}
   
-        <main style={main}>
+        <main className="lecturer-session-main" style={main}>
   
           {error && (
   
@@ -942,7 +943,7 @@ import {
   
           {/* SECTION FILTER */}
   
-          <section style={filterCard}>
+          <section className="lecturer-session-filter" style={filterCard}>
   
             <div>
   
@@ -1007,7 +1008,7 @@ import {
   
           {filteredSessions.length === 0 ? (
   
-            <div style={emptyCard}>
+            <div className="lecturer-session-empty-card" style={emptyCard}>
   
               <div style={emptyIcon}>
                 —
@@ -1042,7 +1043,7 @@ import {
                 SESSIONS
             ================================================= */
   
-            <div style={grid}>
+            <div className="lecturer-session-grid" style={grid}>
   
               {filteredSessions.map(
                 (session) => {
@@ -1071,6 +1072,7 @@ import {
   
                     <article
                       key={session.id}
+                      className="lecturer-session-card"
                       style={sessionCard}
                     >
   
@@ -1167,7 +1169,7 @@ import {
                       </div>
   
   
-                      <div style={actions}>
+                      <div className="lecturer-session-card-actions" style={actions}>
   
                         {status !== "closed" && (
   
@@ -1224,9 +1226,9 @@ import {
   
         {showCreateModal && (
   
-          <div style={overlay}>
+          <div className="lecturer-session-overlay" style={overlay}>
   
-            <div style={modal}>
+            <div className="lecturer-session-modal" style={modal}>
   
               <div style={modalHeader}>
   
@@ -1269,7 +1271,7 @@ import {
                 }
               >
   
-                <div style={formGrid}>
+                <div className="lecturer-session-form-grid" style={formGrid}>
   
                   <div style={formGroup}>
   
@@ -1438,7 +1440,7 @@ import {
                 </div>
   
   
-                <div style={modalActions}>
+                <div className="lecturer-session-modal-actions" style={modalActions}>
   
                   <button
                     type="button"
@@ -1485,9 +1487,9 @@ import {
   
         {showQrModal && (
   
-          <div style={overlay}>
+          <div className="lecturer-session-overlay" style={overlay}>
   
-            <div style={qrModal}>
+            <div className="lecturer-session-modal lecturer-session-qr-modal" style={qrModal}>
   
               <div style={modalHeader}>
   
@@ -1524,7 +1526,7 @@ import {
               </div>
   
   
-              <div style={qrContent}>
+              <div className="lecturer-session-qr-content" style={qrContent}>
   
                 {qrDataUrl ? (
   
@@ -1573,7 +1575,7 @@ import {
                 </div>
   
   
-                <div style={qrActions}>
+                <div className="lecturer-session-qr-actions" style={qrActions}>
   
                   <button
                     type="button"
@@ -1623,9 +1625,9 @@ import {
   
         {showRosterModal && (
   
-          <div style={overlay}>
+          <div className="lecturer-session-overlay" style={overlay}>
   
-            <div style={rosterModal}>
+            <div className="lecturer-session-modal lecturer-session-roster-modal" style={rosterModal}>
   
               <div style={modalHeader}>
   
@@ -1676,7 +1678,7 @@ import {
   
               ) : (
   
-                <div style={tableWrapper}>
+                <div className="lecturer-session-table-wrapper" style={tableWrapper}>
   
                   <table style={table}>
   

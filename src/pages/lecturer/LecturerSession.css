@@ -1,0 +1,326 @@
+/* =========================================================
+   LECTURER SESSION
+   Responsive, calm UI overrides
+   Business logic remains in LecturerSession.jsx
+   ========================================================= */
+
+.lecturer-session-page {
+  min-height: 100%;
+  width: 100%;
+  background: #f5f7fa !important;
+  color: #172033;
+  box-sizing: border-box;
+}
+
+.lecturer-session-page *,
+.lecturer-session-page *::before,
+.lecturer-session-page *::after {
+  box-sizing: border-box;
+}
+
+.lecturer-session-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5eaf1 !important;
+  box-shadow: none !important;
+}
+
+.lecturer-session-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.lecturer-session-header-actions button {
+  transition: border-color 0.18s ease, background-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.lecturer-session-header-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.lecturer-session-main {
+  width: 100%;
+}
+
+.lecturer-session-filter {
+  box-shadow: none !important;
+}
+
+.lecturer-session-filter select {
+  min-width: 260px;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+.lecturer-session-grid {
+  align-items: stretch;
+}
+
+.lecturer-session-card {
+  min-width: 0;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035) !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.lecturer-session-card:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.055) !important;
+  transform: translateY(-1px);
+}
+
+.lecturer-session-card-actions {
+  flex-wrap: wrap;
+}
+
+.lecturer-session-card-actions button {
+  flex: 1 1 150px;
+  min-width: 0;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.lecturer-session-card-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.lecturer-session-loading-card,
+.lecturer-session-empty-card {
+  box-shadow: none !important;
+}
+
+.lecturer-session-loading-card .lecturer-session-page-spinner {
+  display: block;
+}
+
+.lecturer-session-overlay {
+  background: rgba(15, 23, 42, 0.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.lecturer-session-modal {
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12) !important;
+}
+
+.lecturer-session-modal > form {
+  min-width: 0;
+}
+
+.lecturer-session-form-grid {
+  min-width: 0;
+}
+
+.lecturer-session-form-grid select,
+.lecturer-session-form-grid input {
+  min-width: 0;
+}
+
+.lecturer-session-modal-actions {
+  flex-wrap: wrap;
+}
+
+.lecturer-session-modal-actions button {
+  min-width: 110px;
+}
+
+.lecturer-session-qr-content {
+  min-width: 0;
+}
+
+.lecturer-session-qr-actions {
+  flex-wrap: wrap;
+}
+
+.lecturer-session-qr-actions button {
+  min-width: 120px;
+}
+
+.lecturer-session-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lecturer-session-table-wrapper table {
+  min-width: 620px;
+}
+
+@media (max-width: 900px) {
+  .lecturer-session-header {
+    padding: 22px 24px !important;
+  }
+
+  .lecturer-session-main {
+    padding: 24px !important;
+  }
+
+  .lecturer-session-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  .lecturer-session-filter {
+    align-items: flex-start !important;
+  }
+
+  .lecturer-session-filter select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .lecturer-session-header {
+    padding: 18px !important;
+    align-items: flex-start !important;
+  }
+
+  .lecturer-session-header h1 {
+    font-size: 25px !important;
+    line-height: 1.2 !important;
+  }
+
+  .lecturer-session-header p {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+  }
+
+  .lecturer-session-header-actions {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px !important;
+  }
+
+  .lecturer-session-header-actions button:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .lecturer-session-header-actions button {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .lecturer-session-main {
+    padding: 18px !important;
+  }
+
+  .lecturer-session-filter {
+    padding: 15px 16px !important;
+    gap: 12px !important;
+  }
+
+  .lecturer-session-filter h3 {
+    font-size: 16px !important;
+  }
+
+  .lecturer-session-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .lecturer-session-card {
+    padding: 17px !important;
+    border-radius: 14px !important;
+  }
+
+  .lecturer-session-card h2 {
+    font-size: 18px !important;
+  }
+
+  .lecturer-session-card-actions {
+    flex-direction: column;
+  }
+
+  .lecturer-session-card-actions button {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .lecturer-session-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px);
+    border-radius: 14px !important;
+  }
+
+  .lecturer-session-modal header {
+    padding: 17px !important;
+  }
+
+  .lecturer-session-form-grid {
+    grid-template-columns: 1fr !important;
+    padding: 17px !important;
+    gap: 13px !important;
+  }
+
+  .lecturer-session-modal-actions {
+    padding: 14px 17px !important;
+    flex-direction: column-reverse;
+  }
+
+  .lecturer-session-modal-actions button {
+    width: 100%;
+  }
+
+  .lecturer-session-qr-content {
+    padding: 18px !important;
+  }
+
+  .lecturer-session-qr-content img,
+  .lecturer-session-qr-content > div[style*="width"] {
+    width: min(72vw, 240px) !important;
+    height: min(72vw, 240px) !important;
+  }
+
+  .lecturer-session-qr-actions {
+    flex-direction: column;
+  }
+
+  .lecturer-session-qr-actions button {
+    width: 100%;
+  }
+
+  .lecturer-session-table-wrapper {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .lecturer-session-header {
+    padding: 15px !important;
+  }
+
+  .lecturer-session-main {
+    padding: 14px !important;
+  }
+
+  .lecturer-session-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .lecturer-session-header-actions button:last-child {
+    grid-column: auto;
+  }
+
+  .lecturer-session-card {
+    padding: 14px !important;
+  }
+
+  .lecturer-session-card > div:first-child {
+    align-items: flex-start !important;
+  }
+
+  .lecturer-session-card > div:first-child span {
+    max-width: 48%;
+    word-break: break-word;
+  }
+
+  .lecturer-session-detail-row {
+    gap: 8px;
+  }
+}
