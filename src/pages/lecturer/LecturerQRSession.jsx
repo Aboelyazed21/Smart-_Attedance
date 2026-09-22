@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   getSessions,
@@ -120,7 +120,10 @@ function getStatusClass(status) {
 
 export default function LecturerQRSession() {
   const navigate = useNavigate();
-  const { id: sessionId } = useParams();
+  const { pathname } = useLocation();
+
+  const sessionId =
+    pathname.match(/^\/lecturer\/sessions\/(\d+)\/?$/)?.[1] || "";
 
   const savedUser = useMemo(() => getSavedUser(), []);
 
