@@ -6571,3 +6571,116 @@ button {
   }
 
 }
+
+/* =========================================================
+   FINAL ADMIN WIDTH FIX
+   IMPORTANT:
+   Admin pages already have the shared AdminLayout sidebar.
+   Older dashboard styles in this global stylesheet also use
+   .dashboard-main and subtract a 270px sidebar width.
+   That causes AdminLayout pages to lose another 270px and
+   leaves a large empty area on the right.
+
+   Scope these corrections ONLY to AdminLayout so existing
+   student/lecturer/dashboard pages are not affected.
+========================================================= */
+
+.admin-layout {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-layout .admin-layout-content {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden;
+}
+
+.admin-layout .dashboard-page {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-layout .dashboard-main {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden;
+}
+
+.admin-layout .dashboard-header {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-layout .dashboard-content {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-layout .users-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-layout .users-table-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+.admin-layout .users-table {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Desktop: never subtract another sidebar width from Admin pages */
+@media (min-width: 1101px) {
+  .admin-layout .dashboard-main {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .admin-layout .dashboard-content {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/* Mobile: keep the shared AdminLayout drawer behavior */
+@media (max-width: 768px) {
+  .admin-layout .dashboard-page,
+  .admin-layout .dashboard-main,
+  .admin-layout .dashboard-content {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+}
+
