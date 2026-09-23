@@ -3,869 +3,1020 @@ import {
     useMemo,
     useState,
   } from "react";
+  
   import {
-    getAttendanceReport,
-    getStudents,
-    getCourses,
-    getSections,
-    exportAttendanceReport,
+    getRooms,
+    createRoom,
+    updateRoom,
+    deleteRoom,
   } from "../../services/api";
   
-  import "./Reports.css";
+  import "./Rooms.css";
   
   
   /* =========================================================
-     HELPERS
+     ICON
   ========================================================= */
   
-  function getSavedUser() {
-    try {
-      return JSON.parse(
-        localStorage.getItem("user") ||
-          "null"
-      );
-    } catch {
-      return null;
+  function Icon({
+    name,
+    size = 20,
+  }) {
+    const common = {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "1.8",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+    };
+  
+    switch (name) {
+      case "dashboard":
+        return (
+          <svg {...common}>
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+        );
+  
+      case "users":
+        return (
+          <svg {...common}>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        );
+  
+      case "courses":
+        return (
+          <svg {...common}>
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+          </svg>
+        );
+  
+      case "sections":
+        return (
+          <svg {...common}>
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M7 8h10" />
+            <path d="M7 12h10" />
+            <path d="M7 16h6" />
+          </svg>
+        );
+  
+      case "rooms":
+        return (
+          <svg {...common}>
+            <path d="M3 21h18" />
+            <path d="M5 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16" />
+            <path d="M16 8h3a2 2 0 0 1 2 2v11" />
+            <path d="M9 7h3" />
+            <path d="M9 11h3" />
+            <path d="M9 15h3" />
+          </svg>
+        );
+  
+      case "calendar":
+        return (
+          <svg {...common}>
+            <rect x="3" y="4" width="18" height="17" rx="2" />
+            <path d="M16 2v4" />
+            <path d="M8 2v4" />
+            <path d="M3 10h18" />
+            <path d="M8 14h.01" />
+            <path d="M12 14h.01" />
+            <path d="M16 14h.01" />
+            <path d="M8 18h.01" />
+            <path d="M12 18h.01" />
+          </svg>
+        );
+  
+      case "attendance":
+        return (
+          <svg {...common}>
+            <path d="m9 11 3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+        );
+  
+      case "reports":
+        return (
+          <svg {...common}>
+            <path d="M4 19V5" />
+            <path d="M4 19h17" />
+            <path d="m7 15 4-4 3 2 5-6" />
+          </svg>
+        );
+  
+      case "settings":
+        return (
+          <svg {...common}>
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 1.7-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.4v-.2a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.7-1.7.06-.06A1.7 1.7 0 0 0 8.4 15a1.7 1.7 0 0 0-1.56-1.03H6v-2.4h.84A1.7 1.7 0 0 0 8.4 10a1.7 1.7 0 0 0-.34-1.88L8 8.06l1.7-1.7.06.06A1.7 1.7 0 0 0 11.64 6a1.7 1.7 0 0 0 1.03-1.56V4h2.4v.44A1.7 1.7 0 0 0 16.1 6a1.7 1.7 0 0 0 1.88.34l.06-.06 1.7 1.7-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1.03H21v2.4h-.04A1.7 1.7 0 0 0 19.4 15Z" />
+          </svg>
+        );
+  
+      case "logout":
+        return (
+          <svg {...common}>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="m16 17 5-5-5-5" />
+            <path d="M21 12H9" />
+          </svg>
+        );
+  
+      case "search":
+        return (
+          <svg {...common}>
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-4-4" />
+          </svg>
+        );
+  
+      case "bell":
+        return (
+          <svg {...common}>
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+            <path d="M10 21h4" />
+          </svg>
+        );
+  
+      case "building":
+        return (
+          <svg {...common}>
+            <path d="M3 21h18" />
+            <path d="M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17" />
+            <path d="M15 9h3a1 1 0 0 1 1 1v11" />
+            <path d="M8 7h3" />
+            <path d="M8 11h3" />
+            <path d="M8 15h3" />
+          </svg>
+        );
+  
+      case "door":
+        return (
+          <svg {...common}>
+            <rect x="5" y="3" width="14" height="18" rx="2" />
+            <path d="M9 21V7a2 2 0 0 1 2-2h8" />
+            <circle cx="15" cy="12" r=".8" fill="currentColor" stroke="none" />
+          </svg>
+        );
+  
+      case "capacity":
+        return (
+          <svg {...common}>
+            <circle cx="9" cy="7" r="3" />
+            <path d="M3 21v-2a6 6 0 0 1 12 0v2" />
+            <circle cx="17" cy="8" r="2.5" />
+            <path d="M16 14a5 5 0 0 1 5 5v2" />
+          </svg>
+        );
+  
+      case "classroom":
+        return (
+          <svg {...common}>
+            <rect x="3" y="4" width="18" height="13" rx="2" />
+            <path d="M8 21h8" />
+            <path d="M12 17v4" />
+          </svg>
+        );
+  
+      case "lab":
+        return (
+          <svg {...common}>
+            <path d="M9 3h6" />
+            <path d="M10 3v6l-5 9a2 2 0 0 0 1.75 3h10.5A2 2 0 0 0 19 18l-5-9V3" />
+            <path d="M8 15h8" />
+          </svg>
+        );
+  
+      case "location":
+        return (
+          <svg {...common}>
+            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+            <circle cx="12" cy="10" r="2.5" />
+          </svg>
+        );
+  
+      case "plus":
+        return (
+          <svg {...common}>
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+        );
+  
+      case "edit":
+        return (
+          <svg {...common}>
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+          </svg>
+        );
+  
+      case "trash":
+        return (
+          <svg {...common}>
+            <path d="M3 6h18" />
+            <path d="M8 6V4h8v2" />
+            <path d="M19 6l-1 15H6L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+          </svg>
+        );
+  
+      case "refresh":
+        return (
+          <svg {...common}>
+            <path d="M20 11a8 8 0 0 0-14.9-4" />
+            <path d="M4 4v5h5" />
+            <path d="M4 13a8 8 0 0 0 14.9 4" />
+            <path d="M20 20v-5h-5" />
+          </svg>
+        );
+  
+      case "chevron":
+        return (
+          <svg {...common}>
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        );
+  
+      case "close":
+        return (
+          <svg {...common}>
+            <path d="M6 6l12 12" />
+            <path d="M18 6 6 18" />
+          </svg>
+        );
+  
+      default:
+        return null;
     }
-  }
-  
-  
-  function formatDate(value) {
-    if (!value) {
-      return "—";
-    }
-  
-    const date =
-      new Date(value);
-  
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return String(value);
-    }
-  
-    return date.toLocaleDateString(
-      "en-GB",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  }
-  
-  
-  function formatTime(value) {
-    if (!value) {
-      return "—";
-    }
-  
-    const date =
-      new Date(value);
-  
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return String(value);
-    }
-  
-    return date.toLocaleTimeString(
-      "en-US",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    );
-  }
-  
-  
-  function getStudentName(record) {
-    return (
-      record.student_name ||
-      `${record.first_name || ""} ${
-        record.last_name || ""
-      }`.trim() ||
-      "Unknown Student"
-    );
-  }
-  
-  
-  function getStatus(record) {
-    return String(
-      record.attendance_status ||
-        record.status ||
-        "recorded"
-    ).toLowerCase();
   }
   
   
   /* =========================================================
-     MAIN COMPONENT
+     ROOM TYPE
   ========================================================= */
   
-  export default function Reports() {
-    const user =
-      getSavedUser();
+  function getRoomTypeLabel(type) {
+    switch (type) {
+      case "lab":
+        return "Laboratory";
   
+      case "hall":
+        return "Hall";
+  
+      case "classroom":
+        return "Classroom";
+  
+      default:
+        return type || "Unknown";
+    }
+  }
+  
+  
+  /* =========================================================
+     ROOM TYPE ICON
+  ========================================================= */
+  
+  function RoomTypeIcon({
+    type,
+  }) {
+    if (type === "lab") {
+      return <Icon name="lab" size={15} />;
+    }
+  
+    if (type === "classroom") {
+      return <Icon name="classroom" size={15} />;
+    }
+  
+    return <Icon name="building" size={15} />;
+  }
+  
+  
+  /* =========================================================
+     MAIN
+  ========================================================= */
+  
+  function Rooms() {
   
     /* =======================================================
        STATE
     ======================================================= */
   
-    const [
-      records,
-      setRecords,
-    ] = useState([]);
+    const [rooms, setRooms] = useState([]);
   
-    const [
-      students,
-      setStudents,
-    ] = useState([]);
+    const [loading, setLoading] =
+      useState(true);
   
-    const [
-      courses,
-      setCourses,
-    ] = useState([]);
+    const [saving, setSaving] =
+      useState(false);
   
-    const [
-      sections,
-      setSections,
-    ] = useState([]);
+    const [deletingId, setDeletingId] =
+      useState(null);
   
-    const [
-      loading,
-      setLoading,
-    ] = useState(true);
+    const [search, setSearch] =
+      useState("");
   
-    const [
-      error,
-      setError,
-    ] = useState("");
+    const [buildingFilter, setBuildingFilter] =
+      useState("all");
   
+    const [typeFilter, setTypeFilter] =
+      useState("all");
   
-    const [
-      courseId,
-      setCourseId,
-    ] = useState("");
+    const [locationFilter, setLocationFilter] =
+      useState("all");
   
-    const [
-      sectionId,
-      setSectionId,
-    ] = useState("");
+    const [activeBuilding, setActiveBuilding] =
+      useState("all");
   
-    const [
-      startDate,
-      setStartDate,
-    ] = useState("");
+    const [error, setError] =
+      useState("");
   
-    const [
-      endDate,
-      setEndDate,
-    ] = useState("");
+    const [showModal, setShowModal] =
+      useState(false);
+  
+    const [editingRoom, setEditingRoom] =
+      useState(null);
+  
+    const [form, setForm] = useState({
+      building: "",
+      roomName: "",
+      roomType: "classroom",
+      capacity: 40,
+      latitude: "",
+      longitude: "",
+    });
+  
+    /* =======================================================
+       USER
+    ======================================================= */
+  
+    const [user] = useState(() => {
+      try {
+        return JSON.parse(
+          localStorage.getItem("user")
+        );
+      } catch {
+        return null;
+      }
+    });
+  
+    const firstName =
+      user?.first_name ||
+      user?.firstName ||
+      "Admin";
+  
+    const lastName =
+      user?.last_name ||
+      user?.lastName ||
+      "";
+  
+    const displayName =
+      `${firstName} ${lastName}`.trim();
   
   
     /* =======================================================
-       LOAD REPORT
+       LOAD ROOMS
     ======================================================= */
   
-    async function loadReport() {
-  
+    const loadRooms = async () => {
       try {
-  
         setLoading(true);
-  
         setError("");
   
+        const data =
+          await getRooms();
   
-        const [
-          reportResponse,
-          studentsResponse,
-          coursesResponse,
-          sectionsResponse,
-        ] = await Promise.all([
+        const normalized =
+          Array.isArray(data)
+            ? data
+            : Array.isArray(data?.rooms)
+              ? data.rooms
+              : Array.isArray(data?.data)
+                ? data.data
+                : [];
   
-          getAttendanceReport({
-            courseId,
-            sectionId,
-            startDate,
-            endDate,
-          }),
-  
-          getStudents(),
-  
-          getCourses(),
-  
-          getSections(),
-  
-        ]);
-  
-  
-        const reportRecords =
-          Array.isArray(
-            reportResponse?.records
-          )
-            ? reportResponse.records
-            : [];
-  
-  
-        const studentList =
-          Array.isArray(
-            studentsResponse
-          )
-            ? studentsResponse
-            : Array.isArray(
-                studentsResponse?.students
-              )
-            ? studentsResponse.students
-            : Array.isArray(
-                studentsResponse?.data
-              )
-            ? studentsResponse.data
-            : [];
-  
-  
-        const courseList =
-          Array.isArray(
-            coursesResponse
-          )
-            ? coursesResponse
-            : Array.isArray(
-                coursesResponse?.courses
-              )
-            ? coursesResponse.courses
-            : Array.isArray(
-                coursesResponse?.data
-              )
-            ? coursesResponse.data
-            : [];
-  
-  
-        const sectionList =
-          Array.isArray(
-            sectionsResponse
-          )
-            ? sectionsResponse
-            : Array.isArray(
-                sectionsResponse?.sections
-              )
-            ? sectionsResponse.sections
-            : Array.isArray(
-                sectionsResponse?.data
-              )
-            ? sectionsResponse.data
-            : [];
-  
-  
-        setRecords(
-          reportRecords
-        );
-  
-        setStudents(
-          studentList
-        );
-  
-        setCourses(
-          courseList
-        );
-  
-        setSections(
-          sectionList
-        );
+        setRooms(normalized);
   
       } catch (err) {
-  
         console.error(
-          "Reports error:",
+          "Rooms load error:",
           err
         );
   
         setError(
-          err.message ||
-            "Failed to load reports."
+          err?.message ||
+          "Failed to load rooms."
         );
   
       } finally {
-  
         setLoading(false);
-  
       }
-  
-    }
+    };
   
   
     useEffect(() => {
+      loadRooms();
+    }, []);
   
-      loadReport();
   
+    /* =======================================================
+       OPTIONS
+    ======================================================= */
+  
+    const buildings = useMemo(() => {
+      return [
+        ...new Set(
+          rooms
+            .map(
+              (room) =>
+                room.building
+            )
+            .filter(Boolean)
+        ),
+      ].sort();
+    }, [rooms]);
+  
+  
+    const roomTypes = useMemo(() => {
+      return [
+        ...new Set(
+          rooms
+            .map(
+              (room) =>
+                room.room_type
+            )
+            .filter(Boolean)
+        ),
+      ];
+    }, [rooms]);
+  
+  
+    const locationOptions = useMemo(() => {
+      const locations =
+        rooms
+          .map((room) => {
+            if (
+              room.latitude !== null &&
+              room.latitude !== undefined &&
+              room.longitude !== null &&
+              room.longitude !== undefined
+            ) {
+              return "set";
+            }
+  
+            return "not-set";
+          });
+  
+      return [
+        ...new Set(locations),
+      ];
+    }, [rooms]);
+  
+  
+    /* =======================================================
+       STATS
+    ======================================================= */
+  
+    const stats = useMemo(() => {
+      const totalCapacity =
+        rooms.reduce(
+          (sum, room) =>
+            sum +
+            Number(room.capacity || 0),
+          0
+        );
+  
+      const classroomCount =
+        rooms.filter(
+          (room) =>
+            room.room_type ===
+            "classroom"
+        ).length;
+  
+      const laboratoryCount =
+        rooms.filter(
+          (room) =>
+            room.room_type ===
+            "lab"
+        ).length;
+  
+      const hallCount =
+        rooms.filter(
+          (room) =>
+            room.room_type ===
+            "hall"
+        ).length;
+  
+      return {
+        totalBuildings:
+          buildings.length,
+  
+        totalRooms:
+          rooms.length,
+  
+        totalCapacity,
+  
+        classroomCount,
+  
+        laboratoryCount,
+  
+        hallCount,
+  
+        averageCapacity:
+          rooms.length
+            ? Math.round(
+                totalCapacity /
+                  rooms.length
+              )
+            : 0,
+      };
     }, [
-      courseId,
-      sectionId,
-      startDate,
-      endDate,
+      rooms,
+      buildings,
     ]);
   
   
     /* =======================================================
-       SUMMARY
+       FILTER
     ======================================================= */
   
-    const summary =
+    const filteredRooms =
       useMemo(() => {
+        const value =
+          search
+            .trim()
+            .toLowerCase();
   
-        const totalRecords =
-          records.length;
+        return rooms.filter(
+          (room) => {
+            const matchesSearch =
+              !value ||
+              [
+                room.building,
+                room.room_name,
+                room.room_type,
+                room.capacity,
+              ]
+                .filter(
+                  (item) =>
+                    item !==
+                    null &&
+                    item !==
+                    undefined
+                )
+                .join(" ")
+                .toLowerCase()
+                .includes(value);
   
+            const matchesBuilding =
+              buildingFilter ===
+                "all" ||
+              room.building ===
+                buildingFilter;
   
-        const present =
-          records.filter(
-            (item) =>
-              getStatus(item) ===
-              "present"
-          ).length;
+            const matchesType =
+              typeFilter ===
+                "all" ||
+              room.room_type ===
+                typeFilter;
   
+            const hasLocation =
+              room.latitude !==
+                null &&
+              room.latitude !==
+                undefined &&
+              room.longitude !==
+                null &&
+              room.longitude !==
+                undefined;
   
-        const late =
-          records.filter(
-            (item) =>
-              getStatus(item) ===
-              "late"
-          ).length;
-  
-  
-        const absent =
-          records.filter(
-            (item) =>
-              getStatus(item) ===
-              "absent"
-          ).length;
-  
-  
-        const excused =
-          records.filter(
-            (item) =>
-              getStatus(item) ===
-              "excused"
-          ).length;
-  
-  
-        const total =
-          present +
-          late +
-          absent +
-          excused;
-  
-  
-        const attendanceRate =
-          total > 0
-            ? (
-                ((present + late) /
-                  total) *
-                100
-              ).toFixed(1)
-            : "0.0";
-  
-  
-        return {
-          totalStudents:
-            students.length,
-  
-          totalRecords,
-  
-          present,
-  
-          late,
-  
-          absent,
-  
-          excused,
-  
-          attendanceRate,
-        };
-  
-      }, [
-        records,
-        students,
-      ]);
-  
-  
-    /* =======================================================
-       TREND
-    ======================================================= */
-  
-    const trend =
-      useMemo(() => {
-  
-        const map =
-          new Map();
-  
-  
-        records.forEach(
-          (record) => {
-  
-            const date =
-              record.session_date;
-  
-            if (!date) {
-              return;
-            }
-  
-  
-            if (
-              !map.has(date)
-            ) {
-  
-              map.set(
-                date,
-                {
-                  date,
-                  present: 0,
-                  absent: 0,
-                  late: 0,
-                }
+            const matchesLocation =
+              locationFilter ===
+                "all" ||
+              (
+                locationFilter ===
+                  "set" &&
+                hasLocation
+              ) ||
+              (
+                locationFilter ===
+                  "not-set" &&
+                !hasLocation
               );
   
-            }
+            const matchesTab =
+              activeBuilding ===
+                "all" ||
+              room.building ===
+                activeBuilding;
   
-  
-            const item =
-              map.get(date);
-  
-  
-            const status =
-              getStatus(record);
-  
-  
-            if (
-              status ===
-              "present"
-            ) {
-  
-              item.present++;
-  
-            } else if (
-              status ===
-              "absent"
-            ) {
-  
-              item.absent++;
-  
-            } else if (
-              status ===
-              "late"
-            ) {
-  
-              item.late++;
-  
-            }
-  
+            return (
+              matchesSearch &&
+              matchesBuilding &&
+              matchesType &&
+              matchesLocation &&
+              matchesTab
+            );
           }
         );
-  
-  
-        return Array.from(
-          map.values()
-        )
-          .sort(
-            (a, b) =>
-              new Date(a.date) -
-              new Date(b.date)
-          )
-          .slice(-10);
-  
       }, [
-        records,
+        rooms,
+        search,
+        buildingFilter,
+        typeFilter,
+        locationFilter,
+        activeBuilding,
       ]);
   
   
     /* =======================================================
-       COURSE ANALYSIS
+       RECENT ROOMS
     ======================================================= */
   
-    const courseStats =
+    const recentRooms =
       useMemo(() => {
-  
-        const map =
-          new Map();
-  
-  
-        records.forEach(
-          (record) => {
-  
-            const code =
-              record.course_code ||
-              record.course_name ||
-              "Unknown";
-  
-  
-            if (
-              !map.has(code)
-            ) {
-  
-              map.set(
-                code,
-                {
-                  code,
-                  present: 0,
-                  late: 0,
-                  absent: 0,
-                }
-              );
-  
-            }
-  
-  
-            const item =
-              map.get(code);
-  
-  
-            const status =
-              getStatus(record);
-  
-  
-            if (
-              status ===
-              "present"
-            ) {
-  
-              item.present++;
-  
-            }
-  
-            if (
-              status ===
-              "late"
-            ) {
-  
-              item.late++;
-  
-            }
-  
-            if (
-              status ===
-              "absent"
-            ) {
-  
-              item.absent++;
-  
-            }
-  
-          }
-        );
-  
-  
-        return Array.from(
-          map.values()
-        )
-          .map(
-            (item) => {
-  
-              const total =
-                item.present +
-                item.late +
-                item.absent;
-  
-  
-              return {
-                ...item,
-  
-                percentage:
-                  total > 0
-                    ? Math.round(
-                        ((item.present +
-                          item.late) /
-                          total) *
-                          100
-                      )
-                    : 0,
-              };
-  
-            }
-          )
-          .sort(
-            (a, b) =>
-              b.percentage -
-              a.percentage
-          )
-          .slice(0, 5);
-  
-      }, [
-        records,
-      ]);
-  
-  
-    /* =======================================================
-       TOP ABSENT STUDENTS
-    ======================================================= */
-  
-    const topAbsent =
-      useMemo(() => {
-  
-        const map =
-          new Map();
-  
-  
-        records.forEach(
-          (record) => {
-  
-            const status =
-              getStatus(record);
-  
-  
-            const studentId =
-              record.student_id ||
-              record.student_code ||
-              getStudentName(
-                record
-              );
-  
-  
-            if (
-              !map.has(studentId)
-            ) {
-  
-              map.set(
-                studentId,
-                {
-                  id: studentId,
-  
-                  name:
-                    getStudentName(
-                      record
-                    ),
-  
-                  absent: 0,
-  
-                  total: 0,
-  
-                  attended: 0,
-                }
-              );
-  
-            }
-  
-  
-            const item =
-              map.get(studentId);
-  
-  
-            item.total++;
-  
-  
-            if (
-              status ===
-              "absent"
-            ) {
-  
-              item.absent++;
-  
-            }
-  
-  
-            if (
-              status === "present" ||
-              status === "late"
-            ) {
-  
-              item.attended++;
-  
-            }
-  
-          }
-        );
-  
-  
-        return Array.from(
-          map.values()
-        )
-          .map(
-            (item) => ({
-  
-              ...item,
-  
-              attendanceRate:
-                item.total > 0
-                  ? Math.round(
-                      (item.attended /
-                        item.total) *
-                        100
-                    )
-                  : 0,
-  
-            })
-          )
-          .filter(
-            (item) =>
-              item.absent > 0
-          )
-          .sort(
-            (a, b) =>
-              b.absent -
-              a.absent
-          )
-          .slice(0, 5);
-  
-      }, [
-        records,
-      ]);
-  
-  
-    /* =======================================================
-       RECENT
-    ======================================================= */
-  
-    const recentRecords =
-      useMemo(() => {
-  
         return [
-          ...records,
-        ]
-          .sort(
-            (a, b) =>
-              new Date(
-                b.scanned_at ||
-                  b.session_date ||
-                  0
-              ) -
-              new Date(
-                a.scanned_at ||
-                  a.session_date ||
-                  0
-              )
-          )
-          .slice(0, 5);
-  
-      }, [
-        records,
-      ]);
+          ...rooms,
+        ].sort(
+          (a, b) =>
+            Number(b.id || 0) -
+            Number(a.id || 0)
+        ).slice(0, 3);
+      }, [rooms]);
   
   
     /* =======================================================
-       MAX TREND VALUE
+       INPUT
     ======================================================= */
   
-    const trendMax =
-      Math.max(
-        1,
-        ...trend.map(
-          (item) =>
-            Math.max(
-              item.present,
-              item.absent,
-              item.late
-            )
-        )
-      );
+    const handleInputChange =
+      (event) => {
+        const {
+          name,
+          value,
+        } = event.target;
+  
+        setForm(
+          (previous) => ({
+            ...previous,
+            [name]: value,
+          })
+        );
+      };
   
   
     /* =======================================================
-       CLEAR FILTERS
+       CREATE MODAL
     ======================================================= */
   
-    function clearFilters() {
+    const openCreateModal =
+      () => {
+        setEditingRoom(null);
   
-      setCourseId("");
-  
-      setSectionId("");
-  
-      setStartDate("");
-  
-      setEndDate("");
-  
-    }
-  
-  
-    /* =======================================================
-       EXPORT
-    ======================================================= */
-  
-    async function handleExport() {
-  
-      try {
-  
-        await exportAttendanceReport({
-  
-          courseId,
-  
-          sectionId,
-  
-          startDate,
-  
-          endDate,
-  
+        setForm({
+          building:
+            buildings[0] ||
+            "",
+          roomName: "",
+          roomType:
+            "classroom",
+          capacity: 40,
+          latitude: "",
+          longitude: "",
         });
   
-      } catch (err) {
+        setError("");
+        setShowModal(true);
+      };
   
-        setError(
-          err.message ||
-            "Could not export report."
-        );
   
-      }
+    /* =======================================================
+       EDIT MODAL
+    ======================================================= */
   
-    }
+    const openEditModal =
+      (room) => {
+        setEditingRoom(room);
+  
+        setForm({
+          building:
+            room.building ||
+            "",
+  
+          roomName:
+            room.room_name ||
+            "",
+  
+          roomType:
+            room.room_type ||
+            "classroom",
+  
+          capacity:
+            room.capacity ||
+            40,
+  
+          latitude:
+            room.latitude ??
+            "",
+  
+          longitude:
+            room.longitude ??
+            "",
+        });
+  
+        setError("");
+        setShowModal(true);
+      };
+  
+  
+    /* =======================================================
+       CLOSE MODAL
+    ======================================================= */
+  
+    const closeModal =
+      () => {
+        if (saving) {
+          return;
+        }
+  
+        setShowModal(false);
+        setEditingRoom(null);
+      };
+  
+  
+    /* =======================================================
+       SAVE ROOM
+    ======================================================= */
+  
+    const handleSubmit =
+      async (event) => {
+        event.preventDefault();
+  
+        const building =
+          form.building.trim();
+  
+        const roomName =
+          form.roomName.trim();
+  
+        const capacity =
+          Number(form.capacity);
+  
+        if (!building) {
+          setError(
+            "Please enter a building name."
+          );
+          return;
+        }
+  
+        if (!roomName) {
+          setError(
+            "Please enter a room name."
+          );
+          return;
+        }
+  
+        if (
+          !capacity ||
+          capacity <= 0
+        ) {
+          setError(
+            "Capacity must be greater than 0."
+          );
+          return;
+        }
+  
+        try {
+          setSaving(true);
+          setError("");
+  
+          const payload = {
+            building,
+  
+            roomName,
+  
+            roomType:
+              form.roomType,
+  
+            capacity,
+  
+            latitude:
+              form.latitude === ""
+                ? null
+                : Number(
+                    form.latitude
+                  ),
+  
+            longitude:
+              form.longitude === ""
+                ? null
+                : Number(
+                    form.longitude
+                  ),
+          };
+  
+          if (editingRoom) {
+            await updateRoom(
+              editingRoom.id,
+              payload
+            );
+          } else {
+            await createRoom(
+              payload
+            );
+          }
+  
+          await loadRooms();
+  
+          setShowModal(false);
+          setEditingRoom(null);
+  
+        } catch (err) {
+          console.error(
+            "Save room error:",
+            err
+          );
+  
+          setError(
+            err?.message ||
+            "Failed to save room."
+          );
+  
+        } finally {
+          setSaving(false);
+        }
+      };
+  
+  
+    /* =======================================================
+       DELETE
+    ======================================================= */
+  
+    const handleDelete =
+      async (room) => {
+        const confirmed =
+          window.confirm(
+            `Are you sure you want to delete "${room.room_name}"?`
+          );
+  
+        if (!confirmed) {
+          return;
+        }
+  
+        try {
+          setDeletingId(
+            room.id
+          );
+  
+          setError("");
+  
+          await deleteRoom(
+            room.id
+          );
+  
+          await loadRooms();
+  
+        } catch (err) {
+          console.error(
+            "Delete room error:",
+            err
+          );
+  
+          setError(
+            err?.message ||
+            "Failed to delete room."
+          );
+  
+        } finally {
+          setDeletingId(null);
+        }
+      };
+  
+  
+    /* =======================================================
+       RESET FILTERS
+    ======================================================= */
+  
+    const resetFilters =
+      () => {
+        setSearch("");
+        setBuildingFilter("all");
+        setTypeFilter("all");
+        setLocationFilter("all");
+        setActiveBuilding("all");
+      };
     /* =======================================================
        RENDER
     ======================================================= */
   
     return (
-  
-      <div className="reports-page">
-        {/* =================================================
+      <div className="rooms-page">
+  {/* ===================================================
             MAIN
-        ================================================= */}
+        =================================================== */}
   
-        <main className="reports-main">
+        <main className="rooms-main">
   
           {/* HEADER */}
   
-          <header className="reports-topbar">
+          <header className="rooms-header">
   
-            <div className="reports-search">
-              🔎
-              <input
-                placeholder="Search students, courses, sections..."
+            <div className="rooms-breadcrumb">
+              <span>
+                Home
+              </span>
+  
+              <Icon
+                name="chevron"
+                size={14}
               />
+  
+              <strong>
+                Rooms
+              </strong>
             </div>
   
   
-            <div className="reports-user">
-  
-              <span className="reports-bell">
-                🔔
-                <b>3</b>
-              </span>
-  
-              <div className="reports-avatar">
-                {
-                  (
-                    user?.first_name ||
-                    "S"
-                  )
-                    .charAt(0)
-                    .toUpperCase()
-                }
-              </div>
+            <div className="rooms-header-row">
   
               <div>
   
-                <strong>
-                  {
-                    user
-                      ? `${user.first_name || ""} ${
-                          user.last_name || ""
-                        }`.trim()
-                      : "System Admin"
-                  }
-                </strong>
+                <h1>
+                  Rooms
+                </h1>
   
-                <span>
-                  Administrator
-                </span>
+                <p>
+                  Manage classrooms, labs and halls across the campus
+                </p>
+  
+              </div>
+  
+  
+              <div className="rooms-header-actions">
+  
+                <button
+                  className="header-icon-button"
+                  title="Search"
+                  onClick={() =>
+                    document
+                      .getElementById(
+                        "rooms-search-input"
+                      )
+                      ?.focus()
+                  }
+                >
+                  <Icon
+                    name="search"
+                  />
+                </button>
+  
+  
+                <button
+                  className="header-icon-button notification-button"
+                  title="Notifications"
+                >
+                  <Icon
+                    name="bell"
+                  />
+  
+                  <span>
+                    3
+                  </span>
+                </button>
+  
+  
+                <div className="header-admin">
+  
+                  <div className="header-admin-avatar">
+                    {firstName
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
+  
+                  <div>
+  
+                    <strong>
+                      {displayName}
+                    </strong>
+  
+                    <span>
+                      Administrator
+                    </span>
+  
+                  </div>
+  
+                </div>
   
               </div>
   
@@ -876,684 +1027,540 @@ import {
   
           {/* CONTENT */}
   
-          <section className="reports-content">
+          <section className="rooms-content">
   
-            <div className="reports-heading">
   
-              <div>
+            {/* ===============================================
+                ERROR
+            =============================================== */}
   
-                <div className="reports-title-icon">
-                  ▥
+            {error && !showModal && (
+              <div className="rooms-error">
+  
+                <strong>
+                  Something went wrong
+                </strong>
+  
+                <span>
+                  {error}
+                </span>
+  
+                <button
+                  onClick={
+                    loadRooms
+                  }
+                >
+                  <Icon
+                    name="refresh"
+                    size={15}
+                  />
+  
+                  Retry
+                </button>
+  
+              </div>
+            )}
+  
+  
+            {/* ===============================================
+                STAT CARDS
+            =============================================== */}
+  
+            <div className="rooms-stats-grid">
+  
+              <div className="room-stat-card">
+  
+                <div className="room-stat-icon blue">
+                  <Icon
+                    name="building"
+                  />
                 </div>
   
                 <div>
   
-                  <h1>
-                    Reports
-                  </h1>
+                  <strong>
+                    {stats.totalBuildings}
+                  </strong>
+  
+                  <span>
+                    Total Buildings
+                  </span>
+  
+                  <small>
+                    Campus buildings
+                  </small>
+  
+                </div>
+  
+              </div>
+  
+  
+              <div className="room-stat-card">
+  
+                <div className="room-stat-icon purple">
+                  <Icon
+                    name="door"
+                  />
+                </div>
+  
+                <div>
+  
+                  <strong>
+                    {stats.totalRooms}
+                  </strong>
+  
+                  <span>
+                    Total Rooms
+                  </span>
+  
+                  <small>
+                    Classrooms & labs
+                  </small>
+  
+                </div>
+  
+              </div>
+  
+  
+              <div className="room-stat-card">
+  
+                <div className="room-stat-icon green">
+                  <Icon
+                    name="capacity"
+                  />
+                </div>
+  
+                <div>
+  
+                  <strong>
+                    {stats.totalCapacity}
+                  </strong>
+  
+                  <span>
+                    Total Capacity
+                  </span>
+  
+                  <small>
+                    Across all rooms
+                  </small>
+  
+                </div>
+  
+              </div>
+  
+  
+              <div className="room-stat-card">
+  
+                <div className="room-stat-icon orange">
+                  <Icon
+                    name="classroom"
+                  />
+                </div>
+  
+                <div>
+  
+                  <strong>
+                    {stats.classroomCount}
+                  </strong>
+  
+                  <span>
+                    Classrooms
+                  </span>
+  
+                  <small>
+                    Regular classrooms
+                  </small>
+  
+                </div>
+  
+              </div>
+  
+  
+              <div className="room-stat-card">
+  
+                <div className="room-stat-icon violet">
+                  <Icon
+                    name="lab"
+                  />
+                </div>
+  
+                <div>
+  
+                  <strong>
+                    {stats.laboratoryCount}
+                  </strong>
+  
+                  <span>
+                    Laboratories
+                  </span>
+  
+                  <small>
+                    Specialized labs
+                  </small>
+  
+                </div>
+  
+              </div>
+  
+            </div>
+  
+  
+            {/* ===============================================
+                MAIN MANAGEMENT PANEL
+            =============================================== */}
+  
+            <section className="rooms-management-card">
+  
+  
+              {/* PANEL HEADER */}
+  
+              <div className="rooms-management-header">
+  
+                <div>
+  
+                  <h2>
+                    Rooms Management
+                  </h2>
   
                   <p>
-                    View attendance analytics
-                    and reports
+                    View, add, edit and manage campus rooms
                   </p>
   
                 </div>
   
-              </div>
-  
-  
-              <div className="reports-heading-actions">
-  
-                <span>
-                  / Reports
-                </span>
   
                 <button
-                  className="reports-export-btn"
+                  className="add-room-button"
                   onClick={
-                    handleExport
+                    openCreateModal
                   }
                 >
-                  ↓ Export Report
+                  <Icon
+                    name="plus"
+                    size={18}
+                  />
+  
+                  Add Room
                 </button>
   
               </div>
   
-            </div>
   
+              {/* FILTER BAR */}
   
-            {/* ERROR */}
+              <div className="rooms-filter-bar">
   
-            {error && (
+                <div className="rooms-search-box">
   
-              <div className="reports-error">
+                  <Icon
+                    name="search"
+                    size={18}
+                  />
   
-                {error}
+                  <input
+                    id="rooms-search-input"
+                    type="text"
+                    value={search}
+                    onChange={(event) =>
+                      setSearch(
+                        event.target.value
+                      )
+                    }
+                    placeholder="Search by room name, building or type..."
+                  />
   
-              </div>
+                  {search && (
+                    <button
+                      className="clear-search"
+                      onClick={() =>
+                        setSearch("")
+                      }
+                    >
+                      ×
+                    </button>
+                  )}
   
-            )}
+                </div>
   
-  
-            {/* FILTERS */}
-  
-            <section className="reports-filters">
-  
-              <div>
-  
-                <label>
-                  Course
-                </label>
   
                 <select
-                  value={courseId}
-                  onChange={(e) =>
-                    setCourseId(
-                      e.target.value
+                  value={
+                    buildingFilter
+                  }
+                  onChange={(event) =>
+                    setBuildingFilter(
+                      event.target.value
                     )
                   }
                 >
-  
-                  <option value="">
-                    All Courses
+                  <option value="all">
+                    All Buildings
                   </option>
   
-                  {courses.map(
-                    (course) => (
-  
+                  {buildings.map(
+                    (building) => (
                       <option
-                        key={
-                          course.id
-                        }
-                        value={
-                          course.id
-                        }
+                        key={building}
+                        value={building}
                       >
-                        {
-                          course.course_code ||
-                          course.course_name
-                        }
+                        {building}
                       </option>
-  
                     )
                   )}
   
                 </select>
   
-              </div>
-  
-  
-              <div>
-  
-                <label>
-                  Section
-                </label>
   
                 <select
-                  value={sectionId}
-                  onChange={(e) =>
-                    setSectionId(
-                      e.target.value
+                  value={
+                    typeFilter
+                  }
+                  onChange={(event) =>
+                    setTypeFilter(
+                      event.target.value
                     )
                   }
                 >
   
-                  <option value="">
-                    All Sections
+                  <option value="all">
+                    All Types
                   </option>
   
-                  {sections.map(
-                    (section) => (
-  
+                  {roomTypes.map(
+                    (type) => (
                       <option
-                        key={
-                          section.id
-                        }
-                        value={
-                          section.id
-                        }
+                        key={type}
+                        value={type}
                       >
-                        {
-                          section.section_name ||
-                          `Section ${section.id}`
-                        }
+                        {getRoomTypeLabel(
+                          type
+                        )}
                       </option>
-  
                     )
                   )}
   
                 </select>
   
-              </div>
   
-  
-              <div>
-  
-                <label>
-                  From Date
-                </label>
-  
-                <input
-                  type="date"
+                <select
                   value={
-                    startDate
+                    locationFilter
                   }
-                  onChange={(e) =>
-                    setStartDate(
-                      e.target.value
+                  onChange={(event) =>
+                    setLocationFilter(
+                      event.target.value
                     )
                   }
-                />
+                >
+  
+                  <option value="all">
+                    All Locations
+                  </option>
+  
+                  <option value="set">
+                    Location Set
+                  </option>
+  
+                  <option value="not-set">
+                    Location Not Set
+                  </option>
+  
+                </select>
+  
+  
+                <button
+                  className="reset-filter-button"
+                  onClick={
+                    resetFilters
+                  }
+                >
+                  <Icon
+                    name="refresh"
+                    size={16}
+                  />
+  
+                  Reset
+                </button>
   
               </div>
   
   
-              <div>
+              {/* BUILDING TABS */}
   
-                <label>
-                  To Date
-                </label>
+              <div className="rooms-tabs">
   
-                <input
-                  type="date"
-                  value={
-                    endDate
+                <button
+                  className={
+                    activeBuilding ===
+                    "all"
+                      ? "active"
+                      : ""
                   }
-                  onChange={(e) =>
-                    setEndDate(
-                      e.target.value
+                  onClick={() =>
+                    setActiveBuilding(
+                      "all"
                     )
                   }
-                />
+                >
+                  All Rooms
+  
+                  <span>
+                    {rooms.length}
+                  </span>
+                </button>
+  
+  
+                {buildings.map(
+                  (building) => {
+                    const count =
+                      rooms.filter(
+                        (room) =>
+                          room.building ===
+                          building
+                      ).length;
+  
+                    return (
+                      <button
+                        key={
+                          building
+                        }
+                        className={
+                          activeBuilding ===
+                          building
+                            ? "active"
+                            : ""
+                        }
+                        onClick={() =>
+                          setActiveBuilding(
+                            building
+                          )
+                        }
+                      >
+                        {building}
+  
+                        <span>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  }
+                )}
   
               </div>
   
   
-              <button
-                className="reports-clear-btn"
-                onClick={
-                  clearFilters
-                }
-              >
-                ↻ Clear
-              </button>
+              {/* TABLE */}
   
-            </section>
-  
-  
-            {/* STAT CARDS */}
-  
-            <div className="reports-stats">
-  
-              <StatCard
-                icon="👥"
-                title="Total Students"
-                value={
-                  summary.totalStudents
-                }
-                type="green"
-                subtitle="Registered students"
-              />
-  
-              <StatCard
-                icon="✓"
-                title="Present"
-                value={
-                  summary.present
-                }
-                type="blue"
-                subtitle={`Attendance rate: ${summary.attendanceRate}%`}
-              />
-  
-              <StatCard
-                icon="×"
-                title="Absent"
-                value={
-                  summary.absent
-                }
-                type="red"
-                subtitle={
-                  "Students absent"
-                }
-              />
-  
-              <StatCard
-                icon="◷"
-                title="Late"
-                value={
-                  summary.late
-                }
-                type="purple"
-                subtitle={
-                  "Students late"
-                }
-              />
-  
-            </div>
-  
-  
-            {/* MAIN CHART GRID */}
-  
-            <div className="reports-grid-top">
-  
-              {/* TREND */}
-  
-              <section className="reports-card reports-trend-card">
-  
-                <CardTitle
-                  icon="▥"
-                  title="Attendance Trend"
-                />
+              <div className="rooms-table-container">
   
                 {loading ? (
   
-                  <Loading />
+                  <div className="rooms-loading">
   
-                ) : trend.length === 0 ? (
-  
-                  <EmptyState
-                    text="No attendance trend data available."
-                  />
-  
-                ) : (
-  
-                  <div className="trend-chart">
-  
-                    <div className="trend-legend">
-  
-                      <span>
-                        <i className="dot present" />
-                        Present
-                      </span>
-  
-                      <span>
-                        <i className="dot absent" />
-                        Absent
-                      </span>
-  
-                      <span>
-                        <i className="dot late" />
-                        Late
-                      </span>
-  
-                    </div>
-  
-  
-                    <div className="trend-bars">
-  
-                      {trend.map(
-                        (item) => (
-  
-                          <div
-                            className="trend-column"
-                            key={
-                              item.date
-                            }
-                          >
-  
-                            <div className="trend-values">
-  
-                              <span
-                                style={{
-                                  height:
-                                    `${
-                                      (item.present /
-                                        trendMax) *
-                                      100
-                                    }%`,
-                                }}
-                                className="trend-bar present"
-                              />
-  
-                              <span
-                                style={{
-                                  height:
-                                    `${
-                                      (item.absent /
-                                        trendMax) *
-                                      100
-                                    }%`,
-                                }}
-                                className="trend-bar absent"
-                              />
-  
-                              <span
-                                style={{
-                                  height:
-                                    `${
-                                      (item.late /
-                                        trendMax) *
-                                      100
-                                    }%`,
-                                }}
-                                className="trend-bar late"
-                              />
-  
-                            </div>
-  
-                            <small>
-                              {
-                                formatDate(
-                                  item.date
-                                )
-                              }
-                            </small>
-  
-                          </div>
-  
-                        )
-                      )}
-  
-                    </div>
-  
-                  </div>
-  
-                )}
-  
-              </section>
-  
-  
-              {/* OVERALL */}
-  
-              <section className="reports-card overall-card">
-  
-                <CardTitle
-                  icon="◔"
-                  title="Overall Attendance"
-                />
-  
-                <div
-                  className="donut"
-                  style={{
-                    "--rate":
-                      `${summary.attendanceRate}%`,
-                  }}
-                >
-  
-                  <div>
+                    <div className="rooms-spinner" />
   
                     <strong>
-                      {
-                        summary.attendanceRate
-                      }%
+                      Loading rooms...
                     </strong>
   
                     <span>
-                      Attendance Rate
+                      Fetching campus room data
                     </span>
   
                   </div>
   
-                </div>
+                ) : filteredRooms.length === 0 ? (
   
+                  <div className="rooms-empty">
   
-                <div className="overall-list">
-  
-                  <ReportLegend
-                    type="present"
-                    label="Present"
-                    value={
-                      summary.present
-                    }
-                    total={
-                      summary.present +
-                      summary.absent +
-                      summary.late
-                    }
-                  />
-  
-                  <ReportLegend
-                    type="absent"
-                    label="Absent"
-                    value={
-                      summary.absent
-                    }
-                    total={
-                      summary.present +
-                      summary.absent +
-                      summary.late
-                    }
-                  />
-  
-                  <ReportLegend
-                    type="late"
-                    label="Late"
-                    value={
-                      summary.late
-                    }
-                    total={
-                      summary.present +
-                      summary.absent +
-                      summary.late
-                    }
-                  />
-  
-                </div>
-  
-              </section>
-  
-            </div>
-  
-  
-            {/* COURSE + ABSENT */}
-  
-            <div className="reports-grid-middle">
-  
-              <section className="reports-card">
-  
-                <CardTitle
-                  icon="▣"
-                  title="Attendance by Course"
-                />
-  
-                {courseStats.length ===
-                0 ? (
-  
-                  <EmptyState
-                    text="No course attendance data available."
-                  />
-  
-                ) : (
-  
-                  <div className="course-chart">
-  
-                    {courseStats.map(
-                      (course) => (
-  
-                        <div
-                          className="course-row"
-                          key={
-                            course.code
-                          }
-                        >
-  
-                          <div className="course-label">
-  
-                            <strong>
-                              {
-                                course.percentage
-                              }%
-                            </strong>
-  
-                            <span>
-                              {
-                                course.code
-                              }
-                            </span>
-  
-                          </div>
-  
-  
-                          <div className="course-track">
-  
-                            <div
-                              className="course-fill"
-                              style={{
-                                width:
-                                  `${course.percentage}%`,
-                              }}
-                            />
-  
-                          </div>
-  
-                        </div>
-  
-                      )
-                    )}
-  
-                  </div>
-  
-                )}
-  
-              </section>
-  
-  
-              <section className="reports-card">
-  
-                <CardTitle
-                  icon="♙"
-                  title="Top Absent Students"
-                  action="View All"
-                />
-  
-                {topAbsent.length ===
-                0 ? (
-  
-                  <EmptyState
-                    text="No absent student records."
-                  />
-  
-                ) : (
-  
-                  <div className="absent-table">
-  
-                    <div className="absent-header">
-                      <span>#</span>
-                      <span>Student</span>
-                      <span>Absences</span>
-                      <span>Rate</span>
+                    <div className="rooms-empty-icon">
+                      <Icon
+                        name="rooms"
+                        size={30}
+                      />
                     </div>
   
+                    <h3>
+                      No rooms found
+                    </h3>
   
-                    {topAbsent.map(
-                      (
-                        student,
-                        index
-                      ) => (
+                    <p>
+                      {search ||
+                      buildingFilter !==
+                        "all" ||
+                      typeFilter !==
+                        "all"
+                        ? "Try changing your filters."
+                        : "Create your first campus room."}
+                    </p>
   
-                        <div
-                          className="absent-row"
-                          key={
-                            student.id
-                          }
-                        >
-  
-                          <span>
-                            {index + 1}
-                          </span>
-  
-                          <strong>
-                            {
-                              student.name
-                            }
-                          </strong>
-  
-                          <span>
-                            {
-                              student.absent
-                            }
-                          </span>
-  
-                          <b
-                            className={
-                              student.attendanceRate <
-                              60
-                                ? "rate-danger"
-                                : student.attendanceRate <
-                                  75
-                                ? "rate-warning"
-                                : "rate-normal"
-                            }
-                          >
-                            {
-                              student.attendanceRate
-                            }%
-                          </b>
-  
-                        </div>
-  
-                      )
-                    )}
+                    <button
+                      onClick={
+                        search ||
+                        buildingFilter !==
+                          "all" ||
+                        typeFilter !==
+                          "all"
+                          ? resetFilters
+                          : openCreateModal
+                      }
+                    >
+                      {search ||
+                      buildingFilter !==
+                        "all" ||
+                      typeFilter !==
+                        "all"
+                        ? "Reset Filters"
+                        : "Add Room"}
+                    </button>
   
                   </div>
   
-                )}
+                ) : (
   
-              </section>
-  
-            </div>
-  
-  
-            {/* RECENT RECORDS */}
-  
-            <section className="reports-card reports-recent">
-  
-              <CardTitle
-                icon="▤"
-                title="Recent Attendance Records"
-                action="View All"
-              />
-  
-  
-              {loading ? (
-  
-                <Loading />
-  
-              ) : recentRecords.length ===
-                0 ? (
-  
-                <EmptyState
-                  text="No attendance records found."
-                />
-  
-              ) : (
-  
-                <div className="recent-table-wrapper">
-  
-                  <table className="recent-table">
+                  <table className="rooms-table">
   
                     <thead>
   
                       <tr>
   
-                        <th>#</th>
-  
-                        <th>
-                          Student
+                        <th className="check-column">
+                          <input
+                            type="checkbox"
+                            aria-label="Select all rooms"
+                          />
                         </th>
   
                         <th>
-                          Course
+                          #
                         </th>
   
                         <th>
-                          Section
+                          ROOM
                         </th>
   
                         <th>
-                          Date
+                          BUILDING
                         </th>
   
                         <th>
-                          Status
+                          TYPE
                         </th>
   
                         <th>
-                          Check-in Time
+                          CAPACITY
                         </th>
   
                         <th>
-                          Marked By
+                          LOCATION
+                        </th>
+  
+                        <th>
+                          STATUS
+                        </th>
+  
+                        <th>
+                          ACTIONS
                         </th>
   
                       </tr>
@@ -1563,119 +1570,271 @@ import {
   
                     <tbody>
   
-                      {recentRecords.map(
-                        (
-                          record,
-                          index
-                        ) => {
+                      {filteredRooms.map(
+                        (room, index) => {
   
-                          const status =
-                            getStatus(
-                              record
-                            );
+                          const hasLocation =
+                            room.latitude !==
+                              null &&
+                            room.latitude !==
+                              undefined &&
+                            room.longitude !==
+                              null &&
+                            room.longitude !==
+                              undefined;
   
                           return (
-  
                             <tr
                               key={
-                                record.attendance_id ||
-                                index
+                                room.id
                               }
                             >
   
-                              <td>
+                              <td className="check-column">
+                                <input
+                                  type="checkbox"
+                                  aria-label={`Select ${room.room_name}`}
+                                />
+                              </td>
+  
+  
+                              <td className="index-cell">
                                 {index + 1}
                               </td>
   
-                              <td>
   
-                                <strong>
-                                  {
-                                    getStudentName(
-                                      record
-                                    )
-                                  }
-                                </strong>
-  
-                                <small>
-                                  {
-                                    record.student_code ||
-                                    record.university_id ||
-                                    ""
-                                  }
-                                </small>
-  
-                              </td>
+                              {/* ROOM */}
   
                               <td>
   
-                                <strong>
-                                  {
-                                    record.course_code ||
-                                    "—"
-                                  }
-                                </strong>
+                                <div className="room-name-cell">
   
-                                <small>
-                                  {
-                                    record.course_name ||
-                                    ""
-                                  }
-                                </small>
+                                  <div
+                                    className={
+                                      `room-thumbnail ${
+                                        room.room_type ===
+                                        "lab"
+                                          ? "lab-thumb"
+                                          : room.room_type ===
+                                            "classroom"
+                                          ? "class-thumb"
+                                          : "hall-thumb"
+                                      }`
+                                    }
+                                  >
+                                    <RoomTypeIcon
+                                      type={
+                                        room.room_type
+                                      }
+                                    />
+                                  </div>
+  
+  
+                                  <div>
+  
+                                    <strong>
+                                      {
+                                        room.room_name
+                                      }
+                                    </strong>
+  
+                                    <span>
+                                      <RoomTypeIcon
+                                        type={
+                                          room.room_type
+                                        }
+                                      />
+  
+                                      {getRoomTypeLabel(
+                                        room.room_type
+                                      )}
+                                    </span>
+  
+                                  </div>
+  
+                                </div>
   
                               </td>
+  
+  
+                              {/* BUILDING */}
   
                               <td>
-                                {
-                                  record.section_name ||
-                                  "—"
-                                }
+  
+                                <div className="building-cell">
+  
+                                  <strong>
+                                    {
+                                      room.building
+                                    }
+                                  </strong>
+  
+                                  <span>
+                                    Campus
+                                  </span>
+  
+                                </div>
+  
                               </td>
   
-                              <td>
-                                {
-                                  formatDate(
-                                    record.session_date
-                                  )
-                                }
-                              </td>
+  
+                              {/* TYPE */}
   
                               <td>
   
                                 <span
                                   className={
-                                    `status-badge ${status}`
+                                    `room-type-badge ${
+                                      room.room_type
+                                    }`
                                   }
                                 >
-                                  {
-                                    status
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                    status.slice(1)
-                                  }
+                                  <RoomTypeIcon
+                                    type={
+                                      room.room_type
+                                    }
+                                  />
+  
+                                  {getRoomTypeLabel(
+                                    room.room_type
+                                  )}
                                 </span>
   
                               </td>
   
-                              <td>
-                                {
-                                  formatTime(
-                                    record.scanned_at
-                                  )
-                                }
-                              </td>
+  
+                              {/* CAPACITY */}
   
                               <td>
-                                {
-                                  record.lecturer_name ||
-                                  "System Admin"
-                                }
+  
+                                <div className="capacity-cell">
+  
+                                  <Icon
+                                    name="capacity"
+                                    size={17}
+                                  />
+  
+                                  <strong>
+                                    {
+                                      room.capacity
+                                    }
+                                  </strong>
+  
+                                  <span>
+                                    seats
+                                  </span>
+  
+                                </div>
+  
+                              </td>
+  
+  
+                              {/* LOCATION */}
+  
+                              <td>
+  
+                                {hasLocation ? (
+  
+                                  <div className="location-cell">
+  
+                                    <Icon
+                                      name="location"
+                                      size={16}
+                                    />
+  
+                                    <span>
+                                      {Number(
+                                        room.latitude
+                                      ).toFixed(4)}
+                                      ,
+                                      {" "}
+                                      {Number(
+                                        room.longitude
+                                      ).toFixed(4)}
+                                    </span>
+  
+                                  </div>
+  
+                                ) : (
+  
+                                  <span className="not-set-location">
+                                    Not set
+                                  </span>
+  
+                                )}
+  
+                              </td>
+  
+  
+                              {/* STATUS */}
+  
+                              <td>
+  
+                                <span className="room-status available">
+  
+                                  <i />
+  
+                                  Available
+  
+                                </span>
+  
+                              </td>
+  
+  
+                              {/* ACTIONS */}
+  
+                              <td>
+  
+                                <div className="room-actions">
+  
+                                  <button
+                                    className="room-action edit"
+                                    onClick={() =>
+                                      openEditModal(
+                                        room
+                                      )
+                                    }
+                                  >
+                                    <Icon
+                                      name="edit"
+                                      size={15}
+                                    />
+  
+                                    Edit
+                                  </button>
+  
+  
+                                  <button
+                                    className="room-action delete"
+                                    onClick={() =>
+                                      handleDelete(
+                                        room
+                                      )
+                                    }
+                                    disabled={
+                                      deletingId ===
+                                      room.id
+                                    }
+                                  >
+  
+                                    <Icon
+                                      name="trash"
+                                      size={15}
+                                    />
+  
+                                    {deletingId ===
+                                    room.id
+                                      ? "Deleting..."
+                                      : "Delete"}
+  
+                                  </button>
+  
+                                </div>
+  
                               </td>
   
                             </tr>
-  
                           );
-  
                         }
                       )}
   
@@ -1683,187 +1842,753 @@ import {
   
                   </table>
   
-                </div>
+                )}
   
-              )}
+              </div>
+  
+  
+              {/* TABLE FOOTER */}
+  
+              {!loading &&
+                filteredRooms.length >
+                  0 && (
+  
+                  <div className="rooms-table-footer">
+  
+                    <span>
+                      Showing{" "}
+                      <strong>
+                        1
+                      </strong>{" "}
+                      to{" "}
+                      <strong>
+                        {
+                          filteredRooms.length
+                        }
+                      </strong>{" "}
+                      of{" "}
+                      <strong>
+                        {
+                          filteredRooms.length
+                        }
+                      </strong>{" "}
+                      rooms
+                    </span>
+  
+  
+                    <div className="rooms-pagination">
+  
+                      <button
+                        disabled
+                      >
+                        ‹
+                      </button>
+  
+                      <button
+                        className="current"
+                      >
+                        1
+                      </button>
+  
+                      <button
+                        disabled
+                      >
+                        ›
+                      </button>
+  
+                    </div>
+  
+                  </div>
+  
+                )}
   
             </section>
+  
+  
+            {/* ===============================================
+                BOTTOM ANALYTICS
+            =============================================== */}
+  
+            <div className="rooms-bottom-grid">
+  
+  
+              {/* TYPE DISTRIBUTION */}
+  
+              <section className="rooms-info-card">
+  
+                <div className="rooms-card-title">
+  
+                  <div>
+  
+                    <h3>
+                      Room Type Distribution
+                    </h3>
+  
+                    <p>
+                      Overview of room types
+                    </p>
+  
+                  </div>
+  
+                </div>
+  
+  
+                <div className="distribution-content">
+  
+                  <div
+                    className="donut-chart"
+                    style={{
+                      "--classroom":
+                        `${stats.classroomCount}`,
+                      "--lab":
+                        `${stats.laboratoryCount}`,
+                      "--hall":
+                        `${stats.hallCount}`,
+                    }}
+                  >
+  
+                    <div>
+                      <strong>
+                        {rooms.length}
+                      </strong>
+  
+                      <span>
+                        Rooms
+                      </span>
+                    </div>
+  
+                  </div>
+  
+  
+                  <div className="distribution-legend">
+  
+                    <div>
+  
+                      <span className="legend-dot purple" />
+  
+                      <span>
+                        Laboratories
+                      </span>
+  
+                      <strong>
+                        {stats.laboratoryCount}
+                      </strong>
+  
+                      <small>
+                        {rooms.length
+                          ? Math.round(
+                              (
+                                stats.laboratoryCount /
+                                rooms.length
+                              ) *
+                                100
+                            )
+                          : 0}
+                        %
+                      </small>
+  
+                    </div>
+  
+  
+                    <div>
+  
+                      <span className="legend-dot orange" />
+  
+                      <span>
+                        Classrooms
+                      </span>
+  
+                      <strong>
+                        {stats.classroomCount}
+                      </strong>
+  
+                      <small>
+                        {rooms.length
+                          ? Math.round(
+                              (
+                                stats.classroomCount /
+                                rooms.length
+                              ) *
+                                100
+                            )
+                          : 0}
+                        %
+                      </small>
+  
+                    </div>
+  
+  
+                    {stats.hallCount >
+                      0 && (
+  
+                      <div>
+  
+                        <span className="legend-dot blue" />
+  
+                        <span>
+                          Halls
+                        </span>
+  
+                        <strong>
+                          {stats.hallCount}
+                        </strong>
+  
+                        <small>
+                          {Math.round(
+                            (
+                              stats.hallCount /
+                              rooms.length
+                            ) *
+                              100
+                          )}
+                          %
+                        </small>
+  
+                      </div>
+  
+                    )}
+  
+                  </div>
+  
+                </div>
+  
+              </section>
+  
+  
+              {/* CAPACITY */}
+  
+              <section className="rooms-info-card">
+  
+                <div className="rooms-card-title">
+  
+                  <div>
+  
+                    <h3>
+                      Capacity Overview
+                    </h3>
+  
+                    <p>
+                      Room capacity statistics
+                    </p>
+  
+                  </div>
+  
+                </div>
+  
+  
+                <div className="capacity-overview">
+  
+                  <div className="capacity-overview-item">
+  
+                    <div className="capacity-overview-icon blue">
+                      <Icon
+                        name="capacity"
+                        size={25}
+                      />
+                    </div>
+  
+                    <strong>
+                      {stats.totalCapacity}
+                    </strong>
+  
+                    <span>
+                      Total Capacity
+                    </span>
+  
+                    <small>
+                      Across all rooms
+                    </small>
+  
+                  </div>
+  
+  
+                  <div className="capacity-overview-divider" />
+  
+  
+                  <div className="capacity-overview-item">
+  
+                    <div className="capacity-overview-icon green">
+                      <Icon
+                        name="reports"
+                        size={25}
+                      />
+                    </div>
+  
+                    <strong>
+                      {stats.averageCapacity}
+                    </strong>
+  
+                    <span>
+                      Average Capacity
+                    </span>
+  
+                    <small>
+                      Per room
+                    </small>
+  
+                  </div>
+  
+                </div>
+  
+              </section>
+  
+  
+              {/* RECENT ROOMS */}
+  
+              <section className="rooms-info-card recent-card">
+  
+                <div className="rooms-card-title">
+  
+                  <div>
+  
+                    <h3>
+                      Recent Rooms
+                    </h3>
+  
+                    <p>
+                      Recently added rooms
+                    </p>
+  
+                  </div>
+  
+                </div>
+  
+  
+                <div className="recent-rooms-list">
+  
+                  {recentRooms.length ===
+                  0 ? (
+  
+                    <div className="recent-empty">
+                      No rooms yet.
+                    </div>
+  
+                  ) : (
+  
+                    recentRooms.map(
+                      (room) => (
+                        <div
+                          className="recent-room-item"
+                          key={
+                            room.id
+                          }
+                        >
+  
+                          <div
+                            className={
+                              `recent-room-thumb ${
+                                room.room_type
+                              }`
+                            }
+                          >
+                            <RoomTypeIcon
+                              type={
+                                room.room_type
+                              }
+                            />
+                          </div>
+  
+  
+                          <div className="recent-room-info">
+  
+                            <strong>
+                              {
+                                room.room_name
+                              }
+                            </strong>
+  
+                            <span>
+                              {
+                                room.building
+                              }
+                              {" "}
+                              •{" "}
+                              {getRoomTypeLabel(
+                                room.room_type
+                              )}
+                            </span>
+  
+                          </div>
+  
+  
+                          <div className="recent-room-meta">
+  
+                            <strong>
+                              {
+                                room.capacity
+                              }{" "}
+                              seats
+                            </strong>
+  
+                            <span>
+                              Today
+                            </span>
+  
+                          </div>
+  
+                        </div>
+                      )
+                    )
+  
+                  )}
+  
+                </div>
+  
+              </section>
+  
+            </div>
   
           </section>
   
         </main>
   
-      </div>
   
-    );
+        {/* ===================================================
+            MODAL
+        =================================================== */}
   
-  }
+        {showModal && (
   
+          <div
+            className="rooms-modal-overlay"
+            onMouseDown={(event) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeModal();
+              }
+            }}
+          >
   
-  /* =========================================================
-     COMPONENTS
-  ========================================================= */
+            <div className="rooms-modal">
   
-  function StatCard({
-    icon,
-    title,
-    value,
-    type,
-    subtitle,
-  }) {
+              {/* MODAL HEADER */}
   
-    return (
+              <div className="rooms-modal-header">
   
-      <div className="reports-stat-card">
+                <div>
   
-        <div
-          className={
-            `stat-icon ${type}`
-          }
-        >
-          {icon}
-        </div>
+                  <div className="rooms-modal-icon">
+                    <Icon
+                      name={
+                        editingRoom
+                          ? "edit"
+                          : "plus"
+                      }
+                      size={22}
+                    />
+                  </div>
   
-        <div>
+                  <div>
   
-          <span>
-            {title}
-          </span>
+                    <h2>
+                      {editingRoom
+                        ? "Edit Room"
+                        : "Add Room"}
+                    </h2>
   
-          <strong>
-            {value}
-          </strong>
+                    <p>
+                      {editingRoom
+                        ? "Update room information"
+                        : "Create a new campus room"}
+                    </p>
   
-          <small>
-            {subtitle}
-          </small>
+                  </div>
   
-        </div>
-  
-      </div>
-  
-    );
-  
-  }
-  
-  
-  function CardTitle({
-    icon,
-    title,
-    action,
-  }) {
-  
-    return (
-  
-      <div className="reports-card-title">
-  
-        <div>
-  
-          <span>
-            {icon}
-          </span>
-  
-          <h2>
-            {title}
-          </h2>
-  
-        </div>
+                </div>
   
   
-        {action && (
+                <button
+                  className="rooms-modal-close"
+                  onClick={
+                    closeModal
+                  }
+                  disabled={
+                    saving
+                  }
+                >
+                  <Icon
+                    name="close"
+                    size={18}
+                  />
+                </button>
   
-          <button>
-            {action}
-          </button>
+              </div>
+  
+  
+              {/* FORM */}
+  
+              <form
+                onSubmit={
+                  handleSubmit
+                }
+                className="rooms-form"
+              >
+  
+                {error && (
+                  <div className="rooms-form-error">
+                    {error}
+                  </div>
+                )}
+  
+  
+                {/* BUILDING */}
+  
+                <div className="rooms-form-group">
+  
+                  <label>
+                    Building
+                  </label>
+  
+                  <input
+                    type="text"
+                    name="building"
+                    value={
+                      form.building
+                    }
+                    onChange={
+                      handleInputChange
+                    }
+                    placeholder="Example: Building A"
+                    required
+                  />
+  
+                </div>
+  
+  
+                {/* ROOM */}
+  
+                <div className="rooms-form-group">
+  
+                  <label>
+                    Room Name
+                  </label>
+  
+                  <input
+                    type="text"
+                    name="roomName"
+                    value={
+                      form.roomName
+                    }
+                    onChange={
+                      handleInputChange
+                    }
+                    placeholder="Example: LAB-1"
+                    required
+                  />
+  
+                </div>
+  
+  
+                {/* TYPE + CAPACITY */}
+  
+                <div className="rooms-form-grid">
+  
+                  <div className="rooms-form-group">
+  
+                    <label>
+                      Room Type
+                    </label>
+  
+                    <select
+                      name="roomType"
+                      value={
+                        form.roomType
+                      }
+                      onChange={
+                        handleInputChange
+                      }
+                    >
+  
+                      <option value="classroom">
+                        Classroom
+                      </option>
+  
+                      <option value="lab">
+                        Laboratory
+                      </option>
+  
+                      <option value="hall">
+                        Hall
+                      </option>
+  
+                    </select>
+  
+                  </div>
+  
+  
+                  <div className="rooms-form-group">
+  
+                    <label>
+                      Capacity
+                    </label>
+  
+                    <input
+                      type="number"
+                      name="capacity"
+                      min="1"
+                      max="10000"
+                      value={
+                        form.capacity
+                      }
+                      onChange={
+                        handleInputChange
+                      }
+                      required
+                    />
+  
+                  </div>
+  
+                </div>
+  
+  
+                {/* LOCATION */}
+  
+                <div className="rooms-location-section">
+  
+                  <div className="rooms-location-title">
+  
+                    <div>
+  
+                      <h3>
+                        Location
+                      </h3>
+  
+                      <span>
+                        Optional GPS coordinates
+                      </span>
+  
+                    </div>
+  
+                    <Icon
+                      name="location"
+                      size={19}
+                    />
+  
+                  </div>
+  
+  
+                  <div className="rooms-form-grid">
+  
+                    <div className="rooms-form-group">
+  
+                      <label>
+                        Latitude
+                        <span>
+                          Optional
+                        </span>
+                      </label>
+  
+                      <input
+                        type="number"
+                        name="latitude"
+                        step="0.0000001"
+                        value={
+                          form.latitude
+                        }
+                        onChange={
+                          handleInputChange
+                        }
+                        placeholder="31.0409"
+                      />
+  
+                    </div>
+  
+  
+                    <div className="rooms-form-group">
+  
+                      <label>
+                        Longitude
+                        <span>
+                          Optional
+                        </span>
+                      </label>
+  
+                      <input
+                        type="number"
+                        name="longitude"
+                        step="0.0000001"
+                        value={
+                          form.longitude
+                        }
+                        onChange={
+                          handleInputChange
+                        }
+                        placeholder="31.3785"
+                      />
+  
+                    </div>
+  
+                  </div>
+  
+                </div>
+  
+  
+                {/* ACTIONS */}
+  
+                <div className="rooms-modal-actions">
+  
+                  <button
+                    type="button"
+                    className="modal-cancel-button"
+                    onClick={
+                      closeModal
+                    }
+                    disabled={
+                      saving
+                    }
+                  >
+                    Cancel
+                  </button>
+  
+  
+                  <button
+                    type="submit"
+                    className="modal-save-button"
+                    disabled={
+                      saving
+                    }
+                  >
+  
+                    {saving
+                      ? (
+                        <>
+                          <span className="button-spinner" />
+                          Saving...
+                        </>
+                      )
+                      : (
+                        <>
+                          <Icon
+                            name={
+                              editingRoom
+                                ? "edit"
+                                : "plus"
+                            }
+                            size={17}
+                          />
+  
+                          {editingRoom
+                            ? "Update Room"
+                            : "Create Room"}
+                        </>
+                      )}
+  
+                  </button>
+  
+                </div>
+  
+              </form>
+  
+            </div>
+  
+          </div>
   
         )}
   
       </div>
-  
     );
-  
   }
   
-  
-  function ReportLegend({
-    type,
-    label,
-    value,
-    total,
-  }) {
-  
-    const percentage =
-      total > 0
-        ? (
-            (value /
-              total) *
-            100
-          ).toFixed(1)
-        : "0.0";
-  
-  
-    return (
-  
-      <div className="report-legend">
-  
-        <span>
-  
-          <i
-            className={
-              `dot ${type}`
-            }
-          />
-  
-          {label}
-  
-        </span>
-  
-        <strong>
-          {value}
-          <small>
-            {" "}
-            ({percentage}%)
-          </small>
-        </strong>
-  
-      </div>
-  
-    );
-  
-  }
-  
-  
-  function Loading() {
-  
-    return (
-  
-      <div className="reports-loading">
-        Loading report data...
-      </div>
-  
-    );
-  
-  }
-  
-  
-  function EmptyState({
-    text,
-  }) {
-  
-    return (
-  
-      <div className="reports-empty">
-  
-        <div>
-          ▤
-        </div>
-  
-        <p>
-          {text}
-        </p>
-  
-      </div>
-  
-    );
-  
-  }
+  export default Rooms;
