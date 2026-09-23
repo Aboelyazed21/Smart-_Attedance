@@ -546,7 +546,7 @@ export default function EnrollmentManagement() {
       minHeight: "100vh",
       width: "100%",
       minWidth: 0,
-      background: "#f5f7fb",
+      background: "#f4f7fb",
     },
 
     header: {
@@ -616,9 +616,8 @@ export default function EnrollmentManagement() {
     },
 
     primaryButton: {
-      border: "none",
-      background:
-        "linear-gradient(135deg, #1677ff, #0757d9)",
+      border: "1px solid #0f2851",
+      background: "#0f2851",
       color: "#fff",
       padding: "11px 17px",
       borderRadius: "10px",
@@ -661,8 +660,8 @@ export default function EnrollmentManagement() {
     },
 
     selectedRow: {
-      background: "#eef5ff",
-      border: "1px solid #bcd7ff",
+      background: "#e8eef7",
+      border: "1px solid #0f2851",
     },
 
     list: {
@@ -776,14 +775,14 @@ export default function EnrollmentManagement() {
               style={styles.secondaryButton}
               onClick={loadData}
             >
-              ↻ Refresh
+              Refresh
             </button>
 
             <button
               style={styles.primaryButton}
               onClick={openCreateStudent}
             >
-              + Add Student
+              Add Student
             </button>
           </div>
         </header>
@@ -1109,15 +1108,6 @@ export default function EnrollmentManagement() {
                     color: "#64748b",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: "45px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    👤
-                  </div>
-
                   <h3
                     style={{
                       color: "#243b61",
@@ -1575,7 +1565,7 @@ export default function EnrollmentManagement() {
                   color: "#64748b",
                 }}
               >
-                👤 Select a student first.
+                Select a student first.
               </div>
             ) : detailsLoading ? (
               <div
@@ -1595,7 +1585,7 @@ export default function EnrollmentManagement() {
                   color: "#64748b",
                 }}
               >
-                📚 No enrollments found.
+                No enrollments found.
               </div>
             ) : (
               <div style={styles.tableWrap}>

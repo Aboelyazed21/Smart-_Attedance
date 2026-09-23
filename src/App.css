@@ -7199,3 +7199,213 @@ button {
     min-width: 38px !important;
   }
 }
+
+/* =========================================================
+   UNIFIED AUTH (reference system: navy + flat white cards)
+   Scoped to .login-page only — no other page affected.
+========================================================= */
+
+.login-page {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.login-page .top-header {
+  padding: 18px clamp(20px, 5vw, 55px);
+}
+
+.login-page .brand-logo {
+  background: #0f2851;
+  border: 0;
+  box-shadow: 0 6px 18px rgba(15, 40, 81, 0.25);
+}
+
+.login-page .brand-logo span {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.login-page .login-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 14px 34px rgba(15, 40, 81, 0.14);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.login-page .login-card::before {
+  display: none;
+}
+
+.login-page .login-logo {
+  background: #0f2851;
+  box-shadow: 0 6px 16px rgba(15, 40, 81, 0.25);
+}
+
+.login-page .login-logo span {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.login-page .app-name {
+  color: #1e293b;
+}
+
+.login-page .app-description {
+  color: #64748b;
+}
+
+.login-page .welcome-section h3 {
+  color: #1e293b;
+}
+
+.login-page .welcome-section p {
+  color: #64748b;
+}
+
+.login-page .form-group label {
+  color: #334155;
+  font-size: 12.5px;
+}
+
+.login-page .input-container {
+  background: #f4f7fb;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.login-page .input-container:hover {
+  border-color: #cbd5e1;
+}
+
+.login-page .input-container:focus-within {
+  background: #ffffff;
+  border-color: #0f2851;
+  box-shadow: 0 0 0 3px rgba(15, 40, 81, 0.1);
+}
+
+.login-page .input-icon {
+  color: #0f2851;
+  display: grid;
+  place-items: center;
+}
+
+.login-page .input-container input {
+  color: #1e293b;
+}
+
+.login-page .input-container input::placeholder {
+  color: #94a3b8;
+}
+
+.login-page .show-password {
+  color: #64748b;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.login-page .show-password:hover {
+  background: #eef2f7;
+  color: #0f2851;
+}
+
+.login-page .forgot-password {
+  color: #0f2851;
+}
+
+.login-page .sign-in-button {
+  background: #0f2851;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(15, 40, 81, 0.22);
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.login-page .sign-in-button:hover {
+  background: #0a1c3a;
+  box-shadow: 0 10px 22px rgba(15, 40, 81, 0.3);
+  transform: translateY(-2px);
+}
+
+.login-page .sign-in-button:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.login-page .sign-in-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-page .sign-arrow {
+  display: inline-grid;
+  place-items: center;
+}
+
+.login-page .or-divider p {
+  color: #94a3b8;
+}
+
+.login-page .create-account-button {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #0f2851;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  transition: all 0.3s ease;
+}
+
+.login-page .create-account-button:hover {
+  background: #f4f7fb;
+  border-color: #0f2851;
+  transform: translateY(-2px);
+}
+
+.login-page .create-icon {
+  display: inline-grid;
+  place-items: center;
+  color: #0f2851;
+}
+
+.login-page .register-login {
+  margin-top: 14px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media (max-width: 520px) {
+  .login-page .top-header {
+    padding: 14px 16px;
+  }
+
+  .login-page .login-card {
+    border-radius: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page .sign-in-button,
+  .login-page .create-account-button,
+  .login-page .input-container,
+  .login-page .show-password {
+    transition: none;
+  }
+
+  .login-page .sign-in-button:hover,
+  .login-page .create-account-button:hover {
+    transform: none;
+  }
+}

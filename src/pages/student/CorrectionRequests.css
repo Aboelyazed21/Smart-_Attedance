@@ -5,14 +5,14 @@
 
 .correction-page {
   --correction-blue: #287cf0;
-  --correction-blue-dark: #1766cf;
-  --correction-navy: #123f7b;
-  --correction-page: #f5f8fd;
+  --correction-blue-dark: #0f2851;
+  --correction-navy: #0f2851;
+  --correction-page: #f4f7fb;
   --correction-panel: #ffffff;
-  --correction-text: #1d3658;
-  --correction-muted: #667991;
-  --correction-subtle: #8b9db4;
-  --correction-line: #dce6f1;
+  --correction-text: #1e293b;
+  --correction-muted: #64748b;
+  --correction-subtle: #94a3b8;
+  --correction-line: #e2e8f0;
   --sidebar-width: 256px;
 
   min-height: 100dvh;

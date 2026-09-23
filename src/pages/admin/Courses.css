@@ -1,14 +1,14 @@
 /* =========================================================
-   ADMIN USERS — unified reference system (navy + flat cards)
-   Scoped to .admin-users-page. Shared App.css untouched.
+   ADMIN COURSES — unified reference system (navy + flat cards)
+   Scoped to .admin-courses-page. Shared App.css untouched.
 ========================================================= */
 
-.admin-users-page,
-.admin-users-page * {
+.admin-courses-page,
+.admin-courses-page * {
   box-sizing: border-box;
 }
 
-.admin-users-page {
+.admin-courses-page {
   width: 100%;
   min-width: 0;
   min-height: 100vh;
@@ -27,38 +27,36 @@
   overflow-x: clip;
 }
 
-.admin-users-page button,
-.admin-users-page input,
-.admin-users-page select {
+.admin-courses-page button,
+.admin-courses-page input,
+.admin-courses-page select {
   font: inherit;
 }
 
-.admin-users-page button {
+.admin-courses-page button {
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.3s ease;
 }
 
-.admin-users-page button:focus-visible,
-.admin-users-page input:focus-visible,
-.admin-users-page select:focus-visible {
+.admin-courses-page button:focus-visible,
+.admin-courses-page input:focus-visible,
+.admin-courses-page select:focus-visible {
   outline: 3px solid rgba(15, 40, 81, 0.22);
   outline-offset: 2px;
 }
 
-.admin-users-page button:disabled {
+.admin-courses-page button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.admin-users-page button:active {
+.admin-courses-page button:active {
   transform: translateY(1px) scale(0.99);
 }
 
-/* ---------- Main + header ---------- */
-
-.admin-users-page .dashboard-main {
+.admin-courses-page .courses-main {
   width: 100%;
   min-width: 0;
   min-height: 100vh;
@@ -66,10 +64,9 @@
   padding: 0;
 }
 
-.admin-users-page .dashboard-header {
+.admin-courses-page .dashboard-header {
   width: 100%;
   min-width: 0;
-  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -79,7 +76,7 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.admin-users-page .dashboard-header h1 {
+.admin-courses-page .dashboard-header h1 {
   margin: 0;
   color: #1e293b;
   font-size: clamp(1.4rem, 1.1rem + 1.5vw, 1.9rem);
@@ -89,14 +86,14 @@
   overflow-wrap: break-word;
 }
 
-.admin-users-page .dashboard-header p {
+.admin-courses-page .dashboard-header p {
   margin: 7px 0 0;
   color: #64748b;
   font-size: 13.5px;
   line-height: 1.55;
 }
 
-.admin-users-page .professional-add-button {
+.admin-courses-page .professional-add-button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -113,21 +110,18 @@
   box-shadow: 0 6px 16px rgba(15, 40, 81, 0.22);
 }
 
-.admin-users-page .professional-add-button:hover:not(:disabled) {
+.admin-courses-page .professional-add-button:hover:not(:disabled) {
   background: #0a1c3a;
   border-color: #0a1c3a;
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(15, 40, 81, 0.3);
 }
 
-.admin-users-page .button-icon {
+.admin-courses-page .button-icon {
   display: inline-grid;
   place-items: center;
 }
 
-/* ---------- Content + error ---------- */
-
-.admin-users-page .dashboard-content {
+.admin-courses-page .dashboard-content {
   width: 100%;
   min-width: 0;
   max-width: 1400px;
@@ -135,7 +129,7 @@
   padding: clamp(16px, 3vw, 28px) clamp(16px, 3vw, 34px) 40px;
 }
 
-.admin-users-page .dashboard-error {
+.admin-courses-page .dashboard-error {
   display: flex;
   align-items: center;
   gap: 11px;
@@ -147,34 +141,25 @@
   background: #fee2e2;
   color: #991b1b;
   font-size: 13px;
-  line-height: 1.5;
 }
 
-.admin-users-page .dashboard-error > span {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #ef4444;
-  color: #ffffff;
-}
-
-/* ---------- Panel + toolbar ---------- */
-
-.admin-users-page .dashboard-panel,
-.admin-users-page .users-panel {
+.admin-courses-page .dashboard-panel,
+.admin-courses-page .users-panel {
   min-width: 0;
   overflow: hidden;
+  margin-bottom: 18px;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
-.admin-users-page .panel-header,
-.admin-users-page .users-toolbar {
+.admin-courses-page .dashboard-panel:last-child {
+  margin-bottom: 0;
+}
+
+.admin-courses-page .panel-header,
+.admin-courses-page .users-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -184,20 +169,22 @@
   border-bottom: 1px solid #eef2f7;
 }
 
-.admin-users-page .users-toolbar h2 {
+.admin-courses-page .panel-header h2,
+.admin-courses-page .users-toolbar h2 {
   margin: 0;
   color: #1e293b;
   font-size: 16px;
   font-weight: 800;
 }
 
-.admin-users-page .users-toolbar p {
+.admin-courses-page .panel-header p,
+.admin-courses-page .users-toolbar p {
   margin: 4px 0 0;
   color: #64748b;
   font-size: 12.5px;
 }
 
-.admin-users-page .users-search {
+.admin-courses-page .users-search {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -211,19 +198,19 @@
   transition: all 0.3s ease;
 }
 
-.admin-users-page .users-search:focus-within {
+.admin-courses-page .users-search:focus-within {
   border-color: #0f2851;
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(15, 40, 81, 0.08);
 }
 
-.admin-users-page .users-search > span {
+.admin-courses-page .users-search > span {
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
 }
 
-.admin-users-page .users-search input {
+.admin-courses-page .users-search input {
   width: 100%;
   min-width: 0;
   border: 0;
@@ -233,24 +220,22 @@
   font-size: 13px;
 }
 
-.admin-users-page .users-search input::placeholder {
+.admin-courses-page .users-search input::placeholder {
   color: #94a3b8;
 }
 
-/* ---------- Table ---------- */
-
-.admin-users-page .users-table-wrapper {
+.admin-courses-page .users-table-wrapper {
   width: 100%;
   overflow-x: auto;
 }
 
-.admin-users-page .users-table {
+.admin-courses-page .users-table {
   width: 100%;
   min-width: 860px;
   border-collapse: collapse;
 }
 
-.admin-users-page .users-table thead th {
+.admin-courses-page .users-table thead th {
   padding: 12px 14px;
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
@@ -263,7 +248,7 @@
   white-space: nowrap;
 }
 
-.admin-users-page .users-table tbody td {
+.admin-courses-page .users-table tbody td {
   padding: 13px 14px;
   border-bottom: 1px solid #eef2f7;
   color: #334155;
@@ -271,26 +256,26 @@
   vertical-align: middle;
 }
 
-.admin-users-page .users-table tbody tr:last-child td {
+.admin-courses-page .users-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
-.admin-users-page .users-table tbody tr {
+.admin-courses-page .users-table tbody tr {
   transition: background-color 0.2s ease;
 }
 
-.admin-users-page .users-table tbody tr:hover td {
+.admin-courses-page .users-table tbody tr:hover td {
   background: #f6f9fd;
 }
 
-.admin-users-page .user-cell {
+.admin-courses-page .user-cell {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 170px;
 }
 
-.admin-users-page .user-table-avatar {
+.admin-courses-page .user-table-avatar {
   width: 36px;
   height: 36px;
   flex: 0 0 auto;
@@ -303,7 +288,11 @@
   font-weight: 800;
 }
 
-.admin-users-page .user-cell strong {
+.admin-courses-page .user-table-avatar.course-avatar {
+  border-radius: 11px;
+}
+
+.admin-courses-page .user-cell strong {
   display: block;
   overflow: hidden;
   color: #1e293b;
@@ -312,81 +301,34 @@
   white-space: nowrap;
 }
 
-.admin-users-page .user-cell small {
+.admin-courses-page .user-cell small {
   display: block;
   margin-top: 2px;
   color: #94a3b8;
   font-size: 11px;
 }
 
-.admin-users-page .role-badge,
-.admin-users-page .status-badge {
+.admin-courses-page .course-code-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   min-height: 27px;
   padding: 4px 10px;
   border-radius: 999px;
+  background: #e8eef7;
+  color: #0f2851;
   font-size: 11.5px;
   font-weight: 800;
   white-space: nowrap;
 }
 
-.admin-users-page .role-badge {
-  background: #e8eef7;
-  color: #0f2851;
-}
-
-.admin-users-page .role-admin {
-  background: #0f2851;
-  color: #ffffff;
-}
-
-.admin-users-page .role-lecturer {
-  background: #e0e7ff;
-  color: #4338ca;
-}
-
-.admin-users-page .role-ta {
-  background: #f1edff;
-  color: #6d3fd4;
-}
-
-.admin-users-page .role-student {
-  background: #e8eef7;
-  color: #0f2851;
-}
-
-.admin-users-page .role-auditor {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.admin-users-page .status-badge .status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.admin-users-page .status-active {
-  background: #ecfdf5;
-  color: #10b981;
-}
-
-.admin-users-page .status-inactive {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.admin-users-page .user-actions {
+.admin-courses-page .user-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: nowrap;
 }
 
-.admin-users-page .action-button {
+.admin-courses-page .action-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -398,38 +340,31 @@
   white-space: nowrap;
 }
 
-.admin-users-page .edit-button {
+.admin-courses-page .edit-button {
   border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #0f2851;
 }
 
-.admin-users-page .edit-button:hover {
+.admin-courses-page .edit-button:hover {
   border-color: #0f2851;
   background: #f4f7fb;
   transform: translateY(-1px);
 }
 
-.admin-users-page .delete-button {
+.admin-courses-page .delete-button {
   border: 1px solid #fecaca;
   background: #ffffff;
   color: #ef4444;
 }
 
-.admin-users-page .delete-button:hover {
+.admin-courses-page .delete-button:hover {
   background: #fee2e2;
   transform: translateY(-1px);
 }
 
-.admin-users-page .action-button span {
-  display: inline-grid;
-  place-items: center;
-}
-
-/* ---------- Loading / empty ---------- */
-
-.admin-users-page .users-loading,
-.admin-users-page .users-empty {
+.admin-courses-page .users-loading,
+.admin-courses-page .users-empty {
   min-height: 240px;
   display: flex;
   flex-direction: column;
@@ -440,29 +375,29 @@
   text-align: center;
 }
 
-.admin-users-page .loading-spinner {
+.admin-courses-page .loading-spinner {
   width: 34px;
   height: 34px;
   border: 3px solid #e2e8f0;
   border-top-color: #0f2851;
   border-radius: 50%;
-  animation: admin-users-spin 0.8s linear infinite;
+  animation: admin-courses-spin 0.8s linear infinite;
 }
 
-@keyframes admin-users-spin {
+@keyframes admin-courses-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-.admin-users-page .users-loading p,
-.admin-users-page .users-empty p {
+.admin-courses-page .users-loading p,
+.admin-courses-page .users-empty p {
   margin: 0;
   color: #64748b;
   font-size: 13px;
 }
 
-.admin-users-page .empty-icon {
+.admin-courses-page .empty-icon {
   width: 54px;
   height: 54px;
   display: grid;
@@ -472,15 +407,13 @@
   color: #0f2851;
 }
 
-.admin-users-page .users-empty h3 {
+.admin-courses-page .users-empty h3 {
   margin: 4px 0 0;
   color: #1e293b;
   font-size: 15px;
 }
 
-/* ---------- Modal ---------- */
-
-.admin-users-page .modal-overlay {
+.admin-courses-page .modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -491,7 +424,7 @@
   background: rgba(15, 40, 81, 0.5);
 }
 
-.admin-users-page .user-modal {
+.admin-courses-page .user-modal {
   width: min(620px, 100%);
   max-height: calc(100dvh - 36px);
   overflow-y: auto;
@@ -500,7 +433,7 @@
   box-shadow: 0 24px 60px rgba(15, 40, 81, 0.25);
 }
 
-.admin-users-page .modal-header {
+.admin-courses-page .modal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -509,14 +442,14 @@
   border-bottom: 1px solid #eef2f7;
 }
 
-.admin-users-page .modal-header > div:first-child {
+.admin-courses-page .modal-header > div:first-child {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
 }
 
-.admin-users-page .modal-title-icon {
+.admin-courses-page .modal-title-icon {
   width: 42px;
   height: 42px;
   flex: 0 0 auto;
@@ -527,20 +460,20 @@
   color: #0f2851;
 }
 
-.admin-users-page .modal-header h2 {
+.admin-courses-page .modal-header h2 {
   margin: 0;
   color: #1e293b;
   font-size: 17px;
   font-weight: 800;
 }
 
-.admin-users-page .modal-header p {
+.admin-courses-page .modal-header p {
   margin: 4px 0 0;
   color: #64748b;
   font-size: 12.5px;
 }
 
-.admin-users-page .modal-close {
+.admin-courses-page .modal-close {
   width: 36px;
   height: 36px;
   flex: 0 0 auto;
@@ -552,54 +485,39 @@
   color: #64748b;
 }
 
-.admin-users-page .modal-close:hover {
+.admin-courses-page .modal-close:hover {
   background: #fee2e2;
   border-color: #fecaca;
   color: #ef4444;
 }
 
-.admin-users-page .user-form {
+.admin-courses-page .user-form {
   display: grid;
   gap: 13px;
   padding: 20px 22px 22px;
 }
 
-.admin-users-page .form-row {
+.admin-courses-page .form-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 13px;
   min-width: 0;
 }
 
-.admin-users-page .form-group {
+.admin-courses-page .form-group {
   min-width: 0;
   display: grid;
   gap: 6px;
 }
 
-.admin-users-page .form-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.admin-courses-page .form-group label {
   color: #334155;
   font-size: 12.5px;
   font-weight: 700;
 }
 
-.admin-users-page .optional-label {
-  min-height: 22px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 8px;
-  border-radius: 999px;
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 10.5px;
-  font-weight: 800;
-}
-
-.admin-users-page .form-group input,
-.admin-users-page .form-group select {
+.admin-courses-page .form-group input,
+.admin-courses-page .form-group select {
   width: 100%;
   min-height: 42px;
   padding: 0 11px;
@@ -611,31 +529,31 @@
   transition: all 0.3s ease;
 }
 
-.admin-users-page .form-group input:focus,
-.admin-users-page .form-group select:focus {
+.admin-courses-page .form-group input:focus,
+.admin-courses-page .form-group select:focus {
   outline: none;
   border-color: #0f2851;
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(15, 40, 81, 0.08);
 }
 
-.admin-users-page .form-group input::placeholder {
+.admin-courses-page .form-group input::placeholder {
   color: #94a3b8;
 }
 
-.admin-users-page .form-group select {
+.admin-courses-page .form-group select {
   cursor: pointer;
 }
 
-.admin-users-page .modal-actions {
+.admin-courses-page .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
 }
 
-.admin-users-page .professional-cancel-button,
-.admin-users-page .professional-save-button {
+.admin-courses-page .professional-cancel-button,
+.admin-courses-page .professional-save-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -647,105 +565,103 @@
   font-weight: 800;
 }
 
-.admin-users-page .professional-cancel-button {
+.admin-courses-page .professional-cancel-button {
   border: 1px solid #e2e8f0;
   background: #ffffff;
   color: #64748b;
 }
 
-.admin-users-page .professional-cancel-button:hover:not(:disabled) {
+.admin-courses-page .professional-cancel-button:hover:not(:disabled) {
   background: #f4f7fb;
   color: #1e293b;
 }
 
-.admin-users-page .professional-save-button {
+.admin-courses-page .professional-save-button {
   border: 1px solid #0f2851;
   background: #0f2851;
   color: #ffffff;
   box-shadow: 0 6px 16px rgba(15, 40, 81, 0.22);
 }
 
-.admin-users-page .professional-save-button:hover:not(:disabled) {
+.admin-courses-page .professional-save-button:hover:not(:disabled) {
   background: #0a1c3a;
   transform: translateY(-2px);
 }
 
-.admin-users-page .button-spinner {
+.admin-courses-page .button-spinner {
   width: 15px;
   height: 15px;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-top-color: #ffffff;
   border-radius: 50%;
-  animation: admin-users-spin 0.8s linear infinite;
+  animation: admin-courses-spin 0.8s linear infinite;
 }
 
-/* ---------- Responsive ---------- */
-
 @media (max-width: 900px) {
-  .admin-users-page .users-toolbar {
+  .admin-courses-page .users-toolbar {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .admin-users-page .users-search {
+  .admin-courses-page .users-search {
     width: 100%;
   }
 }
 
 @media (max-width: 640px) {
-  .admin-users-page .dashboard-header {
+  .admin-courses-page .dashboard-header {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .admin-users-page .professional-add-button {
+  .admin-courses-page .professional-add-button {
     justify-content: center;
     width: 100%;
   }
 
-  .admin-users-page .form-row {
+  .admin-courses-page .form-row {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .admin-users-page .modal-actions {
+  .admin-courses-page .modal-actions {
     flex-direction: column-reverse;
   }
 
-  .admin-users-page .professional-cancel-button,
-  .admin-users-page .professional-save-button {
+  .admin-courses-page .professional-cancel-button,
+  .admin-courses-page .professional-save-button {
     width: 100%;
   }
 
-  .admin-users-page .user-actions {
+  .admin-courses-page .user-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .admin-users-page .action-button {
+  .admin-courses-page .action-button {
     justify-content: center;
   }
 }
 
 @media (max-width: 420px) {
-  .admin-users-page .dashboard-content {
+  .admin-courses-page .dashboard-content {
     padding-left: 12px;
     padding-right: 12px;
   }
 
-  .admin-users-page .modal-overlay {
+  .admin-courses-page .modal-overlay {
     padding: 10px;
     align-items: end;
   }
 
-  .admin-users-page .user-modal {
+  .admin-courses-page .user-modal {
     border-radius: 14px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .admin-users-page *,
-  .admin-users-page *::before,
-  .admin-users-page *::after {
+  .admin-courses-page *,
+  .admin-courses-page *::before,
+  .admin-courses-page *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;

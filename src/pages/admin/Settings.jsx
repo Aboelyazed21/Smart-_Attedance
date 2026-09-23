@@ -1,6 +1,63 @@
 import React, { useState } from "react";
 import "./Settings.css";
 
+function SettingsIcon({ name, size = 16 }) {
+  const paths = {
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+
+    gear: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
+      </>
+    ),
+
+    grid: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    bell: (
+      <>
+        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+        <path d="M10 21h4" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
 function Settings() {
   const [settings, setSettings] = useState({
     systemName: "Attendify",
@@ -44,7 +101,9 @@ function Settings() {
         {/* ================= TOP BAR ================= */}
         <header className="settings-topbar">
           <div className="settings-search">
-            <span>🔎</span>
+            <span>
+              <SettingsIcon name="search" />
+            </span>
 
             <input
               type="text"
@@ -53,11 +112,6 @@ function Settings() {
           </div>
 
           <div className="settings-user-area">
-            <div className="settings-notification">
-              🔔
-              <span>3</span>
-            </div>
-
             <div className="settings-avatar">
               S
             </div>
@@ -75,7 +129,7 @@ function Settings() {
           <div className="settings-page-header">
             <div className="settings-title-wrapper">
               <div className="settings-title-icon">
-                ⚙
+                <SettingsIcon name="gear" size={18} />
               </div>
 
               <div>
@@ -95,7 +149,7 @@ function Settings() {
           <section className="settings-card">
             <div className="settings-card-header">
               <div className="settings-card-icon">
-                ▣
+                <SettingsIcon name="grid" size={18} />
               </div>
 
               <div>
@@ -176,7 +230,7 @@ function Settings() {
           <section className="settings-card">
             <div className="settings-card-header">
               <div className="settings-card-icon">
-                ◷
+                <SettingsIcon name="clock" size={18} />
               </div>
 
               <div>
@@ -280,7 +334,7 @@ function Settings() {
           <section className="settings-card">
             <div className="settings-card-header">
               <div className="settings-card-icon">
-                ♧
+                <SettingsIcon name="bell" size={18} />
               </div>
 
               <div>
@@ -356,8 +410,8 @@ function Settings() {
           {/* ================= SAVE ================= */}
           <div className="settings-actions">
             {saved && (
-              <div className="settings-saved-message">
-                ✓ Settings saved successfully
+              <div className="settings-saved-message" role="status">
+                Settings saved successfully
               </div>
             )}
 
@@ -366,7 +420,6 @@ function Settings() {
               className="settings-save-button"
               onClick={handleSave}
             >
-              <span>▣</span>
               Save Changes
             </button>
           </div>

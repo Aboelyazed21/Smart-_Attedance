@@ -5,14 +5,14 @@
 
 .sessions-page {
   --sessions-blue: #287cf0;
-  --sessions-blue-dark: #1766cf;
-  --sessions-navy: #123f7b;
-  --sessions-page-bg: #f5f8fd;
+  --sessions-blue-dark: #0f2851;
+  --sessions-navy: #0f2851;
+  --sessions-page-bg: #f4f7fb;
   --sessions-panel: #ffffff;
-  --sessions-text: #1d3658;
-  --sessions-muted: #667991;
-  --sessions-subtle: #8b9db4;
-  --sessions-line: #dce6f1;
+  --sessions-text: #1e293b;
+  --sessions-muted: #64748b;
+  --sessions-subtle: #94a3b8;
+  --sessions-line: #e2e8f0;
   --sidebar-width: 256px;
 
   min-height: 100dvh;
@@ -675,8 +675,8 @@ body.sessions-sidebar-open {
   font-size: 0.82rem;
 }
 
-.session-status,
-.attendance-status {
+.sessions-page .session-status,
+.sessions-page .attendance-status {
   min-height: 28px;
   padding: 5px 9px;
   display: inline-flex;
@@ -688,17 +688,17 @@ body.sessions-sidebar-open {
   white-space: nowrap;
 }
 
-.session-status.scheduled {
+.sessions-page .session-status.scheduled {
   background: #fff5df;
   color: #9c6511;
 }
 
-.session-status.active {
+.sessions-page .session-status.active {
   background: #eaf8f0;
   color: #1e744f;
 }
 
-.session-status.closed {
+.sessions-page .session-status.closed {
   background: #eef3f8;
   color: #617792;
 }
@@ -747,32 +747,32 @@ body.sessions-sidebar-open {
   border-top: 1px solid #edf2f7;
 }
 
-.attendance-status.present {
+.sessions-page .attendance-status.present {
   background: #eaf8f0;
   color: #1e744f;
 }
 
-.attendance-status.late {
+.sessions-page .attendance-status.late {
   background: #fff5df;
   color: #9c6511;
 }
 
-.attendance-status.absent {
+.sessions-page .attendance-status.absent {
   background: #fff0f2;
   color: #a93d4f;
 }
 
-.attendance-status.excused {
+.sessions-page .attendance-status.excused {
   background: #f1edff;
   color: #6947a2;
 }
 
-.attendance-status.recorded {
+.sessions-page .attendance-status.recorded {
   background: #eef3f8;
   color: #617792;
 }
 
-.attendance-status.not-recorded {
+.sessions-page .attendance-status.not-recorded {
   background: #f3f6fa;
   color: #6d819a;
 }

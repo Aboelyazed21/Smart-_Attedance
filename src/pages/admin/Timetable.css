@@ -1268,3 +1268,162 @@
     width: 100%;
   }
 }
+
+/* =========================================================
+   UNIFIED REFERENCE LAYER (navy + flat white cards)
+   Scoped to .timetable-page. Base rules untouched.
+========================================================= */
+
+.timetable-page {
+  background: #f4f7fb;
+  color: #1e293b;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  overflow-x: clip;
+}
+
+.timetable-page button {
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.timetable-page button:focus-visible,
+.timetable-page input:focus-visible,
+.timetable-page select:focus-visible {
+  outline: 3px solid rgba(15, 40, 81, 0.22);
+  outline-offset: 2px;
+}
+
+.timetable-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.timetable-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.timetable-page .tt-topbar {
+  background: #ffffff;
+  border-bottom-color: #e2e8f0;
+}
+
+.timetable-page .tt-global-search,
+.timetable-page .tt-filter-search {
+  border-color: #e2e8f0;
+  background: #f4f7fb;
+}
+
+.timetable-page .tt-global-search:focus-within,
+.timetable-page .tt-filter-search:focus-within {
+  border-color: #0f2851;
+  background: #ffffff;
+}
+
+.timetable-page .tt-global-search input,
+.timetable-page .tt-filter-search input {
+  color: #1e293b;
+}
+
+.timetable-page .tt-global-search input::placeholder,
+.timetable-page .tt-filter-search input::placeholder {
+  color: #94a3b8;
+}
+
+.timetable-page .tt-page-header h1,
+.timetable-page .tt-table-header h2,
+.timetable-page .tt-side-card h3 {
+  color: #1e293b;
+}
+
+.timetable-page .tt-page-header p,
+.timetable-page .tt-view-all {
+  color: #64748b;
+}
+
+.timetable-page .tt-title-icon,
+.timetable-page .tt-stat-icon,
+.timetable-page .tt-empty-icon,
+.timetable-page .tt-course-icon,
+.timetable-page .tt-modal-icon {
+  display: grid;
+  place-items: center;
+}
+
+.timetable-page .tt-stat-icon.blue,
+.timetable-page .tt-course-icon {
+  background: #e8eef7;
+  color: #0f2851;
+}
+
+.timetable-page .tt-add-button,
+.timetable-page .tt-small-add {
+  background: #0f2851;
+  border-color: #0f2851;
+  color: #ffffff;
+}
+
+.timetable-page .tt-add-button:hover:not(:disabled),
+.timetable-page .tt-small-add:hover:not(:disabled) {
+  background: #0a1c3a;
+  transform: translateY(-2px);
+}
+
+.timetable-page .tt-reset-button:hover {
+  border-color: #0f2851;
+  color: #0f2851;
+}
+
+.timetable-page .tt-view-toggle button.active {
+  background: #0f2851;
+  color: #ffffff;
+}
+
+.timetable-page .tt-error,
+.timetable-page .tt-modal-error {
+  border-color: #fecaca;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.timetable-page .tt-calendar-day.today,
+.timetable-page .tt-calendar-day-header.today {
+  background: #0f2851;
+  color: #ffffff;
+}
+
+.timetable-page .tt-quick-action:hover {
+  border-color: #0f2851;
+  transform: translateY(-2px);
+}
+
+.timetable-page .tt-action.edit:hover {
+  border-color: #0f2851;
+  color: #0f2851;
+}
+
+.timetable-page .tt-action.delete:hover {
+  border-color: #fecaca;
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timetable-page *,
+  .timetable-page *::before,
+  .timetable-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

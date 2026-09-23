@@ -3,6 +3,74 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "./services/api";
 import "./App.css";
 
+function AuthIcon({ name, size = 17 }) {
+  const paths = {
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    ),
+
+    lock: (
+      <>
+        <rect x="5" y="11" width="14" height="9" rx="2" />
+        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+      </>
+    ),
+
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    ),
+
+    hash: (
+      <>
+        <path d="M9 3 7 21" />
+        <path d="M17 3l-2 18" />
+        <path d="M4 8h17" />
+        <path d="M3 16h17" />
+      </>
+    ),
+
+    eye: (
+      <>
+        <path d="M3 12a9 9 0 0 1 18 0" />
+        <path d="M3 12a9 9 0 0 0 18 0" />
+        <circle cx="12" cy="12" r="2.5" />
+      </>
+    ),
+
+    eyeOff: (
+      <>
+        <path d="M4 4l16 16" />
+        <path d="M10.6 5.1A9 9 0 0 1 21 12a13 13 0 0 1-3.2 4.4" />
+        <path d="M6.6 6.6A13 13 0 0 0 3 12a9 9 0 0 0 14.9 3.4" />
+      </>
+    ),
+
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
 function Register() {
   const navigate = useNavigate();
 
@@ -77,7 +145,7 @@ function Register() {
         <div className="brand">
 
           <div className="brand-logo">
-            <span>🎓</span>
+            <span aria-hidden="true">A</span>
           </div>
 
           <div className="brand-text">
@@ -86,14 +154,6 @@ function Register() {
           </div>
 
         </div>
-
-        <button
-          type="button"
-          className="language-button"
-        >
-          <span>English</span>
-          <span className="chevron">⌄</span>
-        </button>
 
       </header>
 
@@ -105,7 +165,7 @@ function Register() {
         <div className="login-card register-card">
 
           <div className="login-logo">
-            <span>🎓</span>
+            <span aria-hidden="true">A</span>
           </div>
 
           <h2 className="app-name">
@@ -135,7 +195,7 @@ function Register() {
                 <div className="input-container">
 
                   <span className="input-icon">
-                    👤
+                    <AuthIcon name="user" />
                   </span>
 
                   <input
@@ -162,7 +222,7 @@ function Register() {
                 <div className="input-container">
 
                   <span className="input-icon">
-                    👤
+                    <AuthIcon name="user" />
                   </span>
 
                   <input
@@ -193,7 +253,7 @@ function Register() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  ✉
+                  <AuthIcon name="mail" />
                 </span>
 
                 <input
@@ -222,7 +282,7 @@ function Register() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  #
+                  <AuthIcon name="hash" />
                 </span>
 
                 <input
@@ -251,7 +311,7 @@ function Register() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  🔒
+                  <AuthIcon name="lock" />
                 </span>
 
                 <input
@@ -275,7 +335,9 @@ function Register() {
                     setShowPassword(!showPassword)
                   }
                 >
-                  {showPassword ? "◉" : "◌"}
+                  {showPassword
+                    ? <AuthIcon name="eyeOff" />
+                    : <AuthIcon name="eye" />}
                 </button>
 
               </div>
@@ -294,7 +356,7 @@ function Register() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  🔒
+                  <AuthIcon name="lock" />
                 </span>
 
                 <input
@@ -320,7 +382,9 @@ function Register() {
                     )
                   }
                 >
-                  {showConfirmPassword ? "◉" : "◌"}
+                  {showConfirmPassword
+                    ? <AuthIcon name="eyeOff" />
+                    : <AuthIcon name="eye" />}
                 </button>
 
               </div>
@@ -344,7 +408,7 @@ function Register() {
 
               {!loading && (
                 <span className="sign-arrow">
-                  →
+                  <AuthIcon name="arrow" size={19} />
                 </span>
               )}
 

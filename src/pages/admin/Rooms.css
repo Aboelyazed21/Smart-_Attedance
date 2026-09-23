@@ -4,29 +4,23 @@
 ========================================================= */
 
 .rooms-page {
-  --rooms-primary: #1769ff;
-  --rooms-primary-dark: #0d47b5;
-  --rooms-navy: #09265f;
-  --rooms-navy-2: #0b3278;
+  --rooms-primary: #0f2851;
+  --rooms-primary-dark: #0a1c3a;
+  --rooms-navy: #0f2851;
+  --rooms-navy-2: #0a1c3a;
   --rooms-bg: #f4f7fb;
   --rooms-card: #ffffff;
-  --rooms-border: #e4eaf3;
-  --rooms-text: #10295a;
-  --rooms-muted: #71809a;
-  --rooms-green: #18b77a;
-  --rooms-red: #ef476f;
-  --rooms-purple: #7657e8;
-  --rooms-orange: #ffab32;
+  --rooms-border: #e2e8f0;
+  --rooms-text: #1e293b;
+  --rooms-muted: #64748b;
+  --rooms-green: #10b981;
+  --rooms-red: #ef4444;
+  --rooms-purple: #7c3aed;
+  --rooms-orange: #f59e0b;
 
   min-height: 100vh;
   display: flex;
-  background:
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(45, 115, 255, 0.08),
-      transparent 32%
-    ),
-    #f4f7fb;
+  background: #f4f7fb;
 
   color: var(--rooms-text);
   font-family:
@@ -2544,4 +2538,27 @@
     width: 100%;
   }
 
+}
+
+/* =========================================================
+   UNIFIED REFERENCE DETAILS
+========================================================= */
+
+.rooms-page .recent-room-sep {
+  margin: 0 7px;
+  color: #cbd5e1;
+}
+
+.rooms-page button {
+  transition: all 0.3s ease;
+}
+
+.rooms-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rooms-page button:active {
+    transform: none;
+  }
 }

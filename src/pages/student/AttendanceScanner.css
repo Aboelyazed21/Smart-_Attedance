@@ -5,14 +5,14 @@
 
 .scan-page {
   --scan-blue: #287cf0;
-  --scan-blue-dark: #1766cf;
-  --scan-navy: #123f7b;
-  --scan-page-bg: #f5f8fd;
+  --scan-blue-dark: #0f2851;
+  --scan-navy: #0f2851;
+  --scan-page-bg: #f4f7fb;
   --scan-panel: #ffffff;
-  --scan-text: #1d3658;
-  --scan-muted: #667991;
-  --scan-subtle: #8b9db4;
-  --scan-line: #dce6f1;
+  --scan-text: #1e293b;
+  --scan-muted: #64748b;
+  --scan-subtle: #94a3b8;
+  --scan-line: #e2e8f0;
   --sidebar-width: 256px;
 
   min-height: 100dvh;

@@ -5,14 +5,14 @@
 
 .confirmation-page {
   --confirmation-blue: #287cf0;
-  --confirmation-blue-dark: #1766cf;
-  --confirmation-navy: #123f7b;
-  --confirmation-page-bg: #f5f8fd;
+  --confirmation-blue-dark: #0f2851;
+  --confirmation-navy: #0f2851;
+  --confirmation-page-bg: #f4f7fb;
   --confirmation-panel: #ffffff;
-  --confirmation-text: #1d3658;
-  --confirmation-muted: #667991;
-  --confirmation-subtle: #8b9db4;
-  --confirmation-line: #dce6f1;
+  --confirmation-text: #1e293b;
+  --confirmation-muted: #64748b;
+  --confirmation-subtle: #94a3b8;
+  --confirmation-line: #e2e8f0;
   --sidebar-width: 256px;
 
   min-height: 100dvh;

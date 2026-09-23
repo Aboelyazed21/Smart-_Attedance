@@ -5,14 +5,14 @@
 
 .student-profile-page {
   --profile-blue: #287cf0;
-  --profile-blue-dark: #1766cf;
-  --profile-navy: #123f7b;
-  --profile-page-bg: #f5f8fd;
+  --profile-blue-dark: #0f2851;
+  --profile-navy: #0f2851;
+  --profile-page-bg: #f4f7fb;
   --profile-panel: #ffffff;
-  --profile-text: #1d3658;
-  --profile-muted: #667991;
-  --profile-subtle: #8b9db4;
-  --profile-line: #dce6f1;
+  --profile-text: #1e293b;
+  --profile-muted: #64748b;
+  --profile-subtle: #94a3b8;
+  --profile-line: #e2e8f0;
 
   min-height: 100dvh;
   display: flex;

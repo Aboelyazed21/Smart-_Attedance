@@ -85,6 +85,138 @@ function getDateValue(date) {
   return String(date).slice(0, 10);
 }
 
+function TtIcon({ name, size = 16 }) {
+  const paths = {
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M3 10h18" />
+      </>
+    ),
+
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M3 20a6 6 0 0 1 12 0" />
+        <path d="M16 5a3.5 3.5 0 0 1 0 7" />
+        <path d="M18 14.5A6 6 0 0 1 21 20" />
+      </>
+    ),
+
+    building: (
+      <>
+        <path d="M3 21h18" />
+        <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16" />
+        <path d="M9 9h2M13 9h2M9 13h2M13 13h2" />
+      </>
+    ),
+
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    book: (
+      <>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H21" />
+        <path d="M6.5 2H21v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      </>
+    ),
+
+    list: (
+      <>
+        <path d="M9 6h12M9 12h12M9 18h12" />
+        <path d="M4 6h.01M4 12h.01M4 18h.01" />
+      </>
+    ),
+
+    grid: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    refresh: (
+      <>
+        <path d="M20 11a8 8 0 1 0-2.3 6.3" />
+        <path d="M20 5v6h-6" />
+      </>
+    ),
+
+    plus: <path d="M12 5v14M5 12h14" />,
+
+    close: <path d="M6 6l12 12M18 6 6 18" />,
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+
+    trash: (
+      <>
+        <path d="M4 7h16" />
+        <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        <path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
+        <path d="M10 11v6M14 11v6" />
+      </>
+    ),
+
+    download: (
+      <>
+        <path d="M12 4v11" />
+        <path d="m7 11 5 5 5-5" />
+        <path d="M4 20h16" />
+      </>
+    ),
+
+    alert: (
+      <>
+        <path d="M12 4v9" />
+        <path d="M12 17h.01" />
+        <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+      </>
+    ),
+
+    target: (
+      <>
+        <circle cx="12" cy="12" r="8.5" />
+        <circle cx="12" cy="12" r="4.5" />
+        <circle cx="12" cy="12" r="1" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
 export default function Timetable() {
   const [timetable, setTimetable] = useState([]);
   const [sections, setSections] = useState([]);
@@ -634,7 +766,9 @@ export default function Timetable() {
         <div className="tt-topbar">
 
           <div className="tt-global-search">
-            <span>⌕</span>
+            <span>
+              <TtIcon name="search" />
+            </span>
 
             <input
               type="text"
@@ -650,11 +784,6 @@ export default function Timetable() {
 
           <div className="tt-topbar-right">
 
-            <button className="tt-icon-button">
-              🔔
-              <small>1</small>
-            </button>
-
             <div className="tt-user">
 
               <div className="tt-user-avatar">
@@ -666,8 +795,6 @@ export default function Timetable() {
                   System Admin
                 </strong>
               </div>
-
-              <span>⌄</span>
 
             </div>
 
@@ -682,7 +809,7 @@ export default function Timetable() {
           <div className="tt-title-wrapper">
 
             <div className="tt-title-icon">
-              📅
+              <TtIcon name="calendar" size={20} />
             </div>
 
             <div>
@@ -699,7 +826,9 @@ export default function Timetable() {
           </div>
 
           <div className="tt-header-date">
-            <span>▣</span>
+            <span>
+              <TtIcon name="grid" size={15} />
+            </span>
 
             {new Date().toLocaleDateString(
               "en-US",
@@ -718,7 +847,9 @@ export default function Timetable() {
               openCreateModal
             }
           >
-            <span>＋</span>
+            <span>
+              <TtIcon name="plus" size={15} />
+            </span>
             Add Class to Timetable
           </button>
 
@@ -730,7 +861,9 @@ export default function Timetable() {
 
           {error && (
             <div className="tt-error">
-              <span>⚠</span>
+              <span>
+                <TtIcon name="alert" size={15} />
+              </span>
               <div>
                 {error}
               </div>
@@ -739,8 +872,9 @@ export default function Timetable() {
                 onClick={() =>
                   setError("")
                 }
+                aria-label="Dismiss error"
               >
-                ×
+                <TtIcon name="close" size={15} />
               </button>
             </div>
           )}
@@ -754,7 +888,7 @@ export default function Timetable() {
             <div className="tt-stat-card">
 
               <div className="tt-stat-icon purple">
-                📖
+                <TtIcon name="book" size={19} />
               </div>
 
               <div>
@@ -778,7 +912,7 @@ export default function Timetable() {
             <div className="tt-stat-card">
 
               <div className="tt-stat-icon blue">
-                👥
+                <TtIcon name="users" size={19} />
               </div>
 
               <div>
@@ -798,7 +932,7 @@ export default function Timetable() {
             <div className="tt-stat-card">
 
               <div className="tt-stat-icon green">
-                🏫
+                <TtIcon name="building" size={19} />
               </div>
 
               <div>
@@ -818,7 +952,7 @@ export default function Timetable() {
             <div className="tt-stat-card">
 
               <div className="tt-stat-icon orange">
-                🕐
+                <TtIcon name="clock" size={19} />
               </div>
 
               <div>
@@ -844,7 +978,9 @@ export default function Timetable() {
           <div className="tt-filter-bar">
 
             <div className="tt-filter-search">
-              <span>⌕</span>
+              <span>
+                <TtIcon name="search" size={16} />
+              </span>
 
               <input
                 type="text"
@@ -956,7 +1092,7 @@ export default function Timetable() {
               className="tt-reset-button"
               onClick={resetFilters}
             >
-              ↻
+              <TtIcon name="refresh" size={15} />
               Reset
             </button>
 
@@ -972,7 +1108,7 @@ export default function Timetable() {
                   setViewMode("list")
                 }
               >
-                ▤
+                <TtIcon name="list" size={15} />
                 List
               </button>
 
@@ -988,7 +1124,7 @@ export default function Timetable() {
                   )
                 }
               >
-                ▦
+                <TtIcon name="grid" size={15} />
                 Calendar
               </button>
 
@@ -1027,7 +1163,7 @@ export default function Timetable() {
                     openCreateModal
                   }
                 >
-                  ＋ Add
+                  <TtIcon name="plus" size={14} /> Add
                 </button>
 
               </div>
@@ -1045,7 +1181,7 @@ export default function Timetable() {
               ) : filteredTimetable.length === 0 ? (
                 <div className="tt-empty">
                   <div className="tt-empty-icon">
-                    📅
+                    <TtIcon name="calendar" size={24} />
                   </div>
 
                   <h3>
@@ -1062,7 +1198,7 @@ export default function Timetable() {
                       openCreateModal
                     }
                   >
-                    ＋ Add Class
+                    <TtIcon name="plus" size={15} /> Add Class
                   </button>
                 </div>
               ) : viewMode === "calendar" ? (
@@ -1105,7 +1241,7 @@ export default function Timetable() {
                                   key={item.id}
                                 >
                                   <div className="tt-calendar-course-icon">
-                                    📚
+                                    <TtIcon name="book" size={16} />
                                   </div>
 
                                   <div>
@@ -1191,7 +1327,7 @@ export default function Timetable() {
                                 <div className="tt-course-cell">
 
                                   <div className="tt-course-icon">
-                                    📖
+                                    <TtIcon name="book" size={16} />
                                   </div>
 
                                   <div>
@@ -1226,7 +1362,7 @@ export default function Timetable() {
 
                                   <span>
                                     {item.building ||
-                                      "—"}
+                                      "Not provided"}
                                   </span>
 
                                 </div>
@@ -1285,7 +1421,7 @@ export default function Timetable() {
                                       )
                                     }
                                   >
-                                    ✎
+                                    <TtIcon name="edit" size={15} />
                                   </button>
 
                                   <button
@@ -1297,14 +1433,7 @@ export default function Timetable() {
                                       )
                                     }
                                   >
-                                    🗑
-                                  </button>
-
-                                  <button
-                                    className="tt-action more"
-                                    title="More"
-                                  >
-                                    ⋯
+                                    <TtIcon name="trash" size={15} />
                                   </button>
 
                                 </div>
@@ -1438,7 +1567,9 @@ export default function Timetable() {
                     openCreateModal
                   }
                 >
-                  <span>＋</span>
+                  <span>
+                    <TtIcon name="plus" size={15} />
+                  </span>
                   Add New Class
                 </button>
 
@@ -1450,7 +1581,9 @@ export default function Timetable() {
                     )
                   }
                 >
-                  <span>🏫</span>
+                  <span>
+                    <TtIcon name="building" size={15} />
+                  </span>
                   Manage Rooms
                 </button>
 
@@ -1462,7 +1595,9 @@ export default function Timetable() {
                     )
                   }
                 >
-                  <span>⚠</span>
+                  <span>
+                    <TtIcon name="alert" size={15} />
+                  </span>
                   View Conflicts
                 </button>
 
@@ -1472,7 +1607,9 @@ export default function Timetable() {
                     window.print();
                   }}
                 >
-                  <span>⇩</span>
+                  <span>
+                    <TtIcon name="download" size={15} />
+                  </span>
                   Export Timetable
                 </button>
 
@@ -1536,7 +1673,7 @@ export default function Timetable() {
                             </strong>
 
                             <span>
-                              ◷{" "}
+                              <TtIcon name="clock" size={12} />{" "}
                               {formatTime(
                                 item.start_time
                               )}{" "}
@@ -1547,7 +1684,7 @@ export default function Timetable() {
                             </span>
 
                             <span>
-                              ⌖{" "}
+                              <TtIcon name="target" size={12} />{" "}
                               {item.room_name ||
                                 "No Room"}
                             </span>
@@ -1600,7 +1737,7 @@ export default function Timetable() {
 
               <div>
                 <div className="tt-modal-icon">
-                  📅
+                  <TtIcon name="calendar" size={20} />
                 </div>
 
                 <div>
@@ -1622,8 +1759,9 @@ export default function Timetable() {
                 onClick={
                   closeModal
                 }
+                aria-label="Close dialog"
               >
-                ×
+                <TtIcon name="close" size={15} />
               </button>
 
             </div>
@@ -1841,7 +1979,7 @@ export default function Timetable() {
 
               {error && (
                 <div className="tt-modal-error">
-                  ⚠ {error}
+                  <TtIcon name="alert" size={14} /> {error}
                 </div>
               )}
 

@@ -1,0 +1,371 @@
+/* =========================================================
+   ADMIN SECTIONS — unified reference system (navy + flat)
+   Scoped to .admin-sections-page. Shared App.css untouched.
+========================================================= */
+
+.admin-sections-page,
+.admin-sections-page * {
+  box-sizing: border-box;
+}
+
+.admin-sections-page {
+  background: #f4f7fb;
+  color: #1e293b;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  overflow-x: clip;
+}
+
+.admin-sections-page button,
+.admin-sections-page input,
+.admin-sections-page select {
+  font: inherit;
+}
+
+.admin-sections-page button {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.admin-sections-page button:focus-visible,
+.admin-sections-page input:focus-visible,
+.admin-sections-page select:focus-visible {
+  outline: 3px solid rgba(15, 40, 81, 0.22);
+  outline-offset: 2px;
+}
+
+.admin-sections-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-sections-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.admin-sections-page .dashboard-header h1 {
+  color: #1e293b;
+}
+
+.admin-sections-page .dashboard-header p {
+  color: #64748b;
+}
+
+.admin-sections-page .admin-breadcrumb {
+  color: #94a3b8;
+}
+
+.admin-sections-page .admin-breadcrumb span {
+  margin: 0 8px;
+}
+
+.admin-sections-page .section-stat-card {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.admin-sections-page .section-stat-card strong {
+  color: #1e293b;
+}
+
+.admin-sections-page .section-stat-card span {
+  color: #334155;
+}
+
+.admin-sections-page .section-stat-card small {
+  color: #64748b;
+}
+
+.admin-sections-page .section-stat-icon.blue {
+  background: #e8eef7;
+  color: #0f2851;
+}
+
+.admin-sections-page .section-stat-icon.purple {
+  background: #f1edff;
+  color: #6d3fd4;
+}
+
+.admin-sections-page .section-stat-icon.green {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.admin-sections-page .section-stat-icon.orange {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+.admin-sections-page .section-stat-icon svg,
+.admin-sections-page .section-list-icon svg,
+.admin-sections-page .section-detail-icon svg,
+.admin-sections-page .section-empty-icon svg,
+.admin-sections-page .course-content-icon svg,
+.admin-sections-page .sections-list-search svg,
+.admin-sections-page .section-list-arrow svg,
+.admin-sections-page .section-add-top-button svg,
+.admin-sections-page .add-student-button svg,
+.admin-sections-page .detail-edit-button svg,
+.admin-sections-page .modal-close svg,
+.admin-sections-page .section-tabs button svg {
+  flex: 0 0 auto;
+}
+
+.admin-sections-page .section-add-top-button {
+  background: #0f2851;
+  border-color: #0f2851;
+  box-shadow: 0 6px 16px rgba(15, 40, 81, 0.22);
+}
+
+.admin-sections-page .section-add-top-button:hover:not(:disabled) {
+  background: #0a1c3a;
+  transform: translateY(-2px);
+}
+
+.admin-sections-page .sections-list-panel,
+.admin-sections-page .section-detail-panel {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.admin-sections-page .sections-list-header h2,
+.admin-sections-page .section-detail-title h2 {
+  color: #1e293b;
+}
+
+.admin-sections-page .sections-list-header p,
+.admin-sections-page .section-detail-title p,
+.admin-sections-page .section-detail-title small {
+  color: #64748b;
+}
+
+.admin-sections-page .sections-list-search,
+.admin-sections-page .student-search-box {
+  border-color: #e2e8f0;
+  background: #f4f7fb;
+}
+
+.admin-sections-page .sections-list-search:focus-within,
+.admin-sections-page .student-search-box:focus-within {
+  border-color: #0f2851;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 40, 81, 0.08);
+}
+
+.admin-sections-page .sections-list-search input,
+.admin-sections-page .student-search-box input {
+  color: #1e293b;
+}
+
+.admin-sections-page .sections-list-search input::placeholder,
+.admin-sections-page .student-search-box input::placeholder {
+  color: #94a3b8;
+}
+
+.admin-sections-page .section-list-item:hover {
+  border-color: #0f2851;
+  transform: translateX(3px);
+}
+
+.admin-sections-page .section-list-item.selected {
+  border-color: #0f2851;
+  background: #f4f7fb;
+}
+
+.admin-sections-page .section-list-info strong {
+  color: #1e293b;
+}
+
+.admin-sections-page .section-list-info span,
+.admin-sections-page .section-list-info small {
+  color: #64748b;
+}
+
+.admin-sections-page .section-sep {
+  margin: 0 7px;
+  color: #cbd5e1;
+}
+
+.admin-sections-page .section-list-count {
+  background: #e8eef7;
+  color: #0f2851;
+}
+
+.admin-sections-page .section-list-arrow {
+  display: inline-grid;
+  place-items: center;
+  color: #94a3b8;
+}
+
+.admin-sections-page .section-list-item:hover .section-list-arrow {
+  color: #0f2851;
+  transform: translateX(2px);
+}
+
+.admin-sections-page .active-status {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.admin-sections-page .active-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.admin-sections-page .student-status {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.admin-sections-page .student-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.admin-sections-page .student-status.active {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.admin-sections-page .student-status.inactive {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.admin-sections-page .section-tabs button {
+  color: #64748b;
+}
+
+.admin-sections-page .section-tabs button span {
+  display: inline-grid;
+  place-items: center;
+}
+
+.admin-sections-page .section-tabs button.active {
+  color: #0f2851;
+  border-color: #0f2851;
+}
+
+.admin-sections-page .section-tabs button b {
+  background: #e8eef7;
+  color: #0f2851;
+}
+
+.admin-sections-page .detail-info-card span {
+  color: #64748b;
+}
+
+.admin-sections-page .detail-info-card strong {
+  color: #1e293b;
+}
+
+.admin-sections-page .detail-edit-button {
+  border-color: #cbd5e1;
+  color: #0f2851;
+}
+
+.admin-sections-page .detail-edit-button:hover {
+  border-color: #0f2851;
+  background: #f4f7fb;
+}
+
+.admin-sections-page .detail-delete-button {
+  border-color: #fecaca;
+  color: #ef4444;
+}
+
+.admin-sections-page .detail-delete-button:hover {
+  background: #fee2e2;
+}
+
+.admin-sections-page .add-student-button {
+  background: #0f2851;
+  border-color: #0f2851;
+}
+
+.admin-sections-page .add-student-button:hover:not(:disabled) {
+  background: #0a1c3a;
+}
+
+.admin-sections-page .modal-close:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #ef4444;
+}
+
+.admin-sections-page .professional-save-button {
+  background: #0f2851;
+  border-color: #0f2851;
+}
+
+.admin-sections-page .professional-save-button:hover:not(:disabled) {
+  background: #0a1c3a;
+}
+
+.admin-sections-page .course-content-icon {
+  background: #e8eef7;
+  color: #0f2851;
+}
+
+.admin-sections-page .selected-section-preview {
+  border-color: #e2e8f0;
+  background: #f4f7fb;
+}
+
+@media (max-width: 1024px) {
+  .admin-sections-page .sections-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-sections-page .section-stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-sections-page .section-detail-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-sections-page .detail-edit-button,
+  .admin-sections-page .detail-delete-button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .admin-sections-page .section-tabs {
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sections-page *,
+  .admin-sections-page *::before,
+  .admin-sections-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

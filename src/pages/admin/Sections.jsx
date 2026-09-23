@@ -17,6 +17,94 @@ import {
   removeEnrollment,
   updateStudent,
 } from "../../services/api";
+import "./Sections.css";
+import "./Sections.css";
+
+function SectionIcon({ name, size = 15 }) {
+  const paths = {
+    grid: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M3 20a6 6 0 0 1 12 0" />
+        <path d="M16 5a3.5 3.5 0 0 1 0 7" />
+        <path d="M18 14.5A6 6 0 0 1 21 20" />
+      </>
+    ),
+
+    book: (
+      <>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H21" />
+        <path d="M6.5 2H21v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      </>
+    ),
+
+    briefcase: (
+      <>
+        <rect x="3" y="7" width="18" height="13" rx="2" />
+        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      </>
+    ),
+
+    plus: <path d="M12 5v14M5 12h14" />,
+
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    ),
+
+    chevron: <path d="m9 6 6 6-6 6" />,
+
+    gear: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
+      </>
+    ),
+
+    close: <path d="M6 6l12 12M18 6 6 18" />,
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
 
 
 function Sections() {
@@ -1181,7 +1269,7 @@ function Sections() {
 
   return (
 
-    <div className="dashboard-page">
+    <div className="dashboard-page admin-sections-page">
 
       {/* =====================================================
           MAIN
@@ -1196,7 +1284,7 @@ function Sections() {
 
             <div className="admin-breadcrumb">
               Home
-              <span>›</span>
+              <span>/</span>
               Sections
             </div>
 
@@ -1237,7 +1325,7 @@ function Sections() {
             <div className="section-stat-card">
 
               <div className="section-stat-icon blue">
-                ▤
+                <SectionIcon name="grid" size={18} />
               </div>
 
               <div>
@@ -1262,7 +1350,7 @@ function Sections() {
             <div className="section-stat-card">
 
               <div className="section-stat-icon purple">
-                👥
+                <SectionIcon name="users" size={18} />
               </div>
 
               <div>
@@ -1287,7 +1375,7 @@ function Sections() {
             <div className="section-stat-card">
 
               <div className="section-stat-icon green">
-                📚
+                <SectionIcon name="book" size={18} />
               </div>
 
               <div>
@@ -1312,7 +1400,7 @@ function Sections() {
             <div className="section-stat-card">
 
               <div className="section-stat-icon orange">
-                🎓
+                <SectionIcon name="briefcase" size={18} />
               </div>
 
               <div>
@@ -1340,7 +1428,9 @@ function Sections() {
                 openCreateSection
               }
             >
-              <span>+</span>
+              <span>
+                <SectionIcon name="plus" size={16} />
+              </span>
               Add Section
             </button>
 
@@ -1381,7 +1471,7 @@ function Sections() {
               <div className="sections-list-search">
 
                 <span>
-                  🔍
+                  <SectionIcon name="search" size={16} />
                 </span>
 
                 <input
@@ -1467,7 +1557,7 @@ function Sections() {
                         >
 
                           <div className="section-list-icon">
-                            📚
+                            <SectionIcon name="book" size={18} />
                           </div>
 
 
@@ -1486,12 +1576,12 @@ function Sections() {
                               Section{" "}
                               {section.section_name}
 
-                              {" • "}
+                              <span className="section-sep">/</span>
 
                               Semester{" "}
                               {section.semester}
 
-                              {" • "}
+                              <span className="section-sep">/</span>
 
                               {section.academic_year}
 
@@ -1499,7 +1589,7 @@ function Sections() {
 
                             <small>
 
-                              👤{" "}
+                              <SectionIcon name="user" size={12} />{" "}
                               {section.lecturer_name ||
                                 "Not assigned"}
 
@@ -1516,7 +1606,7 @@ function Sections() {
 
 
                           <span className="section-list-arrow">
-                            ›
+                            <SectionIcon name="chevron" size={14} />
                           </span>
 
                         </button>
@@ -1545,7 +1635,7 @@ function Sections() {
                 <div className="section-detail-empty">
 
                   <div className="section-empty-icon">
-                    📚
+                    <SectionIcon name="book" size={24} />
                   </div>
 
                   <h2>
@@ -1573,7 +1663,7 @@ function Sections() {
                     <div className="section-detail-title">
 
                       <div className="section-detail-icon">
-                        📚
+                        <SectionIcon name="book" size={20} />
                       </div>
 
                       <div>
@@ -1589,7 +1679,7 @@ function Sections() {
                           </h2>
 
                           <span className="active-status">
-                            ● Active
+                            Active
                           </span>
 
                         </div>
@@ -1602,12 +1692,12 @@ function Sections() {
                             {selectedSection.section_name}
                           </strong>
 
-                          {" • "}
+                          <span className="section-sep">/</span>
 
                           Semester{" "}
                           {selectedSection.semester}
 
-                          {" • "}
+                          <span className="section-sep">/</span>
 
                           {selectedSection.academic_year}
 
@@ -1616,7 +1706,7 @@ function Sections() {
 
                         <small>
 
-                          👤{" "}
+                          <SectionIcon name="user" size={12} />{" "}
                           {selectedSection.lecturer_name ||
                             "No lecturer assigned"}
 
@@ -1637,7 +1727,7 @@ function Sections() {
                           )
                         }
                       >
-                        ✎ Edit Section
+                        <SectionIcon name="edit" size={15} /> Edit Section
                       </button>
 
 
@@ -1675,7 +1765,9 @@ function Sections() {
                         )
                       }
                     >
-                      <span>◉</span>
+                      <span>
+                        <SectionIcon name="grid" size={15} />
+                      </span>
                       Overview
                     </button>
 
@@ -1692,7 +1784,9 @@ function Sections() {
                         )
                       }
                     >
-                      <span>👥</span>
+                      <span>
+                        <SectionIcon name="users" size={15} />
+                      </span>
                       Students
                       <b>
                         {sectionStats.students}
@@ -1712,7 +1806,9 @@ function Sections() {
                         )
                       }
                     >
-                      <span>📖</span>
+                      <span>
+                        <SectionIcon name="book" size={15} />
+                      </span>
                       Course Content
                     </button>
 
@@ -1729,7 +1825,9 @@ function Sections() {
                         )
                       }
                     >
-                      <span>⚙</span>
+                      <span>
+                        <SectionIcon name="gear" size={15} />
+                      </span>
                       Settings
                     </button>
 
@@ -1866,7 +1964,7 @@ function Sections() {
                           }
                         >
                           <span>
-                            +
+                            <SectionIcon name="plus" size={15} />
                           </span>
 
                           Add Student
@@ -1921,7 +2019,7 @@ function Sections() {
                       <div className="student-search-box">
 
                         <span>
-                          🔍
+                          <SectionIcon name="search" size={16} />
                         </span>
 
                         <input
@@ -2094,7 +2192,6 @@ function Sections() {
                                         }
                                       >
 
-                                        ●{" "}
                                         {
                                           student.status ||
                                           "active"
@@ -2165,7 +2262,7 @@ function Sections() {
                       <div className="course-content-card">
 
                         <div className="course-content-icon">
-                          📖
+                          <SectionIcon name="book" size={20} />
                         </div>
 
                         <div>
@@ -2308,7 +2405,7 @@ function Sections() {
                             )
                           }
                         >
-                          ✎ Edit Section
+                          <SectionIcon name="edit" size={15} /> Edit Section
                         </button>
 
                       </div>
@@ -2363,7 +2460,7 @@ function Sections() {
                   closeSectionModal
                 }
               >
-                ×
+                <SectionIcon name="close" size={15} />
               </button>
 
             </div>
@@ -2638,7 +2735,7 @@ function Sections() {
                   setShowAddStudent(false)
                 }
               >
-                ×
+                <SectionIcon name="close" size={15} />
               </button>
 
             </div>
@@ -2654,7 +2751,7 @@ function Sections() {
               <div className="selected-section-preview">
 
                 <div>
-                  📚
+                  <SectionIcon name="book" size={20} />
                 </div>
 
                 <div>
@@ -2788,7 +2885,7 @@ function Sections() {
                   setShowEditStudent(false)
                 }
               >
-                ×
+                <SectionIcon name="close" size={15} />
               </button>
 
             </div>

@@ -1,7 +1,7 @@
 ﻿.lecturer-layout {
   min-height: 100vh;
   width: 100%;
-  background: #f6f8fc;
+  background: #f4f7fb;
   color: #172033;
 }
 
@@ -18,11 +18,7 @@
 
   padding: 26px 18px 18px;
 
-  background: linear-gradient(
-    180deg,
-    #101827 0%,
-    #0c1422 100%
-  );
+  background: #0f2851;
 
   border-right: 1px solid rgba(255, 255, 255, 0.06);
 
@@ -50,18 +46,12 @@
 
   border-radius: 12px;
 
-  background: linear-gradient(
-    135deg,
-    #4f46e5,
-    #7c3aed
-  );
+  background: #0f2851;
 
   color: #ffffff;
 
   font-size: 19px;
   font-weight: 800;
-
-  box-shadow: 0 8px 22px rgba(79, 70, 229, 0.3);
 }
 
 .lecturer-layout-brand-text {
@@ -118,18 +108,12 @@
 
   border-radius: 50%;
 
-  background: linear-gradient(
-    135deg,
-    #6366f1,
-    #8b5cf6
-  );
+  background: #1e3a8f;
 
   color: #ffffff;
 
   font-size: 13px;
   font-weight: 800;
-
-  box-shadow: 0 5px 15px rgba(99, 102, 241, 0.25);
 }
 
 .lecturer-layout-profile-info {
@@ -204,15 +188,11 @@
 }
 
 .lecturer-layout-nav-item.active {
-  background: linear-gradient(
-    135deg,
-    rgba(79, 70, 229, 0.95),
-    rgba(99, 102, 241, 0.85)
-  );
+  background: #1e3a8f;
 
   color: #ffffff;
 
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 4px 12px rgba(15, 40, 81, 0.3);
 }
 
 .lecturer-layout-nav-icon {

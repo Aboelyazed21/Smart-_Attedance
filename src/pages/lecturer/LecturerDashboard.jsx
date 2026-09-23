@@ -95,6 +95,117 @@ function formatPercent(value) {
   return `${number.toFixed(number % 1 === 0 ? 0 : 1)}%`;
 }
 
+function LecturerIcon({ name, size = 18 }) {
+  const paths = {
+    refresh: (
+      <>
+        <path d="M20 11a8 8 0 1 0-2.3 6.3" />
+        <path d="M20 5v6h-6" />
+      </>
+    ),
+
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+
+    grid: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    layers: (
+      <>
+        <path d="m12 3 9 5-9 5-9-5Z" />
+        <path d="m3 13 9 5 9-5" />
+      </>
+    ),
+
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M3 20a6 6 0 0 1 12 0" />
+        <path d="M16 5a3.5 3.5 0 0 1 0 7" />
+        <path d="M18 14.5A6 6 0 0 1 21 20" />
+      </>
+    ),
+
+    chart: (
+      <>
+        <path d="M5 19V10" />
+        <path d="M12 19V5" />
+        <path d="M19 19v-6" />
+        <path d="M3 19h18" />
+      </>
+    ),
+
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M3 10h18" />
+      </>
+    ),
+
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    file: (
+      <>
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z" />
+        <path d="M14 3v5h5" />
+        <path d="M9 13h6M9 17h6" />
+      </>
+    ),
+
+    alert: (
+      <>
+        <path d="M12 4v9" />
+        <path d="M12 17h.01" />
+        <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+      </>
+    ),
+
+    qr: (
+      <>
+        <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+        <path d="M4 12h16" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name] || paths.grid}
+    </svg>
+  );
+}
+
+const STAT_TONE_ICONS = {
+  blue: "grid",
+  violet: "layers",
+  green: "users",
+  amber: "chart",
+  cyan: "calendar",
+  red: "clock",
+  indigo: "file",
+  orange: "alert",
+};
+
 export default function LecturerDashboard() {
   const navigate = useNavigate();
 
@@ -232,7 +343,7 @@ export default function LecturerDashboard() {
           disabled={loading}
         >
           <span className="lecturer-dashboard-refresh-icon">
-            ↻
+            <LecturerIcon name="refresh" size={15} />
           </span>
 
           {loading ? "Refreshing..." : "Refresh"}
@@ -270,23 +381,20 @@ export default function LecturerDashboard() {
               </span>
 
               <span className="lecturer-dashboard-stat-icon">
-                {card.label === "Courses" && "CR"}
-                {card.label === "Sections" && "SC"}
-                {card.label === "Enrolled Students" && "ST"}
-                {card.label === "Attendance Rate" && "%"}
-                {card.label === "Total Sessions" && "SE"}
-                {card.label === "Active Sessions" && "ON"}
-                {card.label === "Attendance Records" && "AT"}
-                {card.label === "Pending Corrections" && "PC"}
+                <LecturerIcon
+                  name={STAT_TONE_ICONS[card.tone] || "grid"}
+                  size={18}
+                />
               </span>
             </span>
 
             <strong className="lecturer-dashboard-stat-value">
-              {loading ? "—" : card.value}
+              {loading ? "..." : card.value}
             </strong>
 
             <span className="lecturer-dashboard-stat-link">
-              View details →
+              View details
+              <LecturerIcon name="arrow" size={13} />
             </span>
           </button>
         ))}
@@ -332,7 +440,7 @@ export default function LecturerDashboard() {
           ) : sections.length === 0 ? (
             <div className="lecturer-dashboard-empty">
               <div className="lecturer-dashboard-empty-icon">
-                SC
+                <LecturerIcon name="layers" size={22} />
               </div>
 
               <strong>No assigned sections</strong>
@@ -367,7 +475,7 @@ export default function LecturerDashboard() {
 
                     <span className="lecturer-dashboard-section-info">
                       <strong>
-                        {getCourseCode(section)} · Section{" "}
+                        {getCourseCode(section)}, Section{" "}
                         {getSectionName(section)}
                       </strong>
 
@@ -386,7 +494,7 @@ export default function LecturerDashboard() {
                     </span>
 
                     <span className="lecturer-dashboard-section-arrow">
-                      →
+                      <LecturerIcon name="arrow" size={15} />
                     </span>
                   </button>
                 );
@@ -418,7 +526,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                QR
+                <LecturerIcon name="qr" size={19} />
               </span>
 
               <span>
@@ -428,7 +536,9 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
+              <b>
+                <LecturerIcon name="arrow" size={15} />
+              </b>
             </button>
 
             <button
@@ -438,7 +548,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                AT
+                <LecturerIcon name="calendar" size={19} />
               </span>
 
               <span>
@@ -448,7 +558,9 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
+              <b>
+                <LecturerIcon name="arrow" size={15} />
+              </b>
             </button>
 
             <button
@@ -458,7 +570,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                RP
+                <LecturerIcon name="file" size={19} />
               </span>
 
               <span>
@@ -468,7 +580,9 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
+              <b>
+                <LecturerIcon name="arrow" size={15} />
+              </b>
             </button>
 
             <button
@@ -478,7 +592,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                SC
+                <LecturerIcon name="layers" size={19} />
               </span>
 
               <span>
@@ -488,7 +602,9 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
+              <b>
+                <LecturerIcon name="arrow" size={15} />
+              </b>
             </button>
           </div>
         </div>
@@ -520,7 +636,8 @@ export default function LecturerDashboard() {
             navigate("/lecturer/sessions")
           }
         >
-          Open Sessions →
+          Open Sessions
+          <LecturerIcon name="arrow" size={15} />
         </button>
       </section>
     </div>

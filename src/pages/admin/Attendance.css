@@ -7,11 +7,14 @@
   width: 100%;
   min-height: 100vh;
   display: block;
-  background: #f5f8fc;
-  color: #17345f;
+  background: #f4f7fb;
+  color: #1e293b;
   font-family:
     Inter,
+    -apple-system,
+    BlinkMacSystemFont,
     "Segoe UI",
+    Roboto,
     Arial,
     sans-serif;
 }
@@ -537,7 +540,7 @@
    STATUS
 ========================================================= */
 
-.attendance-status {
+.attendance-page .attendance-status {
   min-width: 49px;
   display: inline-flex;
   align-items: center;
@@ -549,46 +552,46 @@
   font-weight: 700;
 }
 
-.attendance-status i {
+.attendance-page .attendance-status i {
   width: 5px;
   height: 5px;
   border-radius: 50%;
   display: block;
 }
 
-.attendance-status.present {
+.attendance-page .attendance-status.present {
   background: #ddf7e9;
   color: #159653;
 }
 
-.attendance-status.present i {
+.attendance-page .attendance-status.present i {
   background: #15a45b;
 }
 
-.attendance-status.absent {
+.attendance-page .attendance-status.absent {
   background: #ffe5e8;
   color: #df3046;
 }
 
-.attendance-status.absent i {
+.attendance-page .attendance-status.absent i {
   background: #e7354a;
 }
 
-.attendance-status.late {
+.attendance-page .attendance-status.late {
   background: #fff0d9;
   color: #df8510;
 }
 
-.attendance-status.late i {
+.attendance-page .attendance-status.late i {
   background: #ed8c11;
 }
 
-.attendance-status.excused {
+.attendance-page .attendance-status.excused {
   background: #ece7ff;
   color: #7751d8;
 }
 
-.attendance-status.excused i {
+.attendance-page .attendance-status.excused i {
   background: #7751d8;
 }
 

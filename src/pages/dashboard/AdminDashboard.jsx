@@ -202,7 +202,7 @@ function AdminDashboard() {
       label: "Attendance Records",
       value: dashboardData.attendanceRecords,
       description: "Accepted attendance",
-      icon: "check",
+      icon: "calendar",
       tone: "green",
     },
     {
@@ -284,7 +284,23 @@ function AdminDashboard() {
 
           {error && (
             <div className="dashboard-error">
-              <span className="error-mark">!</span>
+              <span className="error-mark">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 4v9" />
+                  <path d="M12 17h.01" />
+                  <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+                </svg>
+              </span>
               <div>
                 <strong>Unable to load dashboard data</strong>
                 <p>{error}</p>
@@ -306,13 +322,11 @@ function AdminDashboard() {
                   <div className="stat-icon">
                     <Icon type={stat.icon} size={21} />
                   </div>
-
-                  <span className="stat-menu">•••</span>
                 </div>
 
                 <div className="stat-value">
                   {loading ? (
-                    <span className="stat-skeleton">---</span>
+                    <span className="stat-skeleton">...</span>
                   ) : (
                     stat.value.toLocaleString()
                   )}
@@ -347,7 +361,7 @@ function AdminDashboard() {
                   </div>
 
                   <strong className="overview-number">
-                    {loading ? "—" : dashboardData.students.toLocaleString()}
+                    {loading ? "..." : dashboardData.students.toLocaleString()}
                   </strong>
                 </div>
 
@@ -363,14 +377,14 @@ function AdminDashboard() {
                   </div>
 
                   <strong className="overview-number">
-                    {loading ? "—" : dashboardData.sessions.toLocaleString()}
+                    {loading ? "..." : dashboardData.sessions.toLocaleString()}
                   </strong>
                 </div>
 
                 <div className="overview-item">
                   <div className="overview-item-left">
                     <span className="overview-icon overview-green">
-                      <Icon type="check" size={18} />
+                      <Icon type="calendar" size={18} />
                     </span>
                     <div>
                       <strong>Accepted Attendance</strong>
@@ -380,7 +394,7 @@ function AdminDashboard() {
 
                   <strong className="overview-number">
                     {loading
-                      ? "—"
+                      ? "..."
                       : dashboardData.attendanceRecords.toLocaleString()}
                   </strong>
                 </div>
@@ -398,7 +412,7 @@ function AdminDashboard() {
 
                   <strong className="overview-number">
                     {loading
-                      ? "—"
+                      ? "..."
                       : dashboardData.pendingCorrections.toLocaleString()}
                   </strong>
                 </div>
@@ -516,7 +530,7 @@ function AdminDashboard() {
 
               <div className="status-card">
                 <div className="status-card-icon">
-                  <Icon type="check" size={19} />
+                  <Icon type="calendar" size={19} />
                 </div>
                 <div>
                   <strong>Attendance</strong>

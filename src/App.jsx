@@ -595,6 +595,60 @@ function App() {
    LOGIN
 ========================================================= */
 
+function AuthIcon({ name, size = 17 }) {
+  const paths = {
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    ),
+
+    lock: (
+      <>
+        <rect x="5" y="11" width="14" height="9" rx="2" />
+        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+      </>
+    ),
+
+    eye: (
+      <>
+        <path d="M3 12a9 9 0 0 1 18 0" />
+        <path d="M3 12a9 9 0 0 0 18 0" />
+        <circle cx="12" cy="12" r="2.5" />
+      </>
+    ),
+
+    eyeOff: (
+      <>
+        <path d="M4 4l16 16" />
+        <path d="M10.6 5.1A9 9 0 0 1 21 12a13 13 0 0 1-3.2 4.4" />
+        <path d="M6.6 6.6A13 13 0 0 0 3 12a9 9 0 0 0 14.9 3.4" />
+      </>
+    ),
+
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+
+    plus: <path d="M12 5v14M5 12h14" />,
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
 function Login() {
   const navigate = useNavigate();
 
@@ -695,15 +749,6 @@ function Login() {
 
         </div>
 
-        <button
-          type="button"
-          className="language-button"
-        >
-          <span>
-            English
-          </span>
-        </button>
-
       </header>
 
       {/* =====================================================
@@ -752,7 +797,7 @@ function Login() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  ✉
+                  <AuthIcon name="mail" />
                 </span>
 
                 <input
@@ -778,7 +823,7 @@ function Login() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  🔒
+                  <AuthIcon name="lock" />
                 </span>
 
                 <input
@@ -805,8 +850,8 @@ function Login() {
                   }
                 >
                   {showPassword
-                    ? "◉"
-                    : "◌"}
+                    ? <AuthIcon name="eyeOff" />
+                    : <AuthIcon name="eye" />}
                 </button>
 
               </div>
@@ -837,7 +882,7 @@ function Login() {
 
               {!loading && (
                 <span className="sign-arrow">
-                  →
+                  <AuthIcon name="arrow" size={19} />
                 </span>
               )}
 
@@ -860,7 +905,7 @@ function Login() {
               className="create-account-button"
             >
               <span className="create-icon">
-                ♙+
+                <AuthIcon name="plus" size={18} />
               </span>
 
               <span>

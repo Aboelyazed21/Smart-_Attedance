@@ -2202,7 +2202,7 @@ function Rooms() {
                               room.building
                             }
                             {" "}
-                            •{" "}
+                            <span className="recent-room-sep">/</span>{" "}
                             {getRoomTypeLabel(
                               room.room_type
                             )}

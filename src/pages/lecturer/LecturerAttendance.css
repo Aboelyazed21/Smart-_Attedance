@@ -811,7 +811,7 @@
   font-size: 8px;
 }
 
-.attendance-status {
+.lecturer-attendance-page .attendance-status {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -831,27 +831,27 @@
   background: currentColor;
 }
 
-.attendance-status-present {
+.lecturer-attendance-page .attendance-status-present {
   background: #ecfdf5;
   color: #047857;
 }
 
-.attendance-status-late {
+.lecturer-attendance-page .attendance-status-late {
   background: #fffbeb;
   color: #b45309;
 }
 
-.attendance-status-absent {
+.lecturer-attendance-page .attendance-status-absent {
   background: #fef2f2;
   color: #dc2626;
 }
 
-.attendance-status-excused {
+.lecturer-attendance-page .attendance-status-excused {
   background: #eff6ff;
   color: #2563eb;
 }
 
-.attendance-status-unknown {
+.lecturer-attendance-page .attendance-status-unknown {
   background: #f1f5f9;
   color: #64748b;
 }

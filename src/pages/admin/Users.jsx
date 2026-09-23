@@ -5,6 +5,71 @@ import {
   updateUser,
   deleteUser,
 } from "../../services/api";
+import "./Users.css";
+
+function AdminIcon({ name, size = 16 }) {
+  const paths = {
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+
+    trash: (
+      <>
+        <path d="M4 7h16" />
+        <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        <path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
+        <path d="M10 11v6M14 11v6" />
+      </>
+    ),
+
+    plus: <path d="M12 5v14M5 12h14" />,
+
+    close: <path d="M6 6l12 12M18 6 6 18" />,
+
+    alert: (
+      <>
+        <path d="M12 4v9" />
+        <path d="M12 17h.01" />
+        <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+      </>
+    ),
+
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M3 20a6 6 0 0 1 12 0" />
+        <path d="M16 5a3.5 3.5 0 0 1 0 7" />
+        <path d="M18 14.5A6 6 0 0 1 21 20" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -289,7 +354,7 @@ function Users() {
   }
 
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-page admin-users-page">
 
       {/* =====================================================
           MAIN
@@ -317,7 +382,7 @@ function Users() {
             onClick={openCreateModal}
           >
             <span className="button-icon">
-              +
+              <AdminIcon name="plus" size={16} />
             </span>
 
             Add User
@@ -331,7 +396,9 @@ function Users() {
 
           {error && (
             <div className="dashboard-error">
-              <span>!</span>
+              <span>
+                <AdminIcon name="alert" size={15} />
+              </span>
 
               {error}
             </div>
@@ -360,7 +427,7 @@ function Users() {
               <div className="users-search">
 
                 <span>
-                  ⌕
+                  <AdminIcon name="search" size={16} />
                 </span>
 
                 <input
@@ -401,7 +468,7 @@ function Users() {
                 <div className="users-empty">
 
                   <div className="empty-icon">
-                    👥
+                    <AdminIcon name="users" size={24} />
                   </div>
 
                   <h3>
@@ -510,7 +577,7 @@ function Users() {
                             {/* PHONE */}
 
                             <td>
-                              {user.phone || "—"}
+                              {user.phone || "Not provided"}
                             </td>
 
                             {/* ROLE */}
@@ -555,7 +622,7 @@ function Users() {
                                 ? new Date(
                                     user.created_at
                                   ).toLocaleDateString()
-                                : "—"}
+                                : "Not provided"}
 
                             </td>
 
@@ -576,7 +643,7 @@ function Users() {
                                   title="Edit user"
                                 >
                                   <span>
-                                    ✎
+                                    <AdminIcon name="edit" size={15} />
                                   </span>
 
                                   Edit
@@ -593,7 +660,7 @@ function Users() {
                                   title="Delete user"
                                 >
                                   <span>
-                                    🗑
+                                    <AdminIcon name="trash" size={15} />
                                   </span>
 
                                   Delete
@@ -645,7 +712,9 @@ function Users() {
               <div>
 
                 <div className="modal-title-icon">
-                  {editingUser ? "✎" : "+"}
+                  {editingUser
+                    ? <AdminIcon name="edit" size={18} />
+                    : <AdminIcon name="plus" size={18} />}
                 </div>
 
                 <div>
@@ -671,8 +740,9 @@ function Users() {
                 className="modal-close"
                 onClick={closeModal}
                 disabled={saving}
+                aria-label="Close dialog"
               >
-                ×
+                <AdminIcon name="close" size={16} />
               </button>
 
             </div>
@@ -892,8 +962,8 @@ function Users() {
                     <>
                       <span>
                         {editingUser
-                          ? "✓"
-                          : "+"}
+                          ? <AdminIcon name="edit" size={15} />
+                          : <AdminIcon name="plus" size={15} />}
                       </span>
 
                       {editingUser

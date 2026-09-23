@@ -12,11 +12,11 @@
 .student-dashboard {
   --student-sidebar-width: 244px;
   --student-blue: #287cf0;
-  --student-blue-dark: #123f7b;
-  --student-text: #173765;
-  --student-muted: #8193aa;
-  --student-border: #e3eaf3;
-  --student-bg: #f5f8fd;
+  --student-blue-dark: #0f2851;
+  --student-text: #1e293b;
+  --student-muted: #64748b;
+  --student-border: #e2e8f0;
+  --student-bg: #f4f7fb;
 
   position: relative;
   width: 100%;
@@ -58,7 +58,7 @@
   padding: 22px 15px 17px;
   display: flex;
   flex-direction: column;
-  background: #123f7b;
+  background: #0f2851;
   color: #fff;
   z-index: 1200;
   overflow-x: hidden;
@@ -189,6 +189,7 @@
 .student-dashboard .student-nav-item.active {
   background: #2b82ef;
   color: #fff;
+  box-shadow: 0 2px 8px rgba(15, 40, 81, 0.25);
 }
 
 .student-dashboard .student-nav-item svg {
@@ -381,18 +382,18 @@
 }
 
 .student-dashboard .student-stat-icon.green {
-  color: #13a47b;
-  background: #e5f8f1;
+  color: #10b981;
+  background: #ecfdf5;
 }
 
 .student-dashboard .student-stat-icon.orange {
-  color: #d78b16;
-  background: #fff2dc;
+  color: #f59e0b;
+  background: #fffbeb;
 }
 
 .student-dashboard .student-stat-icon.red {
-  color: #d95c63;
-  background: #ffebed;
+  color: #ef4444;
+  background: #fee2e2;
 }
 
 .student-dashboard .student-stat-card > div:last-child {
@@ -532,18 +533,18 @@
 }
 
 .student-dashboard .student-status-present {
-  color: #138565;
-  background: #e4f8f1;
+  color: #10b981;
+  background: #ecfdf5;
 }
 
 .student-dashboard .student-status-late {
-  color: #a96d0e;
-  background: #fff2dc;
+  color: #f59e0b;
+  background: #fffbeb;
 }
 
 .student-dashboard .student-status-absent {
-  color: #bd4d54;
-  background: #ffeaec;
+  color: #ef4444;
+  background: #fee2e2;
 }
 
 .student-dashboard .student-status-recorded {
@@ -1792,8 +1793,8 @@
 .student-dashboard .motivation-card {
   position: relative;
   overflow: hidden;
-  background: #123f7b;
-  border-color: #123f7b;
+  background: #0f2851;
+  border-color: #0f2851;
   color: #fff;
 }
 

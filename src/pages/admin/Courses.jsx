@@ -18,6 +18,52 @@ import {
   removeEnrollment,
   updateStudent,
 } from "../../services/api";
+import "./Courses.css";
+
+function CourseIcon({ name, size = 15 }) {
+  const paths = {
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    ),
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+
+    plus: <path d="M12 5v14M5 12h14" />,
+
+    close: <path d="M6 6l12 12M18 6 6 18" />,
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
 
 
 function Courses() {
@@ -1072,7 +1118,7 @@ function Courses() {
   ========================================================= */
 
   return (
-    <div className="courses-page">
+    <div className="courses-page admin-courses-page">
 
 
       {/* =====================================================
@@ -1105,7 +1151,7 @@ function Courses() {
           >
 
             <span className="button-icon">
-              +
+              <CourseIcon name="plus" size={16} />
             </span>
 
             Add Course
@@ -1152,7 +1198,7 @@ function Courses() {
               <div className="users-search">
 
                 <span>
-                  ⌕
+                  <CourseIcon name="search" size={16} />
                 </span>
 
                 <input
@@ -1340,7 +1386,7 @@ function Courses() {
                               ? new Date(
                                   course.created_at
                                 ).toLocaleDateString()
-                              : "—"}
+                              : "Not provided"}
 
                           </td>
 
@@ -1433,8 +1479,8 @@ function Courses() {
                 <div className="modal-title-icon">
                   {
                     editingCourse
-                      ? "✎"
-                      : "+"
+                      ? <CourseIcon name="edit" size={18} />
+                      : <CourseIcon name="plus" size={18} />
                   }
                 </div>
 
@@ -1467,7 +1513,7 @@ function Courses() {
                   saving
                 }
               >
-                ×
+                <CourseIcon name="close" size={15} />
               </button>
 
             </div>
@@ -1634,8 +1680,8 @@ function Courses() {
                       <span>
                         {
                           editingCourse
-                            ? "A"
-                            : "+"
+                            ? <CourseIcon name="edit" size={15} />
+                            : <CourseIcon name="plus" size={15} />
                         }
                       </span>
 
@@ -1726,7 +1772,7 @@ function Courses() {
                   closeStudentsModal
                 }
               >
-                ×
+                <CourseIcon name="close" size={15} />
               </button>
 
             </div>
@@ -1895,7 +1941,7 @@ function Courses() {
               >
 
                 <span>
-                  ⌕
+                  <CourseIcon name="search" size={16} />
                 </span>
 
                 <input
@@ -2223,7 +2269,7 @@ function Courses() {
                             <div className="user-cell">
 
                               <div className="user-table-avatar">
-                                👤
+                                <CourseIcon name="user" size={18} />
                               </div>
 
                               <div>
@@ -2263,7 +2309,7 @@ function Courses() {
 
                             {
                               enrollment.section_name ||
-                              "—"
+                              "Not provided"
                             }
 
                           </td>
@@ -2402,7 +2448,7 @@ function Courses() {
               <div>
 
                 <div className="modal-title-icon">
-                  ✎
+                  <CourseIcon name="edit" size={18} />
                 </div>
 
                 <div>
@@ -2430,7 +2476,7 @@ function Courses() {
                   editingStudentSaving
                 }
               >
-                ×
+                <CourseIcon name="close" size={15} />
               </button>
 
             </div>

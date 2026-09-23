@@ -182,6 +182,175 @@ textarea:focus-visible {
 }
 
 /* =========================================================
+   GLOBAL SAAS PALETTE
+   Additive tokens only — no existing rules touched
+========================================================= */
+
+:root {
+  --att-navy: #101827;
+  --att-navy-soft: #1a2436;
+  --att-page: #f4f7fb;
+  --att-card: #ffffff;
+  --att-primary: #0f2851;
+  --att-primary-dark: #0a1c3a;
+  --att-primary-soft: #e8eef7;
+  --att-text: #172033;
+  --att-muted: #64748b;
+  --att-subtle: #94a3b8;
+  --att-border: #e2e8f0;
+  --att-border-soft: #eef2f7;
+  --att-success: #10b981;
+  --att-success-bg: #ecfdf5;
+  --att-warning: #f59e0b;
+  --att-warning-bg: #fffbeb;
+  --att-danger: #ef4444;
+  --att-danger-bg: #fee2e2;
+  --att-info: #0891b2;
+  --att-info-bg: #ecfeff;
+  --att-violet: #7c3aed;
+  --att-violet-bg: #f5f3ff;
+  --att-orange: #f97316;
+  --att-orange-bg: #fff7ed;
+
+  /* Reference-system aliases (Attendify mobile screens) */
+  --att-header: #0f2851;
+  --att-heading: #1e293b;
+  --att-danger-text: #ef4444;
+  --att-danger-soft: #fee2e2;
+  --att-radius: 14px;
+  --att-radius-sm: 10px;
+  --att-border-line: #e2e8f0;
+  --att-btn-radius: 8px;
+  --att-shadow-soft: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --att-font:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+/* =========================================================
+   SHARED REFERENCE COMPONENTS (opt-in utilities)
+   Apply via className only — no page affected until used
+========================================================= */
+
+.att-card {
+  background: var(--att-card, #ffffff);
+  border: 1px solid var(--att-border-line, #e2e8f0);
+  border-radius: var(--att-radius, 14px);
+}
+
+.att-badge-present,
+.att-badge-absent,
+.att-badge-late {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.att-badge-present {
+  background: var(--att-success-bg, #ecfdf5);
+  color: var(--att-success, #10b981);
+}
+
+.att-badge-absent {
+  background: var(--att-danger-soft, #fee2e2);
+  color: var(--att-danger-text, #ef4444);
+}
+
+.att-badge-late {
+  background: var(--att-warning-bg, #fffbeb);
+  color: var(--att-warning, #f59e0b);
+}
+
+.att-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--att-header, #0f2851);
+  border-radius: var(--att-btn-radius, 8px);
+  background: var(--att-header, #0f2851);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.att-btn-primary:hover {
+  background: var(--att-primary-dark, #4338ca);
+  border-color: var(--att-primary-dark, #4338ca);
+  transform: translateY(-2px);
+}
+
+.att-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.att-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--att-muted, #64748b);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.att-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--att-border-line, #e2e8f0);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--att-heading, #1e293b);
+  font-size: 14px;
+}
+
+.att-input::placeholder {
+  color: var(--att-subtle, #94a3b8);
+}
+
+.att-input:focus {
+  outline: none;
+  border-color: var(--att-primary, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.att-section-title {
+  margin: 0;
+  color: var(--att-heading, #1e293b);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.att-section-sub {
+  margin: 4px 0 0;
+  color: var(--att-muted, #64748b);
+  font-size: 12.5px;
+}
+
+.att-eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--att-primary, #4f46e5);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+/* =========================================================
    MOBILE
 ========================================================= */
 

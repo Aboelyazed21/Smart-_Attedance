@@ -635,3 +635,150 @@
     text-align: center;
   }
 }
+
+/* =========================================================
+   UNIFIED REFERENCE LAYER (navy + flat white cards)
+   Scoped to .admin-settings-page. Base rules untouched.
+========================================================= */
+
+.admin-settings-page.settings-page {
+  background: #f4f7fb;
+  color: #1e293b;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.admin-settings-page button {
+  transition: all 0.3s ease;
+}
+
+.admin-settings-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.admin-settings-page .settings-topbar {
+  background: #ffffff;
+  border-bottom-color: #e2e8f0;
+}
+
+.admin-settings-page .settings-search {
+  border-color: #e2e8f0;
+  background: #f4f7fb;
+}
+
+.admin-settings-page .settings-search:focus-within {
+  border-color: #0f2851;
+  background: #ffffff;
+}
+
+.admin-settings-page .settings-search input {
+  color: #1e293b;
+}
+
+.admin-settings-page .settings-search input::placeholder {
+  color: #94a3b8;
+}
+
+.admin-settings-page .settings-avatar {
+  background: #0f2851;
+  color: #ffffff;
+}
+
+.admin-settings-page .settings-user-info strong {
+  color: #1e293b;
+}
+
+.admin-settings-page .settings-user-info span {
+  color: #64748b;
+}
+
+.admin-settings-page .settings-page-header h1 {
+  color: #1e293b;
+}
+
+.admin-settings-page .settings-page-header p,
+.admin-settings-page .settings-breadcrumb {
+  color: #64748b;
+}
+
+.admin-settings-page .settings-card {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.admin-settings-page .settings-card-header h2 {
+  color: #1e293b;
+}
+
+.admin-settings-page .settings-card-header p {
+  color: #64748b;
+}
+
+.admin-settings-page .settings-title-icon,
+.admin-settings-page .settings-card-icon {
+  display: grid;
+  place-items: center;
+  background: #e8eef7;
+  color: #0f2851;
+}
+
+.admin-settings-page .settings-field label {
+  color: #334155;
+}
+
+.admin-settings-page .settings-field input,
+.admin-settings-page .settings-field select {
+  border-color: #e2e8f0;
+  background: #f4f7fb;
+  color: #1e293b;
+}
+
+.admin-settings-page .settings-field input:focus,
+.admin-settings-page .settings-field select:focus {
+  border-color: #0f2851;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 40, 81, 0.08);
+  outline: none;
+}
+
+.admin-settings-page .settings-toggle.active {
+  background: #0f2851;
+}
+
+.admin-settings-page .settings-save-button {
+  background: #0f2851;
+  border-color: #0f2851;
+  color: #ffffff;
+}
+
+.admin-settings-page .settings-save-button:hover {
+  background: #0a1c3a;
+  transform: translateY(-2px);
+}
+
+.admin-settings-page .settings-saved-message {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.admin-settings-page .attendance-setting-item h3,
+.admin-settings-page .notification-setting-item h3 {
+  color: #1e293b;
+}
+
+.admin-settings-page .attendance-setting-item p,
+.admin-settings-page .notification-setting-item p {
+  color: #64748b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-settings-page button:active {
+    transform: none;
+  }
+}
