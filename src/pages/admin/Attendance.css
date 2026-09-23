@@ -677,40 +677,13 @@
 
   background:
     conic-gradient(
-      #16aa5c
-        0deg
-        var(--present-deg, 0deg),
-
-      #ee4655
-        var(--present-deg, 0deg)
-        calc(
-          var(--present-deg, 0deg) +
-          var(--absent-deg, 0deg)
-        ),
-
-      #f19720
-        calc(
-          var(--present-deg, 0deg) +
-          var(--absent-deg, 0deg)
-        )
-        calc(
-          var(--present-deg, 0deg) +
-          var(--absent-deg, 0deg) +
-          var(--late-deg, 0deg)
-        ),
-
-      #8b4eea
-        calc(
-          var(--present-deg, 0deg) +
-          var(--absent-deg, 0deg) +
-          var(--late-deg, 0deg)
-        )
-        calc(
-          var(--present-deg, 0deg) +
-          var(--absent-deg, 0deg) +
-          var(--late-deg, 0deg) +
-          var(--excused-deg, 0deg)
-        )
+      #16aa5c 0deg
+        var(--attendance-rate, 270deg),
+      #f04b58
+        var(--attendance-rate, 270deg)
+        330deg,
+      #f39a21 330deg
+        360deg
     );
 }
 
@@ -776,10 +749,6 @@
 
 .overview-dot.orange {
   background: #f19720;
-}
-
-.overview-dot.purple {
-  background: #8b4eea;
 }
 
 .attendance-overview-item > strong {
