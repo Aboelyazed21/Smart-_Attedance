@@ -1355,3 +1355,90 @@ button:disabled {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* =========================================================
+   UI/UX UPGRADE — interaction, press, focus, contrast, taps
+   (visual layer only; no logic classes touched)
+========================================================= */
+
+.scan-page button,
+.scan-page input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scan-page button,
+.scan-page .scan-nav-item,
+.scan-page .info-card,
+.scan-page .recent-row {
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+.scan-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.scan-page .scan-nav-item:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.scan-page .primary-button:hover,
+.scan-page .verify-button:hover {
+  transform: translateY(-2px);
+}
+
+.scan-page .primary-button:active,
+.scan-page .verify-button:active,
+.scan-page .recent-link:active,
+.scan-page .retry-history-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.scan-page .info-card:hover {
+  transform: translateY(-2px);
+}
+
+.scan-page .recent-row:not(.table-head):hover {
+  background: #f6faff;
+}
+
+.scan-page .manual-input-wrapper input::placeholder {
+  color: #7c8da3;
+  opacity: 1;
+}
+
+.scan-page .camera-status p,
+.scan-page .section-heading p {
+  color: #66788f;
+}
+
+.scan-page .recent-row {
+  color: #4c6179;
+}
+
+@media (max-width: 720px) {
+  .scan-page .scan-page-hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .scan-page .camera-wrapper,
+  .scan-page #attendance-qr-reader {
+    min-height: 280px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-page button,
+  .scan-page .scan-nav-item,
+  .scan-page .info-card {
+    transition: none;
+  }
+
+  .scan-page button:active,
+  .scan-page .primary-button:hover,
+  .scan-page .verify-button:hover,
+  .scan-page .info-card:hover {
+    transform: none;
+  }
+}

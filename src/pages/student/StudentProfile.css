@@ -1241,3 +1241,110 @@ body.student-profile-nav-open {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* =========================================================
+   UI/UX UPGRADE — interaction, press, focus, contrast, taps
+   (visual layer only; no logic classes touched)
+========================================================= */
+
+.student-profile-page button,
+.student-profile-page input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.student-profile-page button,
+.student-profile-page .student-main-nav button,
+.student-profile-page .profile-stat-card,
+.student-profile-page .profile-card,
+.student-profile-page .side-card,
+.student-profile-page .activity-row {
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+.student-profile-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.student-profile-page .student-main-nav button:active {
+  background: #dbe9fb;
+}
+
+.student-profile-page .edit-profile-btn:hover,
+.student-profile-page .save-btn:hover {
+  transform: translateY(-2px);
+}
+
+.student-profile-page .edit-profile-btn:active,
+.student-profile-page .save-btn:active,
+.student-profile-page .small-edit-btn:active,
+.student-profile-page .refresh-btn:active,
+.student-profile-page .cancel-btn:active,
+.student-profile-page .action-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.student-profile-page .profile-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.student-profile-page .action-button:hover {
+  transform: translateX(2px);
+}
+
+.student-profile-page .action-button:active {
+  transform: translateX(0) scale(0.99);
+}
+
+.student-profile-page .activity-row:hover {
+  background: #f6faff;
+}
+
+.student-profile-page .profile-form input:hover {
+  border-color: #b9cfe8;
+}
+
+.student-profile-page .breadcrumb {
+  color: #66788f;
+}
+
+.student-profile-page .hero-contact span,
+.student-profile-page .card-header p,
+.student-profile-page .side-card p,
+.student-profile-page .activity-row span {
+  color: #5f7389;
+}
+
+.student-profile-page .top-profile-info span,
+.student-profile-page .profile-stat-card small {
+  color: #66788f;
+}
+
+@media (max-width: 720px) {
+  .student-profile-page .profile-page-heading h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .student-profile-page .student-main-nav button {
+    min-height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-profile-page button,
+  .student-profile-page .student-main-nav button,
+  .student-profile-page .profile-stat-card,
+  .student-profile-page .profile-card,
+  .student-profile-page .side-card {
+    transition: none;
+  }
+
+  .student-profile-page button:active,
+  .student-profile-page .edit-profile-btn:hover,
+  .student-profile-page .save-btn:hover,
+  .student-profile-page .profile-stat-card:hover,
+  .student-profile-page .action-button:hover {
+    transform: none;
+  }
+}

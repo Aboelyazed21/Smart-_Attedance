@@ -1122,3 +1122,95 @@ body.confirmation-sidebar-open {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* =========================================================
+   UI/UX UPGRADE — interaction, press, focus, contrast, taps
+   (visual layer only; no logic classes touched)
+========================================================= */
+
+.confirmation-page button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.confirmation-page button,
+.confirmation-page .confirmation-nav button,
+.confirmation-page .summary-card,
+.confirmation-page .next-card,
+.confirmation-page .recent-table-row {
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+.confirmation-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.confirmation-page .confirmation-nav button:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.confirmation-page .primary-confirmation-button:hover,
+.confirmation-page .next-actions button:hover {
+  transform: translateY(-2px);
+}
+
+.confirmation-page .primary-confirmation-button:active,
+.confirmation-page .secondary-confirmation-button:active,
+.confirmation-page .next-actions button:active,
+.confirmation-page .history-error button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.confirmation-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.confirmation-page .summary-card:hover,
+.confirmation-page .next-card:hover {
+  transform: translateY(-2px);
+}
+
+.confirmation-page .recent-table-row:not(.table-header):hover {
+  background: #f6faff;
+}
+
+.confirmation-page .summary-message,
+.confirmation-page .recent-header p {
+  color: #66788f;
+}
+
+.confirmation-page .recent-table-row {
+  color: #4c6179;
+}
+
+.confirmation-page .detail-box small {
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 720px) {
+  .confirmation-page .confirmation-hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .confirmation-page .confirmation-card-header {
+    gap: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirmation-page button,
+  .confirmation-page .confirmation-nav button,
+  .confirmation-page .summary-card,
+  .confirmation-page .next-card {
+    transition: none;
+  }
+
+  .confirmation-page button:active,
+  .confirmation-page .primary-confirmation-button:hover,
+  .confirmation-page .summary-card:hover,
+  .confirmation-page .next-card:hover {
+    transform: none;
+  }
+}

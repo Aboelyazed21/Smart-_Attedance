@@ -1529,3 +1529,106 @@ button:disabled {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* =========================================================
+   UI/UX UPGRADE — interaction, press, focus, contrast, taps
+   (visual layer only; no logic classes touched)
+========================================================= */
+
+.correction-page button,
+.correction-page input,
+.correction-page select,
+.correction-page textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.correction-page button,
+.correction-page .correction-nav button,
+.correction-page .stat-card,
+.correction-page .side-card,
+.correction-page .process-item > span {
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+.correction-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.correction-page .correction-nav button:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.correction-page .new-request-button:hover,
+.correction-page .submit-request-button:hover {
+  transform: translateY(-2px);
+}
+
+.correction-page .new-request-button:active,
+.correction-page .submit-request-button:active,
+.correction-page .retry-button:active,
+.correction-page .view-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.correction-page select,
+.correction-page input[type="date"] {
+  cursor: pointer;
+}
+
+.correction-page .filter-field select:hover,
+.correction-page .filter-field input:hover,
+.correction-page .modal-grid select:hover,
+.correction-page .modal-grid input:hover,
+.correction-page .modal-grid textarea:hover {
+  border-color: #b9cfe8;
+}
+
+.correction-page .stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.correction-page .view-button:hover {
+  transform: translateY(-1px);
+}
+
+.correction-page .correction-global-search input::placeholder,
+.correction-page .input-with-prefix input::placeholder,
+.correction-page .modal-grid input::placeholder,
+.correction-page .modal-grid textarea::placeholder {
+  color: #7c8da3;
+  opacity: 1;
+}
+
+.correction-page .result-count,
+.correction-page .section-title p {
+  color: #66788f;
+}
+
+@media (max-width: 720px) {
+  .correction-page .correction-hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .correction-page .requests-card-header {
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .correction-page button,
+  .correction-page .correction-nav button,
+  .correction-page .stat-card,
+  .correction-page .side-card {
+    transition: none;
+  }
+
+  .correction-page button:active,
+  .correction-page .new-request-button:hover,
+  .correction-page .submit-request-button:hover,
+  .correction-page .stat-card:hover,
+  .correction-page .view-button:hover {
+    transform: none;
+  }
+}

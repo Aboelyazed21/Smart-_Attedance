@@ -1056,3 +1056,95 @@
     max-width: 270px !important;
   }
 }
+
+/* =========================================================
+   UI/UX UPGRADE — interaction, press, focus, contrast, taps
+   (visual layer only; no logic classes touched)
+========================================================= */
+
+.student-dashboard button,
+.student-dashboard input,
+.student-dashboard select,
+.student-dashboard textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.student-dashboard button,
+.student-dashboard .student-nav-item,
+.student-dashboard .student-quick-actions > button,
+.student-dashboard .student-stat-card,
+.student-dashboard .student-panel {
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+.student-dashboard button:active,
+.student-dashboard .student-nav-item:active,
+.student-dashboard .student-quick-actions > button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.student-dashboard .student-nav-item:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.student-dashboard select {
+  cursor: pointer;
+}
+
+.student-dashboard button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.student-dashboard select:focus-visible,
+.student-dashboard textarea:focus-visible {
+  outline: 2px solid rgba(40, 124, 240, 0.35);
+  outline-offset: 2px;
+}
+
+.student-dashboard .student-quick-actions > button:hover {
+  transform: translateY(-2px);
+}
+
+.student-dashboard .student-quick-actions > button:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.student-dashboard .student-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.student-dashboard .student-brand span {
+  font-size: 8px;
+  letter-spacing: 1.4px;
+}
+
+.student-dashboard input::placeholder {
+  color: #7c8da3;
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .student-dashboard .student-brand h2 {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-dashboard button,
+  .student-dashboard .student-nav-item,
+  .student-dashboard .student-quick-actions > button,
+  .student-dashboard .student-stat-card,
+  .student-dashboard .student-panel {
+    transition: none;
+  }
+
+  .student-dashboard button:active,
+  .student-dashboard .student-nav-item:active,
+  .student-dashboard .student-quick-actions > button:active,
+  .student-dashboard .student-quick-actions > button:hover,
+  .student-dashboard .student-stat-card:hover {
+    transform: none;
+  }
+}

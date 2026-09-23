@@ -1036,3 +1036,97 @@ body.sessions-sidebar-open {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* =========================================================
+   UI/UX UPGRADE — interaction, press, focus, contrast, taps
+   (visual layer only; no logic classes touched)
+========================================================= */
+
+.sessions-page button,
+.sessions-page input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sessions-page button,
+.sessions-page .sessions-nav button,
+.sessions-page .sessions-stat-card,
+.sessions-page .session-card {
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+.sessions-page button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.sessions-page .sessions-nav button:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.sessions-page .sessions-refresh-button:hover {
+  transform: translateY(-2px);
+}
+
+.sessions-page .sessions-refresh-button:active,
+.sessions-page .sessions-filter-buttons button:active,
+.sessions-page .sessions-error button:active,
+.sessions-page .sessions-empty button:active,
+.sessions-page .session-card-footer button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.sessions-page .sessions-stat-card:hover,
+.sessions-page .session-card:hover {
+  transform: translateY(-2px);
+}
+
+.sessions-page .session-card:hover {
+  border-color: #bfd8f7;
+}
+
+.sessions-page .sessions-filter-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+.sessions-page .sessions-search input::placeholder {
+  color: #7c8da3;
+  opacity: 1;
+}
+
+.sessions-page .sessions-panel-header p,
+.sessions-page .sessions-result-count {
+  color: #66788f;
+}
+
+.sessions-page .session-card-header p,
+.sessions-page .session-meta strong {
+  color: #3d5570;
+}
+
+@media (max-width: 720px) {
+  .sessions-page .sessions-hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .sessions-page .sessions-search {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sessions-page button,
+  .sessions-page .sessions-nav button,
+  .sessions-page .sessions-stat-card,
+  .sessions-page .session-card {
+    transition: none;
+  }
+
+  .sessions-page button:active,
+  .sessions-page .sessions-refresh-button:hover,
+  .sessions-page .sessions-stat-card:hover,
+  .sessions-page .session-card:hover,
+  .sessions-page .sessions-filter-buttons button:hover {
+    transform: none;
+  }
+}
