@@ -1208,3 +1208,32 @@
     width: 100%;
   }
 }
+/* =========================================================
+   ADMIN SHARED LAYOUT FIX
+   Attendance page is already inside AdminLayout
+   Do NOT reserve another sidebar space.
+========================================================= */
+
+.attendance-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.attendance-main {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 0;
+  box-sizing: border-box;
+}
+
+.attendance-shell {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
