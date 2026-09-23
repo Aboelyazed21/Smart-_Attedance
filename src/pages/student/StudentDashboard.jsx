@@ -1,11 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getMyAttendance,
-} from "../../services/api";
-import "../../App.css";
+import { getMyAttendance } from "../../services/api";
 import "./StudentDashboard.css";
-
 
 function StudentIcon({ name, size = 18 }) {
   const common = {
@@ -140,7 +136,7 @@ function StudentIcon({ name, size = 18 }) {
 
     case "menu":
       return (
-        <svg {...common} size={size}>
+        <svg {...common}>
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       );
@@ -157,9 +153,7 @@ function StudentDashboard() {
 
   const [user] = useState(() => {
     try {
-      return JSON.parse(
-        localStorage.getItem("user") || "{}"
-      );
+      return JSON.parse(localStorage.getItem("user") || "{}");
     } catch {
       return {};
     }
@@ -206,8 +200,14 @@ function StudentDashboard() {
     loadAttendance();
   }, []);
 
+  /* =========================================================
+     MOBILE SIDEBAR
+  ========================================================= */
+
   useEffect(() => {
-    document.body.style.overflow = sidebarOpen ? "hidden" : "";
+    document.body.style.overflow = sidebarOpen
+      ? "hidden"
+      : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -221,13 +221,24 @@ function StudentDashboard() {
       }
     };
 
-    window.addEventListener("keydown", handleEscape);
+    window.addEventListener(
+      "keydown",
+      handleEscape
+    );
 
     return () => {
-      window.removeEventListener("keydown", handleEscape);
+      window.removeEventListener(
+        "keydown",
+        handleEscape
+      );
     };
   }, []);
 
+  /*
+    IMPORTANT:
+    All sidebar navigation goes through this function
+    so the mobile drawer closes before navigation.
+  */
   function navigateStudent(path) {
     setSidebarOpen(false);
     navigate(path);
@@ -317,6 +328,8 @@ function StudentDashboard() {
   ========================================================= */
 
   function handleLogout() {
+    setSidebarOpen(false);
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
@@ -427,29 +440,53 @@ function StudentDashboard() {
       <button
         type="button"
         className="mobile-menu-btn"
-        aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+        aria-label={
+          sidebarOpen
+            ? "Close navigation"
+            : "Open navigation"
+        }
         aria-expanded={sidebarOpen}
-        onClick={() => setSidebarOpen((open) => !open)}
+        onClick={() =>
+          setSidebarOpen(
+            (open) => !open
+          )
+        }
       >
-        <StudentIcon name="menu" size={21} />
+        <StudentIcon
+          name="menu"
+          size={21}
+        />
       </button>
 
       <button
         type="button"
-        className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
+        className={`sidebar-overlay ${
+          sidebarOpen ? "show" : ""
+        }`}
         aria-label="Close navigation"
-        onClick={() => setSidebarOpen(false)}
+        onClick={() =>
+          setSidebarOpen(false)
+        }
       />
 
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside className={`student-sidebar ${sidebarOpen ? "open" : ""}`}>
+      <aside
+        className={`student-sidebar ${
+          sidebarOpen ? "open" : ""
+        }`}
+      >
+
+        {/* BRAND */}
 
         <div className="student-brand">
 
-          <div className="student-brand-logo" aria-hidden="true">
+          <div
+            className="student-brand-logo"
+            aria-hidden="true"
+          >
             A
           </div>
 
@@ -467,13 +504,23 @@ function StudentDashboard() {
 
         <div
           className="student-profile"
-          onClick={() => navigate("/student/profile")}
+          onClick={() =>
+            navigateStudent(
+              "/student/profile"
+            )
+          }
           role="button"
           tabIndex={0}
           onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
               event.preventDefault();
-              navigate("/student/profile");
+
+              navigateStudent(
+                "/student/profile"
+              );
             }
           }}
           title="Open Student Profile"
@@ -503,70 +550,96 @@ function StudentDashboard() {
           <button
             className="student-nav-item active"
             onClick={() =>
-              navigate("/dashboard")
+              navigateStudent(
+                "/dashboard"
+              )
             }
           >
-            <StudentIcon name="dashboard" size={18} />
+            <StudentIcon
+              name="dashboard"
+              size={18}
+            />
+
             Dashboard
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              navigateStudent(
                 "/student/attendance"
               )
             }
           >
-            <StudentIcon name="attendance" size={18} />
+            <StudentIcon
+              name="attendance"
+              size={18}
+            />
+
             My Attendance
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              navigateStudent(
                 "/student/scan"
               )
             }
           >
-            <StudentIcon name="scan" size={18} />
+            <StudentIcon
+              name="scan"
+              size={18}
+            />
+
             Scan QR
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              navigateStudent(
                 "/student/sessions"
               )
             }
           >
-            <StudentIcon name="sessions" size={18} />
+            <StudentIcon
+              name="sessions"
+              size={18}
+            />
+
             My Sessions
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              navigateStudent(
                 "/student/corrections"
               )
             }
           >
-            <StudentIcon name="correction" size={18} />
+            <StudentIcon
+              name="correction"
+              size={18}
+            />
+
             Correction Requests
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              navigateStudent(
                 "/student/notifications"
               )
             }
           >
-            <StudentIcon name="notifications" size={18} />
+            <StudentIcon
+              name="notifications"
+              size={18}
+            />
+
             Notifications
           </button>
 
@@ -580,7 +653,11 @@ function StudentDashboard() {
             className="student-nav-item"
             onClick={handleLogout}
           >
-            <StudentIcon name="logout" size={18} />
+            <StudentIcon
+              name="logout"
+              size={18}
+            />
+
             Logout
           </button>
 
@@ -610,13 +687,23 @@ function StudentDashboard() {
 
           <div
             className="student-header-user"
-            onClick={() => navigate("/student/profile")}
+            onClick={() =>
+              navigateStudent(
+                "/student/profile"
+              )
+            }
             role="button"
             tabIndex={0}
             onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
+              if (
+                event.key === "Enter" ||
+                event.key === " "
+              ) {
                 event.preventDefault();
-                navigate("/student/profile");
+
+                navigateStudent(
+                  "/student/profile"
+                );
               }
             }}
             title="Open Student Profile"
@@ -637,6 +724,7 @@ function StudentDashboard() {
 
           {error && (
             <div className="student-dashboard-error">
+
               {error}
 
               <button
@@ -644,6 +732,7 @@ function StudentDashboard() {
               >
                 Retry
               </button>
+
             </div>
           )}
 
@@ -656,7 +745,10 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon blue">
-                <StudentIcon name="chart" size={19} />
+                <StudentIcon
+                  name="chart"
+                  size={19}
+                />
               </div>
 
               <div>
@@ -680,7 +772,10 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon green">
-                <StudentIcon name="present" size={19} />
+                <StudentIcon
+                  name="present"
+                  size={19}
+                />
               </div>
 
               <div>
@@ -704,7 +799,10 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon orange">
-                <StudentIcon name="clock" size={19} />
+                <StudentIcon
+                  name="clock"
+                  size={19}
+                />
               </div>
 
               <div>
@@ -728,7 +826,10 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon red">
-                <StudentIcon name="absent" size={19} />
+                <StudentIcon
+                  name="absent"
+                  size={19}
+                />
               </div>
 
               <div>
@@ -787,16 +888,20 @@ function StudentDashboard() {
 
               {loading ? (
                 <div className="student-empty-state">
+
                   <div className="student-loading">
                     Loading attendance...
                   </div>
+
                 </div>
-              ) : recentAttendance.length ===
-                0 ? (
+              ) : recentAttendance.length === 0 ? (
                 <div className="student-empty-state">
 
                   <div className="student-empty-icon">
-                    <StudentIcon name="attendance" size={23} />
+                    <StudentIcon
+                      name="attendance"
+                      size={23}
+                    />
                   </div>
 
                   <h3>
@@ -839,7 +944,10 @@ function StudentDashboard() {
                         >
 
                           <div className="student-course-icon">
-                            <StudentIcon name="book" size={18} />
+                            <StudentIcon
+                              name="book"
+                              size={18}
+                            />
                           </div>
 
                           <div className="student-attendance-info">
@@ -899,8 +1007,12 @@ function StudentDashboard() {
                     )
                   }
                 >
+
                   <span className="student-action-icon">
-                    <StudentIcon name="scan" size={17} />
+                    <StudentIcon
+                      name="scan"
+                      size={17}
+                    />
                   </span>
 
                   <div>
@@ -913,7 +1025,13 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow"><StudentIcon name="arrow" size={15} /></b>
+                  <b className="student-action-arrow">
+                    <StudentIcon
+                      name="arrow"
+                      size={15}
+                    />
+                  </b>
+
                 </button>
 
                 <button
@@ -923,8 +1041,12 @@ function StudentDashboard() {
                     )
                   }
                 >
+
                   <span className="student-action-icon">
-                    <StudentIcon name="attendance" size={17} />
+                    <StudentIcon
+                      name="attendance"
+                      size={17}
+                    />
                   </span>
 
                   <div>
@@ -937,7 +1059,13 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow"><StudentIcon name="arrow" size={15} /></b>
+                  <b className="student-action-arrow">
+                    <StudentIcon
+                      name="arrow"
+                      size={15}
+                    />
+                  </b>
+
                 </button>
 
                 <button
@@ -947,8 +1075,12 @@ function StudentDashboard() {
                     )
                   }
                 >
+
                   <span className="student-action-icon">
-                    <StudentIcon name="sessions" size={17} />
+                    <StudentIcon
+                      name="sessions"
+                      size={17}
+                    />
                   </span>
 
                   <div>
@@ -961,7 +1093,13 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow"><StudentIcon name="arrow" size={15} /></b>
+                  <b className="student-action-arrow">
+                    <StudentIcon
+                      name="arrow"
+                      size={15}
+                    />
+                  </b>
+
                 </button>
 
                 <button
@@ -971,8 +1109,12 @@ function StudentDashboard() {
                     )
                   }
                 >
+
                   <span className="student-action-icon">
-                    <StudentIcon name="correction" size={17} />
+                    <StudentIcon
+                      name="correction"
+                      size={17}
+                    />
                   </span>
 
                   <div>
@@ -985,7 +1127,13 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow"><StudentIcon name="arrow" size={15} /></b>
+                  <b className="student-action-arrow">
+                    <StudentIcon
+                      name="arrow"
+                      size={15}
+                    />
+                  </b>
+
                 </button>
 
               </div>
