@@ -9,7 +9,8 @@
 
   position: relative;
 
-  width: 100%;
+  width: 100vw;
+  max-width: 100vw;
   min-width: 0;
   min-height: 100vh;
 
@@ -23,6 +24,30 @@
   color: #172033;
 
   box-sizing: border-box;
+}
+
+/* =========================================================
+   FULL VIEWPORT BASE
+   Prevent the admin area from inheriting a narrower parent.
+========================================================= */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: none;
 }
 
 /* =========================================================
@@ -353,6 +378,7 @@
   grid-column: 2;
 
   width: 100%;
+  max-width: none;
   min-width: 0;
   min-height: 100vh;
 
@@ -498,6 +524,9 @@
 
 @media (min-width: 1101px) {
   .admin-layout {
+    width: 100vw;
+    max-width: 100vw;
+
     grid-template-columns:
       var(--admin-sidebar-width)
       minmax(0, 1fr);
