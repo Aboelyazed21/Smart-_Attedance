@@ -1,0 +1,221 @@
+/* =========================================================
+   MY SESSIONS - RESPONSIVE UI
+   ========================================================= */
+
+.my-sessions-main {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.my-sessions-mobile-menu,
+.my-sessions-sidebar-overlay {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .my-sessions-main {
+    margin-left: 270px;
+    width: calc(100% - 270px) !important;
+    max-width: calc(100% - 270px) !important;
+  }
+
+  .dashboard-sidebar {
+    position: fixed !important;
+    inset: 0 auto 0 0;
+    width: 270px !important;
+    min-width: 270px !important;
+    max-width: 270px !important;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 769px) {
+  .my-sessions-main {
+    margin-left: 230px;
+    width: calc(100% - 230px) !important;
+    max-width: calc(100% - 230px) !important;
+  }
+
+  .dashboard-sidebar {
+    width: 230px !important;
+    min-width: 230px !important;
+    max-width: 230px !important;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body.my-sessions-sidebar-open {
+    overflow: hidden;
+  }
+
+  .dashboard-page {
+    width: 100% !important;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .dashboard-sidebar {
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(84vw, 300px) !important;
+    min-width: 0 !important;
+    max-width: 300px !important;
+    height: 100vh;
+    margin: 0 !important;
+    transform: translateX(-105%);
+    transition: transform .25s ease;
+    z-index: 1200;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .dashboard-page:has(.my-sessions-mobile-menu) .dashboard-sidebar {
+    transform: translateX(-105%);
+  }
+
+  .my-sessions-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(15, 23, 42, .42);
+    z-index: 1100;
+  }
+
+  .dashboard-page:has(.my-sessions-sidebar-overlay) .dashboard-sidebar {
+    transform: translateX(0);
+  }
+
+  .my-sessions-mobile-menu {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #dbe4ef;
+    border-radius: 10px;
+    background: #fff;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1001;
+    box-shadow: 0 5px 16px rgba(15,23,42,.08);
+  }
+
+  .my-sessions-mobile-menu span {
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: #24466f;
+  }
+
+  .my-sessions-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .dashboard-header {
+    padding-left: 70px !important;
+    padding-right: 16px !important;
+    min-height: 72px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 22px !important;
+  }
+
+  .dashboard-header p {
+    font-size: 12px !important;
+  }
+
+  .dashboard-content {
+    padding: 16px !important;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .stat-card {
+    min-width: 0;
+    padding: 14px !important;
+  }
+
+  .dashboard-panel {
+    min-width: 0;
+    padding: 16px !important;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .panel-header button {
+    width: 100%;
+  }
+
+  .dashboard-panel > div[style*="display: flex"] {
+    width: 100%;
+  }
+
+  .dashboard-panel > div[style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-panel > div[style*="display: grid"] > div {
+    min-width: 0;
+  }
+
+  .dashboard-panel > div[style*="display: grid"] > div > div:first-child {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-sessions-mobile-menu {
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .dashboard-header {
+    padding-left: 62px !important;
+  }
+
+  .dashboard-header h1 {
+    font-size: 20px !important;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-content {
+    padding: 12px !important;
+  }
+
+  .dashboard-panel {
+    padding: 13px !important;
+    border-radius: 12px;
+  }
+}

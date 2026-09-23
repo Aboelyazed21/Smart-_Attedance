@@ -1,10 +1,35 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function StudentProfile() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("student-profile-nav-open", sidebarOpen);
+
+    return () => {
+      document.body.classList.remove("student-profile-nav-open");
+    };
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, []);
+
+  const navigateAndClose = (path) => {
+    setSidebarOpen(false);
+    navigate(path);
+  };
 
   const [user, setUser] = useState(null);
   const [student, setStudent] = useState(null);
@@ -105,6 +130,7 @@ export default function StudentProfile() {
   }
 
   function handleLogout() {
+    setSidebarOpen(false);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
@@ -155,7 +181,7 @@ export default function StudentProfile() {
       : 0;
 
   return (
-    <div className="student-profile-page">
+    <div className={`student-profile-page ${sidebarOpen ? "mobile-nav-open" : ""}`}>
 
       {/* =====================================================
           TOP NAVBAR
@@ -165,10 +191,10 @@ export default function StudentProfile() {
 
         <div
           className="student-brand"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigateAndClose("/dashboard")}
         >
           <div className="brand-icon">
-            🎓
+            AT
           </div>
 
           <div className="brand-text">
@@ -177,57 +203,72 @@ export default function StudentProfile() {
           </div>
         </div>
 
+        <button
+          type="button"
+          className="student-profile-mobile-menu"
+          aria-label="Open navigation"
+          aria-expanded={sidebarOpen}
+          onClick={() => setSidebarOpen(true)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        {sidebarOpen && (
+          <button
+            type="button"
+            className="student-profile-nav-overlay"
+            aria-label="Close navigation"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         <nav className="student-main-nav">
 
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigateAndClose("/dashboard")}
           >
-            <span>⌂</span>
             Dashboard
           </button>
 
           <button
             onClick={() =>
-              navigate("/student/attendance")
+              navigateAndClose("/student/attendance")
             }
           >
-            <span>▣</span>
             My Attendance
           </button>
 
           <button
             onClick={() =>
-              navigate("/student/scan")
+              navigateAndClose("/student/scan")
             }
           >
-            <span>⌗</span>
             Scan QR
           </button>
 
           <button
             onClick={() =>
-              navigate("/student/sessions")
+              navigateAndClose("/student/sessions")
             }
           >
-            <span>▤</span>
             My Sessions
           </button>
 
           <button
             onClick={() =>
-              navigate("/student/corrections")
+              navigateAndClose("/student/corrections")
             }
           >
-            <span>⚑</span>
             Correction Requests
           </button>
 
           <button
             onClick={() =>
-              navigate("/student/notifications")
+              navigateAndClose("/student/notifications")
             }
           >
-            <span>●</span>
             Notifications
           </button>
 
@@ -348,11 +389,11 @@ export default function StudentProfile() {
                   <div className="hero-badges">
 
                     <span className="badge">
-                      🎓 Student
+                      AT Student
                     </span>
 
                     <span className="badge">
-                      ● Active
+                      Active
                     </span>
 
                     <span className="badge">
@@ -373,7 +414,7 @@ export default function StudentProfile() {
                 <div className="hero-circle circle-two"></div>
 
                 <div className="hero-graduation">
-                  🎓
+                  AT
                 </div>
 
                 <p>
@@ -475,7 +516,7 @@ export default function StudentProfile() {
                       )
                     }
                   >
-                    ✎ Edit
+                    Edit
                   </button>
 
                 </div>
@@ -534,7 +575,7 @@ export default function StudentProfile() {
                 <div className="card-header">
 
                   <div className="card-title-icon academic-icon">
-                    🎓
+                    AT
                   </div>
 
                   <div>
@@ -598,7 +639,7 @@ export default function StudentProfile() {
               <div className="side-card security-card">
 
                 <div className="side-card-icon">
-                  🔒
+                  Security
                 </div>
 
                 <h3>
@@ -617,7 +658,7 @@ export default function StudentProfile() {
                     )
                   }
                 >
-                  🔑 Change Password
+                  Change Password
                 </button>
 
               </div>
@@ -627,7 +668,7 @@ export default function StudentProfile() {
               <div className="side-card actions-card">
 
                 <div className="side-card-icon orange">
-                  ⚡
+                  Actions
                 </div>
 
                 <h3>
@@ -641,21 +682,21 @@ export default function StudentProfile() {
                 <ActionButton
                   text="View My Attendance"
                   onClick={() =>
-                    navigate("/student/attendance")
+                    navigateAndClose("/student/attendance")
                   }
                 />
 
                 <ActionButton
                   text="View My Sessions"
                   onClick={() =>
-                    navigate("/student/sessions")
+                    navigateAndClose("/student/sessions")
                   }
                 />
 
                 <ActionButton
                   text="Scan Attendance QR"
                   onClick={() =>
-                    navigate("/student/scan")
+                    navigateAndClose("/student/scan")
                   }
                 />
 
@@ -683,7 +724,7 @@ export default function StudentProfile() {
 
                 <button
                   onClick={() =>
-                    navigate("/student/attendance")
+                    navigateAndClose("/student/attendance")
                   }
                 >
                   View All →
@@ -722,7 +763,7 @@ export default function StudentProfile() {
                       >
 
                         <div className="activity-icon">
-                          ✓
+                          
                         </div>
 
                         <div>
@@ -1768,6 +1809,368 @@ export default function StudentProfile() {
           }
 
         }
+
+
+/* =========================================================
+   STUDENT PROFILE - FINAL RESPONSIVE NAVIGATION
+   ========================================================= */
+
+.student-profile-page {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.student-profile-page * {
+  box-sizing: border-box;
+}
+
+.student-profile-mobile-menu,
+.student-profile-nav-overlay {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .student-profile-main {
+    width: min(94%, 1380px);
+    padding-top: 22px;
+  }
+
+  .student-main-nav {
+    gap: 0;
+  }
+
+  .student-main-nav button {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .profile-content-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .personal-card,
+  .academic-card {
+    grid-column: span 2;
+  }
+
+  .security-card,
+  .actions-card {
+    grid-column: span 1;
+  }
+
+  .hero-decoration {
+    display: none !important;
+  }
+
+  .profile-hero {
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  body.student-profile-nav-open {
+    overflow: hidden;
+  }
+
+  .student-topbar {
+    height: 64px;
+    padding: 0 14px 0 64px;
+    position: sticky;
+    z-index: 1000;
+  }
+
+  .student-brand {
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    font-size: 12px;
+  }
+
+  .brand-text strong {
+    font-size: 17px;
+  }
+
+  .brand-text span {
+    font-size: 6px;
+    letter-spacing: 1.2px;
+  }
+
+  .student-main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(84vw, 300px);
+    height: 100vh;
+    padding: 84px 14px 20px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    box-shadow: 12px 0 35px rgba(15, 23, 42, .12);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 5px;
+    transform: translateX(-105%);
+    transition: transform .25s ease;
+    z-index: 1300;
+    overflow-y: auto;
+  }
+
+  .mobile-nav-open .student-main-nav {
+    transform: translateX(0);
+  }
+
+  .student-main-nav button {
+    width: 100%;
+    min-height: 46px;
+    justify-content: flex-start;
+    padding: 0 14px;
+    border-radius: 9px;
+    color: #36516f;
+    background: #fff;
+    font-size: 13px;
+    border: 1px solid transparent;
+  }
+
+  .student-main-nav button:hover {
+    background: #f4f7fb;
+  }
+
+  .student-profile-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(15, 23, 42, .42);
+    z-index: 1200;
+  }
+
+  .student-profile-mobile-menu {
+    display: flex;
+    position: absolute;
+    left: 14px;
+    top: 11px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #dbe4ef;
+    border-radius: 9px;
+    background: #fff;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    z-index: 1400;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .07);
+  }
+
+  .student-profile-mobile-menu span {
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: #24466f;
+  }
+
+  .top-profile {
+    min-width: auto;
+  }
+
+  .top-profile-info,
+  .profile-menu-btn {
+    display: none;
+  }
+
+  .student-profile-main {
+    width: 100%;
+    padding: 18px 14px 36px;
+  }
+
+  .profile-page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .profile-page-heading h1 {
+    font-size: 26px;
+  }
+
+  .profile-page-heading p {
+    font-size: 13px;
+  }
+
+  .refresh-btn {
+    width: 100%;
+  }
+
+  .profile-hero {
+    padding: 22px;
+    min-height: auto;
+    border-radius: 14px;
+  }
+
+  .hero-left {
+    width: 100%;
+    gap: 15px;
+  }
+
+  .hero-avatar {
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    font-size: 24px;
+  }
+
+  .hero-user-info {
+    min-width: 0;
+  }
+
+  .hero-user-info h2 {
+    font-size: 22px;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-contact {
+    flex-direction: column;
+    gap: 5px;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-badges {
+    gap: 5px;
+  }
+
+  .badge {
+    font-size: 9px;
+    padding: 5px 8px;
+  }
+
+  .edit-profile-btn {
+    position: static;
+    margin-top: 18px;
+    width: 100%;
+  }
+
+  .profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .personal-card,
+  .academic-card,
+  .security-card,
+  .actions-card {
+    grid-column: auto;
+  }
+
+  .recent-card {
+    width: 100%;
+  }
+
+  .profile-footer {
+    padding: 16px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-topbar {
+    padding-left: 60px;
+  }
+
+  .student-profile-mobile-menu {
+    left: 10px;
+    top: 10px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand-text span {
+    display: none;
+  }
+
+  .student-profile-main {
+    padding: 14px 10px 28px;
+  }
+
+  .profile-page-heading h1 {
+    font-size: 23px;
+  }
+
+  .profile-hero {
+    padding: 18px;
+  }
+
+  .hero-left {
+    align-items: flex-start;
+  }
+
+  .hero-avatar {
+    width: 62px;
+    height: 62px;
+    min-width: 62px;
+    font-size: 19px;
+  }
+
+  .hero-user-info h2 {
+    font-size: 19px;
+  }
+
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-card,
+  .side-card,
+  .recent-card {
+    border-radius: 13px;
+    padding: 15px;
+  }
+
+  .information-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .info-item.full {
+    grid-column: auto;
+  }
+
+  .card-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .small-edit-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .recent-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+
+  .recent-header button {
+    width: 100%;
+  }
+}
 
       `}</style>
 

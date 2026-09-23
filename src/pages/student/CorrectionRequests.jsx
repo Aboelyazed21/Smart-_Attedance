@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CorrectionRequests.css";
 
@@ -86,6 +86,30 @@ function getSavedUser() {
 function CorrectionRequests() {
   const navigate = useNavigate();
   const user = getSavedUser();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("correction-sidebar-open", sidebarOpen);
+    return () => document.body.classList.remove("correction-sidebar-open");
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const navigateAndClose = (path) => {
+    closeSidebar();
+    navigate(path);
+  };
 
   const firstName =
     user?.first_name ||
@@ -183,6 +207,7 @@ function CorrectionRequests() {
   }
 
   function handleLogout() {
+    closeSidebar();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
@@ -263,8 +288,29 @@ function CorrectionRequests() {
   }
 
   return (
-    <div className="correction-page">
-      <aside className="correction-sidebar">
+    <div className={`correction-page ${sidebarOpen ? "sidebar-open" : ""}`}>
+      <button
+        type="button"
+        className="correction-mobile-menu-button"
+        aria-label="Open navigation menu"
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="correction-sidebar-overlay"
+          aria-label="Close navigation menu"
+          onClick={closeSidebar}
+        />
+      )}
+
+      <aside className={`correction-sidebar ${sidebarOpen ? "is-open" : ""}`}>
         <div className="correction-brand">
           <div className="correction-brand-logo">
             <span className="brand-mark" />
@@ -290,7 +336,7 @@ function CorrectionRequests() {
         <nav className="correction-nav">
           <button
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigateAndClose("/dashboard")}
           >
             <span className="nav-icon">D</span>
             Dashboard
@@ -299,7 +345,7 @@ function CorrectionRequests() {
           <button
             type="button"
             onClick={() =>
-              navigate("/student/attendance")
+              navigateAndClose("/student/attendance")
             }
           >
             <span className="nav-icon">A</span>
@@ -309,7 +355,7 @@ function CorrectionRequests() {
           <button
             type="button"
             onClick={() =>
-              navigate("/student/scan")
+              navigateAndClose("/student/scan")
             }
           >
             <span className="nav-icon">S</span>

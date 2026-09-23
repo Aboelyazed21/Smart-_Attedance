@@ -162,6 +162,8 @@ function escapeCsv(value) {
 function StudentAttendance() {
   const navigate = useNavigate();
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -231,6 +233,36 @@ function StudentAttendance() {
   useEffect(() => {
     loadAttendance();
   }, []);
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      document.body.classList.remove("student-attendance-menu-open");
+      return undefined;
+    }
+
+    document.body.classList.add("student-attendance-menu-open");
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.classList.remove("student-attendance-menu-open");
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove("student-attendance-menu-open");
+    };
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
 
   const courseOptions = useMemo(() => {
     const values = attendance
@@ -592,16 +624,37 @@ function StudentAttendance() {
   }
 
   return (
-    <div className="attendance-page">
+    <div className={`attendance-page ${sidebarOpen ? "attendance-sidebar-open" : ""}`}>
+      <button
+        type="button"
+        className="attendance-mobile-menu"
+        aria-label="Open navigation"
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((value) => !value)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="attendance-sidebar-overlay"
+          aria-label="Close navigation"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside className="attendance-sidebar">
+      <aside className={`attendance-sidebar ${sidebarOpen ? "is-open" : ""}`}>
         <div>
           <div className="attendance-brand">
             <div className="attendance-brand-logo">
-              ✓
+              A
             </div>
 
             <div>
@@ -624,9 +677,10 @@ function StudentAttendance() {
           <nav className="attendance-nav">
             <button
               type="button"
-              onClick={() =>
-                navigate("/dashboard")
-              }
+              onClick={() => {
+                closeSidebar();
+                navigate("/dashboard");
+              }}
             >
               <span>⌂</span>
               Dashboard
@@ -642,9 +696,10 @@ function StudentAttendance() {
 
             <button
               type="button"
-              onClick={() =>
-                navigate("/student/scan")
-              }
+              onClick={() => {
+                closeSidebar();
+                navigate("/student/scan");
+              }}
             >
               <span>▦</span>
               Scan Attendance
@@ -675,7 +730,10 @@ function StudentAttendance() {
           <button
             type="button"
             className="attendance-logout"
-            onClick={handleLogout}
+            onClick={() => {
+              closeSidebar();
+              handleLogout();
+            }}
           >
             <span>↪</span>
             Logout
@@ -760,8 +818,8 @@ function StudentAttendance() {
                 ▣
               </div>
 
-              <div className="attendance-art-check">
-                ✓
+              <div className="attendance-art-mark">
+                •
               </div>
 
               <p>
@@ -781,7 +839,7 @@ function StudentAttendance() {
           <div className="attendance-metrics">
             <div className="attendance-metric-card present">
               <div className="attendance-metric-icon">
-                ✓
+                P
               </div>
 
               <div>
@@ -1426,7 +1484,7 @@ function StudentAttendance() {
               <div className="attendance-side-card attendance-tips-card">
                 <div className="attendance-side-card-title">
                   <div>
-                    <span>💡</span>
+                    <span>Tips</span>
                     <strong>
                       Tips for Better Attendance
                     </strong>
@@ -1435,22 +1493,22 @@ function StudentAttendance() {
 
                 <ul>
                   <li>
-                    <span>✓</span>
+                    <span>•</span>
                     Attend classes regularly
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span>•</span>
                     Check your timetable
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span>•</span>
                     Scan the QR code on time
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span>•</span>
                     Keep track of your progress
                   </li>
                 </ul>

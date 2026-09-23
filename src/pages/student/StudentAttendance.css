@@ -1589,3 +1589,278 @@
     margin-left: 0;
   }
 }
+
+
+/* =========================================================
+   RESPONSIVE DRAWER OVERRIDES
+   Student My Attendance
+========================================================= */
+
+.attendance-mobile-menu {
+  display: none;
+}
+
+.attendance-sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .attendance-page {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .attendance-mobile-menu {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    border: 1px solid #dce6f2;
+    border-radius: 11px;
+    background: rgba(255,255,255,.96);
+    color: #173763;
+    box-shadow: 0 6px 18px rgba(31,69,113,.10);
+    cursor: pointer;
+    z-index: 1400;
+  }
+
+  .attendance-mobile-menu span {
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: #173f72;
+    transition: transform .2s ease, opacity .2s ease;
+  }
+
+  .attendance-sidebar-open .attendance-mobile-menu span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .attendance-sidebar-open .attendance-mobile-menu span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .attendance-sidebar-open .attendance-mobile-menu span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .attendance-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(10, 31, 58, .38);
+    cursor: pointer;
+    z-index: 1190;
+  }
+
+  .attendance-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    width: min(84vw, 300px);
+    height: 100vh;
+
+    padding: 22px 15px;
+
+    transform: translateX(-105%);
+    transition: transform .25s ease, box-shadow .25s ease;
+
+    z-index: 1200;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .attendance-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 18px 0 45px rgba(10, 34, 68, .22);
+  }
+
+  .attendance-main {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    margin-left: 0;
+  }
+
+  .attendance-topbar {
+    min-height: 68px;
+    height: auto;
+    padding: 10px 14px 10px 70px;
+    gap: 12px;
+  }
+
+  .attendance-search {
+    width: min(100%, 430px);
+    flex: 1 1 auto;
+  }
+
+  .attendance-topbar-right {
+    gap: 8px;
+  }
+
+  .attendance-bell {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+  }
+
+  .attendance-header-user {
+    display: none;
+  }
+
+  .attendance-content {
+    width: 100%;
+    min-width: 0;
+    padding: 14px;
+  }
+
+  .attendance-page-hero {
+    min-height: 135px;
+    padding: 20px;
+  }
+
+  .attendance-hero-art {
+    opacity: .32;
+  }
+
+  .attendance-breadcrumb {
+    display: none;
+  }
+
+  .attendance-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-data-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-side-column {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-tips-card {
+    grid-column: auto;
+  }
+
+  .attendance-footer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .student-attendance-menu-open {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 560px) {
+  .attendance-mobile-menu {
+    top: 12px;
+    left: 12px;
+  }
+
+  .attendance-topbar {
+    padding-left: 66px;
+  }
+
+  .attendance-search {
+    min-width: 0;
+  }
+
+  .attendance-search input {
+    font-size: 9px;
+  }
+
+  .attendance-page-hero {
+    min-height: 120px;
+    padding: 17px;
+  }
+
+  .attendance-page-title {
+    gap: 9px;
+  }
+
+  .attendance-page-title-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+  }
+
+  .attendance-page-title h1 {
+    font-size: 18px;
+  }
+
+  .attendance-page-title p {
+    max-width: 230px;
+  }
+
+  .attendance-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-filter-button,
+  .attendance-reset-button {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .attendance-card-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .attendance-table {
+    min-width: 680px;
+  }
+
+  .attendance-table-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .attendance-pagination {
+    align-self: flex-end;
+  }
+
+  .attendance-side-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) {
+  .attendance-mobile-menu,
+  .attendance-sidebar-overlay {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-sidebar,
+  .attendance-mobile-menu span {
+    transition: none;
+  }
+}

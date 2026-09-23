@@ -6,6 +6,36 @@ import "./AttendanceScanner.css";
 
 function AttendanceScanner() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("scan-sidebar-open", sidebarOpen);
+
+    return () => {
+      document.body.classList.remove("scan-sidebar-open");
+    };
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const navigateAndClose = (path) => {
+    closeSidebar();
+    navigate(path);
+  };
 
   const scannerRef = useRef(null);
   const isScanningRef = useRef(false);
@@ -459,6 +489,7 @@ function AttendanceScanner() {
   ========================================================= */
 
   function handleLogout() {
+    closeSidebar();
     localStorage.removeItem(
       "token"
     );
@@ -477,19 +508,38 @@ function AttendanceScanner() {
   return (
     <div className="scan-page">
 
+      <button
+        type="button"
+        className="scan-mobile-menu-button"
+        aria-label="Open navigation menu"
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="scan-sidebar-overlay"
+          aria-label="Close navigation menu"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* ===================================================
           SIDEBAR
       =================================================== */}
 
-      <aside className="scan-sidebar">
+      <aside className={`scan-sidebar ${sidebarOpen ? "is-open" : ""}`}>
 
         {/* BRAND */}
 
         <div className="scan-brand">
 
-          <div className="scan-brand-logo">
-            ✓
-          </div>
+          <div className="scan-brand-logo" aria-hidden="true">A</div>
 
           <div>
             <strong>
@@ -531,8 +581,7 @@ function AttendanceScanner() {
 
           <button
             className="scan-nav-item"
-            onClick={() =>
-              navigate("/dashboard")
+            onClick={() => navigateAndClose("/dashboard")
             }
           >
             <span>⌂</span>
@@ -541,10 +590,7 @@ function AttendanceScanner() {
 
           <button
             className="scan-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
+            onClick={() => navigateAndClose("/student/attendance")
             }
           >
             <span>▤</span>
@@ -585,9 +631,7 @@ function AttendanceScanner() {
 
           <div className="keep-going-card">
 
-            <div className="keep-going-icon">
-              ★
-            </div>
+            <div className="keep-going-icon" aria-hidden="true">+</div>
 
             <div>
               <strong>
@@ -851,9 +895,7 @@ function AttendanceScanner() {
                 {scanResult && (
                   <div className="scanner-message success-state">
 
-                    <div className="success-circle">
-                      ✓
-                    </div>
+                    <div className="success-circle" aria-hidden="true">OK</div>
 
                     <span className="success-label">
                       ATTENDANCE CONFIRMED
@@ -1011,7 +1053,7 @@ function AttendanceScanner() {
                         type="submit"
                         className="verify-button"
                       >
-                        ✓ Verify Code
+                        Verify Code
                       </button>
 
                     </div>
@@ -1257,9 +1299,7 @@ function AttendanceScanner() {
 
                   <div className="security-item">
 
-                    <span className="security-check">
-                      ✓
-                    </span>
+                    <span className="security-check" aria-hidden="true" />
 
                     <div>
                       <strong>
@@ -1275,9 +1315,7 @@ function AttendanceScanner() {
 
                   <div className="security-item">
 
-                    <span className="security-check">
-                      ✓
-                    </span>
+                    <span className="security-check" aria-hidden="true" />
 
                     <div>
                       <strong>
@@ -1293,9 +1331,7 @@ function AttendanceScanner() {
 
                   <div className="security-item">
 
-                    <span className="security-check">
-                      ✓
-                    </span>
+                    <span className="security-check" aria-hidden="true" />
 
                     <div>
                       <strong>
@@ -1311,9 +1347,7 @@ function AttendanceScanner() {
 
                   <div className="security-item">
 
-                    <span className="security-check">
-                      ✓
-                    </span>
+                    <span className="security-check" aria-hidden="true" />
 
                     <div>
                       <strong>
@@ -1330,9 +1364,7 @@ function AttendanceScanner() {
                 </div>
 
                 <div className="security-ready">
-                  <div>
-                    ✓
-                  </div>
+                  <div aria-hidden="true" />
 
                   <strong>
                     All Systems
@@ -1362,33 +1394,33 @@ function AttendanceScanner() {
                 <ul className="tips-list">
 
                   <li>
-                    <span>✓</span>
+                    <span aria-hidden="true" />
                     Make sure there is good lighting
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span aria-hidden="true" />
                     Hold your device steady
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span aria-hidden="true" />
                     Keep the QR code within the frame
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span aria-hidden="true" />
                     Maintain a reasonable distance
                     (10-30 cm)
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span aria-hidden="true" />
                     Ensure the QR code is not blurred or rotated
                   </li>
 
                   <li>
-                    <span>✓</span>
+                    <span aria-hidden="true" />
                     Contact your lecturer if you face any issues
                   </li>
 

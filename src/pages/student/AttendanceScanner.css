@@ -1528,3 +1528,425 @@
     width: 100%;
   }
 }
+
+/* =========================================================
+   FINAL RESPONSIVE / MOBILE DRAWER
+   Shared visual behavior for all screen sizes
+========================================================= */
+
+.scan-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.scan-main {
+  width: calc(100% - 250px);
+  max-width: none;
+  min-width: 0;
+  margin-left: 250px;
+  box-sizing: border-box;
+}
+
+.scan-content,
+.scan-topbar,
+.scan-grid,
+.scan-left-column,
+.scan-right-column {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Remove decorative text glyphs from navigation while keeping
+   the notification count visible. */
+.scan-nav-item > span:first-child {
+  display: none;
+}
+
+.scan-nav-item {
+  justify-content: flex-start;
+}
+
+.scan-brand-logo {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Neutral status markers instead of check/cross symbols. */
+.security-check,
+.tips-list li > span[aria-hidden="true"] {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #2d86df;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.security-ready > div:first-child {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2bb47a;
+  flex: 0 0 8px;
+}
+
+/* Mobile controls */
+.scan-mobile-menu-button {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #dce5ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(24, 55, 90, 0.08);
+  z-index: 1400;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.scan-mobile-menu-button span {
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: #244a73;
+}
+
+.scan-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: rgba(12, 31, 55, 0.36);
+  z-index: 1250;
+  cursor: pointer;
+}
+
+body.scan-sidebar-open {
+  overflow: hidden;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .scan-sidebar {
+    width: 220px;
+  }
+
+  .scan-main {
+    width: calc(100% - 220px);
+    margin-left: 220px;
+  }
+
+  .scan-grid {
+    grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+  }
+
+  .hero-decoration {
+    min-width: 190px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .scan-mobile-menu-button {
+    display: flex;
+  }
+
+  .scan-sidebar-overlay {
+    display: block;
+  }
+
+  .scan-sidebar {
+    width: min(82vw, 300px);
+    min-height: 100vh;
+    height: 100vh;
+    top: 0;
+    bottom: auto;
+    left: 0;
+    padding: 18px 14px;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    z-index: 1300;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: none;
+  }
+
+  .scan-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 18px 0 45px rgba(9, 35, 66, 0.18);
+  }
+
+  .scan-brand {
+    justify-content: flex-start;
+  }
+
+  .scan-brand > div:last-child,
+  .scan-profile-info {
+    display: block;
+  }
+
+  .scan-profile {
+    justify-content: flex-start;
+  }
+
+  .scan-nav {
+    gap: 6px;
+  }
+
+  .scan-nav-item {
+    height: 46px;
+    padding: 0 13px;
+    font-size: 12px;
+    justify-content: flex-start;
+  }
+
+  .scan-nav-item > span:first-child {
+    display: none;
+  }
+
+  .scan-nav-item .notification-badge {
+    display: flex;
+  }
+
+  .keep-going-card {
+    display: flex;
+  }
+
+  .scan-logout {
+    justify-content: flex-start;
+    font-size: 11px;
+  }
+
+  .scan-main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .scan-topbar {
+    min-height: 64px;
+    height: auto;
+    padding: 10px 14px 10px 66px;
+    gap: 10px;
+  }
+
+  .scan-search {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+
+  .scan-search kbd {
+    display: none;
+  }
+
+  .scan-user-area {
+    flex: 0 0 auto;
+  }
+
+  .top-user-info,
+  .top-arrow {
+    display: none;
+  }
+
+  .scan-content {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .scan-page-hero {
+    min-height: auto;
+  }
+
+  .hero-left {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .hero-decoration {
+    display: none;
+  }
+
+  .scan-grid {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .scan-right-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tips-card {
+    grid-column: auto;
+  }
+
+  .camera-wrapper {
+    width: 100%;
+    height: min(72vw, 360px);
+    min-height: 260px;
+  }
+
+  .corner.top-left,
+  .corner.bottom-left {
+    left: calc(50% - min(34vw, 140px));
+  }
+
+  .corner.top-right,
+  .corner.bottom-right {
+    right: calc(50% - min(34vw, 140px));
+  }
+
+  .scan-line {
+    width: min(65vw, 270px);
+  }
+
+  .scanner-controls {
+    gap: clamp(18px, 8vw, 55px);
+  }
+
+  .manual-code-card {
+    flex-direction: column;
+  }
+
+  .manual-form {
+    flex-direction: column;
+  }
+
+  .manual-input-wrapper {
+    width: 100%;
+  }
+
+  .verify-button {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .recent-table {
+    overflow-x: auto;
+  }
+
+  .recent-row {
+    min-width: 520px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .scan-topbar {
+    min-height: 58px;
+    padding: 9px 10px 9px 62px;
+  }
+
+  .scan-search {
+    height: 36px;
+  }
+
+  .bell-button {
+    display: none;
+  }
+
+  .top-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .scan-content {
+    padding: 10px;
+  }
+
+  .hero-left {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .hero-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+  }
+
+  .hero-left h1 {
+    font-size: 16px;
+  }
+
+  .hero-left p {
+    font-size: 8px;
+    line-height: 1.5;
+  }
+
+  .ready-card {
+    padding: 12px;
+  }
+
+  .camera-wrapper {
+    height: min(78vw, 310px);
+    min-height: 240px;
+  }
+
+  .corner {
+    width: 48px;
+    height: 48px;
+  }
+
+  .corner.top-left,
+  .corner.bottom-left {
+    left: calc(50% - min(30vw, 110px));
+  }
+
+  .corner.top-right,
+  .corner.bottom-right {
+    right: calc(50% - min(30vw, 110px));
+  }
+
+  .scan-line {
+    width: min(58vw, 220px);
+  }
+
+  .scanner-controls {
+    height: 70px;
+    gap: 14px;
+  }
+
+  .scanner-control span {
+    width: 36px;
+    height: 36px;
+  }
+
+  .scanner-control small {
+    font-size: 7px;
+  }
+
+  .recent-row {
+    min-width: 500px;
+  }
+
+  .scanner-message {
+    min-height: 300px;
+    padding: 22px 14px;
+  }
+
+  .success-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+  }
+}

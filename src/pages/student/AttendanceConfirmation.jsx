@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import "./AttendanceConfirmation.css";
@@ -6,8 +6,38 @@ import "./AttendanceConfirmation.css";
 function AttendanceConfirmation() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const scanData = location.state || {};
+
+  useEffect(() => {
+    document.body.classList.toggle("confirmation-sidebar-open", sidebarOpen);
+
+    return () => {
+      document.body.classList.remove("confirmation-sidebar-open");
+    };
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const navigateAndClose = (path) => {
+    closeSidebar();
+    navigate(path);
+  };
 
   /* =========================================================
      USER
@@ -107,6 +137,7 @@ function AttendanceConfirmation() {
   ========================================================= */
 
   function handleLogout() {
+    closeSidebar();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
@@ -124,14 +155,35 @@ function AttendanceConfirmation() {
           SIDEBAR
       ===================================================== */}
 
-      <aside className="confirmation-sidebar">
+      <button
+        type="button"
+        className="confirmation-mobile-menu-button"
+        aria-label="Open navigation menu"
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="confirmation-sidebar-overlay"
+          aria-label="Close navigation menu"
+          onClick={closeSidebar}
+        />
+      )}
+
+      <aside className={`confirmation-sidebar ${sidebarOpen ? "is-open" : ""}`}>
 
         {/* BRAND */}
 
         <div className="confirmation-brand">
 
           <div className="confirmation-logo">
-            ✓
+            A
           </div>
 
           <div>
@@ -171,44 +223,34 @@ function AttendanceConfirmation() {
         <nav className="confirmation-nav">
 
           <button
-            onClick={() =>
-              navigate("/dashboard")
-            }
+            onClick={() => navigateAndClose("/dashboard")}
           >
-            <span>⌂</span>
+            <span>DB</span>
             Dashboard
           </button>
 
           <button
-            onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
-            }
+            onClick={() => navigateAndClose("/student/attendance")}
           >
-            <span>▤</span>
+            <span>AT</span>
             My Attendance
           </button>
 
           <button
             className="active"
-            onClick={() =>
-              navigate(
-                "/student/scan"
-              )
-            }
+            onClick={() => navigateAndClose("/student/scan")}
           >
-            <span>▦</span>
+            <span>SC</span>
             Scan Attendance
           </button>
 
           <button>
-            <span>▣</span>
+            <span>CR</span>
             Correction Requests
           </button>
 
           <button>
-            <span>♧</span>
+            <span>NT</span>
             Notifications
 
             <b>
@@ -225,7 +267,7 @@ function AttendanceConfirmation() {
           <div className="confirmation-motivation">
 
             <div>
-              ★
+              +
             </div>
 
             <section>
@@ -244,7 +286,7 @@ function AttendanceConfirmation() {
             className="confirmation-logout"
             onClick={handleLogout}
           >
-            <span>↪</span>
+            <span>LO</span>
             Logout
           </button>
 
@@ -265,7 +307,7 @@ function AttendanceConfirmation() {
           <div className="confirmation-search">
 
             <span>
-              ⌕
+              Search
             </span>
 
             <input
@@ -282,7 +324,7 @@ function AttendanceConfirmation() {
 
             <button className="notification-button">
 
-              ♧
+              N
 
               <b>
                 3
@@ -307,7 +349,7 @@ function AttendanceConfirmation() {
             </div>
 
             <span>
-              ⌄
+              Menu
             </span>
 
           </div>
@@ -327,7 +369,7 @@ function AttendanceConfirmation() {
             <div className="confirmation-hero-left">
 
               <div className="hero-success-icon">
-                ✓
+                OK
               </div>
 
               <div>
@@ -351,7 +393,7 @@ function AttendanceConfirmation() {
             <div className="hero-decoration">
 
               <div className="hero-calendar">
-                ✓
+                AT
               </div>
 
               <strong>
@@ -386,7 +428,7 @@ function AttendanceConfirmation() {
                   <div className="success-ring ring-two" />
 
                   <div className="big-success">
-                    ✓
+                    OK
                   </div>
 
                 </div>
@@ -408,7 +450,7 @@ function AttendanceConfirmation() {
                     <div className="details-title">
 
                       <div className="details-icon">
-                        ▣
+                        AD
                       </div>
 
                       <h3>
@@ -418,7 +460,7 @@ function AttendanceConfirmation() {
                     </div>
 
                     <span className="verified-badge">
-                      ✓ Verified & Secure
+                      Verified & Secure
                     </span>
 
                   </div>
@@ -428,7 +470,7 @@ function AttendanceConfirmation() {
                     <div className="detail-box">
 
                       <span className="detail-icon">
-                        ▣
+                        CR
                       </span>
 
                       <div>
@@ -450,7 +492,7 @@ function AttendanceConfirmation() {
                     <div className="detail-box">
 
                       <span className="detail-icon">
-                        ♟
+                        SC
                       </span>
 
                       <div>
@@ -469,7 +511,7 @@ function AttendanceConfirmation() {
                     <div className="detail-box">
 
                       <span className="detail-icon">
-                        ▣
+                        CR
                       </span>
 
                       <div>
@@ -497,7 +539,7 @@ function AttendanceConfirmation() {
                     <div className="detail-box">
 
                       <span className="detail-icon">
-                        ◷
+                        TM
                       </span>
 
                       <div>
@@ -516,7 +558,7 @@ function AttendanceConfirmation() {
                     <div className="detail-box">
 
                       <span className="detail-icon green">
-                        ✓
+                        ST
                       </span>
 
                       <div>
@@ -535,7 +577,7 @@ function AttendanceConfirmation() {
                     <div className="detail-box">
 
                       <span className="detail-icon">
-                        ▦
+                        QR
                       </span>
 
                       <div>
@@ -559,9 +601,7 @@ function AttendanceConfirmation() {
 
                     <div className="verification-step">
 
-                      <div className="verification-check">
-                        ✓
-                      </div>
+                      <div className="verification-check">OK</div>
 
                       <strong>
                         QR Scanned
@@ -577,9 +617,7 @@ function AttendanceConfirmation() {
 
                     <div className="verification-step">
 
-                      <div className="verification-check">
-                        ✓
-                      </div>
+                      <div className="verification-check">OK</div>
 
                       <strong>
                         Session Verified
@@ -595,9 +633,7 @@ function AttendanceConfirmation() {
 
                     <div className="verification-step">
 
-                      <div className="verification-check">
-                        ✓
-                      </div>
+                      <div className="verification-check">OK</div>
 
                       <strong>
                         Enrollment Verified
@@ -613,9 +649,7 @@ function AttendanceConfirmation() {
 
                     <div className="verification-step">
 
-                      <div className="verification-check">
-                        ✓
-                      </div>
+                      <div className="verification-check">OK</div>
 
                       <strong>
                         Attendance Recorded
@@ -644,7 +678,7 @@ function AttendanceConfirmation() {
                     }
                   >
                     <span>
-                      ▥
+                      AT
                     </span>
 
                     View My Attendance
@@ -663,7 +697,7 @@ function AttendanceConfirmation() {
                     }
                   >
                     <span>
-                      ⌂
+                      DB
                     </span>
 
                     Back to Dashboard
@@ -753,12 +787,12 @@ function AttendanceConfirmation() {
 
                     <span>
                       <b className="present-badge">
-                        ✓ Present
+                        Present
                       </b>
                     </span>
 
                     <span>
-                      ▦ QR Code
+                      QR Code
                     </span>
 
                   </div>
@@ -783,12 +817,12 @@ function AttendanceConfirmation() {
 
                     <span>
                       <b className="present-badge">
-                        ✓ Present
+                        Present
                       </b>
                     </span>
 
                     <span>
-                      ▦ QR Code
+                      QR Code
                     </span>
 
                   </div>
@@ -813,7 +847,7 @@ function AttendanceConfirmation() {
 
                     <span>
                       <b className="absent-badge">
-                        ! Absent
+                        Absent
                       </b>
                     </span>
 
@@ -844,7 +878,7 @@ function AttendanceConfirmation() {
                   <div>
 
                     <div className="summary-title-icon">
-                      ▣
+                      AS
                     </div>
 
                     <h3>
@@ -870,7 +904,7 @@ function AttendanceConfirmation() {
                   <div className="summary-stat present">
 
                     <span>
-                      ✓
+                      P
                     </span>
 
                     <small>
@@ -890,7 +924,7 @@ function AttendanceConfirmation() {
                   <div className="summary-stat sessions">
 
                     <span>
-                      ▦
+                      TS
                     </span>
 
                     <small>
@@ -910,7 +944,7 @@ function AttendanceConfirmation() {
                   <div className="summary-stat rate">
 
                     <span>
-                      ◷
+                      AR
                     </span>
 
                     <small>
@@ -961,7 +995,7 @@ function AttendanceConfirmation() {
                 <div className="next-title">
 
                   <div>
-                    !
+                    N
                   </div>
 
                   <h3>
@@ -975,7 +1009,7 @@ function AttendanceConfirmation() {
                   <div className="next-item">
 
                     <span className="next-green">
-                      ✓
+                      01
                     </span>
 
                     <div>
@@ -993,7 +1027,7 @@ function AttendanceConfirmation() {
                   <div className="next-item">
 
                     <span className="next-blue">
-                      ▥
+                      02
                     </span>
 
                     <div>
@@ -1011,7 +1045,7 @@ function AttendanceConfirmation() {
                   <div className="next-item">
 
                     <span className="next-red">
-                      ♧
+                      03
                     </span>
 
                     <div>
@@ -1029,7 +1063,7 @@ function AttendanceConfirmation() {
                   <div className="next-item">
 
                     <span className="next-purple">
-                      ◎
+                      04
                     </span>
 
                     <div>
