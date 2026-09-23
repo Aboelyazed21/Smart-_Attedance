@@ -1310,33 +1310,8 @@ export default function Attendance() {
                 <div
                   className="attendance-donut"
                   style={{
-                    "--present-deg":
-                      `${
-                        statistics.total > 0
-                          ? (statistics.present / statistics.total) * 360
-                          : 0
-                      }deg`,
-
-                    "--absent-deg":
-                      `${
-                        statistics.total > 0
-                          ? (statistics.absent / statistics.total) * 360
-                          : 0
-                      }deg`,
-
-                    "--late-deg":
-                      `${
-                        statistics.total > 0
-                          ? (statistics.late / statistics.total) * 360
-                          : 0
-                      }deg`,
-
-                    "--excused-deg":
-                      `${
-                        statistics.total > 0
-                          ? (statistics.excused / statistics.total) * 360
-                          : 0
-                      }deg`,
+                    "--attendance-rate":
+                      `${statistics.attendanceRate * 3.6}deg`,
                   }}
                 >
                   <div>
@@ -1347,7 +1322,7 @@ export default function Attendance() {
                     </strong>
 
                     <span>
-                      Attendance rate
+                      Present
                     </span>
                   </div>
                 </div>
@@ -1383,17 +1358,6 @@ export default function Attendance() {
                   label="Late"
                   value={
                     statistics.late
-                  }
-                  total={
-                    statistics.total
-                  }
-                />
-
-                <OverviewItem
-                  color="purple"
-                  label="Excused"
-                  value={
-                    statistics.excused
                   }
                   total={
                     statistics.total
