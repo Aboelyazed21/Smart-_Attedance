@@ -4,6 +4,7 @@ import {
   getMyAttendance,
 } from "../../services/api";
 import "../../App.css";
+import "./StudentDashboard.css";
 
 function Icon({ name, size = 18 }) {
   const icons = {
@@ -386,7 +387,12 @@ function StudentDashboard() {
   ];
 
   return (
-    <div className="student-dashboard-page">
+    <div className="student-dashboard">
+      <input
+        type="checkbox"
+        id="student-dashboard-drawer"
+        className="student-drawer-toggle"
+      />
 
       <aside className="student-sidebar">
 
@@ -465,6 +471,22 @@ function StudentDashboard() {
         </div>
 
       </aside>
+
+      <label
+        htmlFor="student-dashboard-drawer"
+        className="sidebar-overlay"
+        aria-label="Close navigation menu"
+      />
+
+      <label
+        htmlFor="student-dashboard-drawer"
+        className="mobile-menu-btn"
+        aria-label="Open navigation menu"
+      >
+        <span />
+        <span />
+        <span />
+      </label>
 
       <main className="student-dashboard-main">
 
@@ -687,7 +709,7 @@ function StudentDashboard() {
                       navigate(action.path)
                     }
                   >
-                    <span>
+                    <span className="student-action-icon">
                       <Icon
                         name={action.icon}
                         size={17}
@@ -704,7 +726,10 @@ function StudentDashboard() {
                       </small>
                     </div>
 
-                    <b aria-hidden="true">
+                    <b
+                      className="student-action-arrow"
+                      aria-hidden="true"
+                    >
                       <Icon name="arrow" size={15} />
                     </b>
                   </button>

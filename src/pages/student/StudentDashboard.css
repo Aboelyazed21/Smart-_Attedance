@@ -1058,6 +1058,64 @@
 }
 
 /* =========================================================
+   DRAWER TOGGLE (CSS-only; no React state required)
+   A hidden checkbox drives the mobile drawer so no
+   useState/useEffect logic is added to the component.
+========================================================= */
+
+.student-dashboard .student-drawer-toggle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.student-dashboard label.mobile-menu-btn,
+.student-dashboard label.sidebar-overlay {
+  cursor: pointer;
+}
+
+.student-dashboard .mobile-menu-btn {
+  flex-direction: column;
+  gap: 5px;
+}
+
+.student-dashboard .mobile-menu-btn span {
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+.student-dashboard .student-profile {
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .student-dashboard .student-drawer-toggle:checked ~ .student-sidebar {
+    transform: translateX(0);
+    box-shadow: 18px 0 45px rgba(8, 35, 74, 0.22);
+  }
+
+  .student-dashboard .student-drawer-toggle:checked ~ .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-dashboard .student-drawer-toggle:checked ~ .student-sidebar,
+  .student-dashboard .student-drawer-toggle:checked ~ .sidebar-overlay {
+    transition: none;
+  }
+}
+
+/* =========================================================
    UI/UX UPGRADE — interaction, press, focus, contrast, taps
    (visual layer only; no logic classes touched)
 ========================================================= */
