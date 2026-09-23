@@ -309,7 +309,6 @@ function RoomTypeIcon({
 ========================================================= */
 
 function Rooms() {
-  const navigate = useNavigate();
 
   /* =======================================================
      STATE
