@@ -1,159 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyAttendance } from "../../services/api";
-import "./StudentDashboard.css";
-
-function StudentIcon({ name, size = 18 }) {
-  const common = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": "true",
-  };
-
-  switch (name) {
-    case "dashboard":
-      return (
-        <svg {...common}>
-          <rect x="4" y="4" width="6" height="6" rx="1" />
-          <rect x="14" y="4" width="6" height="6" rx="1" />
-          <rect x="4" y="14" width="6" height="6" rx="1" />
-          <rect x="14" y="14" width="6" height="6" rx="1" />
-        </svg>
-      );
-
-    case "attendance":
-      return (
-        <svg {...common}>
-          <path d="M5 19V11" />
-          <path d="M12 19V6" />
-          <path d="M19 19v-9" />
-          <path d="M3 19h18" />
-        </svg>
-      );
-
-    case "scan":
-      return (
-        <svg {...common}>
-          <path d="M5 5h5v5H5z" />
-          <path d="M14 5h5v5h-5z" />
-          <path d="M5 14h5v5H5z" />
-          <path d="M14 14h2" />
-          <path d="M19 14v5h-3" />
-          <path d="M14 19v-2" />
-        </svg>
-      );
-
-    case "sessions":
-      return (
-        <svg {...common}>
-          <rect x="4" y="5" width="16" height="15" rx="2" />
-          <path d="M8 3v4M16 3v4M4 10h16" />
-          <path d="M8 14h3M13 14h3M8 17h3" />
-        </svg>
-      );
-
-    case "correction":
-      return (
-        <svg {...common}>
-          <path d="M12 4v8l5 3" />
-          <circle cx="12" cy="12" r="8" />
-        </svg>
-      );
-
-    case "notifications":
-      return (
-        <svg {...common}>
-          <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-          <path d="M10 21h4" />
-        </svg>
-      );
-
-    case "logout":
-      return (
-        <svg {...common}>
-          <path d="M10 5H5v14h5" />
-          <path d="M13 8l4 4-4 4" />
-          <path d="M17 12H8" />
-        </svg>
-      );
-
-    case "chart":
-      return (
-        <svg {...common}>
-          <path d="M5 19V10" />
-          <path d="M12 19V5" />
-          <path d="M19 19v-7" />
-          <path d="M3 19h18" />
-        </svg>
-      );
-
-    case "present":
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="8" />
-          <path d="M8 12h8" />
-        </svg>
-      );
-
-    case "clock":
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="8" />
-          <path d="M12 8v5l3 2" />
-        </svg>
-      );
-
-    case "absent":
-      return (
-        <svg {...common}>
-          <rect x="5" y="4" width="14" height="16" rx="2" />
-          <path d="M8 8h8M8 12h8M8 16h5" />
-        </svg>
-      );
-
-    case "book":
-      return (
-        <svg {...common}>
-          <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v16H7.5A2.5 2.5 0 0 0 5 21z" />
-          <path d="M5 5.5v15" />
-          <path d="M9 7h6" />
-        </svg>
-      );
-
-    case "arrow":
-      return (
-        <svg {...common}>
-          <path d="M5 12h13" />
-          <path d="m13 7 5 5-5 5" />
-        </svg>
-      );
-
-    case "menu":
-      return (
-        <svg {...common}>
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-      );
-
-    default:
-      return null;
-  }
-}
+import {
+  getMyAttendance,
+} from "../../services/api";
+import "../../App.css";
 
 function StudentDashboard() {
   const navigate = useNavigate();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const [user] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("user") || "{}");
+      return JSON.parse(
+        localStorage.getItem("user") || "{}"
+      );
     } catch {
       return {};
     }
@@ -199,50 +58,6 @@ function StudentDashboard() {
   useEffect(() => {
     loadAttendance();
   }, []);
-
-  /* =========================================================
-     MOBILE SIDEBAR
-  ========================================================= */
-
-  useEffect(() => {
-    document.body.style.overflow = sidebarOpen
-      ? "hidden"
-      : "";
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [sidebarOpen]);
-
-  useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener(
-      "keydown",
-      handleEscape
-    );
-
-    return () => {
-      window.removeEventListener(
-        "keydown",
-        handleEscape
-      );
-    };
-  }, []);
-
-  /*
-    IMPORTANT:
-    All sidebar navigation goes through this function
-    so the mobile drawer closes before navigation.
-  */
-  function navigateStudent(path) {
-    setSidebarOpen(false);
-    navigate(path);
-  }
 
   /* =========================================================
      ATTENDANCE STATS
@@ -328,8 +143,6 @@ function StudentDashboard() {
   ========================================================= */
 
   function handleLogout() {
-    setSidebarOpen(false);
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
@@ -431,63 +244,18 @@ function StudentDashboard() {
   }
 
   return (
-    <div className="student-dashboard">
-
-      {/* =====================================================
-          MOBILE NAVIGATION
-      ===================================================== */}
-
-      <button
-        type="button"
-        className="mobile-menu-btn"
-        aria-label={
-          sidebarOpen
-            ? "Close navigation"
-            : "Open navigation"
-        }
-        aria-expanded={sidebarOpen}
-        onClick={() =>
-          setSidebarOpen(
-            (open) => !open
-          )
-        }
-      >
-        <StudentIcon
-          name="menu"
-          size={21}
-        />
-      </button>
-
-      <button
-        type="button"
-        className={`sidebar-overlay ${
-          sidebarOpen ? "show" : ""
-        }`}
-        aria-label="Close navigation"
-        onClick={() =>
-          setSidebarOpen(false)
-        }
-      />
+    <div className="student-dashboard-page">
 
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside
-        className={`student-sidebar ${
-          sidebarOpen ? "open" : ""
-        }`}
-      >
-
-        {/* BRAND */}
+      <aside className="student-sidebar">
 
         <div className="student-brand">
 
-          <div
-            className="student-brand-logo"
-            aria-hidden="true"
-          >
-            A
+          <div className="student-brand-logo">
+            🎓
           </div>
 
           <div>
@@ -504,23 +272,13 @@ function StudentDashboard() {
 
         <div
           className="student-profile"
-          onClick={() =>
-            navigateStudent(
-              "/student/profile"
-            )
-          }
+          onClick={() => navigate("/student/profile")}
           role="button"
           tabIndex={0}
           onKeyDown={(event) => {
-            if (
-              event.key === "Enter" ||
-              event.key === " "
-            ) {
+            if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-
-              navigateStudent(
-                "/student/profile"
-              );
+              navigate("/student/profile");
             }
           }}
           title="Open Student Profile"
@@ -550,96 +308,70 @@ function StudentDashboard() {
           <button
             className="student-nav-item active"
             onClick={() =>
-              navigateStudent(
-                "/dashboard"
-              )
+              navigate("/dashboard")
             }
           >
-            <StudentIcon
-              name="dashboard"
-              size={18}
-            />
-
+            <span>▦</span>
             Dashboard
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigateStudent(
+              navigate(
                 "/student/attendance"
               )
             }
           >
-            <StudentIcon
-              name="attendance"
-              size={18}
-            />
-
+            <span>✓</span>
             My Attendance
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigateStudent(
+              navigate(
                 "/student/scan"
               )
             }
           >
-            <StudentIcon
-              name="scan"
-              size={18}
-            />
-
+            <span>▣</span>
             Scan QR
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigateStudent(
+              navigate(
                 "/student/sessions"
               )
             }
           >
-            <StudentIcon
-              name="sessions"
-              size={18}
-            />
-
+            <span>◫</span>
             My Sessions
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigateStudent(
+              navigate(
                 "/student/corrections"
               )
             }
           >
-            <StudentIcon
-              name="correction"
-              size={18}
-            />
-
+            <span>⚑</span>
             Correction Requests
           </button>
 
           <button
             className="student-nav-item"
             onClick={() =>
-              navigateStudent(
+              navigate(
                 "/student/notifications"
               )
             }
           >
-            <StudentIcon
-              name="notifications"
-              size={18}
-            />
-
+            <span>🔔</span>
             Notifications
           </button>
 
@@ -653,11 +385,7 @@ function StudentDashboard() {
             className="student-nav-item"
             onClick={handleLogout}
           >
-            <StudentIcon
-              name="logout"
-              size={18}
-            />
-
+            <span>↪</span>
             Logout
           </button>
 
@@ -681,29 +409,19 @@ function StudentDashboard() {
             </h1>
 
             <p>
-              Welcome back, {firstName}!
+              Welcome back, {firstName}! 👋
             </p>
           </div>
 
           <div
             className="student-header-user"
-            onClick={() =>
-              navigateStudent(
-                "/student/profile"
-              )
-            }
+            onClick={() => navigate("/student/profile")}
             role="button"
             tabIndex={0}
             onKeyDown={(event) => {
-              if (
-                event.key === "Enter" ||
-                event.key === " "
-              ) {
+              if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-
-                navigateStudent(
-                  "/student/profile"
-                );
+                navigate("/student/profile");
               }
             }}
             title="Open Student Profile"
@@ -724,7 +442,6 @@ function StudentDashboard() {
 
           {error && (
             <div className="student-dashboard-error">
-
               {error}
 
               <button
@@ -732,7 +449,6 @@ function StudentDashboard() {
               >
                 Retry
               </button>
-
             </div>
           )}
 
@@ -745,10 +461,7 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon blue">
-                <StudentIcon
-                  name="chart"
-                  size={19}
-                />
+                ✓
               </div>
 
               <div>
@@ -772,10 +485,7 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon green">
-                <StudentIcon
-                  name="present"
-                  size={19}
-                />
+                ✓
               </div>
 
               <div>
@@ -799,10 +509,7 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon orange">
-                <StudentIcon
-                  name="clock"
-                  size={19}
-                />
+                ⏱
               </div>
 
               <div>
@@ -826,10 +533,7 @@ function StudentDashboard() {
             <div className="student-stat-card">
 
               <div className="student-stat-icon red">
-                <StudentIcon
-                  name="absent"
-                  size={19}
-                />
+                !
               </div>
 
               <div>
@@ -888,20 +592,16 @@ function StudentDashboard() {
 
               {loading ? (
                 <div className="student-empty-state">
-
                   <div className="student-loading">
                     Loading attendance...
                   </div>
-
                 </div>
-              ) : recentAttendance.length === 0 ? (
+              ) : recentAttendance.length ===
+                0 ? (
                 <div className="student-empty-state">
 
                   <div className="student-empty-icon">
-                    <StudentIcon
-                      name="attendance"
-                      size={23}
-                    />
+                    ✓
                   </div>
 
                   <h3>
@@ -944,10 +644,7 @@ function StudentDashboard() {
                         >
 
                           <div className="student-course-icon">
-                            <StudentIcon
-                              name="book"
-                              size={18}
-                            />
+                            📚
                           </div>
 
                           <div className="student-attendance-info">
@@ -1007,13 +704,7 @@ function StudentDashboard() {
                     )
                   }
                 >
-
-                  <span className="student-action-icon">
-                    <StudentIcon
-                      name="scan"
-                      size={17}
-                    />
-                  </span>
+                  <span>▣</span>
 
                   <div>
                     <strong>
@@ -1025,13 +716,7 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow">
-                    <StudentIcon
-                      name="arrow"
-                      size={15}
-                    />
-                  </b>
-
+                  <b>→</b>
                 </button>
 
                 <button
@@ -1041,13 +726,7 @@ function StudentDashboard() {
                     )
                   }
                 >
-
-                  <span className="student-action-icon">
-                    <StudentIcon
-                      name="attendance"
-                      size={17}
-                    />
-                  </span>
+                  <span>✓</span>
 
                   <div>
                     <strong>
@@ -1059,13 +738,7 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow">
-                    <StudentIcon
-                      name="arrow"
-                      size={15}
-                    />
-                  </b>
-
+                  <b>→</b>
                 </button>
 
                 <button
@@ -1075,13 +748,7 @@ function StudentDashboard() {
                     )
                   }
                 >
-
-                  <span className="student-action-icon">
-                    <StudentIcon
-                      name="sessions"
-                      size={17}
-                    />
-                  </span>
+                  <span>◫</span>
 
                   <div>
                     <strong>
@@ -1093,13 +760,7 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow">
-                    <StudentIcon
-                      name="arrow"
-                      size={15}
-                    />
-                  </b>
-
+                  <b>→</b>
                 </button>
 
                 <button
@@ -1109,13 +770,7 @@ function StudentDashboard() {
                     )
                   }
                 >
-
-                  <span className="student-action-icon">
-                    <StudentIcon
-                      name="correction"
-                      size={17}
-                    />
-                  </span>
+                  <span>⚑</span>
 
                   <div>
                     <strong>
@@ -1127,13 +782,7 @@ function StudentDashboard() {
                     </small>
                   </div>
 
-                  <b className="student-action-arrow">
-                    <StudentIcon
-                      name="arrow"
-                      size={15}
-                    />
-                  </b>
-
+                  <b>→</b>
                 </button>
 
               </div>

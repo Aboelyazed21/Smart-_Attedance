@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import { getMySessions } from "../../services/api";
 import "../../App.css";
-import "./MySessions.css";
 
 function MySessions() {
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ function MySessions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const user = (() => {
     try {
@@ -28,28 +26,6 @@ function MySessions() {
     user?.first_name ||
     user?.firstName ||
     "Student";
-
-  useEffect(() => {
-    document.body.classList.toggle("my-sessions-sidebar-open", sidebarOpen);
-
-    return () => {
-      document.body.classList.remove("my-sessions-sidebar-open");
-    };
-  }, [sidebarOpen]);
-
-  useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === "Escape") setSidebarOpen(false);
-    };
-
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, []);
-
-  const navigateAndClose = (path) => {
-    setSidebarOpen(false);
-    navigate(path);
-  };
 
   /* =========================================================
      LOAD SESSIONS
@@ -265,7 +241,6 @@ function MySessions() {
   ========================================================= */
 
   const handleLogout = () => {
-    setSidebarOpen(false);
     localStorage.removeItem(
       "token"
     );
@@ -288,31 +263,12 @@ function MySessions() {
           SIDEBAR
       ===================================================== */}
 
-      <button
-        type="button"
-        className="my-sessions-mobile-menu"
-        aria-label="Open navigation"
-        aria-expanded={sidebarOpen}
-        onClick={() => setSidebarOpen(true)}
-      >
-        <span></span><span></span><span></span>
-      </button>
-
-      {sidebarOpen && (
-        <button
-          type="button"
-          className="my-sessions-sidebar-overlay"
-          aria-label="Close navigation"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       <aside className="dashboard-sidebar">
 
         <div className="sidebar-brand">
 
           <div className="sidebar-logo">
-            AT
+            🎓
           </div>
 
           <div>
@@ -358,11 +314,13 @@ function MySessions() {
           <button
             className="nav-item"
             onClick={() =>
-              navigateAndClose("/dashboard")
+              navigate(
+                "/dashboard"
+              )
             }
           >
             <span>
-              •
+              ▦
             </span>
 
             Dashboard
@@ -371,11 +329,13 @@ function MySessions() {
           <button
             className="nav-item"
             onClick={() =>
-              navigateAndClose("/student/attendance")
+              navigate(
+                "/student/attendance"
+              )
             }
           >
             <span>
-              •
+              ✓
             </span>
 
             My Attendance
@@ -384,11 +344,13 @@ function MySessions() {
           <button
             className="nav-item"
             onClick={() =>
-              navigateAndClose("/student/scan")
+              navigate(
+                "/student/scan"
+              )
             }
           >
             <span>
-              •
+              ▣
             </span>
 
             Scan QR
@@ -397,11 +359,13 @@ function MySessions() {
           <button
             className="nav-item active"
             onClick={() =>
-              navigateAndClose("/student/sessions")
+              navigate(
+                "/student/sessions"
+              )
             }
           >
             <span>
-              •
+              ◫
             </span>
 
             My Sessions
@@ -417,7 +381,7 @@ function MySessions() {
             }
           >
             <span>
-              •
+              ⚑
             </span>
 
             Correction Requests
@@ -433,7 +397,7 @@ function MySessions() {
             }
           >
             <span>
-              •
+              🔔
             </span>
 
             Notifications
@@ -452,7 +416,7 @@ function MySessions() {
             }
           >
             <span>
-              •
+              ↪
             </span>
 
             Logout
@@ -466,7 +430,7 @@ function MySessions() {
           MAIN
       ===================================================== */}
 
-      <main className="dashboard-main my-sessions-main">
+      <main className="dashboard-main">
 
         {/* HEADER */}
 
@@ -509,7 +473,7 @@ function MySessions() {
             <div className="stat-card">
 
               <div className="stat-icon session-icon">
-                •
+                ◫
               </div>
 
               <div>
@@ -531,7 +495,7 @@ function MySessions() {
             <div className="stat-card">
 
               <div className="stat-icon attendance-icon">
-                •
+                ◷
               </div>
 
               <div>
@@ -553,7 +517,7 @@ function MySessions() {
             <div className="stat-card">
 
               <div className="stat-icon present-icon">
-                •
+                ●
               </div>
 
               <div>
@@ -575,7 +539,7 @@ function MySessions() {
             <div className="stat-card">
 
               <div className="stat-icon absent-icon">
-                •
+                ✓
               </div>
 
               <div>
@@ -743,7 +707,7 @@ function MySessions() {
               <div className="empty-state">
 
                 <div className="empty-icon">
-                  •
+                  ◷
                 </div>
 
                 <h3>
@@ -763,7 +727,7 @@ function MySessions() {
               <div className="empty-state">
 
                 <div className="empty-icon">
-                  •
+                  ◫
                 </div>
 
                 <h3>
@@ -986,7 +950,7 @@ function MySessions() {
                           >
 
                             <span>
-                              Date
+                              📅 Date
                             </span>
 
                             <strong
@@ -1024,7 +988,7 @@ function MySessions() {
                           >
 
                             <span>
-                              Time
+                              🕐 Time
                             </span>
 
                             <strong
@@ -1068,7 +1032,7 @@ function MySessions() {
                           >
 
                             <span>
-                              Room
+                              📍 Room
                             </span>
 
                             <strong
