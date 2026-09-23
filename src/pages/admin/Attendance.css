@@ -1178,3 +1178,59 @@
     padding: 0 7px;
   }
 }
+
+/* =========================================================
+   ATTENDANCE CONTENT POSITION FIX
+   Move the page content slightly to the left
+========================================================= */
+
+.attendance-page {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  padding-left: 0;
+  padding-right: 12px;
+  box-sizing: border-box;
+}
+
+.attendance-page .attendance-header,
+.attendance-page .attendance-stats,
+.attendance-page .attendance-filters,
+.attendance-page .attendance-content,
+.attendance-page .attendance-overview-inline {
+  margin-left: 0;
+}
+
+.attendance-page .attendance-header {
+  padding-left: 0;
+}
+
+.attendance-page .attendance-stats {
+  padding-left: 0;
+}
+
+.attendance-page .attendance-filters {
+  padding-left: 0;
+}
+
+.attendance-page .attendance-content {
+  padding-left: 0;
+}
+
+/* Keep the content wide on desktop */
+@media (min-width: 769px) {
+  .attendance-page {
+    transform: translateX(-35px);
+    width: calc(100% + 35px);
+  }
+}
+
+/* Mobile: don't shift the page */
+@media (max-width: 768px) {
+  .attendance-page {
+    transform: none;
+    width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
