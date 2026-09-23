@@ -684,188 +684,6 @@ export default function Attendance() {
   return (
     <div className="attendance-page">
 
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside className="attendance-sidebar">
-
-        <div className="attendance-brand">
-
-          <div className="attendance-brand-icon">
-            🎓
-          </div>
-
-          <div>
-            <strong>
-              Attendify
-            </strong>
-
-            <span>
-              SMART ATTENDANCE
-            </span>
-          </div>
-
-        </div>
-
-        <nav className="attendance-nav">
-
-          <button
-            onClick={() =>
-              navigate(
-                "/dashboard"
-              )
-            }
-          >
-            ▦
-            <span>
-              Dashboard
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/users"
-              )
-            }
-          >
-            👤
-            <span>
-              Users
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/courses"
-              )
-            }
-          >
-            ▤
-            <span>
-              Courses
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/sections"
-              )
-            }
-          >
-            §
-            <span>
-              Sections
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/rooms"
-              )
-            }
-          >
-            ⌂
-            <span>
-              Rooms
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/timetable"
-              )
-            }
-          >
-            ▦
-            <span>
-              Timetable
-            </span>
-          </button>
-
-          <button className="active">
-            ✓
-            <span>
-              Attendance
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/reports"
-              )
-            }
-          >
-            ▥
-            <span>
-              Reports
-            </span>
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(
-                "/admin/settings"
-              )
-            }
-          >
-            ⚙
-            <span>
-              Settings
-            </span>
-          </button>
-
-        </nav>
-
-        <div className="attendance-sidebar-bottom">
-
-          <div className="attendance-good-morning">
-
-            <strong>
-              Good Morning 👋
-            </strong>
-
-            <span>
-              Track and manage student
-              attendance efficiently.
-            </span>
-
-          </div>
-
-          <button
-            className="attendance-logout"
-            onClick={() => {
-              localStorage.removeItem(
-                "token"
-              );
-
-              localStorage.removeItem(
-                "user"
-              );
-
-              navigate(
-                "/login"
-              );
-            }}
-          >
-            ↪
-            Logout
-          </button>
-
-        </div>
-
-      </aside>
-
-      {/* =====================================================
-          MAIN
-      ===================================================== */}
-
       <main className="attendance-main">
 
         {/* TOP BAR */}
@@ -873,7 +691,6 @@ export default function Attendance() {
         <header className="attendance-topbar">
 
           <div className="attendance-global-search">
-            🔎
             <input
               placeholder="Search students, courses, sections, or rooms..."
               value={search}
@@ -886,11 +703,6 @@ export default function Attendance() {
           </div>
 
           <div className="attendance-user">
-
-            <span className="attendance-notification">
-              🔔
-              <b>3</b>
-            </span>
 
             <div className="attendance-user-avatar">
               {
@@ -935,10 +747,6 @@ export default function Attendance() {
 
           <div className="attendance-title">
 
-            <div className="attendance-title-icon">
-              👥
-            </div>
-
             <div>
 
               <h1>
@@ -980,7 +788,6 @@ export default function Attendance() {
         <section className="attendance-stats">
 
           <StatCard
-            icon="👥"
             title="Total Students"
             value={
               statistics.students
@@ -990,7 +797,6 @@ export default function Attendance() {
           />
 
           <StatCard
-            icon="✓"
             title="Present Today"
             value={
               statistics.present
@@ -1000,7 +806,6 @@ export default function Attendance() {
           />
 
           <StatCard
-            icon="×"
             title="Absent Today"
             value={
               statistics.absent
@@ -1010,7 +815,6 @@ export default function Attendance() {
           />
 
           <StatCard
-            icon="◷"
             title="Late Today"
             value={
               statistics.late
@@ -1026,8 +830,6 @@ export default function Attendance() {
         <section className="attendance-filter-card">
 
           <div className="attendance-search">
-
-            🔎
 
             <input
               placeholder="Search by student name, ID, or course..."
@@ -1146,7 +948,7 @@ export default function Attendance() {
               resetFilters
             }
           >
-            ↻ Reset
+            Reset
           </button>
 
           <button
@@ -1155,7 +957,7 @@ export default function Attendance() {
               exportAttendance
             }
           >
-            ↓ Export
+            Export
           </button>
 
         </section>
@@ -1163,6 +965,90 @@ export default function Attendance() {
         {/* CONTENT */}
 
         <section className="attendance-content">
+
+          {/* ATTENDANCE OVERVIEW */}
+
+          <div className="attendance-overview-inline">
+
+            <div className="attendance-overview-chart">
+
+              <div
+                className="attendance-donut-wrapper"
+              >
+                <div
+                  className="attendance-donut"
+                  style={{
+                    "--present-deg": `${
+                      statistics.total > 0
+                        ? (statistics.present / statistics.total) * 360
+                        : 0
+                    }deg`,
+                    "--absent-deg": `${
+                      statistics.total > 0
+                        ? (statistics.absent / statistics.total) * 360
+                        : 0
+                    }deg`,
+                    "--late-deg": `${
+                      statistics.total > 0
+                        ? (statistics.late / statistics.total) * 360
+                        : 0
+                    }deg`,
+                    "--excused-deg": `${
+                      statistics.total > 0
+                        ? (statistics.excused / statistics.total) * 360
+                        : 0
+                    }deg`,
+                  }}
+                >
+                  <div>
+                    <strong>
+                      {statistics.attendanceRate}%
+                    </strong>
+                    <span>Attendance rate</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3>Attendance Overview</h3>
+                <p>Distribution of the currently filtered attendance records.</p>
+              </div>
+
+            </div>
+
+            <div className="attendance-overview-list">
+
+              <OverviewItem
+                color="green"
+                label="Present"
+                value={statistics.present}
+                total={statistics.total}
+              />
+
+              <OverviewItem
+                color="red"
+                label="Absent"
+                value={statistics.absent}
+                total={statistics.total}
+              />
+
+              <OverviewItem
+                color="orange"
+                label="Late"
+                value={statistics.late}
+                total={statistics.total}
+              />
+
+              <OverviewItem
+                color="purple"
+                label="Excused"
+                value={statistics.excused}
+                total={statistics.total}
+              />
+
+            </div>
+
+          </div>
 
           {/* TABLE */}
 
@@ -1191,7 +1077,7 @@ export default function Attendance() {
                   loadAttendance
                 }
               >
-                ↻ Refresh
+                Refresh
               </button>
 
             </div>
@@ -1391,7 +1277,6 @@ export default function Attendance() {
                                   record.attendance_status
                                 )}
                               >
-                                <i />
                                 {
                                   getStatusLabel(
                                     record.attendance_status
@@ -1426,7 +1311,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  👁
+                                  View
                                 </button>
 
                                 <button
@@ -1437,24 +1322,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  ✎
-                                </button>
-
-                                <button
-                                  title="More"
-                                  onClick={() =>
-                                    alert(
-                                      `Source: ${
-                                        record.source ||
-                                        "---"
-                                      }\nValidation: ${
-                                        record.validation_status ||
-                                        "---"
-                                      }`
-                                    )
-                                  }
-                                >
-                                  ⋯
+                                  Edit
                                 </button>
 
                               </div>
@@ -1474,238 +1342,6 @@ export default function Attendance() {
             )}
 
           </div>
-
-          {/* RIGHT SIDEBAR */}
-
-          <aside className="attendance-right-sidebar">
-
-            {/* OVERVIEW */}
-
-            <div className="attendance-side-card">
-
-              <h3>
-                Attendance Overview
-              </h3>
-
-              <div className="attendance-donut-wrapper">
-
-                <div
-                  className="attendance-donut"
-                  style={{
-                    "--attendance-rate":
-                      `${statistics.attendanceRate * 3.6}deg`,
-                  }}
-                >
-                  <div>
-                    <strong>
-                      {
-                        statistics.attendanceRate
-                      }%
-                    </strong>
-
-                    <span>
-                      Present
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-
-              <div className="attendance-overview-list">
-
-                <OverviewItem
-                  color="green"
-                  label="Present"
-                  value={
-                    statistics.present
-                  }
-                  total={
-                    statistics.total
-                  }
-                />
-
-                <OverviewItem
-                  color="red"
-                  label="Absent"
-                  value={
-                    statistics.absent
-                  }
-                  total={
-                    statistics.total
-                  }
-                />
-
-                <OverviewItem
-                  color="orange"
-                  label="Late"
-                  value={
-                    statistics.late
-                  }
-                  total={
-                    statistics.total
-                  }
-                />
-
-              </div>
-
-            </div>
-
-            {/* TODAY CLASSES */}
-
-            <div className="attendance-side-card">
-
-              <div className="attendance-side-title">
-
-                <h3>
-                  Today's Classes
-                </h3>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/admin/timetable"
-                    )
-                  }
-                >
-                  View All
-                </button>
-
-              </div>
-
-              {sections
-                .slice(0, 3)
-                .map(
-                  (
-                    section,
-                    index
-                  ) => (
-                    <div
-                      className="attendance-class-item"
-                      key={
-                        section.id
-                      }
-                    >
-
-                      <div className="attendance-class-icon">
-                        ▣
-                      </div>
-
-                      <div>
-
-                        <strong>
-                          {
-                            section.course_code ||
-                            section.courseCode ||
-                            `Section ${section.section_name || section.id}`
-                          }
-                        </strong>
-
-                        <span>
-                          {section.course_name ||
-                            section.courseName ||
-                            "Scheduled class"}
-                        </span>
-
-                      </div>
-
-                      <small>
-                        {index === 0
-                          ? "Ongoing"
-                          : "Upcoming"}
-                      </small>
-
-                    </div>
-                  )
-                )}
-
-            </div>
-
-            {/* QUICK ACTIONS */}
-
-            <div className="attendance-side-card">
-
-              <h3>
-                Quick Actions
-              </h3>
-
-              <div className="attendance-quick-actions">
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/admin/sessions"
-                    )
-                  }
-                >
-                  👥 Take Attendance
-                </button>
-
-                <button
-                  onClick={
-                    exportAttendance
-                  }
-                >
-                  ↓ Export CSV
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/admin/reports"
-                    )
-                  }
-                >
-                  ▥ View Reports
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/admin/sessions"
-                    )
-                  }
-                >
-                  ▣ Manage Sessions
-                </button>
-
-              </div>
-
-            </div>
-
-            {/* RECENT ACTIVITY */}
-
-            <div className="attendance-side-card">
-
-              <div className="attendance-side-title">
-
-                <h3>
-                  Recent Activity
-                </h3>
-
-              </div>
-
-              <div className="attendance-activity">
-
-                <ActivityItem
-                  color="green"
-                  text="Attendance records loaded"
-                />
-
-                <ActivityItem
-                  color="blue"
-                  text="Attendance session system connected"
-                />
-
-                <ActivityItem
-                  color="orange"
-                  text="Attendance report available"
-                />
-
-              </div>
-
-            </div>
-
-          </aside>
 
         </section>
 
@@ -1754,7 +1390,7 @@ export default function Attendance() {
                       )
                     }
                   >
-                    ×
+                    Close
                   </button>
 
                 </div>
@@ -1880,7 +1516,7 @@ export default function Attendance() {
                       )
                     }
                   >
-                    ×
+                    Close
                   </button>
 
                 </div>
@@ -1988,7 +1624,6 @@ export default function Attendance() {
 =========================================================== */
 
 function StatCard({
-  icon,
   title,
   value,
   subtitle,
@@ -1998,10 +1633,6 @@ function StatCard({
     <div
       className={`attendance-stat-card ${className}`}
     >
-
-      <div className="attendance-stat-icon">
-        {icon}
-      </div>
 
       <div className="attendance-stat-content">
 

@@ -465,8 +465,6 @@
 }
 
 .attendance-table tbody tr {
-  transition:
-    background 0.15s ease;
 }
 
 .attendance-table tbody tr:hover {
@@ -626,7 +624,6 @@
 }
 
 .attendance-actions button:hover {
-  transform: translateY(-1px);
 }
 
 /* =========================================================
@@ -1179,5 +1176,5 @@
   .attendance-page .attendance-actions button {
     min-width: 44px;
     padding: 0 7px;
-}
+  }
 }
