@@ -34,7 +34,7 @@ import CorrectionRequests from "./pages/student/CorrectionRequests";
 import StudentDashboardPage from "./pages/student/StudentDashboard";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 
-import { loginUser } from "./services/api";
+import { getMyAttendance, loginUser } from "./services/api";
 
 import "./App.css";
 import "./pages/student/StudentDashboard.css";
@@ -1181,31 +1181,178 @@ function StudentDashboard() {
 
   const closeSidebar = () => setSidebarOpen(false);
 
+  const [attendance, setAttendance] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState("");
+
+  async function loadDashboardData() {
+    try {
+      setDataLoading(true);
+      setDataError("");
+
+      const data = await getMyAttendance();
+
+      setAttendance(
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+          ? data.data
+          : []
+      );
+    } catch (err) {
+      setDataError(
+        err.message || "Failed to load dashboard data."
+      );
+    } finally {
+      setDataLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const presentRecords = attendance.filter(
+    (item) =>
+      String(item.status || "").toLowerCase() ===
+      "present"
+  );
+
+  const lateRecords = attendance.filter(
+    (item) =>
+      String(item.status || "").toLowerCase() ===
+      "late"
+  );
+
+  const absentRecords = attendance.filter(
+    (item) =>
+      String(item.status || "").toLowerCase() ===
+      "absent"
+  );
+
+  const attendanceRate =
+    attendance.length > 0
+      ? Math.round(
+          ((presentRecords.length +
+            lateRecords.length) /
+            attendance.length) *
+            100
+        )
+      : 0;
+
+  const greetingHour = new Date().getHours();
+
+  const greeting =
+    greetingHour < 12
+      ? "Good morning"
+      : greetingHour < 18
+      ? "Good afternoon"
+      : "Good evening";
+
+  const recordTime = (record) =>
+    new Date(
+      record.scanned_at ||
+        record.session_date ||
+        0
+    ).getTime() || 0;
+
+  const recentRecords = [...attendance]
+    .sort((a, b) => recordTime(b) - recordTime(a))
+    .slice(0, 4);
+
+  function formatRecordDate(record) {
+    const value =
+      record.scanned_at || record.session_date;
+
+    if (!value) {
+      return "Not available";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  function recordCourse(record) {
+    return (
+      record.course_name ||
+      record.course_code ||
+      record.section_name ||
+      "Attendance Session"
+    );
+  }
+
+  function recordStatus(record) {
+    const status = String(
+      record.status || ""
+    ).toLowerCase();
+
+    if (status === "present") {
+      return {
+        label: "Present",
+        pill: "student-status-present",
+      };
+    }
+
+    if (status === "late") {
+      return {
+        label: "Late",
+        pill: "student-status-late",
+      };
+    }
+
+    if (status === "absent") {
+      return {
+        label: "Absent",
+        pill: "student-status-absent",
+      };
+    }
+
+    return {
+      label: status
+        ? status.charAt(0).toUpperCase() +
+          status.slice(1)
+        : "Recorded",
+      pill: "student-status-recorded",
+    };
+  }
+
   const stats = [
     {
       title: "Attendance Rate",
-      value: "0%",
-      note: "No attendance recorded yet",
+      value: dataLoading ? "..." : `${attendanceRate}%`,
+      note:
+        attendance.length > 0
+          ? `${presentRecords.length} present of ${attendance.length}`
+          : "No attendance recorded yet",
       icon: "chart",
       tone: "blue",
     },
     {
       title: "Total Sessions",
-      value: "0",
+      value: dataLoading ? "..." : attendance.length,
       note: "Sessions attended this semester",
       icon: "calendar",
       tone: "purple",
     },
     {
       title: "Present",
-      value: "0",
+      value: dataLoading ? "..." : presentRecords.length,
       note: "Keep building your streak",
       icon: "dot",
       tone: "green",
     },
     {
       title: "Absent",
-      value: "0",
+      value: dataLoading ? "..." : absentRecords.length,
       note: "Stay consistent",
       icon: "alert",
       tone: "red",
@@ -1445,7 +1592,7 @@ function StudentDashboard() {
               </span>
 
               <h1>
-                Good morning, {firstName}!
+                {greeting}, {firstName}!
               </h1>
 
               <p>
@@ -1830,25 +1977,88 @@ function StudentDashboard() {
 
               </div>
 
-              <div className="student-empty-activity">
-
-                <div className="student-empty-icon soft">
-                  <Icon
-                    name="clock"
-                    size={25}
-                  />
+              {dataLoading ? (
+                <div className="student-empty-activity">
+                  <div className="student-loading">
+                    Loading activity...
+                  </div>
                 </div>
+              ) : dataError ? (
+                <div
+                  className="student-empty-activity"
+                  role="alert"
+                >
+                  <p>{dataError}</p>
 
-                <h3>
-                  No recent activity
-                </h3>
+                  <button
+                    className="student-primary-button"
+                    type="button"
+                    onClick={loadDashboardData}
+                  >
+                    Try again
+                  </button>
+                </div>
+              ) : recentRecords.length === 0 ? (
+                <div className="student-empty-activity">
 
-                <p>
-                  Your attendance records will appear
-                  here once you start attending classes.
-                </p>
+                  <div className="student-empty-icon soft">
+                    <Icon
+                      name="clock"
+                      size={25}
+                    />
+                  </div>
 
-              </div>
+                  <h3>
+                    No recent activity
+                  </h3>
+
+                  <p>
+                    Your attendance records will appear
+                    here once you start attending classes.
+                  </p>
+
+                </div>
+              ) : (
+                <div className="student-attendance-list">
+                  {recentRecords.map((record) => {
+                    const recordState =
+                      recordStatus(record);
+
+                    return (
+                      <div
+                        className="student-attendance-row"
+                        key={
+                          record.id ||
+                          `${record.scanned_at}-${record.course_name}`
+                        }
+                      >
+                        <div className="student-course-icon">
+                          <Icon
+                            name="clock"
+                            size={16}
+                          />
+                        </div>
+
+                        <div className="student-attendance-info">
+                          <strong>
+                            {recordCourse(record)}
+                          </strong>
+
+                          <span>
+                            {formatRecordDate(record)}
+                          </span>
+                        </div>
+
+                        <span
+                          className={`student-status ${recordState.pill}`}
+                        >
+                          {recordState.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
             </section>
 
@@ -1909,7 +2119,9 @@ function StudentDashboard() {
                   <div className="student-goal-circle">
                     <div>
                       <strong>
-                        0%
+                        {dataLoading
+                          ? "..."
+                          : `${attendanceRate}%`}
                       </strong>
 
                       <span>
@@ -1924,7 +2136,9 @@ function StudentDashboard() {
                       <i className="green-dot" />
                       Present
                       <strong>
-                        0
+                        {dataLoading
+                          ? "..."
+                          : presentRecords.length}
                       </strong>
                     </div>
 
@@ -1932,7 +2146,9 @@ function StudentDashboard() {
                       <i className="red-dot" />
                       Absent
                       <strong>
-                        0
+                        {dataLoading
+                          ? "..."
+                          : absentRecords.length}
                       </strong>
                     </div>
 
@@ -1940,7 +2156,9 @@ function StudentDashboard() {
                       <i className="blue-dot" />
                       Total
                       <strong>
-                        0
+                        {dataLoading
+                          ? "..."
+                          : attendance.length}
                       </strong>
                     </div>
 

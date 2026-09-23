@@ -1116,6 +1116,1060 @@
 }
 
 /* =========================================================
+   LIVE DASHBOARD SYSTEM (/dashboard inline component)
+   Root causes fixed here:
+   1. .student-main had NO width/margin rule -> content slid
+      under the fixed sidebar and looked like a narrow column.
+   2. .student-sidebar-bottom was position:absolute (App.css
+      unscoped) -> Logout overlapped the tip card.
+   3. .student-navigation / .student-profile-card /
+      .student-topbar / .student-hero / .student-main-grid /
+      .student-action-card / .student-calendar-* /
+      .student-bottom-grid / .student-side-card / .student-footer
+      had NO rules anywhere -> browser defaults (giant h1,
+      default buttons, stacked broken layout).
+   All selectors below are page-scoped (.student-dashboard ..)
+   so no other page is affected. No !important used.
+========================================================= */
+
+/* ---------- Main column: occupy remaining width ---------- */
+
+.student-dashboard .student-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  margin-left: var(--student-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  background: var(--student-bg);
+}
+
+/* ---------- Sidebar internals ---------- */
+
+.student-dashboard .student-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.student-dashboard .student-navigation .student-nav-item {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+}
+
+.student-dashboard .student-navigation .student-nav-item > svg {
+  flex: 0 0 auto;
+}
+
+.student-dashboard .student-navigation .student-nav-item > span:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-dashboard .student-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.student-dashboard .student-profile-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #1264d8;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.student-dashboard .student-profile-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.student-dashboard .student-profile-copy strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-dashboard .student-profile-copy span {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+}
+
+.student-dashboard .student-sidebar-bottom {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+}
+
+.student-dashboard .student-sidebar-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.student-dashboard .student-sidebar-tip-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffd97a;
+}
+
+.student-dashboard .student-sidebar-tip strong {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+}
+
+.student-dashboard .student-sidebar-tip span {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+}
+
+.student-dashboard .student-logout {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.student-dashboard .student-logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.student-dashboard .student-logout:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ---------- Topbar ---------- */
+
+.student-dashboard .student-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 68px;
+  padding: 10px clamp(16px, 3vw, 34px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--student-border);
+}
+
+.student-dashboard .student-topbar-right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.student-dashboard .student-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.student-dashboard .student-header-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7f1fe;
+  color: #1764c0;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.student-dashboard .student-header-profile strong {
+  display: block;
+  overflow: hidden;
+  max-width: 200px;
+  color: var(--student-text);
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-dashboard .student-header-profile span {
+  display: block;
+  margin-top: 1px;
+  color: var(--student-muted);
+  font-size: 11px;
+}
+
+/* ---------- Content + hero ---------- */
+
+.student-dashboard .student-content {
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  padding: clamp(16px, 3vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.student-dashboard .student-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(18px, 2.6vw, 30px);
+  border: 1px solid var(--student-border);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.student-dashboard .student-hero-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.student-dashboard .student-hero-date {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--student-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-dashboard .student-hero-copy h1 {
+  margin: 0;
+  color: var(--student-text);
+  font-size: clamp(1.45rem, 1.1rem + 1.6vw, 2.05rem);
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  overflow-wrap: break-word;
+}
+
+.student-dashboard .student-hero-copy p {
+  margin: 8px 0 0;
+  max-width: 560px;
+  color: var(--student-muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.student-dashboard .student-hero-art {
+  position: relative;
+  flex: 0 0 auto;
+  width: 210px;
+  min-height: 120px;
+  overflow: hidden;
+}
+
+.student-dashboard .student-hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: #e7f1fe;
+}
+
+.student-dashboard .student-hero-orb.orb-one {
+  width: 120px;
+  height: 120px;
+  right: 60px;
+  top: -30px;
+}
+
+.student-dashboard .student-hero-orb.orb-two {
+  width: 80px;
+  height: 80px;
+  right: 0;
+  bottom: -20px;
+  background: #eaf7f0;
+}
+
+.student-dashboard .student-hero-quote {
+  position: relative;
+  padding-top: 34px;
+  color: #3c5a86;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* ---------- Stats ---------- */
+
+.student-dashboard .student-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.6vw, 18px);
+  width: 100%;
+  min-width: 0;
+}
+
+.student-dashboard .student-stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.student-dashboard .student-stat-icon.purple {
+  background: #f1eaff;
+  color: #6d3fd4;
+}
+
+.student-dashboard .student-stat-content {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.student-dashboard .student-stat-content span,
+.student-dashboard .student-stat-content strong,
+.student-dashboard .student-stat-content small {
+  display: block;
+  min-width: 0;
+}
+
+.student-dashboard .student-stat-glow {
+  display: none;
+}
+
+/* ---------- Main grid ---------- */
+
+.student-dashboard .student-main-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vw, 20px);
+  width: 100%;
+  min-width: 0;
+  align-items: start;
+}
+
+.student-dashboard .student-main-grid > .sessions-panel {
+  grid-column: span 7;
+  grid-row: span 2;
+}
+
+.student-dashboard .student-main-grid > .quick-panel {
+  grid-column: span 5;
+}
+
+.student-dashboard .student-main-grid > .calendar-panel {
+  grid-column: span 5;
+}
+
+.student-dashboard .student-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.student-dashboard .student-panel-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #eaf2ff;
+  color: #1764c0;
+}
+
+.student-dashboard .student-panel-icon.purple {
+  background: #f1eaff;
+  color: #6d3fd4;
+}
+
+.student-dashboard .student-stat-icon.purple {
+  background: #f1eaff;
+  color: #6d3fd4;
+}
+
+.student-dashboard .student-panel-icon.blue {
+  background: #eaf2ff;
+  color: #1764c0;
+}
+
+.student-dashboard .student-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #1764c0;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.student-dashboard .student-view-all:hover {
+  color: #123f7b;
+  transform: translateX(2px);
+}
+
+.student-dashboard .student-view-all:active {
+  transform: translateX(0) scale(0.98);
+}
+
+.student-dashboard .student-empty-session,
+.student-dashboard .student-empty-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 26px 16px;
+  text-align: center;
+}
+
+.student-dashboard .student-empty-session h3,
+.student-dashboard .student-empty-activity h3 {
+  margin: 6px 0 0;
+  color: var(--student-text);
+  font-size: 15px;
+}
+
+.student-dashboard .student-empty-session p,
+.student-dashboard .student-empty-activity p {
+  margin: 0;
+  max-width: 380px;
+  color: var(--student-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.student-dashboard .student-empty-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #eaf2ff;
+  color: #1764c0;
+}
+
+.student-dashboard .student-empty-icon.soft {
+  background: #eef4fa;
+  color: #5b7ba3;
+}
+
+.student-dashboard .student-primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  margin-top: 8px;
+  padding: 0 16px;
+  border: 1px solid #287cf0;
+  border-radius: 10px;
+  background: #287cf0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.student-dashboard .student-primary-button:hover {
+  background: #123f7b;
+  border-color: #123f7b;
+  transform: translateY(-2px);
+}
+
+.student-dashboard .student-primary-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ---------- Quick actions ---------- */
+
+.student-dashboard .student-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.student-dashboard .student-action-card {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid #e6edf5;
+  border-radius: 12px;
+  background: #fbfdff;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.student-dashboard .student-action-card:hover {
+  border-color: #bcd4f2;
+  background: #f2f8ff;
+  transform: translateX(3px);
+}
+
+.student-dashboard .student-action-card:active {
+  transform: translateX(0) scale(0.99);
+}
+
+.student-dashboard .student-action-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #eaf2ff;
+  color: #1764c0;
+}
+
+.student-dashboard .student-action-card.history .student-action-icon {
+  background: #eaf7f0;
+  color: #15803d;
+}
+
+.student-dashboard .student-action-card.correction .student-action-icon {
+  background: #f1eaff;
+  color: #6d3fd4;
+}
+
+.student-dashboard .student-action-card > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.student-dashboard .student-action-card strong {
+  display: block;
+  color: var(--student-text);
+  font-size: 13.5px;
+}
+
+.student-dashboard .student-action-card span {
+  display: block;
+  margin-top: 2px;
+  color: var(--student-muted);
+  font-size: 12px;
+}
+
+.student-dashboard .student-action-card > svg:last-child {
+  flex: 0 0 auto;
+  color: #9db1c7;
+}
+
+/* ---------- Calendar ---------- */
+
+.student-dashboard .calendar-heading {
+  width: 100%;
+}
+
+.student-dashboard .student-calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.student-dashboard .student-calendar-week span {
+  color: var(--student-muted);
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.student-dashboard .student-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.student-dashboard .student-calendar-grid span {
+  min-width: 0;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #3c5572;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.student-dashboard .student-calendar-grid span:empty {
+  visibility: hidden;
+}
+
+.student-dashboard .student-calendar-grid span.today {
+  background: #287cf0;
+  color: #fff;
+  font-weight: 800;
+}
+
+/* ---------- Bottom grid + side cards ---------- */
+
+.student-dashboard .student-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vw, 20px);
+  width: 100%;
+  min-width: 0;
+  align-items: start;
+}
+
+.student-dashboard .student-bottom-grid > .recent-panel {
+  grid-column: span 7;
+  grid-row: span 2;
+}
+
+.student-dashboard .student-bottom-grid > .motivation-card {
+  grid-column: span 5;
+}
+
+.student-dashboard .student-bottom-grid > .student-right-column {
+  grid-column: span 5;
+  min-width: 0;
+  display: grid;
+  gap: clamp(12px, 1.8vw, 20px);
+  align-content: start;
+}
+
+.student-dashboard .student-side-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--student-border);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.student-dashboard .motivation-card {
+  position: relative;
+  overflow: hidden;
+  background: #123f7b;
+  border-color: #123f7b;
+  color: #fff;
+}
+
+.student-dashboard .motivation-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.student-dashboard .motivation-bubble.bubble-one {
+  width: 150px;
+  height: 150px;
+  right: -45px;
+  top: -45px;
+}
+
+.student-dashboard .motivation-bubble.bubble-two {
+  width: 90px;
+  height: 90px;
+  left: -25px;
+  bottom: -25px;
+}
+
+.student-dashboard .motivation-copy {
+  position: relative;
+  min-width: 0;
+}
+
+.student-dashboard .motivation-copy > span {
+  display: block;
+  color: #9ec2f0;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.student-dashboard .motivation-copy h2 {
+  margin: 8px 0 0;
+  color: #fff;
+  font-size: clamp(1.25rem, 1.05rem + 1vw, 1.6rem);
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+
+.student-dashboard .motivation-copy h2 strong {
+  color: #ffd97a;
+}
+
+.student-dashboard .motivation-copy p {
+  margin: 8px 0 0;
+  max-width: 420px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.student-dashboard .student-side-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-bottom: 12px;
+}
+
+.student-dashboard .student-side-title > span {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #eaf2ff;
+  color: #1764c0;
+}
+
+.student-dashboard .student-side-title strong {
+  color: var(--student-text);
+  font-size: 14px;
+}
+
+.student-dashboard .goal-card > p {
+  margin: 0 0 12px;
+  color: var(--student-muted);
+  font-size: 12.5px;
+}
+
+.student-dashboard .student-goal-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.student-dashboard .student-goal-circle {
+  width: 96px;
+  height: 96px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 8px solid #e7f1fe;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.student-dashboard .student-goal-circle strong {
+  display: block;
+  color: var(--student-text);
+  font-size: 17px;
+}
+
+.student-dashboard .student-goal-circle span {
+  display: block;
+  color: var(--student-muted);
+  font-size: 10px;
+}
+
+.student-dashboard .student-goal-stats {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.student-dashboard .student-goal-stats > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: #3c5572;
+  font-size: 12.5px;
+}
+
+.student-dashboard .student-goal-stats i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  font-style: normal;
+}
+
+.student-dashboard .green-dot {
+  background: #22a35c;
+}
+
+.student-dashboard .red-dot {
+  background: #e05252;
+}
+
+.student-dashboard .blue-dot {
+  background: #287cf0;
+}
+
+.student-dashboard .student-goal-stats strong {
+  margin-left: auto;
+  color: var(--student-text);
+  font-size: 13.5px;
+}
+
+.student-dashboard .student-goal-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f2f8ff;
+  color: #3c5a86;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.student-dashboard .student-goal-message svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #b7791f;
+}
+
+.student-dashboard .tips-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.student-dashboard .tips-card li {
+  position: relative;
+  padding-left: 20px;
+  color: #3c5572;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+
+.student-dashboard .tips-card li > span {
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #35b879;
+}
+
+/* ---------- Footer ---------- */
+
+.student-dashboard .student-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 2px 8px;
+  color: var(--student-muted);
+  font-size: 12px;
+}
+
+.student-dashboard .student-footer small {
+  margin-left: auto;
+  color: #9db1c7;
+  font-size: 11px;
+}
+
+/* ---------- Responsive: laptop ---------- */
+
+@media (max-width: 1280px) {
+  .student-dashboard .student-hero-art {
+    width: 170px;
+  }
+
+  .student-dashboard .student-main-grid > .sessions-panel,
+  .student-dashboard .student-main-grid > .quick-panel,
+  .student-dashboard .student-main-grid > .calendar-panel {
+    grid-column: span 12;
+    grid-row: auto;
+  }
+
+  .student-dashboard .student-main-grid > .quick-panel,
+  .student-dashboard .student-main-grid > .calendar-panel {
+    grid-column: span 6;
+  }
+
+  .student-dashboard .student-bottom-grid > .recent-panel,
+  .student-dashboard .student-bottom-grid > .motivation-card,
+  .student-dashboard .student-bottom-grid > .student-right-column {
+    grid-column: span 12;
+    grid-row: auto;
+  }
+
+  .student-dashboard .student-bottom-grid > .student-right-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Responsive: tablet ---------- */
+
+@media (max-width: 1024px) {
+  .student-dashboard .student-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .student-dashboard .student-hero-art {
+    display: none;
+  }
+
+  .student-dashboard .student-bottom-grid > .student-right-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Responsive: mobile drawer point ---------- */
+
+@media (max-width: 720px) {
+  .student-dashboard .student-main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .student-dashboard .student-topbar {
+    min-height: 62px;
+    padding-left: 66px;
+  }
+
+  .student-dashboard .student-header-profile strong {
+    max-width: 130px;
+  }
+
+  .student-dashboard .student-content {
+    padding: 14px;
+  }
+
+  .student-dashboard .student-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .student-dashboard .student-main-grid > .quick-panel,
+  .student-dashboard .student-main-grid > .calendar-panel {
+    grid-column: span 12;
+  }
+
+  .student-dashboard .student-goal-content {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Responsive: small phones ---------- */
+
+@media (max-width: 520px) {
+  .student-dashboard .student-topbar {
+    min-height: 58px;
+    padding: 8px 12px 8px 60px;
+  }
+
+  .student-dashboard .student-header-profile > div:last-child {
+    display: none;
+  }
+
+  .student-dashboard .student-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .student-dashboard .student-hero-copy p {
+    font-size: 12.5px;
+  }
+
+  .student-dashboard .student-panel-header {
+    flex-wrap: wrap;
+  }
+
+  .student-dashboard .student-action-card {
+    padding: 12px;
+  }
+
+  .student-dashboard .student-footer small {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .student-dashboard .student-calendar-grid span {
+    font-size: 11px;
+  }
+
+  .student-dashboard .student-goal-circle {
+    width: 84px;
+    height: 84px;
+  }
+
+  .student-dashboard .student-hero-copy h1 {
+    font-size: 1.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-dashboard .student-logout,
+  .student-dashboard .student-view-all,
+  .student-dashboard .student-primary-button,
+  .student-dashboard .student-action-card {
+    transition: none;
+  }
+
+  .student-dashboard .student-logout:active,
+  .student-dashboard .student-view-all:hover,
+  .student-dashboard .student-view-all:active,
+  .student-dashboard .student-primary-button:hover,
+  .student-dashboard .student-primary-button:active,
+  .student-dashboard .student-action-card:hover,
+  .student-dashboard .student-action-card:active {
+    transform: none;
+  }
+}
+
+/* =========================================================
    UI/UX UPGRADE — interaction, press, focus, contrast, taps
    (visual layer only; no logic classes touched)
 ========================================================= */
