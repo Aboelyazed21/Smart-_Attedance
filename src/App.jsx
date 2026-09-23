@@ -2072,7 +2072,7 @@ function LecturerSections() {
 
   if (!Component) {
     return (
-      <div
+      <div 
         style={{
           minHeight: "100vh",
           display: "grid",

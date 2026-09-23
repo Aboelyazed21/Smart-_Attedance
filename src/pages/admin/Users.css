@@ -1,12 +1,14 @@
 /* =========================================================
    USERS MANAGEMENT
-   Responsive Professional UI
+   Full Width + Responsive Professional UI
 ========================================================= */
 
 .dashboard-page {
   width: 100%;
   min-width: 0;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
   background: #f5f7fb;
   box-sizing: border-box;
 }
@@ -20,9 +22,15 @@
   box-sizing: border-box;
 }
 
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
 .dashboard-header {
   width: 100%;
+  min-width: 0;
   min-height: 96px;
+
   padding: 24px 34px;
 
   display: flex;
@@ -61,6 +69,10 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+/* =========================================================
+   ADD USER BUTTON
+========================================================= */
 
 .professional-add-button {
   flex: 0 0 auto;
@@ -126,19 +138,23 @@
 .dashboard-content {
   width: 100%;
   max-width: none;
-
   min-width: 0;
+
+  margin: 0;
 
   padding: 30px 34px 40px;
 
   box-sizing: border-box;
 }
 
+/* =========================================================
+   ERROR
+========================================================= */
+
 .dashboard-error {
   width: 100%;
 
   margin: 0 0 18px;
-
   padding: 13px 16px;
 
   display: flex;
@@ -178,14 +194,15 @@
 }
 
 /* =========================================================
-   PANEL
+   USERS PANEL
 ========================================================= */
 
 .dashboard-panel {
   width: 100%;
   max-width: none;
-
   min-width: 0;
+
+  margin: 0;
 
   background: #ffffff;
 
@@ -200,6 +217,7 @@
 .users-panel {
   width: 100%;
   max-width: none;
+  min-width: 0;
 
   overflow: hidden;
 }
@@ -322,8 +340,7 @@
 
 .users-table-wrapper {
   width: 100%;
-  max-width: 100%;
-
+  max-width: none;
   min-width: 0;
 
   overflow-x: auto;
@@ -335,7 +352,7 @@
 }
 
 .users-table-wrapper::-webkit-scrollbar {
-  height: 7px;
+  height: 8px;
 }
 
 .users-table-wrapper::-webkit-scrollbar-track {
@@ -344,14 +361,11 @@
 
 .users-table-wrapper::-webkit-scrollbar-thumb {
   background: #cbd5e2;
-
   border-radius: 8px;
 }
 
 /* =========================================================
-   USERS TABLE
-   Desktop:
-   Use all available width.
+   TABLE
 ========================================================= */
 
 .users-table {
@@ -363,50 +377,11 @@
   border-collapse: separate;
   border-spacing: 0;
 
-  table-layout: fixed;
-
   color: #354762;
 
   font-size: 13px;
-}
 
-/* =========================================================
-   TABLE COLUMNS
-========================================================= */
-
-.users-table th:nth-child(1),
-.users-table td:nth-child(1) {
-  width: 20%;
-}
-
-.users-table th:nth-child(2),
-.users-table td:nth-child(2) {
-  width: 20%;
-}
-
-.users-table th:nth-child(3),
-.users-table td:nth-child(3) {
-  width: 12%;
-}
-
-.users-table th:nth-child(4),
-.users-table td:nth-child(4) {
-  width: 12%;
-}
-
-.users-table th:nth-child(5),
-.users-table td:nth-child(5) {
-  width: 11%;
-}
-
-.users-table th:nth-child(6),
-.users-table td:nth-child(6) {
-  width: 11%;
-}
-
-.users-table th:nth-child(7),
-.users-table td:nth-child(7) {
-  width: 14%;
+  table-layout: fixed;
 }
 
 /* =========================================================
@@ -449,6 +424,45 @@
 }
 
 /* =========================================================
+   TABLE COLUMNS
+========================================================= */
+
+.users-table th:nth-child(1),
+.users-table td:nth-child(1) {
+  width: 20%;
+}
+
+.users-table th:nth-child(2),
+.users-table td:nth-child(2) {
+  width: 20%;
+}
+
+.users-table th:nth-child(3),
+.users-table td:nth-child(3) {
+  width: 12%;
+}
+
+.users-table th:nth-child(4),
+.users-table td:nth-child(4) {
+  width: 12%;
+}
+
+.users-table th:nth-child(5),
+.users-table td:nth-child(5) {
+  width: 11%;
+}
+
+.users-table th:nth-child(6),
+.users-table td:nth-child(6) {
+  width: 11%;
+}
+
+.users-table th:nth-child(7),
+.users-table td:nth-child(7) {
+  width: 14%;
+}
+
+/* =========================================================
    TABLE BODY
 ========================================================= */
 
@@ -465,11 +479,11 @@
 
   white-space: nowrap;
 
+  box-sizing: border-box;
+
   overflow: hidden;
 
   text-overflow: ellipsis;
-
-  box-sizing: border-box;
 }
 
 .users-table tbody tr:last-child td {
@@ -486,14 +500,11 @@
 
 .user-cell {
   min-width: 0;
-  max-width: 100%;
 
   display: flex;
   align-items: center;
 
   gap: 11px;
-
-  overflow: hidden;
 }
 
 .user-table-avatar {
@@ -510,7 +521,6 @@
   border-radius: 10px;
 
   background: #eef4ff;
-
   color: #2864df;
 
   font-size: 14px;
@@ -526,8 +536,6 @@
 
   text-overflow: ellipsis;
 
-  white-space: nowrap;
-
   color: #233b5f;
 
   font-size: 13px;
@@ -542,16 +550,10 @@
   color: #9aa5b6;
 
   font-size: 11px;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
 }
 
 /* =========================================================
-   ROLE / STATUS
+   ROLE BADGES
 ========================================================= */
 
 .role-badge,
@@ -567,12 +569,8 @@
   border-radius: 999px;
 
   font-size: 11px;
-
   line-height: 1;
-
   font-weight: 700;
-
-  white-space: nowrap;
 }
 
 .role-student {
@@ -599,6 +597,10 @@
   background: #fff5e8;
   color: #a66514;
 }
+
+/* =========================================================
+   STATUS
+========================================================= */
 
 .status-active {
   background: #eef8f3;
@@ -633,11 +635,9 @@
   display: flex;
   align-items: center;
 
-  justify-content: flex-start;
+  gap: 7px;
 
   flex-wrap: wrap;
-
-  gap: 7px;
 }
 
 .action-button {
@@ -655,7 +655,6 @@
   border-radius: 8px;
 
   background: #ffffff;
-
   color: #4b607d;
 
   font-size: 12px;
@@ -671,17 +670,13 @@
 
 .edit-button:hover {
   background: #f1f6ff;
-
   border-color: #b7ccef;
-
   color: #2864df;
 }
 
 .delete-button:hover {
   background: #fff5f5;
-
   border-color: #efc6ca;
-
   color: #b33b45;
 }
 
@@ -692,14 +687,12 @@
 .users-loading,
 .users-empty {
   width: 100%;
-
   min-height: 300px;
 
   padding: 50px 24px;
 
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
 
@@ -737,16 +730,18 @@
   border-radius: 12px;
 
   background: #f7f9fc;
-
   color: #7c8ca2;
 
   font-size: 22px;
 }
 
+/* =========================================================
+   LOADING SPINNER
+========================================================= */
+
 .loading-spinner,
 .button-spinner {
   border: 2px solid #dce5f2;
-
   border-top-color: #2864df;
 
   border-radius: 50%;
@@ -784,7 +779,6 @@
   padding: 24px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -803,7 +797,6 @@
   overflow-y: auto;
 
   border: 1px solid #e0e6ef;
-
   border-radius: 16px;
 
   background: #ffffff;
@@ -813,11 +806,14 @@
   box-sizing: border-box;
 }
 
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
 .modal-header {
   padding: 22px 24px;
 
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
 
@@ -828,7 +824,6 @@
 
 .modal-header > div:first-child {
   display: flex;
-
   align-items: center;
 
   gap: 12px;
@@ -843,20 +838,16 @@
   flex: 0 0 40px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   border: 1px solid #d7e3f8;
-
   border-radius: 10px;
 
   background: #eef4ff;
-
   color: #2864df;
 
   font-size: 18px;
-
   font-weight: 700;
 }
 
@@ -866,7 +857,6 @@
   color: #173764;
 
   font-size: 19px;
-
   line-height: 1.3;
 }
 
@@ -876,9 +866,12 @@
   color: #7b8799;
 
   font-size: 12px;
-
   line-height: 1.45;
 }
+
+/* =========================================================
+   MODAL CLOSE
+========================================================= */
 
 .modal-close {
   width: 34px;
@@ -887,20 +880,16 @@
   flex: 0 0 34px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   border: 1px solid #dce3ec;
-
   border-radius: 8px;
 
   background: #ffffff;
-
   color: #66758a;
 
   font-size: 20px;
-
   line-height: 1;
 
   cursor: pointer;
@@ -908,12 +897,11 @@
 
 .modal-close:hover {
   background: #f5f7fa;
-
   color: #273d5b;
 }
 
 /* =========================================================
-   USER FORM
+   FORM
 ========================================================= */
 
 .user-form {
@@ -935,7 +923,6 @@
 
 .form-group {
   width: 100%;
-
   min-width: 0;
 
   margin-bottom: 18px;
@@ -943,7 +930,6 @@
 
 .form-group label {
   display: flex;
-
   align-items: center;
 
   gap: 7px;
@@ -953,7 +939,6 @@
   color: #40536e;
 
   font-size: 12px;
-
   font-weight: 700;
 }
 
@@ -961,14 +946,12 @@
   color: #94a0b2;
 
   font-size: 11px;
-
   font-weight: 500;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-
   height: 44px;
 
   min-width: 0;
@@ -976,13 +959,11 @@
   padding: 0 12px;
 
   border: 1px solid #d9e1ec;
-
   border-radius: 9px;
 
   outline: none;
 
   background: #ffffff;
-
   color: #273c59;
 
   font-family: inherit;
@@ -1004,8 +985,7 @@
 .form-group select:focus {
   border-color: #8eafe9;
 
-  box-shadow:
-    0 0 0 3px rgba(40, 100, 223, 0.08);
+  box-shadow: 0 0 0 3px rgba(40, 100, 223, 0.08);
 }
 
 /* =========================================================
@@ -1016,7 +996,6 @@
   padding-top: 4px;
 
   display: flex;
-
   align-items: center;
   justify-content: flex-end;
 
@@ -1030,7 +1009,6 @@
   padding: 0 17px;
 
   display: inline-flex;
-
   align-items: center;
   justify-content: center;
 
@@ -1041,7 +1019,6 @@
   font-family: inherit;
 
   font-size: 13px;
-
   font-weight: 700;
 
   cursor: pointer;
@@ -1056,13 +1033,11 @@
   border: 1px solid #d9e1ec;
 
   background: #ffffff;
-
   color: #56677f;
 }
 
 .professional-cancel-button:hover {
   background: #f6f8fb;
-
   color: #334a68;
 }
 
@@ -1070,13 +1045,11 @@
   border: 1px solid #2864df;
 
   background: #2864df;
-
   color: #ffffff;
 }
 
 .professional-save-button:hover {
   background: #2057c9;
-
   border-color: #2057c9;
 }
 
@@ -1089,8 +1062,66 @@
 }
 
 /* =========================================================
+   IMPORTANT DESKTOP FULL WIDTH FIX
+========================================================= */
+
+@media (min-width: 1101px) {
+  .dashboard-page {
+    width: 100%;
+    max-width: none;
+  }
+
+  .dashboard-main {
+    width: 100%;
+    max-width: none;
+  }
+
+  .dashboard-header {
+    width: 100%;
+    max-width: none;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    max-width: none;
+
+    margin: 0;
+  }
+
+  .dashboard-panel {
+    width: 100%;
+    max-width: none;
+
+    margin: 0;
+  }
+
+  .users-panel {
+    width: 100%;
+    max-width: none;
+  }
+
+  .users-table-wrapper {
+    width: 100%;
+    max-width: none;
+  }
+
+  .users-table {
+    width: 100%;
+    max-width: none;
+
+    min-width: 0;
+
+    table-layout: fixed;
+  }
+
+  .users-table th,
+  .users-table td {
+    box-sizing: border-box;
+  }
+}
+
+/* =========================================================
    LARGE DESKTOP
-   Use the complete available content area
 ========================================================= */
 
 @media (min-width: 1400px) {
@@ -1104,48 +1135,9 @@
     padding-right: 40px;
   }
 
-  .dashboard-panel,
-  .users-panel,
-  .users-table-wrapper,
-  .users-table {
-    width: 100%;
-    max-width: none;
-  }
-
-  .users-table {
-    min-width: 0;
-  }
-}
-
-/* =========================================================
-   DESKTOP / LAPTOP
-========================================================= */
-
-@media (min-width: 1101px) {
-  .dashboard-page,
-  .dashboard-main,
-  .dashboard-content,
-  .dashboard-panel,
-  .users-panel,
-  .users-table-wrapper {
-    width: 100%;
-    max-width: none;
-  }
-
   .users-table {
     width: 100%;
     min-width: 0;
-    max-width: none;
-    table-layout: fixed;
-  }
-
-  .users-table tbody td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .user-actions {
-    flex-wrap: nowrap;
   }
 }
 
@@ -1170,23 +1162,19 @@
 
   .users-search {
     width: 100%;
-
     min-width: 0;
   }
 
-  /*
-    Tablet keeps horizontal scrolling for the table
-    because there is not enough room for 7 columns.
-  */
+  .users-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+  }
+
   .users-table {
     min-width: 900px;
 
     table-layout: auto;
-  }
-
-  .users-table th:nth-child(n),
-  .users-table td:nth-child(n) {
-    width: auto;
   }
 }
 
@@ -1195,6 +1183,16 @@
 ========================================================= */
 
 @media (max-width: 768px) {
+  .dashboard-page {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-main {
+    width: 100%;
+    min-width: 0;
+  }
+
   .dashboard-header {
     min-height: auto;
 
@@ -1228,8 +1226,6 @@
   }
 
   .dashboard-panel {
-    width: 100%;
-
     border-radius: 12px;
   }
 
@@ -1281,10 +1277,6 @@
   .users-table thead th:last-child,
   .users-table tbody td:last-child {
     padding-right: 16px;
-  }
-
-  .user-actions {
-    flex-wrap: nowrap;
   }
 
   .modal-overlay {
