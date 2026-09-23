@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Link,
@@ -653,7 +653,7 @@ function Login() {
         <div className="brand">
 
           <div className="brand-logo">
-            <span>🎓</span>
+            <span aria-hidden="true">A</span>
           </div>
 
           <div className="brand-text">
@@ -675,10 +675,6 @@ function Login() {
           <span>
             English
           </span>
-
-          <span className="chevron">
-            ⌄
-          </span>
         </button>
 
       </header>
@@ -692,7 +688,7 @@ function Login() {
         <div className="login-card">
 
           <div className="login-logo">
-            <span>🎓</span>
+            <span aria-hidden="true">A</span>
           </div>
 
           <h2 className="app-name">
@@ -1043,8 +1039,14 @@ function StudentDashboard() {
         </>
       ),
 
-      check: (
-        <path d="m5 12 4 4L19 6" />
+      dot: (
+        <circle
+          cx="12"
+          cy="12"
+          r="5"
+          fill="currentColor"
+          stroke="none"
+        />
       ),
 
       alert: (
@@ -1135,6 +1137,23 @@ function StudentDashboard() {
     navigate("/");
   };
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () =>
+      window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
   const stats = [
     {
       title: "Attendance Rate",
@@ -1154,7 +1173,7 @@ function StudentDashboard() {
       title: "Present",
       value: "0",
       note: "Keep building your streak",
-      icon: "check",
+      icon: "dot",
       tone: "green",
     },
     {
@@ -1175,13 +1194,34 @@ function StudentDashboard() {
 
   return (
     <div className="student-dashboard">
-      <aside className="student-sidebar">
+      <button
+        type="button"
+        className="mobile-menu-btn"
+        aria-label="Open navigation menu"
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      <aside
+        className={
+          sidebarOpen
+            ? "student-sidebar open"
+            : "student-sidebar"
+        }
+      >
 
         <div>
 
           <div className="student-brand">
-            <div className="student-brand-logo">
-              ✓
+            <div
+              className="student-brand-logo"
+              aria-hidden="true"
+            >
+              A
             </div>
 
             <div>
@@ -1284,24 +1324,6 @@ function StudentDashboard() {
               </span>
             </button>
 
-            <button
-              className="student-nav-item"
-              type="button"
-            >
-              <Icon
-                name="bell"
-                size={18}
-              />
-
-              <span>
-                Notifications
-              </span>
-
-              <b className="student-notification-badge">
-                3
-              </b>
-            </button>
-
           </nav>
         </div>
 
@@ -1345,44 +1367,23 @@ function StudentDashboard() {
 
       </aside>
 
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-overlay show"
+          aria-label="Close navigation menu"
+          onClick={closeSidebar}
+        />
+      )}
+
       <main className="student-main">
 
         <header className="student-topbar">
 
-          <div className="student-search">
-
-            <Icon
-              name="search"
-              size={18}
-            />
-
-            <input
-              type="text"
-              placeholder="Search courses, sessions, or anything..."
-            />
-
-            <span>
-              Ctrl + K
-            </span>
-
-          </div>
-
-          <div className="student-topbar-right">
-
-            <button
-              className="student-notification-button"
-              type="button"
-              aria-label="Notifications"
-            >
-              <Icon
-                name="bell"
-                size={18}
-              />
-
-              <b>3</b>
-            </button>
-
-            <div className="student-header-divider" />
+          <div
+            className="student-topbar-right"
+            style={{ marginLeft: "auto" }}
+          >
 
             <div className="student-header-profile">
 
@@ -1399,10 +1400,6 @@ function StudentDashboard() {
                   Student
                 </span>
               </div>
-
-              <span className="student-header-chevron">
-                ⌄
-              </span>
 
             </div>
 
@@ -1437,9 +1434,6 @@ function StudentDashboard() {
             >
               <div className="student-hero-orb orb-one" />
               <div className="student-hero-orb orb-two" />
-              <div className="student-hero-cap">
-                ◆
-              </div>
               <div className="student-hero-quote">
                 Small steps today,
                 <br />
@@ -1836,10 +1830,6 @@ function StudentDashboard() {
               <div className="motivation-bubble bubble-one" />
               <div className="motivation-bubble bubble-two" />
 
-              <div className="motivation-icon-large">
-                ✦
-              </div>
-
               <div className="motivation-copy">
 
                 <span>
@@ -1860,15 +1850,6 @@ function StudentDashboard() {
                   most out of every class.
                 </p>
 
-              </div>
-
-              <div
-                className="motivation-books"
-                aria-hidden="true"
-              >
-                ▰
-                <br />
-                ▰▰
               </div>
 
             </section>
@@ -1972,9 +1953,7 @@ function StudentDashboard() {
                 <ul>
                   {tips.map((tip) => (
                     <li key={tip}>
-                      <span>
-                        ✓
-                      </span>
+                      <span aria-hidden="true" />
 
                       {tip}
                     </li>
@@ -1993,13 +1972,13 @@ function StudentDashboard() {
               Attendify
             </span>
 
-            <b>•</b>
+            <span aria-hidden="true">/</span>
 
             <span>
               Port Said University
             </span>
 
-            <b>•</b>
+            <span aria-hidden="true">/</span>
 
             <span>
               A Smarter Campus for a Brighter Tomorrow

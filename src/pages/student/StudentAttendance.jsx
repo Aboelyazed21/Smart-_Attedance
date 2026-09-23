@@ -1,27 +1,190 @@
-import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { getMyAttendance } from "../../services/api";
+
+import "../../App.css";
 import "./StudentDashboard.css";
 
-const StudentDashboard = () => {
+/* =========================================================
+   ICONS — inline SVG, usability only
+   (no emoji, no check/cross marks, no decorative symbols)
+========================================================= */
+
+const iconPaths = {
+  home: (
+    <>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V21h14V9.5" />
+      <path d="M9 21v-6h6v6" />
+    </>
+  ),
+
+  chart: (
+    <>
+      <path d="M4 19V9" />
+      <path d="M10 19V5" />
+      <path d="M16 19v-7" />
+      <path d="M22 19H2" />
+    </>
+  ),
+
+  calendar: (
+    <>
+      <rect x="3" y="4.5" width="18" height="16" rx="2" />
+      <path d="M7 2.5v4M17 2.5v4M3 9h18" />
+      <path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2" />
+    </>
+  ),
+
+  qr: (
+    <>
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+      <path d="M14 14h3v3h-3zM19 14v3M14 19h3M19 19h2v-2" />
+    </>
+  ),
+
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
+
+  bell: (
+    <>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </>
+  ),
+
+  search: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m16 16 5 5" />
+    </>
+  ),
+
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+
+  arrow: (
+    <>
+      <path d="M5 12h14" />
+      <path d="m14 7 5 5-5 5" />
+    </>
+  ),
+
+  light: (
+    <>
+      <path d="M9 18h6" />
+      <path d="M10 21h4" />
+      <path d="M8 14c-1.2-1.1-2-2.7-2-4.5a6 6 0 1 1 12 0c0 1.8-.8 3.4-2 4.5-.7.6-1 1.1-1 2H9c0-.9-.3-1.4-1-2z" />
+    </>
+  ),
+
+  logout: (
+    <>
+      <path d="M10 17l5-5-5-5" />
+      <path d="M15 12H3" />
+      <path d="M21 4v16" />
+    </>
+  ),
+
+  user: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </>
+  ),
+};
+
+function Icon({ name, size = 20, stroke = 1.8 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={stroke}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {iconPaths[name] || iconPaths.home}
+    </svg>
+  );
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function formatDate(value) {
+  if (!value) return "—";
+
+  const timestamp = Date.parse(value);
+
+  if (Number.isNaN(timestamp)) {
+    return String(value);
+  }
+
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function getStatusClass(status) {
+  if (status === "present") return "student-status-present";
+  if (status === "absent") return "student-status-absent";
+  if (status === "late") return "student-status-late";
+
+  return "student-status-recorded";
+}
+
+/* =========================================================
+   MY ATTENDANCE PAGE
+========================================================= */
+
+function StudentAttendance() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const user = useMemo(() => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [user] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("user") || "{}");
+      return JSON.parse(localStorage.getItem("user") || "null");
     } catch {
-      return {};
+      return null;
     }
-  }, []);
+  });
 
-  const studentName =
-    user?.name ||
-    user?.full_name ||
-    user?.username ||
-    "Student";
+  const firstName =
+    user?.first_name ||
+    user?.firstName ||
+    (user?.name ? String(user.name).split(" ")[0] : "Student");
 
-  const firstName = studentName.split(" ")[0];
+  const lastName =
+    user?.last_name ||
+    user?.lastName ||
+    (user?.name
+      ? String(user.name)
+          .split(" ")
+          .slice(1)
+          .join(" ")
+      : "");
 
-  const today = new Date();
+  const fullName =
+    `${firstName} ${lastName}`.trim() || "Student";
+
+  const initial =
+    firstName.charAt(0).toUpperCase() || "S";
+
+  const today = useMemo(() => new Date(), []);
 
   const formattedDate = today.toLocaleDateString("en-US", {
     weekday: "long",
@@ -30,38 +193,186 @@ const StudentDashboard = () => {
     year: "numeric",
   });
 
-  const stats = [
+  const monthName = today.toLocaleDateString("en-US", {
+    month: "long",
+  });
+
+  const year = today.getFullYear();
+  const currentDay = today.getDate();
+
+  const daysInMonth = new Date(
+    year,
+    today.getMonth() + 1,
+    0
+  ).getDate();
+
+  const firstDay = new Date(
+    year,
+    today.getMonth(),
+    1
+  ).getDay();
+
+  const calendarCells = Array.from(
+    { length: Math.ceil((firstDay + daysInMonth) / 7) * 7 },
+    (_, index) => {
+      const day = index - firstDay + 1;
+      return day >= 1 && day <= daysInMonth ? day : null;
+    }
+  );
+
+  /* ---------------------------------------------------------
+     ATTENDANCE DATA — real records from the API
+  ---------------------------------------------------------- */
+
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadAttendance = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await getMyAttendance();
+
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data?.attendances)
+            ? data.attendances
+            : [];
+
+      setRecords(list);
+    } catch (err) {
+      console.error("Attendance loading error:", err);
+
+      setRecords([]);
+      setError(
+        err?.message || "Failed to load attendance data."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAttendance();
+  }, [loadAttendance]);
+
+  /* Close the mobile drawer on Escape */
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () =>
+      window.removeEventListener("keydown", handleEscape);
+  }, []);
+
+  const sortedRecords = useMemo(() => {
+    return [...records].sort((a, b) => {
+      const timeA = Date.parse(
+        String(
+          a?.session_date || a?.date || a?.created_at || ""
+        )
+      );
+      const timeB = Date.parse(
+        String(
+          b?.session_date || b?.date || b?.created_at || ""
+        )
+      );
+
+      return (
+        (Number.isNaN(timeB) ? 0 : timeB) -
+        (Number.isNaN(timeA) ? 0 : timeA)
+      );
+    });
+  }, [records]);
+
+  const stats = useMemo(() => {
+    const total = records.length;
+
+    const present = records.filter(
+      (row) =>
+        String(row?.status || "").trim().toLowerCase() ===
+        "present"
+    ).length;
+
+    const absent = records.filter(
+      (row) =>
+        String(row?.status || "").trim().toLowerCase() ===
+        "absent"
+    ).length;
+
+    const rate =
+      total > 0 ? Math.round((present / total) * 100) : 0;
+
+    return [
+      {
+        title: "Attendance Rate",
+        value: `${rate}%`,
+        note: loading
+          ? "Loading attendance data"
+          : total > 0
+            ? "Based on recorded sessions"
+            : "No attendance recorded yet",
+        icon: "chart",
+        tone: "blue",
+      },
+      {
+        title: "Total Sessions",
+        value: String(total),
+        note: "Sessions recorded this semester",
+        icon: "calendar",
+        tone: "purple",
+      },
+      {
+        title: "Present",
+        value: String(present),
+        note: "Sessions marked present",
+        icon: "user",
+        tone: "green",
+      },
+      {
+        title: "Absent",
+        value: String(absent),
+        note: "Sessions marked absent",
+        icon: "user",
+        tone: "red",
+      },
+    ];
+  }, [records, loading]);
+
+  /* ---------------------------------------------------------
+     NAVIGATION
+  ---------------------------------------------------------- */
+
+  const currentPath = location.pathname;
+
+  const navItems = [
     {
-      title: "Attendance Rate",
-      value: "0%",
-      subtitle: "+0% from last month",
-      type: "attendance",
-      icon: "▥",
-      trend: "↗",
+      label: "Dashboard",
+      path: "/dashboard",
+      icon: "home",
     },
     {
-      title: "Total Sessions",
-      value: "0",
-      subtitle: "No sessions yet",
-      type: "sessions",
-      icon: "▣",
-      trend: "☷",
+      label: "My Attendance",
+      path: "/student/attendance",
+      icon: "chart",
     },
     {
-      title: "Present",
-      value: "0",
-      subtitle: "Keep it up!",
-      type: "present",
-      icon: "✓",
-      trend: "↗",
+      label: "Scan Attendance",
+      path: "/student/scan",
+      icon: "qr",
     },
     {
-      title: "Absent",
-      value: "0",
-      subtitle: "Let's do better",
-      type: "absent",
-      icon: "!",
-      trend: "↗",
+      label: "Correction Requests",
+      path: "/student/correction-requests",
+      icon: "clock",
     },
   ];
 
@@ -69,141 +380,116 @@ const StudentDashboard = () => {
     {
       title: "Scan QR Code",
       description: "Mark your attendance",
-      icon: "▦",
-      type: "blue",
-      action: () => navigate("/student/scan"),
+      icon: "qr",
+      tone: "scan",
+      path: "/student/scan",
     },
     {
       title: "My Attendance",
       description: "View your attendance history",
-      icon: "▥",
-      type: "green",
-      action: () => navigate("/student/attendance"),
+      icon: "chart",
+      tone: "history",
+      path: "/student/attendance",
     },
     {
       title: "Request Correction",
       description: "Report an attendance issue",
-      icon: "▤",
-      type: "purple",
-      action: () => {
-        // Reserved for correction page
-      },
+      icon: "clock",
+      tone: "correction",
+      path: "/student/correction-requests",
     },
   ];
 
-  const tips = [
-    "Attend classes regularly",
-    "Check your timetable",
-    "Scan the QR code on time",
-    "Keep track of your progress",
-  ];
+  const isActive = (path) => {
+    if (path === "/dashboard") {
+      return currentPath === "/dashboard";
+    }
 
-  const calendarDays = [
-    "",
-    "",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-  ];
+    return currentPath.startsWith(path);
+  };
+
+  const go = (path) => {
+    setSidebarOpen(false);
+    navigate(path);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
+  /* ---------------------------------------------------------
+     RENDER
+  ---------------------------------------------------------- */
 
   return (
     <div className="student-dashboard">
-      {/* ================= SIDEBAR ================= */}
-      <aside className="student-sidebar">
-        <div className="sidebar-top">
-          {/* Brand */}
+      {/* ============ SIDEBAR ============ */}
+      <aside
+        id="student-attendance-sidebar"
+        className={
+          sidebarOpen
+            ? "student-sidebar open"
+            : "student-sidebar"
+        }
+      >
+        <div>
           <div className="student-brand">
-            <div className="brand-logo">
-              <span>🎓</span>
+            <div
+              className="student-brand-logo"
+              aria-hidden="true"
+            >
+              A
             </div>
 
-            <div className="brand-text">
-              <strong>Attendify</strong>
-              <small>SMART ATTENDANCE</small>
+            <div>
+              <h2>Attendify</h2>
+              <span>SMART ATTENDANCE</span>
             </div>
           </div>
 
-          {/* Profile */}
           <div className="student-profile-card">
-            <div className="student-avatar">
-              {studentName.charAt(0).toUpperCase()}
+            <div className="student-profile-avatar">
+              {initial}
             </div>
 
-            <div className="student-profile-info">
-              <strong>{studentName}</strong>
+            <div className="student-profile-copy">
+              <strong>{fullName}</strong>
               <span>Student</span>
             </div>
-
-            <button className="profile-more">•••</button>
           </div>
 
-          {/* Navigation */}
-          <nav className="student-nav">
-            <button className="student-nav-item active">
-              <span className="nav-icon">⌂</span>
-              <span>Dashboard</span>
-            </button>
-
-            <button
-              className="student-nav-item"
-              onClick={() => navigate("/student/attendance")}
-            >
-              <span className="nav-icon">▥</span>
-              <span>My Attendance</span>
-            </button>
-
-            <button
-              className="student-nav-item"
-              onClick={() => navigate("/student/scan")}
-            >
-              <span className="nav-icon">▦</span>
-              <span>Scan Attendance</span>
-            </button>
-
-            <button className="student-nav-item">
-              <span className="nav-icon">▤</span>
-              <span>Correction Requests</span>
-            </button>
-
-            <button className="student-nav-item">
-              <span className="nav-icon">♟</span>
-              <span>Notifications</span>
-
-              <span className="notification-badge">3</span>
-            </button>
+          <nav
+            className="student-navigation"
+            aria-label="Student navigation"
+          >
+            {navItems.map((item) => (
+              <button
+                key={item.path}
+                type="button"
+                className={
+                  isActive(item.path)
+                    ? "student-nav-item active"
+                    : "student-nav-item"
+                }
+                aria-current={
+                  isActive(item.path) ? "page" : undefined
+                }
+                onClick={() => go(item.path)}
+              >
+                <Icon name={item.icon} size={18} />
+                <span>{item.label}</span>
+              </button>
+            ))}
           </nav>
         </div>
 
-        <div className="sidebar-bottom">
-          <div className="sidebar-motivation">
-            <div className="motivation-icon">🎓</div>
+        <div className="student-sidebar-bottom">
+          <div className="student-sidebar-tip">
+            <div className="student-sidebar-tip-icon">
+              <Icon name="light" size={17} />
+            </div>
 
             <div>
               <strong>Keep going!</strong>
@@ -212,164 +498,223 @@ const StudentDashboard = () => {
           </div>
 
           <button
-            className="logout-button"
-            onClick={() => {
-              localStorage.removeItem("token");
-              localStorage.removeItem("user");
-              navigate("/");
-            }}
+            className="student-logout"
+            type="button"
+            onClick={handleLogout}
           >
-            <span>↪</span>
+            <Icon name="logout" size={17} />
             Logout
           </button>
         </div>
       </aside>
 
-      {/* ================= MAIN ================= */}
+      {/* Mobile overlay — closes the drawer when the page background is tapped. */}
+      <button
+        type="button"
+        className={
+          sidebarOpen
+            ? "sidebar-overlay show"
+            : "sidebar-overlay"
+        }
+        aria-label="Close menu"
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      {/* Mobile menu button — direct child of the page root.
+          It stays above the overlay and drawer on small screens. */}
+      <button
+        className="mobile-menu-btn"
+        type="button"
+        aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+        aria-expanded={sidebarOpen}
+        aria-controls="student-attendance-sidebar"
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <Icon name="menu" size={20} />
+      </button>
+
+      {/* ============ MAIN ============ */}
       <main className="student-main">
-        {/* Header */}
-        <header className="student-header">
-          <div className="search-box">
-            <span className="search-icon">⌕</span>
-
-            <input
-              type="text"
-              placeholder="Search courses, sessions, or anything..."
-            />
-
-            <span className="search-shortcut">Ctrl + K</span>
-          </div>
-
-          <div className="header-right">
-            <button className="header-notification">
-              ♧
-              <span>3</span>
-            </button>
-
-            <div className="header-user">
-              <div className="header-avatar">
-                {studentName.charAt(0).toUpperCase()}
+        <header className="student-topbar">
+          <div
+            className="student-topbar-right"
+            style={{ marginLeft: "auto" }}
+          >
+            <div className="student-header-profile">
+              <div className="student-header-avatar">
+                {initial}
               </div>
 
               <div>
-                <strong>{studentName}</strong>
-                <small>Student</small>
+                <strong>{fullName}</strong>
+                <span>Student</span>
               </div>
-
-              <span className="header-arrow">⌄</span>
             </div>
           </div>
         </header>
 
-        {/* Content */}
-        <div className="student-content">
-          {/* ================= HERO ================= */}
-          <section className="dashboard-hero">
-            <div className="hero-left">
-              <div className="hero-title-row">
-                <h1>
-                  Good Morning, {firstName}! <span>👋</span>
-                </h1>
-              </div>
+        <section className="student-content">
+          {/* ============ HERO ============ */}
+          <div className="student-hero">
+            <div className="student-hero-copy">
+              <span className="student-hero-date">
+                {formattedDate}
+              </span>
+
+              <h1>My Attendance</h1>
 
               <p>
-                Stay consistent, keep learning, and make every class count.
+                Your attendance history for this semester,
+                updated after every class.
               </p>
             </div>
+          </div>
 
-            <div className="hero-date">
-              <div className="date-icon">▣</div>
-
-              <div>
-                <strong>{formattedDate}</strong>
-                <span>Here's your overview for today</span>
-              </div>
-            </div>
-
-            <div className="hero-decoration">
-              <div className="hero-decoration-shape shape-one" />
-              <div className="hero-decoration-shape shape-two" />
-
-              <div className="hero-graduation">🎓</div>
-
-              <div className="hero-quote">
-                <span>“</span>
-                Small steps
-                <br />
-                today, a brighter
-                <br />
-                tomorrow.
-                <span>”</span>
-              </div>
-            </div>
-          </section>
-
-          {/* ================= STATS ================= */}
-          <section className="stats-grid">
+          {/* ============ STATS ============ */}
+          <div className="student-stats">
             {stats.map((stat) => (
-              <div
+              <article
                 key={stat.title}
-                className={`stat-card stat-${stat.type}`}
+                className={`student-stat-card ${stat.tone}`}
               >
-                <div className="stat-icon">{stat.icon}</div>
+                <div className="student-stat-icon">
+                  <Icon name={stat.icon} size={20} />
+                </div>
 
-                <div className="stat-content">
+                <div className="student-stat-content">
                   <span>{stat.title}</span>
                   <strong>{stat.value}</strong>
-                  <small>{stat.subtitle}</small>
+                  <small>{stat.note}</small>
                 </div>
-
-                <div className="stat-trend">{stat.trend}</div>
-              </div>
+              </article>
             ))}
-          </section>
+          </div>
 
-          {/* ================= TOP GRID ================= */}
-          <section className="dashboard-grid-top">
-            {/* Today's Sessions */}
-            <div className="dashboard-card sessions-card">
-              <div className="card-header">
-                <div className="card-title-wrapper">
-                  <div className="card-icon blue-icon">▣</div>
+          {/* ============ MAIN GRID ============ */}
+          <div className="student-main-grid">
+            {/* Attendance history — real data */}
+            <section className="student-panel sessions-panel">
+              <div className="student-panel-header">
+                <div className="student-panel-title">
+                  <div className="student-panel-icon blue">
+                    <Icon name="chart" size={18} />
+                  </div>
 
                   <div>
-                    <h2>Today's Sessions</h2>
-                    <p>Your scheduled classes for today</p>
+                    <h2>Attendance History</h2>
+                    <p>All recorded sessions</p>
                   </div>
                 </div>
-
-                <button className="view-all-button">
-                  View All →
-                </button>
               </div>
 
-              <div className="empty-session">
-                <div className="empty-session-icon">
-                  <span>▣</span>
-                  <small>◷</small>
-                </div>
-
-                <h3>No sessions today</h3>
-
-                <p>
-                  You don't have any scheduled classes for today.
+              {loading && (
+                <p className="student-loading" role="status">
+                  Loading attendance…
                 </p>
+              )}
 
-                <button
-                  className="primary-button"
-                  onClick={() => navigate("/student/scan")}
+              {!loading && error && (
+                <div
+                  className="student-dashboard-error"
+                  role="alert"
                 >
-                  <span>▣</span>
-                  Scan Attendance
-                </button>
-              </div>
-            </div>
+                  <p>{error}</p>
 
-            {/* Quick Actions */}
-            <div className="dashboard-card quick-card">
-              <div className="card-header">
-                <div className="card-title-wrapper">
-                  <div className="card-icon yellow-icon">ϟ</div>
+                  <button
+                    type="button"
+                    onClick={loadAttendance}
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+
+              {!loading && !error && (
+                <>
+                  {sortedRecords.length === 0 ? (
+                    <div className="student-empty-state">
+                      <div className="student-empty-icon">
+                        <Icon name="chart" size={26} />
+                      </div>
+
+                      <h3>No attendance records yet</h3>
+
+                      <p>
+                        Your records will appear here after
+                        your lecturers mark attendance.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="student-attendance-list">
+                      {sortedRecords.map((row, index) => {
+                        const status = String(
+                          row?.status || ""
+                        )
+                          .trim()
+                          .toLowerCase();
+
+                        const statusLabel = status
+                          ? status.charAt(0).toUpperCase() +
+                            status.slice(1)
+                          : "Recorded";
+
+                        const course =
+                          row?.course_name ||
+                          row?.course ||
+                          row?.course_code ||
+                          "Course";
+
+                        const dateValue =
+                          row?.session_date ||
+                          row?.date ||
+                          row?.attendance_date ||
+                          row?.created_at;
+
+                        return (
+                          <div
+                            className="student-attendance-row"
+                            key={
+                              row?.id ??
+                              `${dateValue}-${index}`
+                            }
+                          >
+                            <div className="student-course-icon">
+                              <Icon
+                                name="calendar"
+                                size={18}
+                              />
+                            </div>
+
+                            <div className="student-attendance-info">
+                              <strong>{course}</strong>
+                              <span>
+                                {formatDate(dateValue)}
+                              </span>
+                            </div>
+
+                            <span
+                              className={`student-status ${getStatusClass(
+                                status
+                              )}`}
+                            >
+                              {statusLabel}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </section>
+
+            {/* Quick actions — all functional */}
+            <section className="student-panel quick-panel">
+              <div className="student-panel-header">
+                <div className="student-panel-title">
+                  <div className="student-panel-icon purple">
+                    <Icon name="arrow" size={18} />
+                  </div>
 
                   <div>
                     <h2>Quick Actions</h2>
@@ -378,223 +723,89 @@ const StudentDashboard = () => {
                 </div>
               </div>
 
-              <div className="quick-actions">
+              <div className="student-quick-actions">
                 {quickActions.map((action) => (
                   <button
                     key={action.title}
-                    className={`quick-action ${action.type}`}
-                    onClick={action.action}
+                    className={`student-action-card ${action.tone}`}
+                    type="button"
+                    onClick={() => go(action.path)}
                   >
-                    <div className="quick-action-icon">
-                      {action.icon}
+                    <div className="student-action-icon">
+                      <Icon name={action.icon} size={20} />
                     </div>
 
-                    <div className="quick-action-content">
+                    <div>
                       <strong>{action.title}</strong>
                       <span>{action.description}</span>
                     </div>
 
-                    <span className="quick-arrow">›</span>
+                    <Icon name="arrow" size={17} />
                   </button>
                 ))}
               </div>
-            </div>
+            </section>
 
-            {/* Calendar */}
-            <div className="dashboard-card calendar-card">
-              <div className="calendar-header">
-                <div className="card-title-wrapper">
-                  <div className="card-icon blue-icon">▣</div>
+            {/* Calendar — current month */}
+            <section className="student-panel calendar-panel">
+              <div className="student-panel-header calendar-heading">
+                <div className="student-panel-title">
+                  <div className="student-panel-icon blue">
+                    <Icon name="calendar" size={17} />
+                  </div>
 
                   <div>
                     <h2>Calendar</h2>
+                    <p>
+                      {monthName} {year}
+                    </p>
                   </div>
                 </div>
-
-                <div className="calendar-month">
-                  <button>‹</button>
-                  <strong>
-                    {today.toLocaleDateString("en-US", {
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </strong>
-                  <button>›</button>
-                </div>
               </div>
 
-              <div className="calendar-week">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                  (day) => (
-                    <span key={day}>{day}</span>
-                  )
-                )}
+              <div className="student-calendar-week">
+                {[
+                  "Sun",
+                  "Mon",
+                  "Tue",
+                  "Wed",
+                  "Thu",
+                  "Fri",
+                  "Sat",
+                ].map((day) => (
+                  <span key={day}>{day}</span>
+                ))}
               </div>
 
-              <div className="calendar-days">
-                {calendarDays.map((day, index) => (
+              <div className="student-calendar-grid">
+                {calendarCells.map((day, index) => (
                   <span
                     key={`${day}-${index}`}
                     className={
-                      day === String(today.getDate())
-                        ? "calendar-today"
-                        : ""
+                      day === currentDay ? "today" : ""
                     }
                   >
-                    {day}
+                    {day || ""}
                   </span>
                 ))}
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
 
-          {/* ================= BOTTOM GRID ================= */}
-          <section className="dashboard-grid-bottom">
-            {/* Recent Activity */}
-            <div className="dashboard-card activity-card">
-              <div className="card-header">
-                <div className="card-title-wrapper">
-                  <div className="card-icon blue-icon">◷</div>
+          {/* ============ FOOTER ============ */}
+          <footer className="student-footer">
+            <span>Attendify</span>
+            <span>Port Said University</span>
+            <span>
+              A Smarter Campus for a Brighter Tomorrow
+            </span>
 
-                  <div>
-                    <h2>Recent Activity</h2>
-                    <p>Your latest attendance activity</p>
-                  </div>
-                </div>
-
-                <button className="view-all-button">
-                  View All →
-                </button>
-              </div>
-
-              <div className="empty-activity">
-                <div className="empty-activity-icon">▱</div>
-
-                <h3>No recent activity</h3>
-
-                <p>
-                  Your attendance records will appear here once you start
-                  attending classes.
-                </p>
-              </div>
-            </div>
-
-            {/* Motivation */}
-            <div className="motivation-card">
-              <div className="motivation-background-circle circle-a" />
-              <div className="motivation-background-circle circle-b" />
-
-              <div className="motivation-content">
-                <h2>
-                  Stay consistent
-                  <br />
-                  every class <strong>matters.</strong>
-                </h2>
-
-                <div className="books-illustration">
-                  📚
-                </div>
-
-                <div className="quote-box">
-                  <span>“</span>
-
-                  <p>
-                    The expert in anything
-                    <br />
-                    was once a beginner.
-                  </p>
-
-                  <small>— Helen Hayes</small>
-                </div>
-              </div>
-            </div>
-
-            {/* Attendance Goal */}
-            <div className="dashboard-card goal-card">
-              <div className="card-header">
-                <div className="card-title-wrapper">
-                  <div className="card-icon red-icon">◎</div>
-
-                  <div>
-                    <h2>Attendance Goal</h2>
-                    <p>Target: 75% this semester</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="goal-content">
-                <div className="progress-ring">
-                  <div className="progress-ring-inner">
-                    <strong>0%</strong>
-                    <span>Progress</span>
-                  </div>
-                </div>
-
-                <div className="goal-legend">
-                  <div>
-                    <span className="legend-dot green-dot" />
-                    <label>Present</label>
-                    <strong>0</strong>
-                  </div>
-
-                  <div>
-                    <span className="legend-dot red-dot" />
-                    <label>Absent</label>
-                    <strong>0</strong>
-                  </div>
-
-                  <div>
-                    <span className="legend-dot blue-dot" />
-                    <label>Total</label>
-                    <strong>0</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="goal-tip">
-                <span>💡</span>
-                Regular attendance leads to better academic progress and
-                more opportunities.
-              </div>
-            </div>
-
-            {/* Tips */}
-            <div className="dashboard-card tips-card">
-              <div className="card-header">
-                <div className="card-title-wrapper">
-                  <div className="card-icon yellow-icon">💡</div>
-
-                  <div>
-                    <h2>Tips for Better Attendance</h2>
-                  </div>
-                </div>
-              </div>
-
-              <div className="tips-list">
-                {tips.map((tip) => (
-                  <div className="tip-item" key={tip}>
-                    <span>✓</span>
-                    <p>{tip}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </div>
-
-        {/* Footer */}
-        <footer className="student-footer">
-          <span>Attendify</span>
-          <b>•</b>
-          <span>Port Said University</span>
-          <b>•</b>
-          <span>A Smarter Campus for a Brighter Tomorrow</span>
-
-          <span className="footer-version">v1.0.0</span>
-        </footer>
+            <small>v1.0.0</small>
+          </footer>
+        </section>
       </main>
     </div>
   );
-};
+}
 
-export default StudentDashboard;
+export default StudentAttendance;

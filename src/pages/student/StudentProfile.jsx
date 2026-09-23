@@ -1,17 +1,228 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "./StudentProfile.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000/api";
+
+function Icon({ name, size = 18 }) {
+  const icons = {
+    dashboard: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M3 10h18" />
+      </>
+    ),
+
+    scan: (
+      <>
+        <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+        <path d="M4 12h16" />
+      </>
+    ),
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+
+    logout: (
+      <>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H9" />
+      </>
+    ),
+
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    ),
+
+    phone: (
+      <>
+        <path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+      </>
+    ),
+
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    layers: (
+      <>
+        <path d="m12 3 9 5-9 5-9-5Z" />
+        <path d="m3 13 9 5 9-5" />
+      </>
+    ),
+
+    chart: (
+      <>
+        <path d="M21 12a9 9 0 1 1-9-9" />
+        <path d="M12 3v9h9" />
+      </>
+    ),
+
+    refresh: (
+      <>
+        <path d="M20 11a8 8 0 1 0-2.3 6.3" />
+        <path d="M20 5v6h-6" />
+      </>
+    ),
+
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {icons[name]}
+    </svg>
+  );
+}
+
+function getSavedUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function formatDateTime(value) {
+  if (!value) return "";
+
+  const raw = String(value);
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+    ? `${raw}T00:00:00`
+    : raw.replace(" ", "T");
+
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) return raw;
+
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatStatus(value) {
+  const status = String(value || "recorded").trim().toLowerCase();
+
+  if (!status) return "Recorded";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function statusClass(value) {
+  const status = String(value || "recorded").trim().toLowerCase();
+
+  const known = ["present", "late", "absent", "excused"];
+
+  return known.includes(status) ? status : "recorded";
+}
+
+async function requestJson(path, token, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  let data = {};
+
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || data.error || "Request failed."
+    );
+  }
+
+  return data;
+}
 
 export default function StudentProfile() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const savedUser = useMemo(() => getSavedUser(), []);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [student, setStudent] = useState(null);
+  const [attendance, setAttendance] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveNotice, setSaveNotice] = useState("");
+
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordNotice, setPasswordNotice] = useState("");
 
   useEffect(() => {
-    document.body.classList.toggle("student-profile-nav-open", sidebarOpen);
+    document.body.classList.toggle(
+      "student-profile-nav-open",
+      sidebarOpen
+    );
 
     return () => {
-      document.body.classList.remove("student-profile-nav-open");
+      document.body.classList.remove(
+        "student-profile-nav-open"
+      );
     };
   }, [sidebarOpen]);
 
@@ -23,30 +234,32 @@ export default function StudentProfile() {
     };
 
     window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
+    return () =>
+      window.removeEventListener("keydown", handleEscape);
   }, []);
-
-  const navigateAndClose = (path) => {
-    setSidebarOpen(false);
-    navigate(path);
-  };
-
-  const [user, setUser] = useState(null);
-  const [student, setStudent] = useState(null);
-  const [attendance, setAttendance] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (!saveNotice) return undefined;
+
+    const timer = setTimeout(() => setSaveNotice(""), 5000);
+    return () => clearTimeout(timer);
+  }, [saveNotice]);
+
+  useEffect(() => {
+    if (!passwordNotice) return undefined;
+
+    const timer = setTimeout(
+      () => setPasswordNotice(""),
+      5000
+    );
+    return () => clearTimeout(timer);
+  }, [passwordNotice]);
 
   async function loadProfile() {
-    try {
-      setLoading(true);
-      setError("");
+    setLoading(true);
+    setError("");
 
+    try {
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -54,120 +267,93 @@ export default function StudentProfile() {
         return;
       }
 
-      /* =========================
-         USER
-      ========================= */
-
-      const userResponse = await fetch(`${API_BASE_URL}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const userData = await userResponse.json();
-
-      if (!userResponse.ok) {
-        throw new Error(
-          userData.message || "Failed to load account information"
-        );
-      }
-
-      setUser(userData.user);
-
-      /* =========================
-         STUDENT
-      ========================= */
-
-      const studentResponse = await fetch(
-        `${API_BASE_URL}/students/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const userData = await requestJson(
+        "/auth/me",
+        token
       );
 
-      const studentData = await studentResponse.json();
-
-      if (studentResponse.ok) {
-        setStudent(studentData.student || studentData);
-      }
-
-      /* =========================
-         ATTENDANCE
-      ========================= */
+      setUser(userData.user || null);
 
       try {
-        const attendanceResponse = await fetch(
-          `${API_BASE_URL}/attendance/my`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const studentData = await requestJson(
+          "/students/me",
+          token
         );
 
-        const attendanceData = await attendanceResponse.json();
+        setStudent(
+          studentData.student || studentData || null
+        );
+      } catch {
+        setStudent(null);
+      }
 
-        if (attendanceResponse.ok) {
-          setAttendance(
-            Array.isArray(attendanceData)
-              ? attendanceData
-              : Array.isArray(attendanceData.data)
+      try {
+        const attendanceData = await requestJson(
+          "/attendance/my",
+          token
+        );
+
+        setAttendance(
+          Array.isArray(attendanceData)
+            ? attendanceData
+            : Array.isArray(attendanceData.data)
               ? attendanceData.data
               : []
-          );
-        }
+        );
       } catch {
         setAttendance([]);
       }
-    } catch (err) {
-      console.error("Profile loading error:", err);
-      setError(err.message || "Failed to load profile");
+    } catch (requestError) {
+      setError(
+        requestError.message ||
+          "Could not load your profile."
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  function handleLogout() {
-    setSidebarOpen(false);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  }
+  useEffect(() => {
+    void loadProfile();
+  }, []);
+
+  const displayUser = user || savedUser || {};
 
   function getInitials() {
-    if (!user) return "S";
+    const first =
+      displayUser.first_name ||
+      displayUser.firstName ||
+      "";
+    const last =
+      displayUser.last_name ||
+      displayUser.lastName ||
+      "";
 
-    const first = user.first_name?.charAt(0) || "";
-    const last = user.last_name?.charAt(0) || "";
-
-    return `${first}${last}`.toUpperCase() || "S";
+    return `${first.charAt(0)}${last.charAt(0)}`
+      .toUpperCase()
+      .trim() || "S";
   }
 
   function getFullName() {
-    if (!user) return "Student";
+    const full =
+      `${displayUser.first_name || displayUser.firstName || ""} ${
+        displayUser.last_name || displayUser.lastName || ""
+      }`.trim();
 
-    return `${user.first_name || ""} ${
-      user.last_name || ""
-    }`.trim();
+    return full || "Student";
   }
 
   const presentCount = attendance.filter(
     (item) =>
       String(
-        item.status ||
-          item.attendance_status ||
-          ""
+        item.status || item.attendance_status || ""
       ).toLowerCase() === "present"
   ).length;
 
   const lateCount = attendance.filter(
     (item) =>
       String(
-        item.status ||
-          item.attendance_status ||
-          ""
+        item.status || item.attendance_status || ""
       ).toLowerCase() === "late"
   ).length;
 
@@ -180,28 +366,236 @@ export default function StudentProfile() {
         )
       : 0;
 
+  const recentActivity = useMemo(
+    () => attendance.slice(0, 5),
+    [attendance]
+  );
+
+  const studentCode =
+    student?.student_code || student?.studentCode || "";
+
+  const accountStatus = String(
+    displayUser.status || "active"
+  ).toLowerCase();
+
+  const department =
+    student?.department_name || student?.department || "";
+
+  const level =
+    student?.level || student?.academic_level || "";
+
+  function navigateAndClose(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
+
+  const isActive = (path) => location.pathname === path;
+
+  function handleLogout() {
+    setSidebarOpen(false);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  }
+
+  function startEditing() {
+    setEditForm({
+      firstName:
+        displayUser.first_name ||
+        displayUser.firstName ||
+        "",
+      lastName:
+        displayUser.last_name ||
+        displayUser.lastName ||
+        "",
+      email: displayUser.email || "",
+      phone: displayUser.phone || "",
+    });
+    setSaveError("");
+    setSaveNotice("");
+    setEditing(true);
+
+    document
+      .getElementById("personal-information")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function handleEditChange(event) {
+    const { name, value } = event.target;
+    setEditForm((current) => ({ ...current, [name]: value }));
+  }
+
+  async function handleSaveProfile(event) {
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    if (
+      !editForm.firstName.trim() ||
+      !editForm.lastName.trim() ||
+      !editForm.email.trim()
+    ) {
+      setSaveError(
+        "First name, last name, and email are required."
+      );
+      return;
+    }
+
+    setSaving(true);
+    setSaveError("");
+
+    try {
+      const data = await requestJson(
+        "/auth/me",
+        token,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            firstName: editForm.firstName.trim(),
+            lastName: editForm.lastName.trim(),
+            email: editForm.email.trim(),
+            phone: editForm.phone.trim(),
+          }),
+        }
+      );
+
+      if (data.user) {
+        setUser(data.user);
+
+        try {
+          const saved = getSavedUser() || {};
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...saved, ...data.user })
+          );
+        } catch {
+          // Cached header info is optional.
+        }
+      }
+
+      setEditing(false);
+      setSaveNotice("Your profile was updated.");
+    } catch (requestError) {
+      setSaveError(
+        requestError.message ||
+          "Could not update your profile."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handlePasswordChange(event) {
+    const { name, value } = event.target;
+    setPasswordForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  async function handleSavePassword(event) {
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    if (
+      !passwordForm.currentPassword ||
+      !passwordForm.newPassword
+    ) {
+      setPasswordError(
+        "Enter your current and new password."
+      );
+      return;
+    }
+
+    if (
+      passwordForm.newPassword !==
+      passwordForm.confirmPassword
+    ) {
+      setPasswordError("The new passwords do not match.");
+      return;
+    }
+
+    setChangingPassword(true);
+    setPasswordError("");
+
+    try {
+      const data = await requestJson(
+        "/auth/me/password",
+        token,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            currentPassword: passwordForm.currentPassword,
+            newPassword: passwordForm.newPassword,
+          }),
+        }
+      );
+
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setShowPasswordForm(false);
+      setPasswordNotice(
+        data.message || "Your password was changed."
+      );
+    } catch (requestError) {
+      setPasswordError(
+        requestError.message ||
+          "Could not change your password."
+      );
+    } finally {
+      setChangingPassword(false);
+    }
+  }
+
+  const navItems = [
+    { path: "/dashboard", label: "Dashboard" },
+    { path: "/student/attendance", label: "My Attendance" },
+    { path: "/student/scan", label: "Scan Attendance" },
+    {
+      path: "/student/correction-requests",
+      label: "Correction Requests",
+    },
+  ];
+
   return (
-    <div className={`student-profile-page ${sidebarOpen ? "mobile-nav-open" : ""}`}>
-
-      {/* =====================================================
-          TOP NAVBAR
-      ====================================================== */}
-
+    <div
+      className={`student-profile-page ${
+        sidebarOpen ? "mobile-nav-open" : ""
+      }`}
+    >
       <header className="student-topbar">
-
-        <div
+        <button
+          type="button"
           className="student-brand"
           onClick={() => navigateAndClose("/dashboard")}
+          aria-label="Go to dashboard"
         >
-          <div className="brand-icon">
-            AT
-          </div>
+          <span
+            className="brand-icon"
+            aria-hidden="true"
+          >
+            <span className="brand-mark" />
+          </span>
 
-          <div className="brand-text">
+          <span className="brand-text">
             <strong>Attendify</strong>
             <span>SMART ATTENDANCE</span>
-          </div>
-        </div>
+          </span>
+        </button>
 
         <button
           type="button"
@@ -210,9 +604,9 @@ export default function StudentProfile() {
           aria-expanded={sidebarOpen}
           onClick={() => setSidebarOpen(true)}
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span />
+          <span />
+          <span />
         </button>
 
         {sidebarOpen && (
@@ -224,124 +618,85 @@ export default function StudentProfile() {
           />
         )}
 
-        <nav className="student-main-nav">
-
-          <button
-            onClick={() => navigateAndClose("/dashboard")}
-          >
-            Dashboard
-          </button>
-
-          <button
-            onClick={() =>
-              navigateAndClose("/student/attendance")
-            }
-          >
-            My Attendance
-          </button>
-
-          <button
-            onClick={() =>
-              navigateAndClose("/student/scan")
-            }
-          >
-            Scan QR
-          </button>
-
-          <button
-            onClick={() =>
-              navigateAndClose("/student/sessions")
-            }
-          >
-            My Sessions
-          </button>
-
-          <button
-            onClick={() =>
-              navigateAndClose("/student/corrections")
-            }
-          >
-            Correction Requests
-          </button>
-
-          <button
-            onClick={() =>
-              navigateAndClose("/student/notifications")
-            }
-          >
-            Notifications
-          </button>
-
+        <nav
+          className="student-main-nav"
+          aria-label="Student pages"
+        >
+          {navItems.map((item) => (
+            <button
+              key={item.path}
+              type="button"
+              className={isActive(item.path) ? "active" : ""}
+              onClick={() => navigateAndClose(item.path)}
+            >
+              {item.label}
+            </button>
+          ))}
         </nav>
 
         <div className="top-profile">
-
-          <div className="top-avatar">
-            {getInitials()}
-          </div>
+          <div className="top-avatar">{getInitials()}</div>
 
           <div className="top-profile-info">
-            <strong>
-              {user?.first_name || "Student"}
-            </strong>
-
+            <strong>{getFullName()}</strong>
             <span>Student</span>
           </div>
 
           <button
-            className="profile-menu-btn"
+            type="button"
+            className="profile-logout-btn"
             onClick={handleLogout}
-            title="Logout"
           >
-            ↓
+            <Icon name="logout" size={15} />
+            Logout
           </button>
-
         </div>
-
       </header>
 
-      {/* =====================================================
-          PAGE
-      ====================================================== */}
-
       <main className="student-profile-main">
-
         <div className="profile-page-heading">
-
           <div>
-            <div className="breadcrumb">
-              Home <span>›</span> My Profile
-            </div>
+            <p className="breadcrumb">
+              <span>Home</span>
+              <span aria-hidden="true">/</span>
+              <span>My Profile</span>
+            </p>
 
             <h1>My Profile</h1>
 
             <p>
-              View and manage your personal account information.
+              View and manage your personal account
+              information.
             </p>
           </div>
 
           <button
+            type="button"
             className="refresh-btn"
             onClick={loadProfile}
+            disabled={loading}
           >
-            ↻ Refresh
+            <Icon name="refresh" size={15} />
+            {loading ? "Loading" : "Refresh"}
           </button>
-
         </div>
 
         {loading && (
-          <div className="profile-loading">
-            <div className="loading-spinner"></div>
+          <div
+            className="profile-loading"
+            aria-live="polite"
+          >
+            <div className="loading-spinner" aria-hidden="true" />
             <p>Loading profile...</p>
           </div>
         )}
 
         {!loading && error && (
-          <div className="profile-error">
+          <div className="profile-error" role="alert">
             <strong>Profile Error</strong>
             <span>{error}</span>
 
-            <button onClick={loadProfile}>
+            <button type="button" onClick={loadProfile}>
               Try Again
             </button>
           </div>
@@ -349,1921 +704,568 @@ export default function StudentProfile() {
 
         {!loading && !error && (
           <>
-
-            {/* =================================================
-                HERO PROFILE CARD
-            ================================================== */}
-
             <section className="profile-hero">
-
               <div className="hero-left">
-
                 <div className="hero-avatar">
                   {getInitials()}
-
-                  <span className="avatar-status"></span>
+                  <span
+                    className="avatar-status"
+                    aria-hidden="true"
+                  />
                 </div>
 
                 <div className="hero-user-info">
-
                   <span className="hero-label">
                     STUDENT ACCOUNT
                   </span>
 
-                  <h2>
-                    {getFullName()}
-                  </h2>
+                  <h2>{getFullName()}</h2>
 
                   <div className="hero-contact">
-
                     <span>
-                      ✉ {user?.email || "No email"}
+                      <Icon name="mail" size={14} />
+                      {displayUser.email || "No email"}
                     </span>
 
                     <span>
-                      ☎ {user?.phone || "No phone"}
+                      <Icon name="phone" size={14} />
+                      {displayUser.phone || "No phone"}
                     </span>
-
                   </div>
 
                   <div className="hero-badges">
+                    <span className="badge role">Student</span>
 
-                    <span className="badge">
-                      AT Student
+                    <span
+                      className={`badge status ${accountStatus}`}
+                    >
+                      {formatStatus(accountStatus)}
                     </span>
 
-                    <span className="badge">
-                      Active
+                    <span className="badge code">
+                      ID: {studentCode || "Not assigned"}
                     </span>
-
-                    <span className="badge">
-                      ID:{" "}
-                      {student?.student_code ||
-                        student?.studentCode ||
-                        "—"}
-                    </span>
-
                   </div>
-
                 </div>
-
-              </div>
-
-              <div className="hero-decoration">
-                <div className="hero-circle circle-one"></div>
-                <div className="hero-circle circle-two"></div>
-
-                <div className="hero-graduation">
-                  AT
-                </div>
-
-                <p>
-                  "Consistency today
-                  <br />
-                  builds a brighter tomorrow."
-                </p>
               </div>
 
               <button
+                type="button"
                 className="edit-profile-btn"
-                onClick={() =>
-                  document
-                    .getElementById("personal-information")
-                    ?.scrollIntoView({
-                      behavior: "smooth",
-                    })
-                }
+                onClick={startEditing}
               >
-                ✎ Edit Profile
+                <Icon name="edit" size={15} />
+                Edit Profile
               </button>
-
             </section>
 
-            {/* =================================================
-                STATISTICS
-            ================================================== */}
+            <section
+              className="profile-stats"
+              aria-label="Attendance statistics"
+            >
+              <div className="profile-stat-card blue">
+                <span className="profile-stat-icon">
+                  <Icon name="chart" size={18} />
+                </span>
 
-            <section className="profile-stats">
+                <div>
+                  <span>Total Attendance</span>
+                  <strong>{attendanceRate}%</strong>
+                  <small>Present and late records</small>
+                </div>
+              </div>
 
-              <StatCard
-                icon="◉"
-                title="Total Attendance"
-                value={`${attendanceRate}%`}
-                description="Keep going!"
-                type="blue"
-              />
+              <div className="profile-stat-card green">
+                <span className="profile-stat-icon">
+                  <Icon name="calendar" size={18} />
+                </span>
 
-              <StatCard
-                icon="✓"
-                title="Present"
-                value={presentCount}
-                description="Classes attended"
-                type="green"
-              />
+                <div>
+                  <span>Present</span>
+                  <strong>{presentCount}</strong>
+                  <small>Classes attended</small>
+                </div>
+              </div>
 
-              <StatCard
-                icon="◷"
-                title="Late"
-                value={lateCount}
-                description="Arrived late"
-                type="orange"
-              />
+              <div className="profile-stat-card orange">
+                <span className="profile-stat-icon">
+                  <Icon name="clock" size={18} />
+                </span>
 
-              <StatCard
-                icon="▤"
-                title="Records"
-                value={recordsCount}
-                description="Total records"
-                type="purple"
-              />
+                <div>
+                  <span>Late</span>
+                  <strong>{lateCount}</strong>
+                  <small>Arrived late</small>
+                </div>
+              </div>
 
+              <div className="profile-stat-card purple">
+                <span className="profile-stat-icon">
+                  <Icon name="layers" size={18} />
+                </span>
+
+                <div>
+                  <span>Records</span>
+                  <strong>{recordsCount}</strong>
+                  <small>Total records</small>
+                </div>
+              </div>
             </section>
-
-            {/* =================================================
-                CONTENT GRID
-            ================================================== */}
 
             <section className="profile-content-grid">
-
-              {/* PERSONAL */}
-
               <div
                 className="profile-card personal-card"
                 id="personal-information"
               >
-
                 <div className="card-header">
-
-                  <div className="card-title-icon">
-                    ●
-                  </div>
-
                   <div>
-                    <h3>
-                      Personal Information
-                    </h3>
-
-                    <p>
-                      Your basic account details
-                    </p>
+                    <h3>Personal Information</h3>
+                    <p>Your basic account details</p>
                   </div>
 
-                  <button
-                    className="small-edit-btn"
-                    onClick={() =>
-                      window.alert(
-                        "Profile editing is connected to your account settings."
-                      )
-                    }
+                  {!editing && (
+                    <button
+                      type="button"
+                      className="small-edit-btn"
+                      onClick={startEditing}
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+
+                {saveNotice && (
+                  <p className="form-notice" role="status">
+                    {saveNotice}
+                  </p>
+                )}
+
+                {editing ? (
+                  <form
+                    className="profile-form"
+                    onSubmit={handleSaveProfile}
                   >
-                    Edit
-                  </button>
+                    <label>
+                      First Name
+                      <input
+                        name="firstName"
+                        value={editForm.firstName}
+                        onChange={handleEditChange}
+                        required
+                        autoComplete="given-name"
+                      />
+                    </label>
 
-                </div>
+                    <label>
+                      Last Name
+                      <input
+                        name="lastName"
+                        value={editForm.lastName}
+                        onChange={handleEditChange}
+                        required
+                        autoComplete="family-name"
+                      />
+                    </label>
 
-                <div className="information-grid">
+                    <label className="form-full">
+                      Email Address
+                      <input
+                        type="email"
+                        name="email"
+                        value={editForm.email}
+                        onChange={handleEditChange}
+                        required
+                        autoComplete="email"
+                      />
+                    </label>
 
-                  <InfoItem
-                    label="First Name"
-                    value={
-                      user?.first_name || "Not provided"
-                    }
-                    icon="●"
-                  />
+                    <label>
+                      Phone Number
+                      <input
+                        name="phone"
+                        value={editForm.phone}
+                        onChange={handleEditChange}
+                        placeholder="Optional"
+                        autoComplete="tel"
+                      />
+                    </label>
 
-                  <InfoItem
-                    label="Last Name"
-                    value={
-                      user?.last_name || "Not provided"
-                    }
-                    icon="●"
-                  />
+                    <label>
+                      Account Status
+                      <input
+                        value={formatStatus(accountStatus)}
+                        disabled
+                      />
+                    </label>
 
-                  <InfoItem
-                    label="Email Address"
-                    value={
-                      user?.email || "Not provided"
-                    }
-                    icon="✉"
-                    full
-                  />
+                    {saveError && (
+                      <p
+                        className="form-error"
+                        role="alert"
+                      >
+                        {saveError}
+                      </p>
+                    )}
 
-                  <InfoItem
-                    label="Phone Number"
-                    value={
-                      user?.phone || "Not provided"
-                    }
-                    icon="☎"
-                  />
+                    <div className="form-actions">
+                      <button
+                        type="button"
+                        className="cancel-btn"
+                        disabled={saving}
+                        onClick={() => {
+                          setEditing(false);
+                          setSaveError("");
+                        }}
+                      >
+                        Cancel
+                      </button>
 
-                  <InfoItem
-                    label="Account Status"
-                    value={
-                      user?.status || "active"
-                    }
-                    icon="●"
-                  />
+                      <button
+                        type="submit"
+                        className="save-btn"
+                        disabled={saving}
+                      >
+                        {saving
+                          ? "Saving..."
+                          : "Save Changes"}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="information-grid">
+                    <div className="info-item">
+                      <span>First Name</span>
+                      <strong>
+                        {displayUser.first_name ||
+                          displayUser.firstName ||
+                          "Not provided"}
+                      </strong>
+                    </div>
 
-                </div>
+                    <div className="info-item">
+                      <span>Last Name</span>
+                      <strong>
+                        {displayUser.last_name ||
+                          displayUser.lastName ||
+                          "Not provided"}
+                      </strong>
+                    </div>
 
+                    <div className="info-item info-full">
+                      <span>Email Address</span>
+                      <strong>
+                        {displayUser.email ||
+                          "Not provided"}
+                      </strong>
+                    </div>
+
+                    <div className="info-item">
+                      <span>Phone Number</span>
+                      <strong>
+                        {displayUser.phone ||
+                          "Not provided"}
+                      </strong>
+                    </div>
+
+                    <div className="info-item">
+                      <span>Account Status</span>
+                      <strong>
+                        <span
+                          className={`badge status ${accountStatus}`}
+                        >
+                          {formatStatus(accountStatus)}
+                        </span>
+                      </strong>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* ACADEMIC */}
 
               <div className="profile-card academic-card">
-
                 <div className="card-header">
-
-                  <div className="card-title-icon academic-icon">
-                    AT
-                  </div>
-
                   <div>
-                    <h3>
-                      Academic Information
-                    </h3>
-
+                    <h3>Academic Information</h3>
                     <p>
-                      Information linked to your student record
+                      Information linked to your student
+                      record
                     </p>
                   </div>
-
                 </div>
 
                 <div className="information-grid">
+                  <div className="info-item">
+                    <span>Student ID</span>
+                    <strong>
+                      {studentCode || "Not assigned"}
+                    </strong>
+                  </div>
 
-                  <InfoItem
-                    label="Student ID"
-                    value={
-                      student?.student_code ||
-                      student?.studentCode ||
-                      "Not provided"
-                    }
-                    icon="#"
-                  />
+                  {department && (
+                    <div className="info-item">
+                      <span>Department</span>
+                      <strong>{department}</strong>
+                    </div>
+                  )}
 
-                  <InfoItem
-                    label="Profile ID"
-                    value={
-                      student?.id || "Not provided"
-                    }
-                    icon="ID"
-                  />
+                  {level && (
+                    <div className="info-item">
+                      <span>Level / Year</span>
+                      <strong>{level}</strong>
+                    </div>
+                  )}
 
-                  <InfoItem
-                    label="Department"
-                    value={
-                      student?.department_name ||
-                      student?.department ||
-                      "Not provided"
-                    }
-                    icon="▦"
-                  />
-
-                  <InfoItem
-                    label="Level / Year"
-                    value={
-                      student?.level ||
-                      student?.academic_level ||
-                      "Not provided"
-                    }
-                    icon="▥"
-                  />
-
+                  {!department && !level && (
+                    <p className="info-note">
+                      Additional academic details are not
+                      available for this account yet.
+                    </p>
+                  )}
                 </div>
-
               </div>
-
-              {/* SECURITY */}
 
               <div className="side-card security-card">
-
-                <div className="side-card-icon">
-                  Security
-                </div>
-
-                <h3>
-                  Account Security
-                </h3>
+                <h3>Account Security</h3>
 
                 <p>
-                  Keep your account secure by using
-                  a strong private password.
+                  Keep your account secure by using a
+                  strong private password.
                 </p>
 
-                <button
-                  onClick={() =>
-                    window.alert(
-                      "Password change will be available from account settings."
-                    )
-                  }
-                >
-                  Change Password
-                </button>
+                {passwordNotice && (
+                  <p
+                    className="form-notice"
+                    role="status"
+                  >
+                    {passwordNotice}
+                  </p>
+                )}
 
+                {showPasswordForm ? (
+                  <form
+                    className="profile-form"
+                    onSubmit={handleSavePassword}
+                  >
+                    <label className="form-full">
+                      Current Password
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        value={
+                          passwordForm.currentPassword
+                        }
+                        onChange={handlePasswordChange}
+                        required
+                        autoComplete="current-password"
+                      />
+                    </label>
+
+                    <label className="form-full">
+                      New Password
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordForm.newPassword}
+                        onChange={handlePasswordChange}
+                        required
+                        minLength={8}
+                        autoComplete="new-password"
+                      />
+                    </label>
+
+                    <label className="form-full">
+                      Confirm New Password
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={
+                          passwordForm.confirmPassword
+                        }
+                        onChange={handlePasswordChange}
+                        required
+                        autoComplete="new-password"
+                      />
+                    </label>
+
+                    {passwordError && (
+                      <p
+                        className="form-error"
+                        role="alert"
+                      >
+                        {passwordError}
+                      </p>
+                    )}
+
+                    <div className="form-actions">
+                      <button
+                        type="button"
+                        className="cancel-btn"
+                        disabled={changingPassword}
+                        onClick={() => {
+                          setShowPasswordForm(false);
+                          setPasswordError("");
+                          setPasswordForm({
+                            currentPassword: "",
+                            newPassword: "",
+                            confirmPassword: "",
+                          });
+                        }}
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="submit"
+                        className="save-btn"
+                        disabled={changingPassword}
+                      >
+                        {changingPassword
+                          ? "Saving..."
+                          : "Change Password"}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPasswordError("");
+                      setShowPasswordForm(true);
+                    }}
+                  >
+                    Change Password
+                  </button>
+                )}
               </div>
 
-              {/* QUICK ACTIONS */}
-
               <div className="side-card actions-card">
+                <h3>Quick Actions</h3>
 
-                <div className="side-card-icon orange">
-                  Actions
-                </div>
+                <p>Common account actions</p>
 
-                <h3>
-                  Quick Actions
-                </h3>
-
-                <p>
-                  Common account actions
-                </p>
-
-                <ActionButton
-                  text="View My Attendance"
+                <button
+                  type="button"
+                  className="action-button"
                   onClick={() =>
                     navigateAndClose("/student/attendance")
                   }
-                />
+                >
+                  View My Attendance
+                  <Icon name="arrow" size={15} />
+                </button>
 
-                <ActionButton
-                  text="View My Sessions"
-                  onClick={() =>
-                    navigateAndClose("/student/sessions")
-                  }
-                />
-
-                <ActionButton
-                  text="Scan Attendance QR"
+                <button
+                  type="button"
+                  className="action-button"
                   onClick={() =>
                     navigateAndClose("/student/scan")
                   }
-                />
+                >
+                  Scan Attendance QR
+                  <Icon name="arrow" size={15} />
+                </button>
 
+                <button
+                  type="button"
+                  className="action-button"
+                  onClick={() =>
+                    navigateAndClose(
+                      "/student/correction-requests"
+                    )
+                  }
+                >
+                  Correction Requests
+                  <Icon name="arrow" size={15} />
+                </button>
               </div>
-
             </section>
 
-            {/* =================================================
-                RECENT ACTIVITY
-            ================================================== */}
-
             <section className="recent-card">
-
               <div className="recent-header">
-
                 <div>
-                  <h3>
-                    Recent Activity
-                  </h3>
-
-                  <p>
-                    Your latest attendance activity
-                  </p>
+                  <h3>Recent Activity</h3>
+                  <p>Your latest attendance activity</p>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() =>
                     navigateAndClose("/student/attendance")
                   }
                 >
-                  View All →
+                  View All
+                  <Icon name="arrow" size={14} />
                 </button>
-
               </div>
 
-              {attendance.length === 0 ? (
+              {recentActivity.length === 0 ? (
                 <div className="empty-activity">
-
-                  <div className="empty-icon">
-                    ▤
-                  </div>
-
-                  <strong>
-                    No recent activity
-                  </strong>
-
-                  <span>
-                    Your latest attendance actions
-                    will appear here.
+                  <span className="empty-activity-icon">
+                    <Icon name="clock" size={20} />
                   </span>
 
+                  <strong>No recent activity</strong>
+
+                  <span>
+                    Your latest attendance actions will
+                    appear here.
+                  </span>
                 </div>
               ) : (
                 <div className="activity-list">
+                  {recentActivity.map((item, index) => {
+                    const course =
+                      item.course_name ||
+                      item.course_code ||
+                      "Attendance session";
 
-                  {attendance
-                    .slice(0, 5)
-                    .map((item, index) => (
+                    const when = formatDateTime(
+                      item.scanned_at || item.session_date
+                    );
+
+                    return (
                       <div
                         className="activity-row"
-                        key={
-                          item.id || index
-                        }
+                        key={item.id || `${when}-${index}`}
                       >
-
-                        <div className="activity-icon">
-                          
-                        </div>
-
                         <div>
                           <strong>
                             Attendance Recorded
                           </strong>
-
-                          <span>
-                            {item.course_name ||
-                              item.course_code ||
-                              "Attendance session"}
-                          </span>
+                          <span>{course}</span>
+                          {when && <small>{when}</small>}
                         </div>
 
-                        <span className="activity-status">
-                          {item.status ||
-                            item.attendance_status ||
-                            "Recorded"}
+                        <span
+                          className={`activity-status ${statusClass(
+                            item.status ||
+                              item.attendance_status
+                          )}`}
+                        >
+                          {formatStatus(
+                            item.status ||
+                              item.attendance_status
+                          )}
                         </span>
-
                       </div>
-                    ))}
-
+                    );
+                  })}
                 </div>
               )}
-
             </section>
-
           </>
         )}
-
       </main>
 
-      {/* =====================================================
-          FOOTER
-      ====================================================== */}
-
       <footer className="profile-footer">
-
         <span>
-          © 2026 Attendify. All rights reserved.
+          2026 Attendify. All rights reserved.
         </span>
 
-        <div>
-          <button>Privacy</button>
-          <button>Terms</button>
-          <button>Help</button>
-          <button onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-
+        <button type="button" onClick={handleLogout}>
+          <Icon name="logout" size={14} />
+          Logout
+        </button>
       </footer>
-
-      {/* =====================================================
-          PAGE STYLES
-      ====================================================== */}
-
-      <style>{`
-
-        * {
-          box-sizing: border-box;
-        }
-
-        .student-profile-page {
-          min-height: 100vh;
-          background: #f5f8fd;
-          color: #102b5c;
-          font-family:
-            Inter,
-            "Segoe UI",
-            Arial,
-            sans-serif;
-        }
-
-        /* ================================
-           TOP NAV
-        ================================= */
-
-        .student-topbar {
-          height: 72px;
-          background: rgba(255,255,255,0.97);
-          border-bottom: 1px solid #e8edf5;
-          display: flex;
-          align-items: center;
-          padding: 0 5%;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          box-shadow:
-            0 2px 12px rgba(15,45,90,0.04);
-        }
-
-        .student-brand {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          cursor: pointer;
-          min-width: 190px;
-        }
-
-        .brand-icon {
-          width: 42px;
-          height: 42px;
-          border-radius: 12px;
-          background:
-            linear-gradient(
-              135deg,
-              #1769e0,
-              #4388ed
-            );
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 21px;
-          box-shadow:
-            0 5px 15px rgba(23,105,224,0.18);
-        }
-
-        .brand-text {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .brand-text strong {
-          font-size: 21px;
-          line-height: 20px;
-          color: #0c2c66;
-        }
-
-        .brand-text span {
-          font-size: 7px;
-          letter-spacing: 1.7px;
-          font-weight: 800;
-          color: #72809b;
-          margin-top: 4px;
-        }
-
-        .student-main-nav {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 4px;
-          flex: 1;
-        }
-
-        .student-main-nav button {
-          border: none;
-          background: transparent;
-          color: #203b69;
-          padding: 10px 12px;
-          border-radius: 9px;
-          font-size: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          white-space: nowrap;
-          transition: 0.2s;
-        }
-
-        .student-main-nav button:hover {
-          background: #eef4ff;
-          color: #1769e0;
-        }
-
-        .student-main-nav button span {
-          color: #1557bb;
-          font-size: 15px;
-        }
-
-        .top-profile {
-          min-width: 190px;
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 9px;
-        }
-
-        .top-avatar {
-          width: 38px;
-          height: 38px;
-          border-radius: 50%;
-          background:
-            linear-gradient(
-              135deg,
-              #1769e0,
-              #397de1
-            );
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 13px;
-          font-weight: 800;
-        }
-
-        .top-profile-info {
-          display: flex;
-          flex-direction: column;
-          min-width: 70px;
-        }
-
-        .top-profile-info strong {
-          font-size: 11px;
-          color: #122d5b;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 95px;
-        }
-
-        .top-profile-info span {
-          font-size: 10px;
-          color: #75839c;
-          margin-top: 2px;
-        }
-
-        .profile-menu-btn {
-          border: 1px solid #dce5f2;
-          background: white;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          cursor: pointer;
-          color: #1769e0;
-        }
-
-        /* ================================
-           MAIN
-        ================================= */
-
-        .student-profile-main {
-          width: min(1380px, 92%);
-          margin: auto;
-          padding: 28px 0 50px;
-        }
-
-        .profile-page-heading {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          margin-bottom: 20px;
-        }
-
-        .breadcrumb {
-          color: #72819c;
-          font-size: 12px;
-          margin-bottom: 8px;
-        }
-
-        .breadcrumb span {
-          margin: 0 7px;
-          color: #a9b4c7;
-        }
-
-        .profile-page-heading h1 {
-          margin: 0;
-          font-size: 31px;
-          color: #102b5c;
-          letter-spacing: -0.7px;
-        }
-
-        .profile-page-heading p {
-          margin: 6px 0 0;
-          color: #72809a;
-          font-size: 14px;
-        }
-
-        .refresh-btn {
-          border: 1px solid #dce5f2;
-          background: white;
-          color: #1769e0;
-          padding: 10px 17px;
-          border-radius: 9px;
-          font-weight: 700;
-          cursor: pointer;
-        }
-
-        /* ================================
-           HERO
-        ================================= */
-
-        .profile-hero {
-          min-height: 180px;
-          position: relative;
-          overflow: hidden;
-          border-radius: 20px;
-          padding: 30px 32px;
-          color: #102b5c;
-          background:
-            linear-gradient(
-              120deg,
-              #dceaff 0%,
-              #eef5ff 50%,
-              #d8e9ff 100%
-            );
-          border: 1px solid #c9ddfa;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          box-shadow:
-            0 8px 28px rgba(20,65,130,0.07);
-          margin-bottom: 18px;
-        }
-
-        .hero-left {
-          display: flex;
-          align-items: center;
-          gap: 22px;
-          position: relative;
-          z-index: 2;
-        }
-
-        .hero-avatar {
-          width: 104px;
-          height: 104px;
-          border-radius: 50%;
-          background: white;
-          border: 4px solid rgba(255,255,255,0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #1769e0;
-          font-size: 31px;
-          font-weight: 800;
-          position: relative;
-          box-shadow:
-            0 8px 25px rgba(27,76,145,0.13);
-        }
-
-        .avatar-status {
-          position: absolute;
-          right: 2px;
-          bottom: 4px;
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: #16a566;
-          border: 3px solid white;
-        }
-
-        .hero-user-info h2 {
-          margin: 4px 0 5px;
-          font-size: 29px;
-          color: #0c2b61;
-          letter-spacing: -0.5px;
-        }
-
-        .hero-label {
-          font-size: 10px;
-          letter-spacing: 1.8px;
-          font-weight: 800;
-          color: #3972c7;
-        }
-
-        .hero-contact {
-          display: flex;
-          gap: 20px;
-          color: #405b83;
-          font-size: 13px;
-          margin-bottom: 12px;
-        }
-
-        .hero-badges {
-          display: flex;
-          gap: 7px;
-          flex-wrap: wrap;
-        }
-
-        .badge {
-          background: rgba(255,255,255,0.72);
-          border: 1px solid rgba(255,255,255,0.85);
-          border-radius: 20px;
-          padding: 6px 11px;
-          font-size: 11px;
-          font-weight: 700;
-          color: #234676;
-        }
-
-        .hero-decoration {
-          position: absolute;
-          right: 40px;
-          top: 0;
-          height: 100%;
-          width: 390px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0.8;
-        }
-
-        .hero-circle {
-          position: absolute;
-          border-radius: 50%;
-          border: 35px solid rgba(73,139,227,0.08);
-        }
-
-        .circle-one {
-          width: 250px;
-          height: 250px;
-          right: -80px;
-          top: -80px;
-        }
-
-        .circle-two {
-          width: 150px;
-          height: 150px;
-          left: 30px;
-          bottom: -80px;
-        }
-
-        .hero-graduation {
-          font-size: 64px;
-          position: relative;
-          z-index: 2;
-          opacity: 0.5;
-        }
-
-        .hero-decoration p {
-          position: relative;
-          z-index: 2;
-          font-size: 12px;
-          line-height: 1.5;
-          color: #4b6388;
-          font-style: italic;
-        }
-
-        .edit-profile-btn {
-          position: absolute;
-          top: 22px;
-          right: 22px;
-          z-index: 5;
-          border: none;
-          background: #1769e0;
-          color: white;
-          padding: 10px 17px;
-          border-radius: 9px;
-          font-weight: 700;
-          cursor: pointer;
-          box-shadow:
-            0 5px 15px rgba(23,105,224,0.2);
-        }
-
-        /* ================================
-           STATS
-        ================================= */
-
-        .profile-stats {
-          display: grid;
-          grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-          gap: 14px;
-          margin-bottom: 18px;
-        }
-
-        .stat-card {
-          background: white;
-          border-radius: 16px;
-          border: 1px solid #e4ebf5;
-          padding: 18px;
-          display: flex;
-          align-items: center;
-          gap: 13px;
-          box-shadow:
-            0 4px 16px rgba(25,60,110,0.04);
-        }
-
-        .stat-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 800;
-          font-size: 18px;
-        }
-
-        .stat-card.blue .stat-icon {
-          background: #e9f2ff;
-          color: #1769e0;
-        }
-
-        .stat-card.green .stat-icon {
-          background: #e5f8ef;
-          color: #16a566;
-        }
-
-        .stat-card.orange .stat-icon {
-          background: #fff3df;
-          color: #e99812;
-        }
-
-        .stat-card.purple .stat-icon {
-          background: #f0ebff;
-          color: #6d55d9;
-        }
-
-        .stat-title {
-          font-size: 11px;
-          color: #72809a;
-          margin-bottom: 3px;
-        }
-
-        .stat-value {
-          font-size: 25px;
-          font-weight: 800;
-          color: #102b5c;
-          line-height: 1;
-        }
-
-        .stat-description {
-          font-size: 10px;
-          color: #8491a8;
-          margin-top: 4px;
-        }
-
-        /* ================================
-           CONTENT
-        ================================= */
-
-        .profile-content-grid {
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1.3fr)
-            minmax(0, 1fr)
-            minmax(250px, 0.75fr);
-          gap: 16px;
-          align-items: start;
-        }
-
-        .profile-card,
-        .side-card,
-        .recent-card {
-          background: white;
-          border: 1px solid #e4ebf5;
-          border-radius: 17px;
-          box-shadow:
-            0 4px 18px rgba(25,60,110,0.04);
-        }
-
-        .profile-card {
-          padding: 20px;
-        }
-
-        .card-header {
-          display: flex;
-          align-items: center;
-          gap: 11px;
-          padding-bottom: 15px;
-          border-bottom: 1px solid #edf1f7;
-          margin-bottom: 15px;
-        }
-
-        .card-title-icon,
-        .side-card-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 11px;
-          background: #eaf2ff;
-          color: #1769e0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .academic-icon {
-          background: #edf2ff;
-          color: #5369d9;
-        }
-
-        .card-header h3,
-        .side-card h3,
-        .recent-header h3 {
-          margin: 0;
-          font-size: 17px;
-          color: #112e60;
-        }
-
-        .card-header p,
-        .side-card p,
-        .recent-header p {
-          margin: 4px 0 0;
-          font-size: 11px;
-          color: #7b89a1;
-        }
-
-        .small-edit-btn {
-          margin-left: auto;
-          border: 1px solid #dbe5f3;
-          background: white;
-          color: #1769e0;
-          border-radius: 8px;
-          padding: 7px 11px;
-          font-size: 11px;
-          font-weight: 700;
-          cursor: pointer;
-        }
-
-        .information-grid {
-          display: grid;
-          grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-          gap: 9px;
-        }
-
-        .info-item {
-          background: #f7f9fd;
-          border: 1px solid #e9eef6;
-          border-radius: 11px;
-          padding: 12px;
-        }
-
-        .info-item.full {
-          grid-column: 1 / -1;
-        }
-
-        .info-label {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          color: #71809b;
-          font-size: 9px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .info-icon {
-          color: #1769e0;
-          font-size: 9px;
-        }
-
-        .info-value {
-          margin-top: 6px;
-          color: #173663;
-          font-size: 12px;
-          font-weight: 700;
-          word-break: break-word;
-        }
-
-        /* ================================
-           SIDE CARDS
-        ================================= */
-
-        .side-card {
-          padding: 19px;
-        }
-
-        .side-card-icon {
-          margin-bottom: 10px;
-        }
-
-        .side-card-icon.orange {
-          background: #fff1dc;
-          color: #ed9711;
-        }
-
-        .side-card h3 {
-          font-size: 16px;
-        }
-
-        .side-card p {
-          line-height: 1.6;
-          margin-bottom: 15px;
-        }
-
-        .security-card button {
-          width: 100%;
-          border: 1px solid #cbdcf6;
-          background: #f9fbff;
-          color: #1769e0;
-          border-radius: 9px;
-          padding: 10px;
-          font-weight: 700;
-          font-size: 11px;
-          cursor: pointer;
-        }
-
-        .actions-card {
-          margin-top: 16px;
-        }
-
-        .action-button {
-          width: 100%;
-          border: 1px solid #e0e8f4;
-          background: #f9fbff;
-          color: #193968;
-          border-radius: 9px;
-          padding: 11px 12px;
-          margin-top: 8px;
-          text-align: left;
-          font-weight: 700;
-          font-size: 11px;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-
-        .action-button:hover {
-          border-color: #bcd3f6;
-          background: #f0f6ff;
-          color: #1769e0;
-        }
-
-        /* ================================
-           RECENT
-        ================================= */
-
-        .recent-card {
-          margin-top: 16px;
-          padding: 20px;
-        }
-
-        .recent-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-bottom: 14px;
-          border-bottom: 1px solid #edf1f7;
-        }
-
-        .recent-header button {
-          border: 1px solid #dbe5f2;
-          background: white;
-          color: #1769e0;
-          border-radius: 8px;
-          padding: 8px 12px;
-          font-size: 10px;
-          font-weight: 700;
-          cursor: pointer;
-        }
-
-        .empty-activity {
-          min-height: 150px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          color: #7c8ba4;
-        }
-
-        .empty-icon {
-          width: 42px;
-          height: 42px;
-          border-radius: 11px;
-          background: #f0f4fa;
-          color: #9aa9bd;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 5px;
-        }
-
-        .empty-activity strong {
-          font-size: 12px;
-          color: #53637e;
-        }
-
-        .empty-activity span {
-          font-size: 10px;
-        }
-
-        .activity-list {
-          padding-top: 7px;
-        }
-
-        .activity-row {
-          display: flex;
-          align-items: center;
-          gap: 11px;
-          padding: 11px 4px;
-          border-bottom: 1px solid #f0f3f7;
-        }
-
-        .activity-icon {
-          width: 34px;
-          height: 34px;
-          border-radius: 9px;
-          background: #e9f8f0;
-          color: #159d60;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 800;
-        }
-
-        .activity-row > div:nth-child(2) {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-
-        .activity-row strong {
-          font-size: 11px;
-        }
-
-        .activity-row span {
-          color: #8090a8;
-          font-size: 10px;
-          margin-top: 3px;
-        }
-
-        .activity-status {
-          color: #159d60 !important;
-          font-weight: 700;
-        }
-
-        /* ================================
-           LOADING / ERROR
-        ================================= */
-
-        .profile-loading {
-          min-height: 350px;
-          background: white;
-          border-radius: 18px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          color: #71809a;
-        }
-
-        .loading-spinner {
-          width: 36px;
-          height: 36px;
-          border: 3px solid #e5edfa;
-          border-top-color: #1769e0;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          margin-bottom: 12px;
-        }
-
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        .profile-error {
-          background: #fff4f4;
-          border: 1px solid #ffd4d4;
-          color: #b52c2c;
-          padding: 20px;
-          border-radius: 14px;
-          display: flex;
-          flex-direction: column;
-          gap: 7px;
-        }
-
-        .profile-error button {
-          width: fit-content;
-          border: none;
-          background: #d93636;
-          color: white;
-          border-radius: 8px;
-          padding: 8px 14px;
-          cursor: pointer;
-          margin-top: 5px;
-        }
-
-        /* ================================
-           FOOTER
-        ================================= */
-
-        .profile-footer {
-          width: min(1380px, 92%);
-          margin: auto;
-          border-top: 1px solid #e2e8f1;
-          padding: 20px 0 28px;
-          display: flex;
-          justify-content: space-between;
-          color: #7c899f;
-          font-size: 11px;
-        }
-
-        .profile-footer div {
-          display: flex;
-          gap: 17px;
-        }
-
-        .profile-footer button {
-          border: none;
-          background: transparent;
-          color: #60718e;
-          cursor: pointer;
-          font-size: 11px;
-        }
-
-        /* ================================
-           RESPONSIVE
-        ================================= */
-
-        @media (max-width: 1200px) {
-
-          .student-main-nav {
-            gap: 0;
-          }
-
-          .student-main-nav button {
-            padding: 9px 7px;
-            font-size: 10px;
-          }
-
-          .student-brand {
-            min-width: 155px;
-          }
-
-          .top-profile {
-            min-width: 150px;
-          }
-
-          .profile-content-grid {
-            grid-template-columns:
-              minmax(0, 1fr)
-              minmax(0, 1fr);
-          }
-
-          .security-card,
-          .actions-card {
-            grid-column: span 1;
-          }
-
-        }
-
-        @media (max-width: 900px) {
-
-          .student-topbar {
-            height: auto;
-            min-height: 70px;
-            flex-wrap: wrap;
-            padding: 10px 4%;
-          }
-
-          .student-main-nav {
-            order: 3;
-            width: 100%;
-            overflow-x: auto;
-            justify-content: flex-start;
-            padding-top: 8px;
-          }
-
-          .top-profile {
-            margin-left: auto;
-          }
-
-          .profile-stats {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
-          }
-
-          .profile-content-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .hero-decoration {
-            opacity: 0.3;
-            right: -40px;
-          }
-
-        }
-
-        @media (max-width: 650px) {
-
-          .student-profile-main {
-            width: 94%;
-            padding-top: 18px;
-          }
-
-          .student-brand {
-            min-width: auto;
-          }
-
-          .brand-text {
-            display: none;
-          }
-
-          .top-profile-info {
-            display: none;
-          }
-
-          .profile-page-heading {
-            align-items: flex-start;
-            gap: 12px;
-          }
-
-          .profile-page-heading h1 {
-            font-size: 25px;
-          }
-
-          .profile-hero {
-            padding: 22px;
-          }
-
-          .hero-left {
-            gap: 14px;
-          }
-
-          .hero-avatar {
-            width: 76px;
-            height: 76px;
-            font-size: 23px;
-          }
-
-          .hero-user-info h2 {
-            font-size: 21px;
-          }
-
-          .hero-contact {
-            flex-direction: column;
-            gap: 4px;
-          }
-
-          .hero-decoration {
-            display: none;
-          }
-
-          .edit-profile-btn {
-            position: static;
-            margin-left: auto;
-            align-self: flex-start;
-            padding: 8px 10px;
-          }
-
-          .profile-stats {
-            grid-template-columns: 1fr;
-          }
-
-          .information-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .info-item.full {
-            grid-column: auto;
-          }
-
-          .profile-footer {
-            flex-direction: column;
-            gap: 12px;
-          }
-
-        }
-
-
-/* =========================================================
-   STUDENT PROFILE - FINAL RESPONSIVE NAVIGATION
-   ========================================================= */
-
-.student-profile-page {
-  width: 100%;
-  min-width: 0;
-  overflow-x: hidden;
-}
-
-.student-profile-page * {
-  box-sizing: border-box;
-}
-
-.student-profile-mobile-menu,
-.student-profile-nav-overlay {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .student-profile-main {
-    width: min(94%, 1380px);
-    padding-top: 22px;
-  }
-
-  .student-main-nav {
-    gap: 0;
-  }
-
-  .student-main-nav button {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .profile-content-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .personal-card,
-  .academic-card {
-    grid-column: span 2;
-  }
-
-  .security-card,
-  .actions-card {
-    grid-column: span 1;
-  }
-
-  .hero-decoration {
-    display: none !important;
-  }
-
-  .profile-hero {
-    padding-right: 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  body.student-profile-nav-open {
-    overflow: hidden;
-  }
-
-  .student-topbar {
-    height: 64px;
-    padding: 0 14px 0 64px;
-    position: sticky;
-    z-index: 1000;
-  }
-
-  .student-brand {
-    min-width: 0;
-  }
-
-  .brand-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    font-size: 12px;
-  }
-
-  .brand-text strong {
-    font-size: 17px;
-  }
-
-  .brand-text span {
-    font-size: 6px;
-    letter-spacing: 1.2px;
-  }
-
-  .student-main-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: min(84vw, 300px);
-    height: 100vh;
-    padding: 84px 14px 20px;
-    background: #ffffff;
-    border-right: 1px solid #e2e8f0;
-    box-shadow: 12px 0 35px rgba(15, 23, 42, .12);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 5px;
-    transform: translateX(-105%);
-    transition: transform .25s ease;
-    z-index: 1300;
-    overflow-y: auto;
-  }
-
-  .mobile-nav-open .student-main-nav {
-    transform: translateX(0);
-  }
-
-  .student-main-nav button {
-    width: 100%;
-    min-height: 46px;
-    justify-content: flex-start;
-    padding: 0 14px;
-    border-radius: 9px;
-    color: #36516f;
-    background: #fff;
-    font-size: 13px;
-    border: 1px solid transparent;
-  }
-
-  .student-main-nav button:hover {
-    background: #f4f7fb;
-  }
-
-  .student-profile-nav-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: rgba(15, 23, 42, .42);
-    z-index: 1200;
-  }
-
-  .student-profile-mobile-menu {
-    display: flex;
-    position: absolute;
-    left: 14px;
-    top: 11px;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 1px solid #dbe4ef;
-    border-radius: 9px;
-    background: #fff;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 4px;
-    cursor: pointer;
-    z-index: 1400;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, .07);
-  }
-
-  .student-profile-mobile-menu span {
-    width: 18px;
-    height: 2px;
-    border-radius: 2px;
-    background: #24466f;
-  }
-
-  .top-profile {
-    min-width: auto;
-  }
-
-  .top-profile-info,
-  .profile-menu-btn {
-    display: none;
-  }
-
-  .student-profile-main {
-    width: 100%;
-    padding: 18px 14px 36px;
-  }
-
-  .profile-page-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .profile-page-heading h1 {
-    font-size: 26px;
-  }
-
-  .profile-page-heading p {
-    font-size: 13px;
-  }
-
-  .refresh-btn {
-    width: 100%;
-  }
-
-  .profile-hero {
-    padding: 22px;
-    min-height: auto;
-    border-radius: 14px;
-  }
-
-  .hero-left {
-    width: 100%;
-    gap: 15px;
-  }
-
-  .hero-avatar {
-    width: 78px;
-    height: 78px;
-    min-width: 78px;
-    font-size: 24px;
-  }
-
-  .hero-user-info {
-    min-width: 0;
-  }
-
-  .hero-user-info h2 {
-    font-size: 22px;
-    overflow-wrap: anywhere;
-  }
-
-  .hero-contact {
-    flex-direction: column;
-    gap: 5px;
-    font-size: 11px;
-    overflow-wrap: anywhere;
-  }
-
-  .hero-badges {
-    gap: 5px;
-  }
-
-  .badge {
-    font-size: 9px;
-    padding: 5px 8px;
-  }
-
-  .edit-profile-btn {
-    position: static;
-    margin-top: 18px;
-    width: 100%;
-  }
-
-  .profile-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .profile-content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .personal-card,
-  .academic-card,
-  .security-card,
-  .actions-card {
-    grid-column: auto;
-  }
-
-  .recent-card {
-    width: 100%;
-  }
-
-  .profile-footer {
-    padding: 16px 14px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .student-topbar {
-    padding-left: 60px;
-  }
-
-  .student-profile-mobile-menu {
-    left: 10px;
-    top: 10px;
-    width: 38px;
-    height: 38px;
-  }
-
-  .brand-text span {
-    display: none;
-  }
-
-  .student-profile-main {
-    padding: 14px 10px 28px;
-  }
-
-  .profile-page-heading h1 {
-    font-size: 23px;
-  }
-
-  .profile-hero {
-    padding: 18px;
-  }
-
-  .hero-left {
-    align-items: flex-start;
-  }
-
-  .hero-avatar {
-    width: 62px;
-    height: 62px;
-    min-width: 62px;
-    font-size: 19px;
-  }
-
-  .hero-user-info h2 {
-    font-size: 19px;
-  }
-
-  .profile-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-card,
-  .side-card,
-  .recent-card {
-    border-radius: 13px;
-    padding: 15px;
-  }
-
-  .information-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .info-item.full {
-    grid-column: auto;
-  }
-
-  .card-header {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .small-edit-btn {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .recent-header {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 10px;
-  }
-
-  .recent-header button {
-    width: 100%;
-  }
-}
-
-      `}</style>
-
     </div>
-  );
-}
-
-/* =========================================================
-   STAT CARD
-========================================================= */
-
-function StatCard({
-  icon,
-  title,
-  value,
-  description,
-  type,
-}) {
-  return (
-    <div className={`stat-card ${type}`}>
-
-      <div className="stat-icon">
-        {icon}
-      </div>
-
-      <div>
-        <div className="stat-title">
-          {title}
-        </div>
-
-        <div className="stat-value">
-          {value}
-        </div>
-
-        <div className="stat-description">
-          {description}
-        </div>
-      </div>
-
-    </div>
-  );
-}
-
-/* =========================================================
-   INFO ITEM
-========================================================= */
-
-function InfoItem({
-  label,
-  value,
-  icon,
-  full = false,
-}) {
-  return (
-    <div
-      className={`info-item ${
-        full ? "full" : ""
-      }`}
-    >
-
-      <div className="info-label">
-        <span className="info-icon">
-          {icon}
-        </span>
-
-        {label}
-      </div>
-
-      <div className="info-value">
-        {value}
-      </div>
-
-    </div>
-  );
-}
-
-/* =========================================================
-   ACTION BUTTON
-========================================================= */
-
-function ActionButton({
-  text,
-  onClick,
-}) {
-  return (
-    <button
-      className="action-button"
-      onClick={onClick}
-    >
-      {text}
-      <span style={{ float: "right" }}>
-        →
-      </span>
-    </button>
   );
 }

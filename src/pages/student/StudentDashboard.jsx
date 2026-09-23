@@ -1,12 +1,102 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   getMyAttendance,
 } from "../../services/api";
 import "../../App.css";
 
+function Icon({ name, size = 18 }) {
+  const icons = {
+    dashboard: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M3 10h18" />
+      </>
+    ),
+
+    scan: (
+      <>
+        <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+        <path d="M4 12h16" />
+      </>
+    ),
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+
+    logout: (
+      <>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H9" />
+      </>
+    ),
+
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    layers: (
+      <>
+        <path d="m12 3 9 5-9 5-9-5Z" />
+        <path d="m3 13 9 5 9-5" />
+      </>
+    ),
+
+    chart: (
+      <>
+        <path d="M21 12a9 9 0 1 1-9-9" />
+        <path d="M12 3v9h9" />
+      </>
+    ),
+
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {icons[name]}
+    </svg>
+  );
+}
+
+function formatStatus(value) {
+  const status = String(value || "").trim().toLowerCase();
+
+  if (!status) return "Not provided";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 function StudentDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [user] = useState(() => {
     try {
@@ -21,10 +111,6 @@ function StudentDashboard() {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  /* =========================================================
-     LOAD ATTENDANCE
-  ========================================================= */
 
   async function loadAttendance() {
     try {
@@ -41,11 +127,6 @@ function StudentDashboard() {
           : []
       );
     } catch (err) {
-      console.error(
-        "Student dashboard attendance error:",
-        err
-      );
-
       setError(
         err.message ||
           "Failed to load attendance data."
@@ -58,10 +139,6 @@ function StudentDashboard() {
   useEffect(() => {
     loadAttendance();
   }, []);
-
-  /* =========================================================
-     ATTENDANCE STATS
-  ========================================================= */
 
   const stats = useMemo(() => {
     const total = attendance.length;
@@ -112,10 +189,6 @@ function StudentDashboard() {
     };
   }, [attendance]);
 
-  /* =========================================================
-     RECENT ATTENDANCE
-  ========================================================= */
-
   const recentAttendance = useMemo(() => {
     return [...attendance]
       .sort((a, b) => {
@@ -138,10 +211,6 @@ function StudentDashboard() {
       .slice(0, 5);
   }, [attendance]);
 
-  /* =========================================================
-     LOGOUT
-  ========================================================= */
-
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -150,20 +219,18 @@ function StudentDashboard() {
   }
 
   const firstName =
-    user?.first_name || "Student";
+    user?.first_name || user?.firstName || "Student";
 
   const lastName =
-    user?.last_name || "";
+    user?.last_name || user?.lastName || "";
 
   const fullName =
     `${firstName} ${lastName}`.trim();
 
   const avatar =
-    firstName.charAt(0).toUpperCase();
+    (firstName.charAt(0) || "S").toUpperCase();
 
-  /* =========================================================
-     STATUS
-  ========================================================= */
+  const isActive = (path) => location.pathname === path;
 
   function getStatus(item) {
     const status = String(
@@ -215,7 +282,7 @@ function StudentDashboard() {
       item.session_date;
 
     if (!value) {
-      return "—";
+      return "Not available";
     }
 
     const date = new Date(value);
@@ -243,19 +310,93 @@ function StudentDashboard() {
     );
   }
 
+  const navItems = [
+    {
+      path: "/dashboard",
+      label: "Dashboard",
+      icon: "dashboard",
+    },
+    {
+      path: "/student/attendance",
+      label: "My Attendance",
+      icon: "calendar",
+    },
+    {
+      path: "/student/scan",
+      label: "Scan Attendance",
+      icon: "scan",
+    },
+    {
+      path: "/student/correction-requests",
+      label: "Correction Requests",
+      icon: "edit",
+    },
+  ];
+
+  const quickActions = [
+    {
+      path: "/student/scan",
+      title: "Scan Attendance",
+      text: "Mark your attendance",
+      icon: "scan",
+    },
+    {
+      path: "/student/attendance",
+      title: "My Attendance",
+      text: "View full attendance",
+      icon: "calendar",
+    },
+    {
+      path: "/student/correction-requests",
+      title: "Correction Request",
+      text: "Report an issue",
+      icon: "edit",
+    },
+  ];
+
+  const statCards = [
+    {
+      tone: "blue",
+      icon: "chart",
+      label: "Attendance Rate",
+      value: loading ? "..." : `${stats.percentage}%`,
+      hint: "Overall attendance",
+    },
+    {
+      tone: "green",
+      icon: "calendar",
+      label: "Present",
+      value: loading ? "..." : stats.present,
+      hint: "Accepted attendance",
+    },
+    {
+      tone: "orange",
+      icon: "clock",
+      label: "Late",
+      value: loading ? "..." : stats.late,
+      hint: "Late attendance",
+    },
+    {
+      tone: "red",
+      icon: "layers",
+      label: "Absent",
+      value: loading ? "..." : stats.absent,
+      hint: "Missing attendance",
+    },
+  ];
+
   return (
     <div className="student-dashboard-page">
-
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
 
       <aside className="student-sidebar">
 
         <div className="student-brand">
 
-          <div className="student-brand-logo">
-            🎓
+          <div
+            className="student-brand-logo"
+            aria-hidden="true"
+          >
+            A
           </div>
 
           <div>
@@ -268,22 +409,7 @@ function StudentDashboard() {
 
         </div>
 
-        {/* PROFILE */}
-
-        <div
-          className="student-profile"
-          onClick={() => navigate("/student/profile")}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              navigate("/student/profile");
-            }
-          }}
-          title="Open Student Profile"
-          style={{ cursor: "pointer" }}
-        >
+        <div className="student-profile">
 
           <div className="student-profile-avatar">
             {avatar}
@@ -301,91 +427,38 @@ function StudentDashboard() {
 
         </div>
 
-        {/* NAVIGATION */}
+        <nav className="student-nav" aria-label="Student pages">
 
-        <nav className="student-nav">
-
-          <button
-            className="student-nav-item active"
-            onClick={() =>
-              navigate("/dashboard")
-            }
-          >
-            <span>▦</span>
-            Dashboard
-          </button>
-
-          <button
-            className="student-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
-            }
-          >
-            <span>✓</span>
-            My Attendance
-          </button>
-
-          <button
-            className="student-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/scan"
-              )
-            }
-          >
-            <span>▣</span>
-            Scan QR
-          </button>
-
-          <button
-            className="student-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/sessions"
-              )
-            }
-          >
-            <span>◫</span>
-            My Sessions
-          </button>
-
-          <button
-            className="student-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/corrections"
-              )
-            }
-          >
-            <span>⚑</span>
-            Correction Requests
-          </button>
-
-          <button
-            className="student-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/notifications"
-              )
-            }
-          >
-            <span>🔔</span>
-            Notifications
-          </button>
+          {navItems.map((item) => (
+            <button
+              key={item.path}
+              type="button"
+              className={
+                isActive(item.path)
+                  ? "student-nav-item active"
+                  : "student-nav-item"
+              }
+              onClick={() => navigate(item.path)}
+            >
+              <span>
+                <Icon name={item.icon} size={16} />
+              </span>
+              {item.label}
+            </button>
+          ))}
 
         </nav>
-
-        {/* LOGOUT */}
 
         <div className="student-sidebar-bottom">
 
           <button
+            type="button"
             className="student-nav-item"
             onClick={handleLogout}
           >
-            <span>↪</span>
+            <span>
+              <Icon name="logout" size={16} />
+            </span>
             Logout
           </button>
 
@@ -393,13 +466,7 @@ function StudentDashboard() {
 
       </aside>
 
-      {/* =====================================================
-          MAIN
-      ===================================================== */}
-
       <main className="student-dashboard-main">
-
-        {/* HEADER */}
 
         <header className="student-dashboard-header">
 
@@ -409,24 +476,11 @@ function StudentDashboard() {
             </h1>
 
             <p>
-              Welcome back, {firstName}! 👋
+              Welcome back, {firstName}
             </p>
           </div>
 
-          <div
-            className="student-header-user"
-            onClick={() => navigate("/student/profile")}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                navigate("/student/profile");
-              }
-            }}
-            title="Open Student Profile"
-            style={{ cursor: "pointer" }}
-          >
+          <div className="student-header-user">
 
             <div className="student-header-avatar">
               {avatar}
@@ -438,131 +492,56 @@ function StudentDashboard() {
 
         <section className="student-dashboard-content">
 
-          {/* ERROR */}
-
           {error && (
-            <div className="student-dashboard-error">
+            <div
+              className="student-dashboard-error"
+              role="alert"
+            >
               {error}
 
               <button
+                type="button"
                 onClick={loadAttendance}
               >
-                Retry
+                Try again
               </button>
             </div>
           )}
 
-          {/* =================================================
-              STAT CARDS
-          ================================================= */}
-
           <div className="student-stat-grid">
 
-            <div className="student-stat-card">
+            {statCards.map((card) => (
+              <div
+                className="student-stat-card"
+                key={card.label}
+              >
 
-              <div className="student-stat-icon blue">
-                ✓
+                <div
+                  className={`student-stat-icon ${card.tone}`}
+                >
+                  <Icon name={card.icon} size={18} />
+                </div>
+
+                <div>
+                  <span>
+                    {card.label}
+                  </span>
+
+                  <strong>
+                    {card.value}
+                  </strong>
+
+                  <small>
+                    {card.hint}
+                  </small>
+                </div>
+
               </div>
-
-              <div>
-                <span>
-                  Attendance Rate
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : `${stats.percentage}%`}
-                </strong>
-
-                <small>
-                  Overall attendance
-                </small>
-              </div>
-
-            </div>
-
-            <div className="student-stat-card">
-
-              <div className="student-stat-icon green">
-                ✓
-              </div>
-
-              <div>
-                <span>
-                  Present
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : stats.present}
-                </strong>
-
-                <small>
-                  Accepted attendance
-                </small>
-              </div>
-
-            </div>
-
-            <div className="student-stat-card">
-
-              <div className="student-stat-icon orange">
-                ⏱
-              </div>
-
-              <div>
-                <span>
-                  Late
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : stats.late}
-                </strong>
-
-                <small>
-                  Late attendance
-                </small>
-              </div>
-
-            </div>
-
-            <div className="student-stat-card">
-
-              <div className="student-stat-icon red">
-                !
-              </div>
-
-              <div>
-                <span>
-                  Absent
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : stats.absent}
-                </strong>
-
-                <small>
-                  Missing attendance
-                </small>
-              </div>
-
-            </div>
+            ))}
 
           </div>
 
-          {/* =================================================
-              TOP GRID
-          ================================================= */}
-
           <div className="student-dashboard-grid">
-
-            {/* RECENT ATTENDANCE */}
 
             <section className="student-panel">
 
@@ -579,6 +558,7 @@ function StudentDashboard() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() =>
                     navigate(
                       "/student/attendance"
@@ -601,7 +581,7 @@ function StudentDashboard() {
                 <div className="student-empty-state">
 
                   <div className="student-empty-icon">
-                    ✓
+                    <Icon name="calendar" size={20} />
                   </div>
 
                   <h3>
@@ -614,6 +594,7 @@ function StudentDashboard() {
                   </p>
 
                   <button
+                    type="button"
                     className="student-primary-button"
                     onClick={() =>
                       navigate(
@@ -621,7 +602,7 @@ function StudentDashboard() {
                       )
                     }
                   >
-                    Scan QR Code
+                    Scan Attendance
                   </button>
 
                 </div>
@@ -644,7 +625,10 @@ function StudentDashboard() {
                         >
 
                           <div className="student-course-icon">
-                            📚
+                            <Icon
+                              name="calendar"
+                              size={16}
+                            />
                           </div>
 
                           <div className="student-attendance-info">
@@ -677,8 +661,6 @@ function StudentDashboard() {
 
             </section>
 
-            {/* QUICK ACTIONS */}
-
             <section className="student-panel">
 
               <div className="student-panel-header">
@@ -697,103 +679,42 @@ function StudentDashboard() {
 
               <div className="student-quick-actions">
 
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/student/scan"
-                    )
-                  }
-                >
-                  <span>▣</span>
+                {quickActions.map((action) => (
+                  <button
+                    key={action.path}
+                    type="button"
+                    onClick={() =>
+                      navigate(action.path)
+                    }
+                  >
+                    <span>
+                      <Icon
+                        name={action.icon}
+                        size={17}
+                      />
+                    </span>
 
-                  <div>
-                    <strong>
-                      Scan QR Code
-                    </strong>
+                    <div>
+                      <strong>
+                        {action.title}
+                      </strong>
 
-                    <small>
-                      Mark your attendance
-                    </small>
-                  </div>
+                      <small>
+                        {action.text}
+                      </small>
+                    </div>
 
-                  <b>→</b>
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/student/attendance"
-                    )
-                  }
-                >
-                  <span>✓</span>
-
-                  <div>
-                    <strong>
-                      My Attendance
-                    </strong>
-
-                    <small>
-                      View full attendance
-                    </small>
-                  </div>
-
-                  <b>→</b>
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/student/sessions"
-                    )
-                  }
-                >
-                  <span>◫</span>
-
-                  <div>
-                    <strong>
-                      My Sessions
-                    </strong>
-
-                    <small>
-                      View your classes
-                    </small>
-                  </div>
-
-                  <b>→</b>
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/student/corrections"
-                    )
-                  }
-                >
-                  <span>⚑</span>
-
-                  <div>
-                    <strong>
-                      Correction Request
-                    </strong>
-
-                    <small>
-                      Report an issue
-                    </small>
-                  </div>
-
-                  <b>→</b>
-                </button>
+                    <b aria-hidden="true">
+                      <Icon name="arrow" size={15} />
+                    </b>
+                  </button>
+                ))}
 
               </div>
 
             </section>
 
           </div>
-
-          {/* =================================================
-              STUDENT INFORMATION
-          ================================================= */}
 
           <section className="student-panel student-information-panel">
 
@@ -829,7 +750,7 @@ function StudentDashboard() {
                 </span>
 
                 <strong>
-                  {user?.email || "—"}
+                  {user?.email || "Not provided"}
                 </strong>
               </div>
 
@@ -840,9 +761,10 @@ function StudentDashboard() {
 
                 <strong>
                   {user?.student_code ||
+                    user?.studentCode ||
                     user?.university_id ||
                     user?.student_id ||
-                    "—"}
+                    "Not assigned"}
                 </strong>
               </div>
 
@@ -852,7 +774,9 @@ function StudentDashboard() {
                 </span>
 
                 <strong className="student-active-text">
-                  Active
+                  {formatStatus(
+                    user?.status || "active"
+                  )}
                 </strong>
               </div>
 

@@ -1,1168 +1,786 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { getMySessions } from "../../services/api";
-import "../../App.css";
+import "./MySessions.css";
+
+function Icon({ name, size = 18 }) {
+  const icons = {
+    dashboard: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M3 10h18" />
+      </>
+    ),
+
+    scan: (
+      <>
+        <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+        <path d="M4 12h16" />
+      </>
+    ),
+
+    sessions: (
+      <>
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M7 2v4M17 2v4M3 9h18M7 13h4M7 16h7" />
+      </>
+    ),
+
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </>
+    ),
+
+    logout: (
+      <>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H9" />
+      </>
+    ),
+
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {icons[name]}
+    </svg>
+  );
+}
+
+function getSavedUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function formatDate(value) {
+  if (!value) return "Not available";
+
+  const raw = String(value);
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+    ? `${raw}T00:00:00`
+    : raw.replace(" ", "T");
+
+  const date = new Date(normalized);
+
+  if (Number.isNaN(date.getTime())) return raw;
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+}
+
+function formatTime(value) {
+  if (!value) return "";
+
+  const raw = String(value);
+
+  if (!raw.includes("T") && !raw.includes("-")) {
+    return raw.length >= 5 ? raw.slice(0, 5) : raw;
+  }
+
+  const date = new Date(raw.replace(" ", "T"));
+
+  if (Number.isNaN(date.getTime())) {
+    return raw.length >= 5 ? raw.slice(0, 5) : raw;
+  }
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getSessionStatus(session) {
+  const raw = String(session.status || "scheduled")
+    .toLowerCase()
+    .trim();
+
+  const aliases = {
+    open: "active",
+    running: "active",
+    completed: "closed",
+    ended: "closed",
+  };
+
+  return aliases[raw] || raw;
+}
+
+function formatStatus(value) {
+  const status = String(value || "").trim();
+
+  if (!status) return "Not recorded";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function getAttendanceStatus(session) {
+  const attendanceStatus = String(
+    session.attendance_status ||
+      session.attendance?.status ||
+      ""
+  )
+    .toLowerCase()
+    .trim();
+
+  const validationStatus = String(
+    session.validation_status || ""
+  )
+    .toLowerCase()
+    .trim();
+
+  if (attendanceStatus === "late") {
+    return {
+      label: "Late",
+      className: "late",
+    };
+  }
+
+  if (attendanceStatus === "absent") {
+    return {
+      label: "Absent",
+      className: "absent",
+    };
+  }
+
+  if (attendanceStatus === "excused") {
+    return {
+      label: "Excused",
+      className: "excused",
+    };
+  }
+
+  if (
+    attendanceStatus === "present" ||
+    attendanceStatus === "accepted" ||
+    attendanceStatus === "on_time" ||
+    validationStatus === "accepted"
+  ) {
+    return {
+      label: "Present",
+      className: "present",
+    };
+  }
+
+  if (session.attendance_id || session.attendance?.id) {
+    return {
+      label: "Recorded",
+      className: "recorded",
+    };
+  }
+
+  return {
+    label: "Not recorded",
+    className: "not-recorded",
+  };
+}
 
 function MySessions() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const user = getSavedUser();
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all");
-
-  const user = (() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("user") || "null"
-      );
-    } catch {
-      return null;
-    }
-  })();
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   const firstName =
     user?.first_name ||
     user?.firstName ||
     "Student";
 
-  /* =========================================================
-     LOAD SESSIONS
-  ========================================================= */
+  const lastName =
+    user?.last_name ||
+    user?.lastName ||
+    "";
 
-  const loadSessions = async () => {
+  const fullName = `${firstName} ${lastName}`.trim();
+  const avatarLetter = firstName.charAt(0).toUpperCase() || "S";
+
+  const loadSessions = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
-      setError("");
-
       const data = await getMySessions();
 
-      const records =
-        Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-            ? data.data
-            : Array.isArray(data?.sessions)
-              ? data.sessions
-              : [];
+      const records = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data?.sessions)
+            ? data.sessions
+            : [];
 
       setSessions(records);
-    } catch (err) {
-      console.error(
-        "My sessions loading error:",
-        err
-      );
-
+    } catch (requestError) {
       setSessions([]);
-
       setError(
-        err.message ||
-          "Failed to load sessions"
+        requestError.message ||
+          "Could not load your sessions."
       );
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadSessions();
   }, []);
 
-  /* =========================================================
-     HELPERS
-  ========================================================= */
+  useEffect(() => {
+    void loadSessions();
+  }, [loadSessions]);
 
-  const getStatus = (session) =>
-    String(
-      session.status || "scheduled"
-    )
-      .toLowerCase()
-      .trim();
-
-  const formatDate = (value) => {
-    if (!value) {
-      return "—";
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return String(value);
-    }
-
-    return date.toLocaleDateString(
-      "en-US",
-      {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }
+  useEffect(() => {
+    document.body.classList.toggle(
+      "sessions-sidebar-open",
+      sidebarOpen
     );
-  };
 
-  const formatTime = (value) => {
-    if (!value) {
-      return "—";
-    }
+    return () =>
+      document.body.classList.remove(
+        "sessions-sidebar-open"
+      );
+  }, [sidebarOpen]);
 
-    const text = String(value);
-
-    if (
-      text.includes("T") ||
-      text.includes("-")
-    ) {
-      const date = new Date(value);
-
-      if (!Number.isNaN(date.getTime())) {
-        return date.toLocaleTimeString(
-          "en-US",
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-          }
-        );
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
       }
-    }
+    };
 
-    return text.length >= 5
-      ? text.substring(0, 5)
-      : text;
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () =>
+      window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const navigateAndClose = (path) => {
+    closeSidebar();
+    navigate(path);
   };
 
-  /* =========================================================
-     FILTERED SESSIONS
-  ========================================================= */
+  const isActive = (path) => location.pathname === path;
+
+  const counts = useMemo(
+    () => ({
+      all: sessions.length,
+      scheduled: sessions.filter(
+        (session) => getSessionStatus(session) === "scheduled"
+      ).length,
+      active: sessions.filter(
+        (session) => getSessionStatus(session) === "active"
+      ).length,
+      closed: sessions.filter(
+        (session) => getSessionStatus(session) === "closed"
+      ).length,
+    }),
+    [sessions]
+  );
 
   const filteredSessions = useMemo(() => {
-    if (filter === "all") {
-      return sessions;
-    }
+    const normalizedSearch = search.trim().toLowerCase();
 
-    return sessions.filter(
-      (session) =>
-        getStatus(session) === filter
-    );
-  }, [sessions, filter]);
+    return sessions.filter((session) => {
+      const sessionStatus = getSessionStatus(session);
 
-  /* =========================================================
-     COUNTS
-  ========================================================= */
+      const matchesStatus =
+        statusFilter === "all" ||
+        sessionStatus === statusFilter;
 
-  const counts = useMemo(() => {
-    return {
-      all: sessions.length,
+      const searchableText = [
+        session.course_code,
+        session.course_name,
+        session.section_name,
+        session.room_name,
+        session.building,
+        session.session_date,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
-      scheduled:
-        sessions.filter(
-          (session) =>
-            getStatus(session) ===
-            "scheduled"
-        ).length,
+      const matchesSearch =
+        !normalizedSearch ||
+        searchableText.includes(normalizedSearch);
 
-      active:
-        sessions.filter(
-          (session) =>
-            getStatus(session) ===
-            "active"
-        ).length,
+      return matchesStatus && matchesSearch;
+    });
+  }, [search, sessions, statusFilter]);
 
-      closed:
-        sessions.filter(
-          (session) =>
-            getStatus(session) ===
-            "closed"
-        ).length,
-    };
-  }, [sessions]);
+  const filterOptions = [
+    { value: "all", label: "All", count: counts.all },
+    {
+      value: "scheduled",
+      label: "Scheduled",
+      count: counts.scheduled,
+    },
+    { value: "active", label: "Active", count: counts.active },
+    { value: "closed", label: "Closed", count: counts.closed },
+  ];
 
-  /* =========================================================
-     ATTENDANCE STATUS
-  ========================================================= */
-
-  const getAttendanceStatus = (
-    session
-  ) => {
-    const attendanceStatus =
-      String(
-        session.attendance_status ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
-
-    const validationStatus =
-      String(
-        session.validation_status ||
-          ""
-      )
-        .toLowerCase()
-        .trim();
-
-    if (
-      session.attendance_id ||
-      attendanceStatus === "present" ||
-      attendanceStatus === "accepted" ||
-      attendanceStatus === "on_time" ||
-      validationStatus === "accepted"
-    ) {
-      return {
-        label: "Present",
-        className: "present",
-      };
-    }
-
-    if (
-      attendanceStatus === "late"
-    ) {
-      return {
-        label: "Late",
-        className: "late",
-      };
-    }
-
-    if (
-      attendanceStatus === "absent"
-    ) {
-      return {
-        label: "Absent",
-        className: "absent",
-      };
-    }
-
-    return {
-      label: "Not Recorded",
-      className: "not-recorded",
-    };
-  };
-
-  /* =========================================================
-     LOGOUT
-  ========================================================= */
-
-  const handleLogout = () => {
-    localStorage.removeItem(
-      "token"
-    );
-
-    localStorage.removeItem(
-      "user"
-    );
-
+  function handleLogout() {
+    closeSidebar();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/");
-  };
-
-  /* =========================================================
-     RENDER
-  ========================================================= */
+  }
 
   return (
-    <div className="dashboard-page">
+    <div className="sessions-page">
+      <button
+        type="button"
+        className="sessions-mobile-menu-button"
+        aria-label="Open navigation menu"
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
 
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sessions-sidebar-overlay"
+          aria-label="Close navigation menu"
+          onClick={closeSidebar}
+        />
+      )}
 
-      <aside className="dashboard-sidebar">
-
-        <div className="sidebar-brand">
-
-          <div className="sidebar-logo">
-            🎓
+      <aside
+        className={`sessions-sidebar ${
+          sidebarOpen ? "is-open" : ""
+        }`}
+      >
+        <div className="sessions-brand">
+          <div className="sessions-brand-logo" aria-hidden="true">
+            <span className="brand-mark" />
           </div>
 
           <div>
-            <h2>
-              Attendify
-            </h2>
-
-            <span>
-              SMART ATTENDANCE
-            </span>
+            <strong>Attendify</strong>
+            <span>SMART ATTENDANCE</span>
           </div>
-
         </div>
 
-        {/* PROFILE */}
+        <div className="sessions-profile">
+          <div className="sessions-avatar">{avatarLetter}</div>
 
-        <div className="sidebar-profile">
-
-          <div className="profile-avatar">
-            {firstName
-              .charAt(0)
-              .toUpperCase()}
+          <div className="sessions-profile-info">
+            <strong>{fullName}</strong>
+            <span>Student</span>
           </div>
-
-          <div className="profile-info">
-
-            <strong>
-              {firstName}
-            </strong>
-
-            <span>
-              Student
-            </span>
-
-          </div>
-
         </div>
 
-        {/* NAVIGATION */}
-
-        <nav className="dashboard-nav">
-
+        <nav className="sessions-nav">
           <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/dashboard"
-              )
-            }
+            type="button"
+            className={isActive("/dashboard") ? "active" : ""}
+            onClick={() => navigateAndClose("/dashboard")}
           >
-            <span>
-              ▦
+            <span className="sessions-nav-icon">
+              <Icon name="dashboard" size={16} />
             </span>
-
             Dashboard
           </button>
 
           <button
-            className="nav-item"
+            type="button"
+            className={
+              isActive("/student/attendance") ? "active" : ""
+            }
             onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
+              navigateAndClose("/student/attendance")
             }
           >
-            <span>
-              ✓
+            <span className="sessions-nav-icon">
+              <Icon name="calendar" size={16} />
             </span>
-
             My Attendance
           </button>
 
           <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/student/scan"
-              )
+            type="button"
+            className={
+              isActive("/student/scan") ? "active" : ""
             }
+            onClick={() => navigateAndClose("/student/scan")}
           >
-            <span>
-              ▣
+            <span className="sessions-nav-icon">
+              <Icon name="scan" size={16} />
             </span>
-
-            Scan QR
+            Scan Attendance
           </button>
 
           <button
-            className="nav-item active"
+            type="button"
+            className={
+              isActive("/student/sessions") ? "active" : ""
+            }
             onClick={() =>
-              navigate(
-                "/student/sessions"
-              )
+              navigateAndClose("/student/sessions")
             }
           >
-            <span>
-              ◫
+            <span className="sessions-nav-icon">
+              <Icon name="sessions" size={16} />
             </span>
-
             My Sessions
           </button>
 
           <button
-            className="nav-item"
             type="button"
+            className={
+              isActive("/student/correction-requests")
+                ? "active"
+                : ""
+            }
             onClick={() =>
-              alert(
-                "Correction Requests page will be added next."
-              )
+              navigateAndClose("/student/correction-requests")
             }
           >
-            <span>
-              ⚑
+            <span className="sessions-nav-icon">
+              <Icon name="edit" size={16} />
             </span>
-
             Correction Requests
           </button>
-
-          <button
-            className="nav-item"
-            type="button"
-            onClick={() =>
-              alert(
-                "Notifications page will be added next."
-              )
-            }
-          >
-            <span>
-              🔔
-            </span>
-
-            Notifications
-          </button>
-
         </nav>
 
-        {/* LOGOUT */}
-
-        <div className="sidebar-bottom">
+        <div className="sessions-sidebar-bottom">
+          <div className="sessions-side-tip">
+            <strong>Keep going</strong>
+            <span>Every class counts.</span>
+          </div>
 
           <button
-            className="nav-item logout-button"
-            onClick={
-              handleLogout
-            }
+            type="button"
+            className="sessions-logout"
+            onClick={handleLogout}
           >
             <span>
-              ↪
+              <Icon name="logout" size={16} />
             </span>
-
             Logout
           </button>
-
         </div>
-
       </aside>
 
-      {/* =====================================================
-          MAIN
-      ===================================================== */}
-
-      <main className="dashboard-main">
-
-        {/* HEADER */}
-
-        <header className="dashboard-header">
-
-          <div>
-
-            <h1>
-              My Sessions
-            </h1>
-
-            <p>
-              View your enrolled class sessions
-            </p>
-
-          </div>
-
-          <div className="dashboard-user">
-
-            <div className="header-avatar">
-              {firstName
-                .charAt(0)
-                .toUpperCase()}
+      <main className="sessions-main">
+        <header className="sessions-topbar">
+          <div className="sessions-user-area">
+            <div className="sessions-top-avatar">
+              {avatarLetter}
             </div>
 
+            <div className="sessions-top-user-info">
+              <strong>{fullName}</strong>
+              <span>Student</span>
+            </div>
           </div>
-
         </header>
 
-        {/* CONTENT */}
-
-        <section className="dashboard-content">
-
-          {/* =================================================
-              STATISTICS
-          ================================================= */}
-
-          <div className="dashboard-stats">
-
-            <div className="stat-card">
-
-              <div className="stat-icon session-icon">
-                ◫
-              </div>
-
-              <div>
-
-                <span>
-                  All Sessions
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : counts.all}
-                </strong>
-
-              </div>
-
+        <section className="sessions-content">
+          <div className="sessions-hero">
+            <div>
+              <span className="sessions-eyebrow">ATTENDANCE</span>
+              <h1>My Sessions</h1>
+              <p>
+                View class sessions available to your enrolled
+                sections.
+              </p>
             </div>
 
-            <div className="stat-card">
-
-              <div className="stat-icon attendance-icon">
-                ◷
-              </div>
-
-              <div>
-
-                <span>
-                  Scheduled
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : counts.scheduled}
-                </strong>
-
-              </div>
-
-            </div>
-
-            <div className="stat-card">
-
-              <div className="stat-icon present-icon">
-                ●
-              </div>
-
-              <div>
-
-                <span>
-                  Active
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : counts.active}
-                </strong>
-
-              </div>
-
-            </div>
-
-            <div className="stat-card">
-
-              <div className="stat-icon absent-icon">
-                ✓
-              </div>
-
-              <div>
-
-                <span>
-                  Closed
-                </span>
-
-                <strong>
-                  {loading
-                    ? "..."
-                    : counts.closed}
-                </strong>
-
-              </div>
-
-            </div>
-
+            <button
+              type="button"
+              className="sessions-refresh-button"
+              onClick={loadSessions}
+              disabled={loading}
+            >
+              {loading ? "Loading" : "Refresh"}
+            </button>
           </div>
 
-          {/* =================================================
-              SESSIONS PANEL
-          ================================================= */}
-
-          <div className="dashboard-panel">
-
-            <div className="panel-header">
-
-              <div>
-
-                <h2>
-                  Class Sessions
-                </h2>
-
-                <p>
-                  Sessions for your enrolled sections
-                </p>
-
-              </div>
-
-              <button
-                type="button"
-                onClick={
-                  loadSessions
-                }
-                disabled={
-                  loading
-                }
-              >
-                {loading
-                  ? "Loading..."
-                  : "Refresh"}
-              </button>
-
+          <div className="sessions-stats">
+            <div className="sessions-stat-card total">
+              <span>All Sessions</span>
+              <strong>{loading ? "Loading" : counts.all}</strong>
+              <small>Available sessions</small>
             </div>
 
-            {/* FILTERS */}
+            <div className="sessions-stat-card scheduled">
+              <span>Scheduled</span>
+              <strong>
+                {loading ? "Loading" : counts.scheduled}
+              </strong>
+              <small>Upcoming sessions</small>
+            </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                flexWrap: "wrap",
-                marginBottom: "20px",
-              }}
-            >
+            <div className="sessions-stat-card active">
+              <span>Active</span>
+              <strong>{loading ? "Loading" : counts.active}</strong>
+              <small>Open for attendance</small>
+            </div>
 
-              {[
-                ["all", "All"],
-                [
-                  "scheduled",
-                  "Scheduled",
-                ],
-                [
-                  "active",
-                  "Active",
-                ],
-                [
-                  "closed",
-                  "Closed",
-                ],
-              ].map(
-                ([value, label]) => (
+            <div className="sessions-stat-card closed">
+              <span>Closed</span>
+              <strong>{loading ? "Loading" : counts.closed}</strong>
+              <small>Completed sessions</small>
+            </div>
+          </div>
 
+          <section className="sessions-panel">
+            <div className="sessions-panel-header">
+              <div>
+                <h2>Class Sessions</h2>
+                <p>Sessions from your enrolled sections.</p>
+              </div>
+
+              {!loading && !error && (
+                <span className="sessions-result-count">
+                  Showing {filteredSessions.length} of{" "}
+                  {sessions.length} sessions
+                </span>
+              )}
+            </div>
+
+            <div className="sessions-filters">
+              <label className="sessions-search">
+                <Icon name="search" size={16} />
+
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(event.target.value)
+                  }
+                  placeholder="Search course, section, or room"
+                  aria-label="Search sessions"
+                />
+              </label>
+
+              <div
+                className="sessions-filter-buttons"
+                aria-label="Filter sessions by status"
+              >
+                {filterOptions.map((option) => (
                   <button
-                    key={value}
+                    key={option.value}
                     type="button"
-                    onClick={() =>
-                      setFilter(
-                        value
-                      )
+                    className={
+                      statusFilter === option.value ? "active" : ""
                     }
-                    style={{
-                      border:
-                        filter ===
-                        value
-                          ? "none"
-                          : "1px solid #dfe4ea",
+                    aria-pressed={
+                      statusFilter === option.value
+                    }
+                    onClick={() =>
+                      setStatusFilter(option.value)
+                    }
+                  >
+                    {option.label}
+                    <span>{option.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                      background:
-                        filter ===
-                        value
-                          ? "#4f46e5"
-                          : "#fff",
+            {error ? (
+              <div className="sessions-error" role="alert">
+                <p>{error}</p>
 
-                      color:
-                        filter ===
-                        value
-                          ? "#fff"
-                          : "#4b5563",
+                <button
+                  type="button"
+                  onClick={loadSessions}
+                >
+                  Try again
+                </button>
+              </div>
+            ) : loading ? (
+              <div
+                className="sessions-skeleton-grid"
+                aria-hidden="true"
+              >
+                <span />
+                <span />
+                <span />
+              </div>
+            ) : filteredSessions.length === 0 ? (
+              <div className="sessions-empty">
+                <h3>
+                  {sessions.length
+                    ? "No sessions match your filters"
+                    : "No sessions are available yet"}
+                </h3>
 
-                      padding:
-                        "9px 16px",
+                <p>
+                  {sessions.length
+                    ? "Change the search or status filter to see other sessions."
+                    : "Your enrolled class sessions will appear here when available."}
+                </p>
 
-                      borderRadius:
-                        "8px",
-
-                      cursor:
-                        "pointer",
-
-                      fontWeight:
-                        600,
+                {sessions.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearch("");
+                      setStatusFilter("all");
                     }}
                   >
-                    {label}
+                    Reset filters
                   </button>
-
-                )
-              )}
-
-            </div>
-
-            {/* ERROR */}
-
-            {error && (
-              <div
-                style={{
-                  background:
-                    "#fff1f2",
-
-                  color:
-                    "#be123c",
-
-                  border:
-                    "1px solid #fecdd3",
-
-                  padding:
-                    "14px 16px",
-
-                  borderRadius:
-                    "10px",
-
-                  marginBottom:
-                    "18px",
-                }}
-              >
-                {error}
+                )}
               </div>
-            )}
-
-            {/* LOADING */}
-
-            {loading ? (
-
-              <div className="empty-state">
-
-                <div className="empty-icon">
-                  ◷
-                </div>
-
-                <h3>
-                  Loading sessions...
-                </h3>
-
-                <p>
-                  Please wait while we load
-                  your sessions.
-                </p>
-
-              </div>
-
-            ) : filteredSessions.length ===
-              0 ? (
-
-              <div className="empty-state">
-
-                <div className="empty-icon">
-                  ◫
-                </div>
-
-                <h3>
-                  No sessions found
-                </h3>
-
-                <p>
-                  There are no sessions matching
-                  the selected filter.
-                </p>
-
-              </div>
-
             ) : (
+              <div className="sessions-card-grid">
+                {filteredSessions.map((session, index) => {
+                  const sessionStatus = getSessionStatus(session);
+                  const attendanceStatus =
+                    getAttendanceStatus(session);
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "repeat(auto-fill, minmax(300px, 1fr))",
-                  gap: "16px",
-                }}
-              >
+                  const startTime = formatTime(
+                    session.scheduled_start
+                  );
 
-                {filteredSessions.map(
-                  (session) => {
+                  const endTime = formatTime(
+                    session.scheduled_end
+                  );
 
-                    const attendance =
-                      getAttendanceStatus(
-                        session
-                      );
+                  const timeRange =
+                    startTime && endTime
+                      ? `${startTime} to ${endTime}`
+                      : startTime || endTime || "Not available";
 
-                    const status =
-                      getStatus(
-                        session
-                      );
+                  const room = [
+                    session.building,
+                    session.room_name,
+                  ]
+                    .filter(Boolean)
+                    .join(", ");
 
-                    return (
+                  const canScan =
+                    sessionStatus === "active" &&
+                    attendanceStatus.className === "not-recorded";
 
-                      <div
-                        key={
-                          session.id
-                        }
-                        style={{
-                          border:
-                            "1px solid #e7eaf0",
+                  return (
+                    <article
+                      className="session-card"
+                      key={session.id || `${sessionStatus}-${index}`}
+                    >
+                      <div className="session-card-header">
+                        <div>
+                          {session.course_code && (
+                            <span className="session-course-code">
+                              {session.course_code}
+                            </span>
+                          )}
 
-                          borderRadius:
-                            "14px",
+                          <h3>
+                            {session.course_name ||
+                              "Course not available"}
+                          </h3>
 
-                          padding:
-                            "20px",
-
-                          background:
-                            "#fff",
-
-                          boxShadow:
-                            "0 4px 16px rgba(15,23,42,0.05)",
-                        }}
-                      >
-
-                        {/* COURSE HEADER */}
-
-                        <div
-                          style={{
-                            display:
-                              "flex",
-
-                            justifyContent:
-                              "space-between",
-
-                            alignItems:
-                              "flex-start",
-
-                            gap:
-                              "12px",
-
-                            marginBottom:
-                              "16px",
-                          }}
-                        >
-
-                          <div>
-
-                            <div
-                              style={{
-                                fontSize:
-                                  "13px",
-
-                                fontWeight:
-                                  700,
-
-                                color:
-                                  "#6366f1",
-
-                                marginBottom:
-                                  "5px",
-                              }}
-                            >
-                              {session.course_code ||
-                                "COURSE"}
-                            </div>
-
-                            <h3
-                              style={{
-                                margin:
-                                  0,
-
-                                fontSize:
-                                  "18px",
-
-                                color:
-                                  "#111827",
-                              }}
-                            >
-                              {session.course_name ||
-                                "Course"}
-                            </h3>
-
-                            <p
-                              style={{
-                                margin:
-                                  "5px 0 0",
-
-                                color:
-                                  "#6b7280",
-
-                                fontSize:
-                                  "14px",
-                              }}
-                            >
-                              Section{" "}
-                              {session.section_name ||
-                                "—"}
-                            </p>
-
-                          </div>
-
-                          {/* SESSION STATUS */}
-
-                          <span
-                            style={{
-                              padding:
-                                "6px 10px",
-
-                              borderRadius:
-                                "999px",
-
-                              fontSize:
-                                "12px",
-
-                              fontWeight:
-                                700,
-
-                              background:
-                                status ===
-                                "active"
-                                  ? "#dcfce7"
-                                  : status ===
-                                      "closed"
-                                    ? "#f3f4f6"
-                                    : "#fef3c7",
-
-                              color:
-                                status ===
-                                "active"
-                                  ? "#166534"
-                                  : status ===
-                                      "closed"
-                                    ? "#4b5563"
-                                    : "#92400e",
-                            }}
-                          >
-                            {status
-                              .charAt(
-                                0
-                              )
-                              .toUpperCase() +
-                              status.slice(
-                                1
-                              )}
-                          </span>
-
+                          <p>
+                            {session.section_name
+                              ? `Section ${session.section_name}`
+                              : "Section not available"}
+                          </p>
                         </div>
 
-                        {/* SESSION INFO */}
-
-                        <div
-                          style={{
-                            display:
-                              "grid",
-
-                            gap:
-                              "11px",
-
-                            marginBottom:
-                              "18px",
-                          }}
+                        <span
+                          className={`session-status ${sessionStatus}`}
                         >
-
-                          {/* DATE */}
-
-                          <div
-                            style={{
-                              display:
-                                "flex",
-
-                              justifyContent:
-                                "space-between",
-
-                              gap:
-                                "10px",
-
-                              color:
-                                "#6b7280",
-
-                              fontSize:
-                                "14px",
-                            }}
-                          >
-
-                            <span>
-                              📅 Date
-                            </span>
-
-                            <strong
-                              style={{
-                                color:
-                                  "#374151",
-                              }}
-                            >
-                              {formatDate(
-                                session.session_date
-                              )}
-                            </strong>
-
-                          </div>
-
-                          {/* TIME */}
-
-                          <div
-                            style={{
-                              display:
-                                "flex",
-
-                              justifyContent:
-                                "space-between",
-
-                              gap:
-                                "10px",
-
-                              color:
-                                "#6b7280",
-
-                              fontSize:
-                                "14px",
-                            }}
-                          >
-
-                            <span>
-                              🕐 Time
-                            </span>
-
-                            <strong
-                              style={{
-                                color:
-                                  "#374151",
-                              }}
-                            >
-                              {formatTime(
-                                session.scheduled_start
-                              )}
-
-                              {" - "}
-
-                              {formatTime(
-                                session.scheduled_end
-                              )}
-                            </strong>
-
-                          </div>
-
-                          {/* ROOM */}
-
-                          <div
-                            style={{
-                              display:
-                                "flex",
-
-                              justifyContent:
-                                "space-between",
-
-                              gap:
-                                "10px",
-
-                              color:
-                                "#6b7280",
-
-                              fontSize:
-                                "14px",
-                            }}
-                          >
-
-                            <span>
-                              📍 Room
-                            </span>
-
-                            <strong
-                              style={{
-                                color:
-                                  "#374151",
-
-                                textAlign:
-                                  "right",
-                              }}
-                            >
-                              {session.building
-                                ? `${session.building} - `
-                                : ""}
-
-                              {session.room_name ||
-                                "Not assigned"}
-                            </strong>
-
-                          </div>
-
-                        </div>
-
-                        {/* FOOTER */}
-
-                        <div
-                          style={{
-                            borderTop:
-                              "1px solid #eef0f3",
-
-                            paddingTop:
-                              "14px",
-
-                            display:
-                              "flex",
-
-                            justifyContent:
-                              "space-between",
-
-                            alignItems:
-                              "center",
-
-                            gap:
-                              "10px",
-                          }}
-                        >
-
-                          <span
-                            style={{
-                              fontSize:
-                                "13px",
-
-                              fontWeight:
-                                700,
-
-                              color:
-                                attendance.className ===
-                                "present"
-                                  ? "#15803d"
-                                  : attendance.className ===
-                                      "late"
-                                    ? "#b45309"
-                                    : attendance.className ===
-                                        "absent"
-                                      ? "#dc2626"
-                                      : "#6b7280",
-                            }}
-                          >
-                            {attendance.label}
-                          </span>
-
-                          {/* SCAN QR */}
-
-                          {status ===
-                            "active" &&
-                            !session.attendance_id && (
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  navigate(
-                                    "/student/scan"
-                                  )
-                                }
-                                style={{
-                                  border:
-                                    "none",
-
-                                  background:
-                                    "#4f46e5",
-
-                                  color:
-                                    "#fff",
-
-                                  padding:
-                                    "9px 14px",
-
-                                  borderRadius:
-                                    "8px",
-
-                                  cursor:
-                                    "pointer",
-
-                                  fontWeight:
-                                    700,
-                                }}
-                              >
-                                Scan QR
-                              </button>
-
-                            )}
-
-                        </div>
-
+                          {formatStatus(sessionStatus)}
+                        </span>
                       </div>
 
-                    );
-                  }
-                )}
+                      <div className="session-meta">
+                        <div>
+                          <span>Date</span>
+                          <strong>
+                            {formatDate(session.session_date)}
+                          </strong>
+                        </div>
 
+                        <div>
+                          <span>Time</span>
+                          <strong>{timeRange}</strong>
+                        </div>
+
+                        <div>
+                          <span>Room</span>
+                          <strong>{room || "Not assigned"}</strong>
+                        </div>
+                      </div>
+
+                      <div className="session-card-footer">
+                        <span
+                          className={`attendance-status ${attendanceStatus.className}`}
+                        >
+                          {attendanceStatus.label}
+                        </span>
+
+                        {canScan && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate("/student/scan")
+                            }
+                          >
+                            Scan attendance
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-
             )}
-
-          </div>
-
+          </section>
         </section>
-
       </main>
-
     </div>
   );
 }

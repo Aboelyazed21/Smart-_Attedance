@@ -50,17 +50,8 @@ function NavIcon({ type }) {
   if (type === "correction") {
     return (
       <svg {...common}>
-        <circle cx="12" cy="12" r="8" />
-        <path d="M12 8v4l3 2" />
-      </svg>
-    );
-  }
-
-  if (type === "notifications") {
-    return (
-      <svg {...common}>
-        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-        <path d="M10 21h4" />
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
       </svg>
     );
   }
@@ -92,13 +83,8 @@ function StudentMobileNav() {
     },
     {
       label: "Requests",
-      path: "/student/corrections",
+      path: "/student/correction-requests",
       icon: "correction",
-    },
-    {
-      label: "Alerts",
-      path: "/student/notifications",
-      icon: "notifications",
     },
   ];
 

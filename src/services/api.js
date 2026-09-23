@@ -1037,3 +1037,36 @@ export async function exportAttendanceReport(
 
   return true;
 }
+
+
+/* =========================================================
+   CORRECTION REQUESTS (STUDENT)
+========================================================= */
+
+export async function getMyCorrections() {
+  return apiRequest(
+    "/corrections/me"
+  );
+}
+
+
+export async function createCorrection({
+  attendanceEventId = null,
+  requestedStatus,
+  reason,
+  evidenceUrl = null,
+} = {}) {
+  return apiRequest(
+    "/corrections",
+    {
+      method: "POST",
+
+      body: JSON.stringify({
+        attendanceEventId,
+        requestedStatus,
+        reason,
+        evidenceUrl,
+      }),
+    }
+  );
+}
