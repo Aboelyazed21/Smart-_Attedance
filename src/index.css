@@ -1,6 +1,6 @@
 /* =========================================================
    GLOBAL RESET
-   Full viewport application layout
+   Responsive foundation for the whole application
 ========================================================= */
 
 *,
@@ -13,8 +13,11 @@ html {
   width: 100%;
   min-width: 0;
   min-height: 100%;
+
   margin: 0;
   padding: 0;
+
+  scroll-behavior: smooth;
 }
 
 body {
@@ -38,12 +41,18 @@ body {
     Helvetica,
     Arial,
     sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* =========================================================
+   ROOT
+========================================================= */
 
 #root {
   width: 100%;
   max-width: none;
-
   min-width: 0;
   min-height: 100vh;
 
@@ -54,20 +63,22 @@ body {
 }
 
 /* =========================================================
-   ROOT CHILDREN
+   ROOT DIRECT CHILDREN
 ========================================================= */
 
 #root > * {
   width: 100%;
   max-width: none;
   min-width: 0;
+  min-height: 0;
 
   margin: 0;
+
   box-sizing: border-box;
 }
 
 /* =========================================================
-   IMAGES / MEDIA
+   MEDIA
 ========================================================= */
 
 img,
@@ -77,8 +88,12 @@ canvas {
   max-width: 100%;
 }
 
+img {
+  height: auto;
+}
+
 /* =========================================================
-   BUTTONS / INPUTS
+   FORM ELEMENTS
 ========================================================= */
 
 button,
@@ -86,6 +101,16 @@ input,
 select,
 textarea {
   font: inherit;
+
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 /* =========================================================
@@ -95,6 +120,49 @@ textarea {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* =========================================================
+   TABLE FOUNDATION
+========================================================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   RESPONSIVE SAFETY
+========================================================= */
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+nav,
+div {
+  min-width: 0;
+}
+
+/* =========================================================
+   PREVENT LONG TEXT FROM BREAKING MOBILE LAYOUT
+========================================================= */
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
 }
 
 /* =========================================================
@@ -108,5 +176,22 @@ a {
     width: 100%;
     min-width: 0;
     min-height: 100vh;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-width: 0;
   }
 }

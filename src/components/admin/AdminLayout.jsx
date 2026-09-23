@@ -148,19 +148,11 @@ function AdminIcon({ type, size = 19 }) {
     case "attendance":
       return (
         <svg {...commonProps}>
-          <circle
-            cx="12"
-            cy="12"
-            r="9"
-            stroke="currentColor"
-            strokeWidth="1.8"
-          />
           <path
-            d="m8 12 2.5 2.5L16.5 9"
+            d="M4 20V10M10 20V6M16 20v-9M22 20H2"
             stroke="currentColor"
             strokeWidth="1.8"
             strokeLinecap="round"
-            strokeLinejoin="round"
           />
         </svg>
       );
