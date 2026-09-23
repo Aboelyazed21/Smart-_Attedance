@@ -427,3 +427,275 @@
   .student-dashboard .student-header-avatar { width: 32px; height: 32px; }
   .student-dashboard .student-topbar { height: 62px; }
 }
+/* =========================================================
+   STUDENT MOBILE SIDEBAR
+   SIDEBAR STAYS VISIBLE ON MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .student-dashboard {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* -------------------------------------------------------
+     SIDEBAR
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-sidebar {
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+
+    width: 235px !important;
+    min-width: 235px !important;
+    max-width: 235px !important;
+
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    padding: 18px 12px !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    background: #17457f !important;
+
+    transform: none !important;
+
+    z-index: 1200 !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /* -------------------------------------------------------
+     MAIN CONTENT
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-dashboard-main {
+    width: calc(100% - 235px) !important;
+    max-width: calc(100% - 235px) !important;
+    min-width: 0 !important;
+
+    margin-left: 235px !important;
+
+    padding-bottom: 20px !important;
+
+    box-sizing: border-box !important;
+
+    overflow-x: hidden !important;
+  }
+
+  /* -------------------------------------------------------
+     HIDE MOBILE DRAWER BUTTON
+  ------------------------------------------------------- */
+
+  .student-dashboard .mobile-menu-btn {
+    display: none !important;
+  }
+
+  .student-dashboard .sidebar-overlay {
+    display: none !important;
+  }
+
+  /* -------------------------------------------------------
+     BRAND
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-brand {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 9px !important;
+
+    margin-bottom: 18px !important;
+  }
+
+  .student-dashboard .student-brand-logo {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+
+    border-radius: 10px !important;
+
+    font-size: 18px !important;
+  }
+
+  .student-dashboard .student-brand h2 {
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+
+    white-space: nowrap !important;
+  }
+
+  .student-dashboard .student-brand span {
+    font-size: 6.5px !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  /* -------------------------------------------------------
+     STUDENT PROFILE
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-profile {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 9px !important;
+
+    padding: 9px !important;
+
+    margin-bottom: 16px !important;
+
+    border-radius: 11px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .student-dashboard .student-profile-avatar {
+    width: 36px !important;
+    height: 36px !important;
+
+    min-width: 36px !important;
+
+    font-size: 14px !important;
+  }
+
+  .student-dashboard .student-profile strong {
+    font-size: 10.5px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .student-dashboard .student-profile span {
+    font-size: 8px !important;
+  }
+
+  /* -------------------------------------------------------
+     NAVIGATION
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-nav {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 3px !important;
+  }
+
+  .student-dashboard .student-nav-item {
+    width: 100% !important;
+
+    min-height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 9px !important;
+
+    padding: 0 10px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 10px !important;
+
+    white-space: nowrap !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .student-dashboard .student-nav-item svg {
+    width: 17px !important;
+    height: 17px !important;
+
+    min-width: 17px !important;
+  }
+
+  /* -------------------------------------------------------
+     BOTTOM AREA
+     LOGOUT STAYS AT THE BOTTOM
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-sidebar-bottom {
+    width: 100% !important;
+
+    margin-top: auto !important;
+
+    padding-top: 14px !important;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .student-dashboard .student-sidebar-bottom
+    .student-nav-item {
+    min-height: 42px !important;
+  }
+
+  /* -------------------------------------------------------
+     MAIN HEADER
+  ------------------------------------------------------- */
+
+  .student-dashboard .student-dashboard-header {
+    width: 100% !important;
+
+    padding: 18px 16px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  .student-dashboard .student-dashboard-content {
+    width: 100% !important;
+
+    padding: 0 16px 24px !important;
+
+    box-sizing: border-box !important;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 480px) {
+
+  .student-dashboard .student-sidebar {
+    width: 215px !important;
+    min-width: 215px !important;
+    max-width: 215px !important;
+
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .student-dashboard .student-dashboard-main {
+    width: calc(100% - 215px) !important;
+    max-width: calc(100% - 215px) !important;
+
+    margin-left: 215px !important;
+  }
+
+  .student-dashboard .student-nav-item {
+    min-height: 40px !important;
+
+    font-size: 9px !important;
+  }
+
+  .student-dashboard .student-profile strong {
+    font-size: 9.5px !important;
+  }
+}
