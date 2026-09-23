@@ -1407,3 +1407,52 @@
     width: 100%;
   }
 }
+/* =========================================================
+   FINAL DESKTOP WIDTH FIX
+   Make Users page use the complete area beside Admin Sidebar
+========================================================= */
+
+@media (min-width: 1101px) {
+  .dashboard-page,
+  .dashboard-main {
+    width: calc(100vw - 240px) !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .dashboard-header {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-content {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .users-panel {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .users-table-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .users-table {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
