@@ -3,11 +3,6 @@ import {
     useMemo,
     useState,
   } from "react";
-  
-  import {
-    useNavigate,
-  } from "react-router-dom";
-  
   import {
     getAttendanceReport,
     getStudents,
@@ -817,27 +812,6 @@ import {
       }
   
     }
-  
-  
-    /* =======================================================
-       LOGOUT
-    ======================================================= */
-  
-    function handleLogout() {
-  
-      localStorage.removeItem(
-        "token"
-      );
-  
-      localStorage.removeItem(
-        "user"
-      );
-  
-      navigate("/");
-  
-    }
-  
-  
     /* =======================================================
        RENDER
     ======================================================= */
@@ -845,164 +819,6 @@ import {
     return (
   
       <div className="reports-page">
-  
-        {/* =================================================
-            SIDEBAR
-        ================================================= */}
-  
-        <aside className="reports-sidebar">
-  
-          <div className="reports-brand">
-  
-            <div className="reports-brand-icon">
-              ✓
-            </div>
-  
-            <div>
-  
-              <strong>
-                Attendify
-              </strong>
-  
-              <span>
-                SMART ATTENDANCE
-              </span>
-  
-            </div>
-  
-          </div>
-  
-  
-          <nav className="reports-nav">
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/dashboard"
-                )
-              }
-            >
-              <span>⌂</span>
-              Dashboard
-            </button>
-  
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/users"
-                )
-              }
-            >
-              <span>♙</span>
-              Users
-            </button>
-  
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/courses"
-                )
-              }
-            >
-              <span>▣</span>
-              Courses
-            </button>
-  
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/sections"
-                )
-              }
-            >
-              <span>§</span>
-              Sections
-            </button>
-  
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/rooms"
-                )
-              }
-            >
-              <span>▦</span>
-              Rooms
-            </button>
-  
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/timetable"
-                )
-              }
-            >
-              <span>▤</span>
-              Timetable
-            </button>
-  
-  
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/attendance"
-                )
-              }
-            >
-              <span>✓</span>
-              Attendance
-            </button>
-  
-  
-            <button className="active">
-              <span>▥</span>
-              Reports
-            </button>
-  
-  
-            <button>
-              <span>⚙</span>
-              Settings
-            </button>
-  
-          </nav>
-  
-  
-          <div className="reports-sidebar-bottom">
-  
-            <div className="reports-greeting">
-  
-              <strong>
-                Good Morning 👋
-              </strong>
-  
-              <span>
-                Track and manage student
-                attendance efficiently.
-              </span>
-  
-            </div>
-  
-  
-            <button
-              className="reports-logout"
-              onClick={
-                handleLogout
-              }
-            >
-              ↪ Logout
-            </button>
-  
-          </div>
-  
-        </aside>
-  
-  
         {/* =================================================
             MAIN
         ================================================= */}

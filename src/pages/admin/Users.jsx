@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import {
   getUsers,
   createUser,
@@ -9,8 +7,6 @@ import {
 } from "../../services/api";
 
 function Users() {
-  const navigate = useNavigate();
-
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -247,17 +243,6 @@ function Users() {
   }
 
   /* =========================================================
-     LOGOUT
-  ========================================================= */
-
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    navigate("/");
-  }
-
-  /* =========================================================
      ROLE STYLE
   ========================================================= */
 
@@ -305,145 +290,6 @@ function Users() {
 
   return (
     <div className="dashboard-page">
-
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside className="dashboard-sidebar">
-
-        <div className="sidebar-brand">
-
-          <div className="sidebar-logo">
-            A
-          </div>
-
-          <div>
-            <h2>Attendify</h2>
-
-            <span>
-              Smart Attendance
-            </span>
-          </div>
-
-        </div>
-
-        <div className="sidebar-profile">
-
-          <div className="profile-avatar">
-            A
-          </div>
-
-          <div>
-            <strong>
-              System Admin
-            </strong>
-
-            <span>
-              Administrator
-            </span>
-          </div>
-
-        </div>
-
-        <nav className="dashboard-nav">
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/dashboard")
-            }
-          >
-            <span>▦</span>
-            Dashboard
-          </button>
-
-          <button className="nav-item active">
-            <span>👥</span>
-            Users
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/courses")
-            }
-          >
-            <span>📚</span>
-            Courses
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/sections")
-            }
-          >
-            <span>▤</span>
-            Sections
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/rooms")
-            }
-          >
-            <span>🏫</span>
-            Rooms
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/timetable")
-            }
-          >
-            <span>🗓</span>
-            Timetable
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/attendance")
-            }
-          >
-            <span>✓</span>
-            Attendance
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/reports")
-            }
-          >
-            <span>▥</span>
-            Reports
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/admin/settings")
-            }
-          >
-            <span>⚙</span>
-            Settings
-          </button>
-
-        </nav>
-
-        <button
-          className="nav-item logout-item"
-          onClick={handleLogout}
-        >
-          <span>↪</span>
-          Logout
-        </button>
-
-      </aside>
 
       {/* =====================================================
           MAIN

@@ -5,10 +5,6 @@ import {
 } from "react";
 
 import {
-  useNavigate,
-} from "react-router-dom";
-
-import {
   getSections,
   createSection,
   updateSection,
@@ -24,9 +20,6 @@ import {
 
 
 function Sections() {
-
-  const navigate = useNavigate();
-
   /* =========================================================
      USER
   ========================================================= */
@@ -1183,189 +1176,12 @@ function Sections() {
 
 
   /* =========================================================
-     LOGOUT
-  ========================================================= */
-
-  function handleLogout() {
-
-    localStorage.removeItem(
-      "token"
-    );
-
-    localStorage.removeItem(
-      "user"
-    );
-
-    navigate("/");
-
-  }
-
-
-  /* =========================================================
      RENDER
   ========================================================= */
 
   return (
 
     <div className="dashboard-page">
-
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside className="dashboard-sidebar">
-
-        <div className="sidebar-brand">
-
-          <div className="sidebar-logo">
-            🎓
-          </div>
-
-          <div>
-
-            <h2>
-              Attendify
-            </h2>
-
-            <span>
-              SMART ATTENDANCE
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div className="sidebar-profile">
-
-          <div className="profile-avatar">
-            {firstName
-              .charAt(0)
-              .toUpperCase()}
-          </div>
-
-          <div className="profile-info">
-
-            <strong>
-              {firstName} {lastName}
-            </strong>
-
-            <span>
-              System Administrator
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <nav className="dashboard-nav">
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate("/dashboard")
-            }
-          >
-            <span>▦</span>
-            Dashboard
-          </button>
-
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/admin/users"
-              )
-            }
-          >
-            <span>👥</span>
-            Users
-          </button>
-
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/admin/courses"
-              )
-            }
-          >
-            <span>📚</span>
-            Courses
-          </button>
-
-
-          <button
-            className="nav-item active"
-          >
-            <span>▤</span>
-            Sections
-          </button>
-
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/admin/rooms"
-              )
-            }
-          >
-            <span>🏫</span>
-            Rooms
-          </button>
-
-
-          <button
-            className="nav-item"
-            onClick={() =>
-              navigate(
-                "/admin/timetable"
-              )
-            }
-          >
-            <span>🗓</span>
-            Timetable
-          </button>
-
-
-          <button className="nav-item">
-            <span>✓</span>
-            Attendance
-          </button>
-
-
-          <button className="nav-item">
-            <span>▥</span>
-            Reports
-          </button>
-
-
-          <button className="nav-item">
-            <span>⚙</span>
-            Settings
-          </button>
-
-        </nav>
-
-
-        <div className="sidebar-bottom">
-
-          <button
-            className="nav-item logout-button"
-            onClick={handleLogout}
-          >
-            <span>↪</span>
-            Logout
-          </button>
-
-        </div>
-
-      </aside>
-
 
       {/* =====================================================
           MAIN

@@ -18,6 +18,7 @@ import Timetable from "./pages/admin/Timetable";
 import Attendance from "./pages/admin/Attendance";
 import Reports from "./pages/admin/Reports";
 import Settings from "./pages/admin/Settings";
+import AdminLayout from "./components/admin/AdminLayout";
 
 import LecturerDashboard from "./pages/lecturer/LecturerDashboard";
 import LecturerSessions from "./pages/lecturer/LecturerSessions";
@@ -133,7 +134,11 @@ function App() {
       return <Login />;
     }
 
-    return <Users />;
+    return (
+      <AdminLayout>
+        <Users />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -145,7 +150,11 @@ function App() {
       return <Login />;
     }
 
-    return <Courses />;
+    return (
+      <AdminLayout>
+        <Courses />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -181,6 +190,17 @@ function App() {
       return <Login />;
     }
 
+    if (
+      role === "admin" ||
+      role === "administrator"
+    ) {
+      return (
+        <AdminLayout>
+          <CourseDetails />
+        </AdminLayout>
+      );
+    }
+
     return <CourseDetails />;
   }
 
@@ -193,7 +213,11 @@ function App() {
       return <Login />;
     }
 
-    return <Sections />;
+    return (
+      <AdminLayout>
+        <Sections />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -205,7 +229,11 @@ function App() {
       return <Login />;
     }
 
-    return <Rooms />;
+    return (
+      <AdminLayout>
+        <Rooms />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -217,7 +245,11 @@ function App() {
       return <Login />;
     }
 
-    return <Timetable />;
+    return (
+      <AdminLayout>
+        <Timetable />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -229,7 +261,11 @@ function App() {
       return <Login />;
     }
 
-    return <Attendance />;
+    return (
+      <AdminLayout>
+        <Attendance />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -241,7 +277,11 @@ function App() {
       return <Login />;
     }
 
-    return <Reports />;
+    return (
+      <AdminLayout>
+        <Reports />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -253,7 +293,11 @@ function App() {
       return <Login />;
     }
 
-    return <Settings />;
+    return (
+      <AdminLayout>
+        <Settings />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -462,7 +506,11 @@ function App() {
       return <Login />;
     }
 
-    return <EnrollmentManagement />;
+    return (
+      <AdminLayout>
+        <EnrollmentManagement />
+      </AdminLayout>
+    );
   }
 
   /* =========================================================
@@ -488,7 +536,11 @@ function App() {
       role === "admin" ||
       role === "administrator"
     ) {
-      return <AdminDashboard />;
+      return (
+        <AdminLayout>
+          <AdminDashboard />
+        </AdminLayout>
+      );
     }
 
     if (

@@ -6,141 +6,13 @@
   min-height: 100vh;
   background: #f5f8fc;
   color: #102a56;
-  display: flex;
+  display: block;
   font-family:
     Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-}
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
-.timetable-sidebar {
-  width: 208px;
-  min-width: 208px;
-  min-height: 100vh;
-  background:
-    linear-gradient(
-      180deg,
-      #092653 0%,
-      #103c7b 100%
-    );
-  color: white;
-  display: flex;
-  flex-direction: column;
-  padding: 18px 14px;
-  box-sizing: border-box;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  z-index: 20;
-}
-
-.tt-brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 4px 5px 28px;
-}
-
-.tt-brand-logo {
-  width: 43px;
-  height: 43px;
-  border-radius: 12px;
-  background: #1674f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 23px;
-  box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.18);
-}
-
-.tt-brand h2 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: -0.5px;
-}
-
-.tt-brand span {
-  display: block;
-  margin-top: 3px;
-  font-size: 7px;
-  letter-spacing: 1px;
-  opacity: 0.75;
-}
-
-.tt-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tt-nav-item {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.88);
-  min-height: 40px;
-  border-radius: 9px;
-  padding: 0 11px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  cursor: pointer;
-  text-align: left;
-  font-size: 12px;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-
-.tt-nav-item span {
-  width: 18px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.tt-nav-item:hover {
-  background: rgba(255, 255, 255, 0.09);
-}
-
-.tt-nav-item.active {
-  background: #267df4;
-  box-shadow:
-    0 8px 20px rgba(14, 102, 222, 0.3);
-  color: white;
-}
-
-.tt-sidebar-bottom {
-  margin-top: auto;
-}
-
-.tt-sidebar-message {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 13px;
-  margin-bottom: 14px;
-}
-
-.tt-sidebar-message strong {
-  display: block;
-  font-size: 12px;
-}
-
-.tt-sidebar-message p {
-  margin: 7px 0 0;
-  font-size: 9px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.tt-logout {
-  color: white;
 }
 
 /* =========================================================
@@ -1310,54 +1182,6 @@
   }
 }
 
-@media (max-width: 1000px) {
-  .timetable-sidebar {
-    width: 74px;
-    min-width: 74px;
-    padding: 15px 8px;
-  }
-
-  .tt-brand {
-    justify-content: center;
-  }
-
-  .tt-brand > div:last-child,
-  .tt-nav-item:not(.active)::after {
-    display: none;
-  }
-
-  .tt-nav-item {
-    justify-content: center;
-    padding: 0;
-  }
-
-  .tt-nav-item span {
-    width: auto;
-  }
-
-  .tt-sidebar-message {
-    display: none;
-  }
-
-  .tt-nav-item {
-    font-size: 0;
-  }
-
-  .tt-nav-item span {
-    font-size: 15px;
-  }
-
-  .tt-stats {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .tt-right-sidebar {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 720px) {
   .tt-topbar {
     padding: 0 14px;
@@ -1428,10 +1252,6 @@
 }
 
 @media (max-width: 500px) {
-  .timetable-sidebar {
-    display: none;
-  }
-
   .tt-global-search {
     width: 180px;
   }

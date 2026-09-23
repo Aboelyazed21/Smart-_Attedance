@@ -1,0 +1,308 @@
+.admin-layout {
+    min-height: 100vh;
+    width: 100%;
+    background: #f5f7fa;
+  }
+  
+  .admin-layout-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-right: 1px solid #e5e9ef;
+    z-index: 1100;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+  
+  .admin-layout-sidebar::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .admin-layout-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .admin-layout-sidebar::-webkit-scrollbar-thumb {
+    background: #d8dee8;
+    border-radius: 999px;
+  }
+  
+  .admin-sidebar-brand {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 20px;
+    border-bottom: 1px solid #edf0f4;
+    flex-shrink: 0;
+  }
+  
+  .admin-brand-mark {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
+  
+  .admin-brand-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  
+  .admin-brand-text strong {
+    color: #172033;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  
+  .admin-brand-text span {
+    color: #7b8494;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  
+  .admin-layout-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px 12px;
+  }
+  
+  .admin-nav-item {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 13px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #667085;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease;
+  }
+  
+  .admin-nav-item:hover {
+    background: #f6f8fb;
+    color: #1f2937;
+  }
+  
+  .admin-nav-item.active {
+    background: #eff6ff;
+    border-color: #dbeafe;
+    color: #2563eb;
+    font-weight: 600;
+  }
+  
+  .admin-nav-icon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .admin-nav-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .admin-sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid #edf0f4;
+    flex-shrink: 0;
+  }
+  
+  .admin-logout-item {
+    color: #667085;
+  }
+  
+  .admin-logout-item:hover {
+    background: #f8fafc;
+    color: #dc2626;
+  }
+  
+  .admin-layout-content {
+    width: calc(100% - 240px);
+    min-width: 0;
+    min-height: 100vh;
+    margin-left: 240px;
+    box-sizing: border-box;
+  }
+  
+  /* Mobile menu button */
+  
+  .admin-mobile-menu-button {
+    display: none;
+  }
+  
+  /* Mobile overlay */
+  
+  .admin-sidebar-overlay {
+    display: none;
+  }
+  
+  /* Tablet */
+  
+  @media (max-width: 1024px) {
+    .admin-layout-sidebar {
+      width: 220px;
+    }
+  
+    .admin-layout-content {
+      width: calc(100% - 220px);
+      margin-left: 220px;
+    }
+  
+    .admin-sidebar-brand {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  
+    .admin-layout-nav {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+  
+  /* Mobile */
+  
+  @media (max-width: 768px) {
+    .admin-layout-sidebar {
+      width: min(82vw, 300px);
+      transform: translateX(-105%);
+      transition: transform 0.28s ease;
+      box-shadow: 18px 0 45px rgba(15, 23, 42, 0.14);
+    }
+  
+    .admin-layout.admin-sidebar-is-open .admin-layout-sidebar {
+      transform: translateX(0);
+    }
+  
+    .admin-layout-content {
+      width: 100%;
+      margin-left: 0;
+    }
+  
+    .admin-mobile-menu-button {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e4e8ee;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #263449;
+      cursor: pointer;
+      z-index: 1200;
+      box-shadow: 0 5px 18px rgba(15, 23, 42, 0.08);
+    }
+  
+    .admin-mobile-menu-button:hover {
+      background: #f8fafc;
+    }
+  
+    .admin-menu-icon {
+      width: 20px;
+      height: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  
+    .admin-menu-icon span {
+      width: 100%;
+      height: 2px;
+      display: block;
+      border-radius: 999px;
+      background: currentColor;
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+    }
+  
+    .admin-menu-icon.is-open span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+  
+    .admin-menu-icon.is-open span:nth-child(2) {
+      opacity: 0;
+    }
+  
+    .admin-menu-icon.is-open span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+  
+    .admin-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      padding: 0;
+      border: 0;
+      background: rgba(15, 23, 42, 0.38);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      cursor: pointer;
+      z-index: 1050;
+    }
+  }
+  
+  /* Small phones */
+  
+  @media (max-width: 480px) {
+    .admin-layout-sidebar {
+      width: min(88vw, 290px);
+    }
+  
+    .admin-mobile-menu-button {
+      top: 10px;
+      left: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 9px;
+    }
+  }
+  
+  /* Prevent background scrolling when drawer is open */
+  
+  body.admin-sidebar-open {
+    overflow: hidden;
+  }

@@ -458,54 +458,15 @@ import {
   
   
     /* =========================================================
-       LOGOUT
-    ========================================================= */
-  
-    function handleLogout() {
-      localStorage.removeItem(
-        "token"
-      );
-  
-      localStorage.removeItem(
-        "user"
-      );
-  
-      navigate("/");
-    }
-  
-  
-    /* =========================================================
        LOADING
     ========================================================= */
   
     if (loading) {
       return (
-        <div className="dashboard-page">
-  
-          <aside className="dashboard-sidebar">
-  
-            <div className="sidebar-brand">
-  
-              <div className="sidebar-logo">
-                A
-              </div>
-  
-              <div>
-                <h2>
-                  Attendify
-                </h2>
-  
-                <span>
-                  Smart Attendance
-                </span>
-              </div>
-  
-            </div>
-  
-          </aside>
+        <div className="course-details-page">
   
   
-          <main className="dashboard-main">
+          <main className="course-details-main">
   
             <div className="course-details-loading">
   
@@ -534,32 +495,10 @@ import {
   
     if (error && !course) {
       return (
-        <div className="dashboard-page">
-  
-          <aside className="dashboard-sidebar">
-  
-            <div className="sidebar-brand">
-  
-              <div className="sidebar-logo">
-                A
-              </div>
-  
-              <div>
-                <h2>
-                  Attendify
-                </h2>
-  
-                <span>
-                  Smart Attendance
-                </span>
-              </div>
-  
-            </div>
-  
-          </aside>
+        <div className="course-details-page">
   
   
-          <main className="dashboard-main">
+          <main className="course-details-main">
   
             <div className="course-details-error">
   
@@ -602,221 +541,18 @@ import {
     ========================================================= */
   
     return (
-      <div className="dashboard-page">
+      <div className="course-details-page">
   
         {/* =====================================================
             SIDEBAR
         ===================================================== */}
-  
-        <aside className="dashboard-sidebar">
-  
-          <div className="sidebar-brand">
-  
-            <div className="sidebar-logo">
-              A
-            </div>
-  
-            <div>
-              <h2>
-                Attendify
-              </h2>
-  
-              <span>
-                Smart Attendance
-              </span>
-            </div>
-  
-          </div>
-  
-  
-          <div className="sidebar-profile">
-  
-            <div className="profile-avatar">
-              A
-            </div>
-  
-            <div>
-              <strong>
-                System Admin
-              </strong>
-  
-              <span>
-                Administrator
-              </span>
-            </div>
-  
-          </div>
-  
-  
-          <nav className="dashboard-nav">
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/dashboard"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                D
-              </span>
-  
-              Dashboard
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/users"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                U
-              </span>
-  
-              Users
-            </button>
-  
-  
-            <button
-              className="nav-item active"
-              onClick={() =>
-                navigate(
-                  "/admin/courses"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                C
-              </span>
-  
-              Courses
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/sections"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                S
-              </span>
-  
-              Sections
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/rooms"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                R
-              </span>
-  
-              Rooms
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/timetable"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                T
-              </span>
-  
-              Timetable
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/attendance"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                A
-              </span>
-  
-              Attendance
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/reports"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                P
-              </span>
-  
-              Reports
-            </button>
-  
-  
-            <button
-              className="nav-item"
-              onClick={() =>
-                navigate(
-                  "/admin/settings"
-                )
-              }
-            >
-              <span className="nav-symbol">
-                S
-              </span>
-  
-              Settings
-            </button>
-  
-          </nav>
-  
-  
-          <button
-            className="nav-item logout-item"
-            onClick={
-              handleLogout
-            }
-          >
-            <span className="nav-symbol">
-              L
-            </span>
-  
-            Logout
-          </button>
-  
-        </aside>
   
   
         {/* =====================================================
             MAIN
         ===================================================== */}
   
-        <main className="dashboard-main">
+        <main className="course-details-main">
   
           {/* HEADER */}
   

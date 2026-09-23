@@ -15,147 +15,12 @@
 
 
 /* =========================================================
-   SIDEBAR
-========================================================= */
-
-.reports-sidebar {
-  width: 220px;
-  min-height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background:
-    linear-gradient(
-      180deg,
-      #123f7a 0%,
-      #0e3972 100%
-    );
-  color: white;
-  padding: 18px 12px;
-  display: flex;
-  flex-direction: column;
-  z-index: 20;
-}
-
-
-.reports-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 7px 25px;
-}
-
-
-.reports-brand-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #1784f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-}
-
-
-.reports-brand strong {
-  display: block;
-  font-size: 17px;
-}
-
-
-.reports-brand span {
-  display: block;
-  font-size: 7px;
-  opacity: .75;
-  margin-top: 2px;
-}
-
-
-.reports-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-
-.reports-nav button {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: rgba(255,255,255,.9);
-  padding: 11px 10px;
-  border-radius: 8px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-
-.reports-nav button:hover,
-.reports-nav button.active {
-  background: #1784f7;
-  color: white;
-}
-
-
-.reports-nav button span {
-  width: 18px;
-  text-align: center;
-}
-
-
-.reports-sidebar-bottom {
-  margin-top: auto;
-}
-
-
-.reports-greeting {
-  background: rgba(255,255,255,.1);
-  border-radius: 10px;
-  padding: 13px;
-  margin-bottom: 15px;
-}
-
-
-.reports-greeting strong {
-  display: block;
-  font-size: 11px;
-}
-
-
-.reports-greeting span {
-  display: block;
-  font-size: 9px;
-  line-height: 1.5;
-  margin-top: 5px;
-  opacity: .8;
-}
-
-
-.reports-logout {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: white;
-  padding: 10px;
-  text-align: left;
-  cursor: pointer;
-  font-size: 11px;
-}
-
-
-/* =========================================================
    MAIN
 ========================================================= */
 
 .reports-main {
-  margin-left: 220px;
-  width: calc(100% - 220px);
+  margin-left: 0;
+  width: 100%;
   min-width: 0;
 }
 
@@ -1033,30 +898,7 @@
 
 
 @media (max-width: 800px) {
-
-  .reports-sidebar {
-    width: 72px;
-  }
-
-  .reports-brand > div:last-child,
-  .reports-nav button:not(.active) {
-    font-size: 0;
-  }
-
-  .reports-nav button {
-    justify-content: center;
-  }
-
-  .reports-nav button span {
-    font-size: 14px;
-  }
-
-  .reports-main {
-    margin-left: 72px;
-    width: calc(100% - 72px);
-  }
-
-  .reports-filters {
+.reports-filters {
     grid-template-columns:
       repeat(2, 1fr);
   }

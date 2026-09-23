@@ -4,7 +4,8 @@
 
 .settings-page {
   min-height: 100vh;
-  display: flex;
+  width: 100%;
+  min-width: 0;
   background: #f5f8fc;
   color: #102a56;
   font-family: Arial, Helvetica, sans-serif;
@@ -144,7 +145,7 @@
    ============================================================ */
 
 .settings-main {
-  flex: 1;
+  width: 100%;
   min-width: 0;
 }
 
@@ -562,10 +563,6 @@
    ============================================================ */
 
 @media (max-width: 1100px) {
-  .settings-sidebar {
-    width: 200px;
-    min-width: 200px;
-  }
 
   .settings-content {
     padding: 22px 20px 30px;
@@ -581,9 +578,6 @@
 }
 
 @media (max-width: 800px) {
-  .settings-sidebar {
-    display: none;
-  }
 
   .settings-topbar {
     padding: 0 15px;

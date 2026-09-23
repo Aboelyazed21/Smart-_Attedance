@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import {
   getTimetable,
   createTimetable,
@@ -88,8 +86,6 @@ function getDateValue(date) {
 }
 
 export default function Timetable() {
-  const navigate = useNavigate();
-
   const [timetable, setTimetable] = useState([]);
   const [sections, setSections] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -620,161 +616,12 @@ export default function Timetable() {
     setRoomFilter("all");
     setDayFilter("all");
   }
-
-  /* =========================================================
-     NAVIGATION
-  ========================================================= */
-
-  function goTo(path) {
-    navigate(path);
-  }
-
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    navigate("/");
-  }
-
-  /* =========================================================
+/* =========================================================
      RENDER
   ========================================================= */
 
   return (
     <div className="timetable-page">
-
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside className="timetable-sidebar">
-
-        <div className="tt-brand">
-          <div className="tt-brand-logo">
-            🎓
-          </div>
-
-          <div>
-            <h2>Attendify</h2>
-            <span>SMART ATTENDANCE</span>
-          </div>
-        </div>
-
-        <nav className="tt-nav">
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/dashboard")
-            }
-          >
-            <span>▦</span>
-            Dashboard
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/users")
-            }
-          >
-            <span>♙</span>
-            Users
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/courses")
-            }
-          >
-            <span>▤</span>
-            Courses
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/sections")
-            }
-          >
-            <span>§</span>
-            Sections
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/rooms")
-            }
-          >
-            <span>⌂</span>
-            Rooms
-          </button>
-
-          <button
-            className="tt-nav-item active"
-          >
-            <span>◫</span>
-            Timetable
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/attendance")
-            }
-          >
-            <span>✓</span>
-            Attendance
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/reports")
-            }
-          >
-            <span>▥</span>
-            Reports
-          </button>
-
-          <button
-            className="tt-nav-item"
-            onClick={() =>
-              goTo("/admin/settings")
-            }
-          >
-            <span>⚙</span>
-            Settings
-          </button>
-
-        </nav>
-
-        <div className="tt-sidebar-bottom">
-
-          <div className="tt-sidebar-message">
-            <strong>
-              Good Morning 👋
-            </strong>
-
-            <p>
-              Manage your academic
-              schedule efficiently.
-            </p>
-          </div>
-
-          <button
-            className="tt-nav-item tt-logout"
-            onClick={logout}
-          >
-            <span>↪</span>
-            Logout
-          </button>
-
-        </div>
-
-      </aside>
 
       {/* =====================================================
           MAIN

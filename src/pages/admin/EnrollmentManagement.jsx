@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000/api";
 
@@ -62,8 +61,6 @@ function getInitial(student) {
 }
 
 export default function EnrollmentManagement() {
-  const navigate = useNavigate();
-
   const [students, setStudents] = useState([]);
   const [sections, setSections] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
@@ -539,16 +536,6 @@ export default function EnrollmentManagement() {
     }
   }
 
-  /* =========================================================
-     LOGOUT
-  ========================================================= */
-
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    navigate("/");
-  }
 
   /* =========================================================
      STYLES
@@ -561,49 +548,9 @@ export default function EnrollmentManagement() {
       display: "flex",
     },
 
-    sidebar: {
-      width: "260px",
-      background:
-        "linear-gradient(180deg, #092b68 0%, #071f4d 100%)",
-      color: "#fff",
-      padding: "28px 18px",
-      boxSizing: "border-box",
-      position: "fixed",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      overflowY: "auto",
-      zIndex: 20,
-    },
 
-    brand: {
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      marginBottom: "30px",
-      padding: "4px 8px",
-    },
 
-    brandIcon: {
-      width: "48px",
-      height: "48px",
-      borderRadius: "14px",
-      background: "#1677ff",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "24px",
-    },
 
-    profile: {
-      background: "rgba(255,255,255,0.08)",
-      borderRadius: "16px",
-      padding: "16px",
-      display: "flex",
-      gap: "12px",
-      alignItems: "center",
-      marginBottom: "24px",
-    },
 
     avatar: {
       width: "44px",
@@ -618,34 +565,9 @@ export default function EnrollmentManagement() {
       flexShrink: 0,
     },
 
-    nav: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "6px",
-    },
 
-    navButton: {
-      border: "none",
-      background: "transparent",
-      color: "#dce9ff",
-      padding: "13px 14px",
-      borderRadius: "12px",
-      cursor: "pointer",
-      textAlign: "left",
-      fontSize: "14px",
-      fontWeight: 700,
-    },
 
-    activeNav: {
-      background: "#1677ff",
-      color: "#fff",
-    },
 
-    main: {
-      marginLeft: "260px",
-      width: "calc(100% - 260px)",
-      minHeight: "100vh",
-    },
 
     header: {
       background: "#fff",
@@ -839,139 +761,10 @@ export default function EnrollmentManagement() {
   return (
     <div style={styles.page}>
       {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
-
-      <aside style={styles.sidebar}>
-        <div style={styles.brand}>
-          <div style={styles.brandIcon}>
-            🎓
-          </div>
-
-          <div>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 800,
-              }}
-            >
-              Attendify
-            </div>
-
-            <div
-              style={{
-                fontSize: "10px",
-                letterSpacing: "2px",
-                opacity: 0.75,
-              }}
-            >
-              SMART ATTENDANCE
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.profile}>
-          <div style={styles.avatar}>A</div>
-
-          <div>
-            <strong>Administrator</strong>
-
-            <div
-              style={{
-                fontSize: "12px",
-                opacity: 0.75,
-                marginTop: "3px",
-              }}
-            >
-              System Admin
-            </div>
-          </div>
-        </div>
-
-        <nav style={styles.nav}>
-          <button
-            style={styles.navButton}
-            onClick={() =>
-              navigate("/dashboard")
-            }
-          >
-            ▦ &nbsp; Dashboard
-          </button>
-
-          <button
-            style={styles.navButton}
-            onClick={() =>
-              navigate("/admin/users")
-            }
-          >
-            👥 &nbsp; Users
-          </button>
-
-          <button
-            style={styles.navButton}
-            onClick={() =>
-              navigate("/admin/courses")
-            }
-          >
-            📚 &nbsp; Courses
-          </button>
-
-          <button
-            style={styles.navButton}
-            onClick={() =>
-              navigate("/admin/sections")
-            }
-          >
-            ▤ &nbsp; Sections
-          </button>
-
-          <button
-            style={styles.navButton}
-            onClick={() =>
-              navigate("/admin/rooms")
-            }
-          >
-            🏫 &nbsp; Rooms
-          </button>
-
-          <button
-            style={styles.navButton}
-            onClick={() =>
-              navigate("/admin/timetable")
-            }
-          >
-            🗓 &nbsp; Timetable
-          </button>
-
-          <button
-            style={{
-              ...styles.navButton,
-              ...styles.activeNav,
-            }}
-          >
-            🎓 &nbsp; Students
-          </button>
-        </nav>
-
-        <button
-          style={{
-            ...styles.navButton,
-            position: "absolute",
-            bottom: "25px",
-            left: "18px",
-            right: "18px",
-          }}
-          onClick={logout}
-        >
-          ↪ &nbsp; Logout
-        </button>
-      </aside>
-
-      {/* =====================================================
           MAIN
       ===================================================== */}
 
-      <main style={styles.main}>
+      <div>
         {/* HEADER */}
 
         <header style={styles.header}>
@@ -1976,7 +1769,8 @@ export default function EnrollmentManagement() {
             )}
           </section>
         </section>
-      </main>
+      </div>
+
 
       {/* =====================================================
           STUDENT MODAL

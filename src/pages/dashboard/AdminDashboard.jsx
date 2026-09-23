@@ -173,11 +173,7 @@ function AdminDashboard() {
     loadDashboard();
   }, []);
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  }
+
 
   const firstName = user.first_name || "Admin";
   const lastName = user.last_name || "";
@@ -219,81 +215,11 @@ function AdminDashboard() {
     },
   ];
 
-  const navItems = [
-    { label: "Dashboard", icon: "dashboard", path: "/dashboard", active: true },
-    { label: "Users", icon: "users", path: "/admin/users" },
-    { label: "Courses", icon: "courses", path: "/admin/courses" },
-    { label: "Sections", icon: "sections", path: "/admin/sections" },
-    { label: "Rooms", icon: "rooms", path: "/admin/rooms" },
-    { label: "Timetable", icon: "calendar", path: "/admin/timetable" },
-    { label: "Attendance", icon: "attendance", path: "/admin/attendance" },
-    { label: "Reports", icon: "reports", path: "/admin/reports" },
-    { label: "Settings", icon: "settings", path: "/admin/settings" },
-  ];
+
 
   return (
     <div className="dashboard-page admin-dashboard">
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-brand">
-          <div className="sidebar-logo">A</div>
 
-          <div className="sidebar-brand-text">
-            <h2>Attendify</h2>
-            <span>SMART ATTENDANCE</span>
-          </div>
-        </div>
-
-        <div className="sidebar-profile">
-          <div className="profile-avatar">
-            {initials || "A"}
-          </div>
-
-          <div className="sidebar-profile-info">
-            <strong>
-              {firstName} {lastName}
-            </strong>
-            <span>
-              <i className="online-dot" />
-              Administrator
-            </span>
-          </div>
-        </div>
-
-        <div className="sidebar-section-label">MAIN MENU</div>
-
-        <nav className="dashboard-nav">
-          {navItems.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              className={`nav-item ${item.active ? "active" : ""}`}
-              onClick={() => navigate(item.path)}
-            >
-              <span className="nav-icon">
-                <Icon type={item.icon} size={19} />
-              </span>
-              <span className="nav-label">{item.label}</span>
-
-              {item.active && <span className="active-indicator" />}
-            </button>
-          ))}
-        </nav>
-
-        <div className="sidebar-bottom">
-          <div className="sidebar-divider" />
-
-          <button
-            type="button"
-            className="nav-item logout-item"
-            onClick={handleLogout}
-          >
-            <span className="nav-icon">
-              <Icon type="logout" size={19} />
-            </span>
-            <span className="nav-label">Logout</span>
-          </button>
-        </div>
-      </aside>
 
       <main className="dashboard-main">
         <header className="dashboard-header">
