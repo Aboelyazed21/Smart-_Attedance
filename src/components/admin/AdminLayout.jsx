@@ -1,200 +1,271 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./AdminLayout.css";
 
-const navigationItems = [
-  {
-    label: "Dashboard",
-    short: "DB",
-    path: "/dashboard",
-  },
-  {
-    label: "Users",
-    short: "US",
-    path: "/admin/users",
-  },
-  {
-    label: "Courses",
-    short: "CO",
-    path: "/admin/courses",
-  },
-  {
-    label: "Sections",
-    short: "SC",
-    path: "/admin/sections",
-  },
-  {
-    label: "Rooms",
-    short: "RM",
-    path: "/admin/rooms",
-  },
-  {
-    label: "Timetable",
-    short: "TT",
-    path: "/admin/timetable",
-  },
-  {
-    label: "Attendance",
-    short: "AT",
-    path: "/admin/attendance",
-  },
-  {
-    label: "Reports",
-    short: "RP",
-    path: "/admin/reports",
-  },
-  {
-    label: "Settings",
-    short: "ST",
-    path: "/admin/settings",
-  },
-  {
-    label: "Enrollments",
-    short: "EN",
-    path: "/admin/enrollments",
-  },
-];
+/* =========================================================
+   ADMIN ICON
+========================================================= */
 
-function AdminIcon({ type }) {
+function AdminIcon({ type, size = 19 }) {
   const commonProps = {
-    width: 20,
-    height: 20,
+    width: size,
+    height: size,
     viewBox: "0 0 24 24",
     fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": true,
+    xmlns: "http://www.w3.org/2000/svg",
+    "aria-hidden": "true",
   };
 
   switch (type) {
     case "dashboard":
       return (
         <svg {...commonProps}>
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-          <rect x="14" y="14" width="7" height="7" rx="1" />
+          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
         </svg>
       );
 
     case "users":
       return (
         <svg {...commonProps}>
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          <path
+            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="9"
+            cy="7"
+            r="4"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       );
 
     case "courses":
       return (
         <svg {...commonProps}>
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+          <path
+            d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M8 7h8M8 10h6"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       );
 
     case "sections":
       return (
         <svg {...commonProps}>
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-          <path d="M17.5 14v7" />
-          <path d="M14 17.5h7" />
+          <rect
+            x="3"
+            y="4"
+            width="18"
+            height="16"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M3 9h18M8 4v16"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
         </svg>
       );
 
     case "rooms":
       return (
         <svg {...commonProps}>
-          <path d="M3 21h18" />
-          <path d="M5 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
-          <path d="M9 7h4" />
-          <path d="M9 11h4" />
-          <path d="M9 15h4" />
-          <path d="M17 9h2a2 2 0 0 1 2 2v10" />
+          <path
+            d="M4 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M2 21h20M8 7h6M8 11h6M8 15h2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <path
+            d="M14 21v-4h2v4"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
         </svg>
       );
 
     case "calendar":
       return (
         <svg {...commonProps}>
-          <rect x="3" y="4" width="18" height="18" rx="2" />
-          <path d="M16 2v4" />
-          <path d="M8 2v4" />
-          <path d="M3 10h18" />
-          <path d="M8 14h.01" />
-          <path d="M12 14h.01" />
-          <path d="M16 14h.01" />
-          <path d="M8 18h.01" />
-          <path d="M12 18h.01" />
+          <rect
+            x="3"
+            y="4.5"
+            width="18"
+            height="17"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M16 2.5v4M8 2.5v4M3 9h18"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <path
+            d="M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
         </svg>
       );
 
     case "attendance":
       return (
         <svg {...commonProps}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="m8 12 2.5 2.5L16 9" />
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="m8 12 2.5 2.5L16.5 9"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       );
 
     case "reports":
       return (
         <svg {...commonProps}>
-          <path d="M4 19V5" />
-          <path d="M4 19h17" />
-          <path d="m7 15 3-4 3 2 5-6" />
+          <path
+            d="M4 20V10M10 20V4M16 20v-7M22 20H2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       );
 
     case "settings":
       return (
         <svg {...commonProps}>
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.5 1.5-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.55V20h-2.12v-.09a1.7 1.7 0 0 0-1.03-1.55 1.7 1.7 0 0 0-1.88.34l-.06.06-1.5-1.5.06-.06A1.7 1.7 0 0 0 9.2 15a1.7 1.7 0 0 0-1.55-1.03H7.56v-2.12h.09A1.7 1.7 0 0 0 9.2 10.8a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.5-1.5.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.55V6h2.12v.09a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.5 1.5-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.55 1.03H20v2.12h-.09A1.7 1.7 0 0 0 19.4 15Z" />
+          <path
+            d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="m19.4 15 .1.1a1.8 1.8 0 0 1-2.55 2.55l-.1-.1a1.8 1.8 0 0 0-3.07 1.27v.18a1.8 1.8 0 0 1-3.6 0v-.18a1.8 1.8 0 0 0-3.07-1.27l-.1.1a1.8 1.8 0 0 1-2.55-2.55l.1-.1a1.8 1.8 0 0 0-1.27-3.07h-.18a1.8 1.8 0 0 1 0-3.6h.18a1.8 1.8 0 0 0 1.27-3.07l-.1-.1A1.8 1.8 0 0 1 7 4.62l.1.1a1.8 1.8 0 0 0 3.07-1.27v-.18a1.8 1.8 0 0 1 3.6 0v.18a1.8 1.8 0 0 0 3.07 1.27l.1-.1a1.8 1.8 0 0 1 2.55 2.55l-.1.1a1.8 1.8 0 0 0 1.27 3.07h.18a1.8 1.8 0 0 1 0 3.6h-.18A1.8 1.8 0 0 0 19.4 15Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
         </svg>
       );
 
     case "enrollments":
       return (
         <svg {...commonProps}>
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M19 8v6" />
-          <path d="M16 11h6" />
+          <path
+            d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M8 8h8M8 12h8M8 16h5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       );
 
     default:
-      return null;
+      return (
+        <svg {...commonProps}>
+          <circle
+            cx="12"
+            cy="12"
+            r="8"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
   }
 }
 
-function LogoutIcon() {
+/* =========================================================
+   LOGOUT ICON
+========================================================= */
+
+function LogoutIcon({ size = 19 }) {
   return (
     <svg
-      width="20"
-      height="20"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <path d="M10 17l5-5-5-5" />
-      <path d="M15 12H3" />
-      <path d="M21 19V5a2 2 0 0 0-2-2h-6" />
-      <path d="M13 21h6a2 2 0 0 0 2-2" />
+      <path
+        d="M10 17l5-5-5-5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15 12H3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13 4h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
+
+/* =========================================================
+   MENU ICON
+========================================================= */
 
 function MenuIcon({ open }) {
   return (
@@ -206,30 +277,126 @@ function MenuIcon({ open }) {
   );
 }
 
+/* =========================================================
+   ADMIN LAYOUT
+========================================================= */
+
 export default function AdminLayout({ children }) {
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const navigationItems = [
+    {
+      label: "Dashboard",
+      short: "DB",
+      path: "/dashboard",
+      icon: "dashboard",
+    },
+    {
+      label: "Users",
+      short: "US",
+      path: "/admin/users",
+      icon: "users",
+    },
+    {
+      label: "Courses",
+      short: "CO",
+      path: "/admin/courses",
+      icon: "courses",
+    },
+    {
+      label: "Sections",
+      short: "SC",
+      path: "/admin/sections",
+      icon: "sections",
+    },
+    {
+      label: "Rooms",
+      short: "RM",
+      path: "/admin/rooms",
+      icon: "rooms",
+    },
+    {
+      label: "Timetable",
+      short: "TM",
+      path: "/admin/timetable",
+      icon: "calendar",
+    },
+    {
+      label: "Attendance",
+      short: "AT",
+      path: "/admin/attendance",
+      icon: "attendance",
+    },
+    {
+      label: "Reports",
+      short: "RP",
+      path: "/admin/reports",
+      icon: "reports",
+    },
+    {
+      label: "Settings",
+      short: "ST",
+      path: "/admin/settings",
+      icon: "settings",
+    },
+    {
+      label: "Enrollments",
+      short: "EN",
+      path: "/admin/enrollments",
+      icon: "enrollments",
+    },
+  ];
+
+  /* =========================================================
+     CLOSE DRAWER WHEN ROUTE CHANGES
+  ========================================================= */
 
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
+  /* =========================================================
+     ESCAPE KEY
+  ========================================================= */
+
   useEffect(() => {
-    if (!sidebarOpen) {
-      document.body.classList.remove("admin-sidebar-open");
-      return;
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
     }
 
-    document.body.classList.add("admin-sidebar-open");
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  /* =========================================================
+     LOCK BODY SCROLL ON MOBILE DRAWER
+  ========================================================= */
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add("admin-sidebar-open");
+    } else {
+      document.body.classList.remove("admin-sidebar-open");
+    }
 
     return () => {
       document.body.classList.remove("admin-sidebar-open");
     };
   }, [sidebarOpen]);
 
-  const isActive = (path) => {
+  /* =========================================================
+     ACTIVE ROUTE
+  ========================================================= */
+
+  function isActive(path) {
     if (path === "/dashboard") {
       return location.pathname === "/dashboard";
     }
@@ -238,14 +405,22 @@ export default function AdminLayout({ children }) {
       location.pathname === path ||
       location.pathname.startsWith(`${path}/`)
     );
-  };
+  }
 
-  const handleNavigation = (path) => {
+  /* =========================================================
+     NAVIGATION
+  ========================================================= */
+
+  function handleNavigation(path) {
     setSidebarOpen(false);
     navigate(path);
-  };
+  }
 
-  const handleLogout = () => {
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  function handleLogout() {
     setSidebarOpen(false);
 
     localStorage.removeItem("token");
@@ -256,7 +431,7 @@ export default function AdminLayout({ children }) {
     sessionStorage.removeItem("user");
 
     navigate("/");
-  };
+  }
 
   return (
     <div
@@ -264,95 +439,118 @@ export default function AdminLayout({ children }) {
         sidebarOpen ? "admin-sidebar-is-open" : ""
       }`}
     >
-      {/* Mobile menu button */}
+      {/* =====================================================
+          MOBILE MENU BUTTON
+      ===================================================== */}
+
       <button
         type="button"
         className="admin-mobile-menu-button"
-        onClick={() => setSidebarOpen((prev) => !prev)}
-        aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+        onClick={() => setSidebarOpen((value) => !value)}
+        aria-label={
+          sidebarOpen
+            ? "Close admin navigation"
+            : "Open admin navigation"
+        }
         aria-expanded={sidebarOpen}
       >
         <MenuIcon open={sidebarOpen} />
       </button>
 
-      {/* Mobile overlay */}
+      {/* =====================================================
+          MOBILE OVERLAY
+      ===================================================== */}
+
       {sidebarOpen && (
         <button
           type="button"
           className="admin-sidebar-overlay"
           onClick={() => setSidebarOpen(false)}
-          aria-label="Close navigation"
+          aria-label="Close admin navigation"
         />
       )}
 
-      {/* Shared admin sidebar */}
+      {/* =====================================================
+          SHARED ADMIN SIDEBAR
+      ===================================================== */}
+
       <aside className="admin-layout-sidebar">
+        {/* BRAND */}
+
         <div className="admin-sidebar-brand">
-          <div className="admin-brand-mark">SA</div>
+          <div className="admin-brand-mark">A</div>
 
           <div className="admin-brand-text">
-            <strong>Smart Attendance</strong>
-            <span>Administration</span>
+            <strong>Attendify</strong>
+            <span>SMART ATTENDANCE</span>
           </div>
         </div>
 
-        <nav className="admin-layout-nav" aria-label="Admin navigation">
-          {navigationItems.map((item) => (
-            <button
-              key={item.path}
-              type="button"
-              className={`admin-nav-item ${
-                isActive(item.path) ? "active" : ""
-              }`}
-              onClick={() => handleNavigation(item.path)}
-            >
-              <span className="admin-nav-icon">
-                <AdminIcon
-                  type={
-                    item.path === "/dashboard"
-                      ? "dashboard"
-                      : item.path === "/admin/users"
-                      ? "users"
-                      : item.path === "/admin/courses"
-                      ? "courses"
-                      : item.path === "/admin/sections"
-                      ? "sections"
-                      : item.path === "/admin/rooms"
-                      ? "rooms"
-                      : item.path === "/admin/timetable"
-                      ? "calendar"
-                      : item.path === "/admin/attendance"
-                      ? "attendance"
-                      : item.path === "/admin/reports"
-                      ? "reports"
-                      : item.path === "/admin/settings"
-                      ? "settings"
-                      : "enrollments"
-                  }
-                />
-              </span>
+        {/* NAVIGATION */}
 
-              <span className="admin-nav-label">{item.label}</span>
-            </button>
-          ))}
+        <nav
+          className="admin-layout-nav"
+          aria-label="Admin navigation"
+        >
+          {navigationItems.map((item) => {
+            const active = isActive(item.path);
+
+            return (
+              <button
+                key={item.path}
+                type="button"
+                className={`admin-nav-item ${
+                  active ? "active" : ""
+                }`}
+                onClick={() => handleNavigation(item.path)}
+              >
+                <span className="admin-nav-icon">
+                  <AdminIcon type={item.icon} size={18} />
+                </span>
+
+                <span className="admin-nav-label">
+                  {item.label}
+                </span>
+
+                <span className="admin-nav-short">
+                  {item.short}
+                </span>
+              </button>
+            );
+          })}
         </nav>
+
+        {/* FOOTER */}
 
         <div className="admin-sidebar-footer">
           <button
             type="button"
-            className="admin-nav-item admin-logout-item"
+            className="admin-logout-item"
             onClick={handleLogout}
           >
             <span className="admin-nav-icon">
-              <LogoutIcon />
+              <LogoutIcon size={18} />
             </span>
 
-            <span className="admin-nav-label">Logout</span>
+            <span className="admin-nav-label">
+              Logout
+            </span>
+
+            <span className="admin-nav-short">
+              OUT
+            </span>
           </button>
         </div>
       </aside>
 
-      {/* Page content */}
+      {/* =====================================================
+          PAGE CONTENT
+
+          IMPORTANT:
+          No margin-left here.
+          Grid handles sidebar space.
+      ===================================================== */}
+
       <main className="admin-layout-content">
         {children}
       </main>
