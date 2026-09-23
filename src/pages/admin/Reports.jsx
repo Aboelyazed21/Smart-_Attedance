@@ -108,10 +108,6 @@ import {
   ========================================================= */
   
   export default function Reports() {
-  
-    const navigate =
-      useNavigate();
-  
     const user =
       getSavedUser();
   

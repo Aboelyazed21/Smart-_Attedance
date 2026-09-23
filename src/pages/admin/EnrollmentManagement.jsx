@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-
-const API_BASE = "http://localhost:5000/api";
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000/api";
 
 async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("token");
@@ -536,7 +537,6 @@ export default function EnrollmentManagement() {
     }
   }
 
-
   /* =========================================================
      STYLES
   ========================================================= */
@@ -544,30 +544,10 @@ export default function EnrollmentManagement() {
   const styles = {
     page: {
       minHeight: "100vh",
+      width: "100%",
+      minWidth: 0,
       background: "#f5f7fb",
-      display: "flex",
     },
-
-
-
-
-
-    avatar: {
-      width: "44px",
-      height: "44px",
-      borderRadius: "50%",
-      background: "#fff",
-      color: "#1264d8",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontWeight: 800,
-      flexShrink: 0,
-    },
-
-
-
-
 
     header: {
       background: "#fff",
@@ -760,11 +740,7 @@ export default function EnrollmentManagement() {
 
   return (
     <div style={styles.page}>
-      {/* =====================================================
-          MAIN
-      ===================================================== */}
-
-      <div>
+      <main style={styles.main}>
         {/* HEADER */}
 
         <header style={styles.header}>
@@ -1769,8 +1745,7 @@ export default function EnrollmentManagement() {
             )}
           </section>
         </section>
-      </div>
-
+      </main>
 
       {/* =====================================================
           STUDENT MODAL
