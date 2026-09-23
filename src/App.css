@@ -7409,3 +7409,264 @@ button {
     transform: none;
   }
 }
+
+/* =========================================================
+   AUTH SPLIT LAYOUT (reference: brand panel + form card)
+   Desktop: two columns. Mobile: compact, panel becomes
+   a slim banner. Applies only to .auth-split login.
+========================================================= */
+
+.login-page.auth-split .auth-brand-panel {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .login-page.auth-split {
+    background: #f4f7fb;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+  }
+
+  .login-page.auth-split::after {
+    display: none;
+  }
+
+  .login-page.auth-split .top-header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding: 20px clamp(24px, 4vw, 54px);
+    background: transparent;
+    position: relative;
+    z-index: 5;
+  }
+
+  .login-page.auth-split .auth-brand-panel {
+    display: flex;
+    align-items: center;
+    grid-column: 1;
+    grid-row: 2 / 4;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 0 26px clamp(24px, 4vw, 54px);
+    padding: clamp(28px, 4vw, 56px);
+    border-radius: 22px;
+    color: #ffffff;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(10, 28, 58, 0.42),
+        rgba(10, 28, 58, 0.66)
+      ),
+      url("/university-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+  }
+
+  .login-page.auth-split .auth-brand-copy {
+    min-width: 0;
+    max-width: 460px;
+  }
+
+  .login-page.auth-split .auth-brand-copy h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 2.7rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .login-page.auth-split .auth-brand-copy > p {
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+
+  .login-page.auth-split .auth-brand-features {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 30px;
+  }
+
+  .login-page.auth-split .auth-brand-features > div {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+    color: #ffffff;
+  }
+
+  .login-page.auth-split .auth-brand-features svg {
+    color: #ffd97a;
+  }
+
+  .login-page.auth-split .auth-brand-features span {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .login-page.auth-split .auth-brand-foot {
+    margin: 30px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .login-page.auth-split .login-area {
+    grid-column: 2;
+    grid-row: 2;
+    align-items: center;
+    padding: 10px clamp(20px, 4vw, 60px) 20px;
+  }
+
+  .login-page.auth-split .login-card {
+    width: min(430px, 100%);
+  }
+
+  .login-page.auth-split .page-footer {
+    grid-column: 2;
+    grid-row: 3;
+  }
+}
+
+@media (max-width: 1023px) {
+  .login-page.auth-split {
+    background: #f4f7fb;
+  }
+
+  .login-page.auth-split::after {
+    display: none;
+  }
+
+  .login-page.auth-split .auth-brand-panel {
+    display: block;
+    margin: 0;
+    padding: 26px 20px 22px;
+    background: #0f2851;
+    color: #ffffff;
+  }
+
+  .login-page.auth-split .auth-brand-copy {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .login-page.auth-split .auth-brand-copy h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .login-page.auth-split .auth-brand-copy h2 br {
+    display: none;
+  }
+
+  .login-page.auth-split .auth-brand-copy > p {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .login-page.auth-split .auth-brand-features {
+    display: none;
+  }
+
+  .login-page.auth-split .auth-brand-foot {
+    display: none;
+  }
+
+  .login-page.auth-split .top-header {
+    display: none;
+  }
+}
+
+/* ---------- Auth helper states (forgot/reset pages) ---------- */
+
+.login-page .form-notice {
+  display: grid;
+  gap: 14px;
+  margin-top: 4px;
+  padding: 14px;
+  border: 1px solid #b8e2cc;
+  border-radius: 10px;
+  background: #effaf4;
+  color: #20704e;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.login-page .form-notice p {
+  margin: 0;
+}
+
+.login-page .form-notice .sign-in-button {
+  width: 100%;
+}
+
+.login-page .form-error {
+  padding: 12px;
+  border: 1px solid #f0c3ca;
+  border-radius: 10px;
+  background: #fff7f8;
+  color: #9d3549;
+}
+
+.login-page .form-error p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.login-page .password-strength {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.login-page .password-strength span {
+  height: 5px;
+  flex: 1;
+  border-radius: 3px;
+  background: #e2e8f0;
+}
+
+.login-page .password-strength small {
+  margin-left: 6px;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.login-page .password-strength.weak span:nth-child(1) {
+  background: #ef4444;
+}
+
+.login-page .password-strength.fair span:nth-child(-n + 2) {
+  background: #f59e0b;
+}
+
+.login-page .password-strength.good span:nth-child(-n + 3) {
+  background: #287cf0;
+}
+
+.login-page .password-strength.strong span {
+  background: #10b981;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page .auth-brand-panel {
+    scroll-behavior: auto;
+  }
+}

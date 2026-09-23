@@ -112,6 +112,44 @@ export async function getCurrentUser() {
 
 
 /* =========================================================
+   PASSWORD RESET
+========================================================= */
+
+export async function forgotPassword(
+  emailOrId
+) {
+  return apiRequest(
+    "/auth/forgot-password",
+    {
+      method: "POST",
+
+      body: JSON.stringify({
+        email: emailOrId,
+      }),
+    }
+  );
+}
+
+
+export async function resetPassword(
+  token,
+  newPassword
+) {
+  return apiRequest(
+    "/auth/reset-password",
+    {
+      method: "POST",
+
+      body: JSON.stringify({
+        token,
+        newPassword,
+      }),
+    }
+  );
+}
+
+
+/* =========================================================
    ADMIN DASHBOARD
 ========================================================= */
 

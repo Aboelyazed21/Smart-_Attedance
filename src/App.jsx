@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 
 import Register from "./Register";
+import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
 
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import Users from "./pages/admin/Users";
@@ -124,6 +126,22 @@ function App() {
 
   if (location.pathname === "/register") {
     return <Register />;
+  }
+
+  /* =========================================================
+     FORGOT PASSWORD (public)
+  ========================================================= */
+
+  if (location.pathname === "/forgot-password") {
+    return <ForgotPassword />;
+  }
+
+  /* =========================================================
+     RESET PASSWORD (public, token in query string)
+  ========================================================= */
+
+  if (location.pathname === "/reset-password") {
+    return <ResetPassword />;
   }
 
   /* =========================================================
@@ -630,6 +648,30 @@ function AuthIcon({ name, size = 17 }) {
     arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
 
     plus: <path d="M12 5v14M5 12h14" />,
+
+    cap: (
+      <>
+        <path d="M12 4 2 9l10 5 10-5Z" />
+        <path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" />
+        <path d="M22 9v5" />
+      </>
+    ),
+
+    chart: (
+      <>
+        <path d="M5 19V10" />
+        <path d="M12 19V5" />
+        <path d="M19 19v-6" />
+        <path d="M3 19h18" />
+      </>
+    ),
+
+    shield: (
+      <>
+        <path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6Z" />
+        <path d="m9.5 12 2 2 3.5-4" />
+      </>
+    ),
   };
 
   return (
@@ -723,7 +765,7 @@ function Login() {
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page auth-split">
 
       {/* =====================================================
           HEADER
@@ -750,6 +792,48 @@ function Login() {
         </div>
 
       </header>
+
+      <aside
+        className="auth-brand-panel"
+        aria-hidden="true"
+      >
+        <div className="auth-brand-copy">
+          <h2>
+            Building a
+            <br />
+            Smarter Campus
+          </h2>
+
+          <p>
+            Attendify helps universities manage
+            attendance efficiently, ensuring a more
+            connected and productive academic
+            environment.
+          </p>
+
+          <div className="auth-brand-features">
+            <div>
+              <AuthIcon name="cap" size={20} />
+              <span>Accurate Attendance</span>
+            </div>
+
+            <div>
+              <AuthIcon name="chart" size={20} />
+              <span>Better Management</span>
+            </div>
+
+            <div>
+              <AuthIcon name="shield" size={20} />
+              <span>A More Connected Campus</span>
+            </div>
+          </div>
+
+          <p className="auth-brand-foot">
+            Education Today
+            <br />A Brighter Tomorrow
+          </p>
+        </div>
+      </aside>
 
       {/* =====================================================
           LOGIN
@@ -863,6 +947,7 @@ function Login() {
               <button
                 type="button"
                 className="forgot-password"
+                onClick={() => navigate("/forgot-password")}
               >
                 Forgot password?
               </button>
