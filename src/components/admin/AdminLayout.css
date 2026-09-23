@@ -21,6 +21,8 @@
   background: #f5f7fa;
 
   color: #172033;
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -162,7 +164,7 @@
 
   gap: 5px;
 
-  flex: 0 0 auto;
+  flex: 1 1 auto;
 
   min-height: 0;
 }
@@ -306,7 +308,7 @@
 }
 
 /* =========================================================
-   FOOTER
+   SIDEBAR FOOTER
 ========================================================= */
 
 .admin-sidebar-footer {
@@ -314,9 +316,9 @@
 
   flex-shrink: 0;
 
-  margin-top: 8px;
+  margin-top: auto;
 
-  padding-top: 8px;
+  padding-top: 14px;
 
   border-top: 1px solid #edf1f5;
 }
@@ -340,10 +342,11 @@
 }
 
 /* =========================================================
-   PAGE CONTENT
+   MAIN CONTENT
    IMPORTANT:
-   Grid reserves sidebar space.
-   There is NO margin-left here.
+   Sidebar width is reserved by CSS Grid.
+   No negative positioning.
+   No extra margin.
 ========================================================= */
 
 .admin-layout-content {
@@ -353,7 +356,8 @@
   min-width: 0;
   min-height: 100vh;
 
-  margin-left: 0;
+  margin: 0;
+  padding: 0;
 
   box-sizing: border-box;
 
@@ -361,16 +365,16 @@
 }
 
 /* =========================================================
-   DESKTOP CONTENT POSITION
-   Keeps the shared content slightly closer to the sidebar.
+   CONTENT CHILDREN
+   Prevent pages from becoming wider than viewport.
 ========================================================= */
 
-@media (min-width: 1101px) {
-  .admin-layout-content {
-    position: relative;
-    left: -24px;
-    width: calc(100% + 24px);
-  }
+.admin-layout-content > * {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -474,27 +478,81 @@
 }
 
 /* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1400px) {
+  .admin-layout {
+    --admin-sidebar-width: 240px;
+  }
+
+  .admin-layout-content {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (min-width: 1101px) {
+  .admin-layout {
+    grid-template-columns:
+      var(--admin-sidebar-width)
+      minmax(0, 1fr);
+  }
+
+  .admin-layout-content {
+    grid-column: 2;
+
+    position: static;
+
+    left: auto;
+
+    width: 100%;
+    max-width: none;
+
+    margin-left: 0;
+  }
+
+  .admin-layout-content > * {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* =========================================================
    TABLET
 ========================================================= */
 
 @media (max-width: 1100px) and (min-width: 769px) {
   .admin-layout {
     --admin-sidebar-width: 195px;
+
+    grid-template-columns:
+      var(--admin-sidebar-width)
+      minmax(0, 1fr);
   }
 
   .admin-layout-sidebar {
     width: var(--admin-sidebar-width);
+
     padding-left: 10px;
     padding-right: 10px;
   }
 
   .admin-layout-content {
     grid-column: 2;
+
     width: 100%;
+    max-width: none;
+
     min-width: 0;
+
     margin-left: 0;
     padding-left: 0;
-    box-sizing: border-box;
+    padding-right: 0;
   }
 
   .admin-layout-content > * {
@@ -522,9 +580,17 @@
 
     width: 100%;
     min-width: 0;
+
+    background: #f5f7fa;
   }
 
   .admin-layout-sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
     width: min(84vw, 300px);
 
     transform: translateX(-105%);
@@ -541,18 +607,31 @@
   .admin-sidebar-is-open .admin-layout-sidebar {
     transform: translateX(0);
 
-    box-shadow: 18px 0 45px rgba(15, 23, 42, 0.16);
+    box-shadow:
+      18px 0 45px rgba(15, 23, 42, 0.16);
   }
 
   .admin-layout-content {
+    display: block;
+
     width: 100%;
+    max-width: none;
 
     min-width: 0;
     min-height: 100vh;
 
-    margin-left: 0;
+    margin: 0;
+    padding: 0;
 
-    display: block;
+    box-sizing: border-box;
+
+    overflow-x: hidden;
+  }
+
+  .admin-layout-content > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .admin-mobile-menu-button {
@@ -590,6 +669,26 @@
 
     flex-basis: 38px;
   }
+
+  .admin-brand-text strong {
+    font-size: 14px;
+  }
+
+  .admin-brand-text span {
+    font-size: 6px;
+  }
+
+  .admin-nav-item,
+  .admin-logout-item {
+    min-height: 43px;
+  }
+
+  .admin-nav-icon {
+    width: 31px;
+    height: 31px;
+
+    flex-basis: 31px;
+  }
 }
 
 /* =========================================================
@@ -604,6 +703,9 @@
   .admin-nav-item,
   .admin-logout-item {
     min-height: 42px;
+
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
 
@@ -621,7 +723,7 @@
 }
 
 /* =========================================================
-   LOCK BODY WHEN DRAWER IS OPEN
+   BODY LOCK WHEN MOBILE DRAWER IS OPEN
 ========================================================= */
 
 body.admin-sidebar-open {
