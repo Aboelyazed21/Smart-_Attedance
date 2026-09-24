@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 import "./AttendanceScanner.css";
 
 function Icon({ name, size = 18 }) {
@@ -1071,6 +1073,8 @@ function AttendanceScanner() {
           </div>
         </section>
       </main>
+
+      <StudentAssistant />
     </div>
   );
 }

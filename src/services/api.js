@@ -111,6 +111,38 @@ export async function getCurrentUser() {
 }
 
 
+/* Update the authenticated user's own phone number.
+   Uses the existing users.phone field (verified ownership
+   is enforced server-side). */
+
+export async function updateMyPhone(
+  phone
+) {
+  return apiRequest(
+    "/me",
+    {
+      method: "PUT",
+
+      body: JSON.stringify({
+        phone,
+      }),
+    }
+  );
+}
+
+
+/* Student attendance analytics (preferred summary endpoint).
+   The backend derives the student identity from the JWT —
+   never from a client supplied id. Falls back to
+   /attendance/my when the endpoint is not deployed yet. */
+
+export async function getStudentAttendanceSummary() {
+  return apiRequest(
+    "/student/attendance/summary"
+  );
+}
+
+
 /* =========================================================
    PASSWORD RESET
 ========================================================= */

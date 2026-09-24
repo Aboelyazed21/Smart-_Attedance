@@ -5,6 +5,8 @@ import {
   getMyAttendance,
   getMyCorrections,
 } from "../../services/api";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 import "./CorrectionRequests.css";
 
 function Icon({ name, size = 18 }) {
@@ -1253,6 +1255,8 @@ function CorrectionRequests() {
           </div>
         </div>
       )}
+
+      <StudentAssistant />
     </div>
   );
 }

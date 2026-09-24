@@ -1,0 +1,307 @@
+/* ============================================================
+   GLOBAL RESPONSIVE SYSTEM
+   Loaded last. Safety net for every page:
+   - no horizontal page scroll
+   - responsive tables via inner scroll containers
+   - modals fit viewport
+   - touch targets + readable inputs on mobile
+   - consistent hamburger (three lines)
+   Applies to 320 / 360 / 375 / 390 / 414 / 430 / 768 /
+   1024 / 1280 / 1440+.
+   ============================================================ */
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+span,
+small,
+strong,
+td,
+th,
+li {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Hamburger shared — three horizontal lines only */
+.hamburger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text, #111827);
+}
+
+/* Tables must never force page scroll */
+.attendance-table-wrap,
+.users-table-wrapper,
+.requests-table-wrap,
+.recent-table {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Modals fit viewport */
+.modal-backdrop {
+  padding: 12px;
+}
+
+.request-modal,
+.modal-grid,
+.details-grid {
+  max-width: 100%;
+}
+
+/* Centered QR success — calm professional green */
+.centered-success {
+  margin: 0 auto;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  padding: 28px 20px;
+  border: 1px solid var(--success-border, #a7f3d0);
+  border-radius: 12px;
+  background: var(--success-soft, #ecfdf5);
+  color: #065f46;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.centered-success h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #065f46;
+}
+
+.centered-success p {
+  margin: 0;
+  font-size: 14px;
+  color: #047857;
+  line-height: 1.6;
+  max-width: 44ch;
+}
+
+/* Generic stacked-card helper for very small tables */
+@media (max-width: 640px) {
+  .attendance-table,
+  .users-table,
+  .requests-table {
+    min-width: 0;
+  }
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 1280px) {
+  .dashboard-content,
+  .attendance-content,
+  .scan-content,
+  .confirmation-content,
+  .correction-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-stats,
+  .attendance-metrics,
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-grid,
+  .attendance-data-grid,
+  .scan-grid,
+  .confirmation-grid,
+  .correction-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Prevent fixed-width breakage */
+  .login-card,
+  .register-card,
+  .scanner-card,
+  .success-card,
+  .recent-attendance-card,
+  .summary-card,
+  .next-card {
+    max-width: 100%;
+  }
+
+  /* Touch targets */
+  button,
+  select,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 40px;
+  }
+
+  .nav-item,
+  .scan-nav-item,
+  .attendance-nav button,
+  .correction-nav button,
+  .student-nav-item,
+  .chatbot-nav button,
+  .confirmation-nav button {
+    min-height: 44px;
+  }
+
+  /* Inputs readable + no iOS zoom */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .chatbot-form input,
+  .manual-input-wrapper input,
+  .filter-field input,
+  .filter-field select,
+  .attendance-filter-field input,
+  .attendance-filter-field select {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-stats,
+  .attendance-metrics,
+  .stats-grid,
+  .student-stat-grid,
+  .chatbot-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .details-grid,
+  .modal-grid,
+  .summary-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  h1 {
+    font-size: 20px !important;
+    line-height: 1.25 !important;
+  }
+
+  h2 {
+    font-size: 17px !important;
+  }
+
+  .dashboard-header,
+  .attendance-topbar,
+  .scan-topbar,
+  .confirmation-topbar,
+  .correction-topbar,
+  .chatbot-topbar,
+  .student-dashboard-header {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .dashboard-content,
+  .attendance-content,
+  .scan-content,
+  .confirmation-content,
+  .correction-content,
+  .chatbot-content,
+  .student-dashboard-content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .confirmation-actions,
+  .success-actions,
+  .modal-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .confirmation-actions button,
+  .success-actions button,
+  .modal-footer button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* 320px safety */
+@media (max-width: 360px) {
+  body {
+    font-size: 14px;
+  }
+
+  .login-card,
+  .register-card {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .top-user-info,
+  .chatbot-top-user,
+  .attendance-header-user section,
+  .top-avatar + div {
+    display: none !important;
+  }
+}
+
+/* Landscape phones — keep content usable */
+@media (max-height: 500px) and (orientation: landscape) {
+  .camera-wrapper {
+    height: 240px !important;
+  }
+
+  .scanner-message {
+    min-height: 240px !important;
+    padding: 20px !important;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scan-line {
+    animation: none !important;
+  }
+}

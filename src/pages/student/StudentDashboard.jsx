@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   getMyAttendance,
 } from "../../services/api";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 import "../../App.css";
 import "./StudentDashboard.css";
 
@@ -812,6 +814,8 @@ function StudentDashboard() {
         </section>
 
       </main>
+
+      <StudentAssistant />
 
     </div>
   );

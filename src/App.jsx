@@ -33,6 +33,7 @@ import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
 import AttendanceConfirmation from "./pages/student/AttendanceConfirmation";
 import CorrectionRequests from "./pages/student/CorrectionRequests";
+import StudentChatbot from "./pages/student/StudentChatbot";
 import StudentDashboardPage from "./pages/student/StudentDashboard";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 
@@ -511,6 +512,34 @@ function App() {
     }
 
     return <AttendanceConfirmation />;
+  }
+
+  /* =========================================================
+     STUDENT CHATBOT
+  ========================================================= */
+
+  if (
+    location.pathname === "/student/chatbot"
+  ) {
+    const user = getSavedUser();
+
+    if (!user) {
+      return <Login />;
+    }
+
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
+
+    if (role !== "student") {
+      return <Login />;
+    }
+
+    return <StudentChatbot />;
   }
 
   /* =========================================================

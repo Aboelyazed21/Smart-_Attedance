@@ -277,7 +277,8 @@
 
 .lecturer-dashboard-stat-value {
   display: block;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
   color: var(--att-text, #172033);
   font-size: clamp(1.4rem, 1.2rem + 1vw, 1.8rem);
   font-weight: 800;

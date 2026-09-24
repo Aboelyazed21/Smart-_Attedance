@@ -1,0 +1,56 @@
+/* ============================================================
+   APP FOOTER — reusable, minimal, responsive.
+   Used by student, lecturer and admin pages.
+   ============================================================ */
+
+.app-footer {
+  width: 100%;
+  padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: #ffffff;
+  border-top: 1px solid var(--border, #e5e7eb);
+  color: var(--text-secondary, #6b7280);
+}
+
+.app-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.app-footer-brand {
+  color: var(--primary, #2563eb);
+  font-weight: 700;
+}
+
+.app-footer-sep {
+  color: var(--text-muted, #9ca3af);
+}
+
+.app-footer-uni {
+  font-weight: 500;
+}
+
+.app-footer-copy {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary, #6b7280);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 16px 12px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .app-footer-inner,
+  .app-footer-copy {
+    font-size: 12px;
+  }
+}

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 import "./AttendanceConfirmation.css";
 
 function Icon({ name, size = 18 }) {
@@ -793,6 +795,8 @@ function AttendanceConfirmation() {
           </div>
         </section>
       </main>
+
+      <StudentAssistant />
     </div>
   );
 }
