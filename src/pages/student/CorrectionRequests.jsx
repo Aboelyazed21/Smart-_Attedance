@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 import "./CorrectionRequests.css";
 
 const courseOptions = [
@@ -911,6 +913,8 @@ function CorrectionRequests() {
           </div>
         </div>
       )}
+
+      <StudentAssistant />
     </div>
   );
 }

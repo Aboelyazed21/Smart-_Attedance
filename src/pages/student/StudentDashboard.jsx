@@ -9,6 +9,8 @@ import {
   toRecords,
 } from "../../utils/attendanceInsights";
 import Footer from "../../components/Footer";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 import "../../App.css";
 import "./StudentDashboard.css";
 
@@ -1000,6 +1002,8 @@ function StudentDashboard() {
         <Footer />
 
       </main>
+
+      <StudentAssistant />
 
     </div>
   );

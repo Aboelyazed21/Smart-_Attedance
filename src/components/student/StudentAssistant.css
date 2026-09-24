@@ -1,0 +1,295 @@
+/* ============================================================
+   STUDENT ASSISTANT — floating button + chat panel.
+   Scoped to .student-assistant-* only. Students only.
+   ============================================================ */
+
+.student-assistant-fab {
+  position: fixed;
+  right: calc(20px + env(safe-area-inset-right, 0px));
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+
+  width: 56px;
+  height: 56px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: var(--primary, #2563eb);
+  color: #ffffff;
+
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(17, 24, 39, 0.12));
+
+  cursor: pointer;
+}
+
+.student-assistant-fab:hover {
+  background: var(--primary-hover, #1d4ed8);
+}
+
+.student-assistant-fab svg {
+  position: relative;
+  z-index: 1;
+}
+
+.student-assistant-fab-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--primary, #2563eb);
+  animation: student-assistant-ripple 2.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes student-assistant-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-assistant-fab-pulse {
+    animation: none;
+  }
+}
+
+.student-assistant-panel {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  z-index: 950;
+
+  width: min(400px, calc(100vw - 32px));
+  max-height: min(600px, calc(100dvh - 120px));
+
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: #ffffff;
+
+  box-shadow: var(--shadow-lg, 0 12px 32px rgba(17, 24, 39, 0.12));
+
+  overflow: hidden;
+}
+
+.student-assistant-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 12px 12px 10px;
+
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.student-assistant-header strong {
+  display: block;
+  font-size: 14px;
+}
+
+.student-assistant-header span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+}
+
+.student-assistant-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.student-assistant-full {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.student-assistant-close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.student-assistant-week {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  background: var(--bg-subtle, #fafbfc);
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+}
+
+.student-assistant-messages {
+  flex: 1;
+  min-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.student-assistant-msg {
+  padding: 8px 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  background: var(--bg-subtle, #fafbfc);
+}
+
+.student-assistant-msg.user {
+  background: var(--primary-soft, #eff6ff);
+  border-color: var(--primary-border, #bfdbfe);
+}
+
+.student-assistant-msg-role {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-secondary, #6b7280);
+}
+
+.student-assistant-msg p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.student-assistant-typing {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 18px;
+}
+
+.student-assistant-typing span[aria-hidden="true"] {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9ca3af;
+}
+
+.student-assistant-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px 0;
+}
+
+.student-assistant-suggest button {
+  min-height: 34px;
+  padding: 4px 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.student-assistant-suggest button:hover:not(:disabled) {
+  border-color: var(--primary, #2563eb);
+  color: var(--primary, #2563eb);
+}
+
+.student-assistant-form {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+.student-assistant-form input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-input, #d1d5db);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.student-assistant-form button {
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0 14px;
+  border: 1px solid var(--primary, #2563eb);
+  border-radius: 8px;
+  background: var(--primary, #2563eb);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.student-assistant-form button:disabled,
+.student-assistant-suggest button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.student-assistant-state {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary, #6b7280);
+}
+
+.student-assistant-error span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--danger, #b91c1c);
+}
+
+.student-assistant-error button {
+  border: 0;
+  background: transparent;
+  color: var(--danger, #b91c1c);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .student-assistant-panel {
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    width: auto;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    max-height: min(560px, calc(100dvh - 110px));
+  }
+
+  .student-assistant-fab {
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+}

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 
 import "./AttendanceScanner.css";
 
@@ -1215,6 +1217,8 @@ function AttendanceScanner() {
         <Footer />
 
       </main>
+
+      <StudentAssistant />
 
     </div>
   );

@@ -95,6 +95,93 @@ function formatPercent(value) {
   return `${number.toFixed(number % 1 === 0 ? 0 : 1)}%`;
 }
 
+function StatIcon({ name }) {
+  const paths = {
+    courses: (
+      <>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H21" />
+        <path d="M6.5 2H21v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      </>
+    ),
+    sections: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M3 9h18M9 21V9" />
+      </>
+    ),
+    students: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </>
+    ),
+    sessions: (
+      <>
+        <rect x="3" y="4" width="18" height="17" rx="2" />
+        <path d="M16 2v4M8 2v4M3 10h18" />
+      </>
+    ),
+    live: (
+      <>
+        <circle cx="12" cy="12" r="8.5" />
+        <circle cx="12" cy="12" r="2.5" />
+      </>
+    ),
+    records: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="m16 11 2 2 4-4" />
+      </>
+    ),
+    corrections: (
+      <>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+    qr: (
+      <>
+        <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+        <path d="M14 14h3v3h-3zM19 14v3M14 19h3M19 19h2v-2" />
+      </>
+    ),
+    attendance: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="m16 11 2 2 4-4" />
+      </>
+    ),
+    reports: (
+      <>
+        <path d="M4 19V9" />
+        <path d="M10 19V5" />
+        <path d="M16 19v-7" />
+        <path d="M22 19H2" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name] || paths.sessions}
+    </svg>
+  );
+}
+
 export default function LecturerDashboard() {
   const navigate = useNavigate();
 
@@ -159,6 +246,7 @@ export default function LecturerDashboard() {
       label: "Courses",
       value: formatNumber(stats.totalCourses),
       tone: "blue",
+      icon: "courses",
       action: () => navigate("/lecturer/sections"),
     },
     {
@@ -167,36 +255,43 @@ export default function LecturerDashboard() {
         stats.totalSections ?? sections.length
       ),
       tone: "blue",
+      icon: "sections",
       action: () => navigate("/lecturer/sections"),
     },
     {
       label: "Enrolled Students",
       value: formatNumber(stats.totalEnrolledStudents),
       tone: "green",
+      icon: "students",
       action: () => navigate("/lecturer/sections"),
     },
     {
       label: "Attendance Rate",
       value: formatPercent(stats.attendancePercentage),
       tone: "amber",
+      icon: "attendance",
       action: () => navigate("/lecturer/attendance"),
     },
     {
       label: "Total Sessions",
       value: formatNumber(stats.totalSessions),
       tone: "neutral",
+      icon: "sessions",
       action: () => navigate("/lecturer/sessions"),
     },
     {
       label: "Active Sessions",
       value: formatNumber(stats.activeSessions),
       tone: "red",
+      icon: "live",
+      pulse: true,
       action: () => navigate("/lecturer/sessions"),
     },
     {
       label: "Attendance Records",
       value: formatNumber(stats.totalAttendanceEvents),
       tone: "blue",
+      icon: "records",
       action: () => navigate("/lecturer/attendance"),
     },
     {
@@ -205,6 +300,7 @@ export default function LecturerDashboard() {
         stats?.correctionRequests?.pending
       ),
       tone: "amber",
+      icon: "corrections",
       action: () => navigate("/lecturer/attendance"),
     },
   ];
@@ -268,17 +364,15 @@ export default function LecturerDashboard() {
                 {card.label}
               </span>
 
-              {card.label !== "Attendance Rate" && (
-                <span className="lecturer-dashboard-stat-icon">
-                  {card.label === "Courses" && "CR"}
-                  {card.label === "Sections" && "SC"}
-                  {card.label === "Enrolled Students" && "ST"}
-                  {card.label === "Total Sessions" && "SE"}
-                  {card.label === "Active Sessions" && "ON"}
-                  {card.label === "Attendance Records" && "AT"}
-                  {card.label === "Pending Corrections" && "PC"}
-                </span>
-              )}
+              <span
+                className={
+                  card.pulse
+                    ? "lecturer-dashboard-stat-icon lecturer-attendance-pulse"
+                    : "lecturer-dashboard-stat-icon"
+                }
+              >
+                <StatIcon name={card.icon} />
+              </span>
             </span>
 
             <strong className="lecturer-dashboard-stat-value">
@@ -425,7 +519,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                QR
+                <StatIcon name="qr" />
               </span>
 
               <span>
@@ -444,7 +538,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                AT
+                <StatIcon name="attendance" />
               </span>
 
               <span>
@@ -463,7 +557,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                RP
+                <StatIcon name="reports" />
               </span>
 
               <span>
@@ -482,7 +576,7 @@ export default function LecturerDashboard() {
               }
             >
               <span className="lecturer-dashboard-action-icon">
-                SC
+                <StatIcon name="sections" />
               </span>
 
               <span>

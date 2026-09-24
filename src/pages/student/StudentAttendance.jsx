@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { getMyAttendance } from "../../services/api";
 import Footer from "../../components/Footer";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 
 import "../../App.css";
 import "./StudentAttendance.css";
@@ -1410,6 +1412,8 @@ function StudentAttendance() {
 
         <Footer />
       </main>
+
+      <StudentAssistant />
     </div>
   );
 }

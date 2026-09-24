@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { getMyAttendance } from "../../services/api";
 import Footer from "../../components/Footer";
+import StudentAssistant from "../../components/student/StudentAssistant";
+import "../../components/student/StudentAssistant.css";
 
 import "./AttendanceConfirmation.css";
 
@@ -1076,6 +1078,8 @@ function AttendanceConfirmation() {
         <Footer />
 
       </main>
+
+      <StudentAssistant />
 
     </div>
   );

@@ -23,28 +23,107 @@ function getInitials(firstName = "", lastName = "") {
 }
 
 const navigationItems = [
-  { label: "Dashboard", short: "DB", path: "/dashboard" },
+  { label: "Dashboard", icon: "dashboard", path: "/dashboard" },
   {
     label: "Attendance Sessions",
-    short: "AS",
+    icon: "sessions",
     path: "/lecturer/sessions",
   },
   {
     label: "My Sections",
-    short: "SC",
+    icon: "sections",
     path: "/lecturer/sections",
   },
   {
     label: "Attendance",
-    short: "AT",
+    icon: "attendance",
     path: "/lecturer/attendance",
   },
   {
     label: "Reports",
-    short: "RP",
+    icon: "reports",
     path: "/lecturer/reports",
   },
 ];
+
+const pageTitles = {
+  "/dashboard": "Dashboard",
+  "/lecturer/sessions": "Attendance Sessions",
+  "/lecturer/sections": "My Sections",
+  "/lecturer/attendance": "Attendance",
+  "/lecturer/reports": "Reports",
+};
+
+function getPageTitle(pathname) {
+  if (pageTitles[pathname]) return pageTitles[pathname];
+  if (pathname.startsWith("/lecturer/sessions/"))
+    return "Session Details";
+  if (pathname.startsWith("/lecturer/")) return "Lecturer Portal";
+  return "Attendify";
+}
+
+function NavIcon({ name }) {
+  const paths = {
+    dashboard: (
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </>
+    ),
+    sessions: (
+      <>
+        <rect x="3" y="4" width="18" height="17" rx="2" />
+        <path d="M16 2v4M8 2v4M3 10h18" />
+      </>
+    ),
+    sections: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M3 9h18M9 21V9" />
+      </>
+    ),
+    attendance: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="m16 11 2 2 4-4" />
+      </>
+    ),
+    reports: (
+      <>
+        <path d="M4 19V9" />
+        <path d="M10 19V5" />
+        <path d="M16 19v-7" />
+        <path d="M22 19H2" />
+      </>
+    ),
+    logout: (
+      <>
+        <path d="M10 17l5-5-5-5" />
+        <path d="M15 12H3" />
+        <path d="M21 4v16" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[name] || paths.dashboard}
+    </svg>
+  );
+}
 
 export default function LecturerLayout({ children }) {
   const navigate = useNavigate();
@@ -125,20 +204,34 @@ export default function LecturerLayout({ children }) {
         Skip to main content
       </a>
 
-      <button
-        type="button"
-        className="lecturer-menu-button"
-        aria-label={
-          navOpen ? "Close navigation" : "Open navigation"
-        }
-        aria-expanded={navOpen}
-        aria-controls="lecturer-sidebar"
-        onClick={() => setNavOpen((open) => !open)}
-      >
-        <span />
-        <span />
-        <span />
-      </button>
+      <header className="lecturer-mobile-header">
+        <button
+          type="button"
+          className="lecturer-menu-button"
+          aria-label={
+            navOpen ? "Close navigation" : "Open navigation"
+          }
+          aria-expanded={navOpen}
+          aria-controls="lecturer-sidebar"
+          onClick={() => setNavOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <div className="lecturer-mobile-header-text">
+          <strong>Attendify</strong>
+          <span>{getPageTitle(location.pathname)}</span>
+        </div>
+
+        <div
+          className="lecturer-mobile-header-avatar"
+          aria-hidden="true"
+        >
+          {initials}
+        </div>
+      </header>
 
       {navOpen && (
         <button
@@ -148,6 +241,18 @@ export default function LecturerLayout({ children }) {
           onClick={() => setNavOpen(false)}
         />
       )}
+
+      <button
+        type="button"
+        className="lecturer-sidebar-close"
+        aria-label="Close navigation"
+        aria-expanded={navOpen}
+        aria-controls="lecturer-sidebar"
+        onClick={() => setNavOpen(false)}
+        tabIndex={navOpen ? 0 : -1}
+      >
+        <span aria-hidden="true">×</span>
+      </button>
 
       <aside
         id="lecturer-sidebar"
@@ -197,7 +302,7 @@ export default function LecturerLayout({ children }) {
                 onClick={() => navigate(item.path)}
               >
                 <span className="lecturer-layout-nav-icon">
-                  {item.short}
+                  <NavIcon name={item.icon} />
                 </span>
 
                 <span className="lecturer-layout-nav-label">
@@ -229,7 +334,7 @@ export default function LecturerLayout({ children }) {
             onClick={handleLogout}
           >
             <span className="lecturer-layout-logout-icon">
-              LO
+              <NavIcon name="logout" />
             </span>
 
             <span>Logout</span>
