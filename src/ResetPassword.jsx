@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { resetPassword } from "./services/api";
+import { useLanguage } from "./utils/i18n";
 import "./App.css";
 
 function getQueryToken() {
@@ -41,6 +42,7 @@ function checkStrength(password) {
 }
 
 function ResetPassword() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const token = useMemo(() => getQueryToken(), []);
@@ -59,20 +61,20 @@ function ResetPassword() {
 
     if (!token) {
       setError(
-        "This password reset link is invalid."
+        t("pwd.invalidLink")
       );
       return;
     }
 
     if (newPassword.length < 8) {
       setError(
-        "New password must be at least 8 characters."
+        t("pwd.passwordMin")
       );
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("The passwords do not match.");
+      setError(t("pwd.passwordMismatch"));
       return;
     }
 
@@ -85,7 +87,7 @@ function ResetPassword() {
     } catch (requestError) {
       setError(
         requestError.message ||
-          "Could not reset the password."
+          t("pwd.resetFailed")
       );
     } finally {
       setSaving(false);
@@ -102,7 +104,7 @@ function ResetPassword() {
 
           <div className="brand-text">
             <h1>Attendify</h1>
-            <p>SMART ATTENDANCE SYSTEM</p>
+            <p>{t("brand.tagline")}</p>
           </div>
         </div>
       </header>
@@ -114,11 +116,11 @@ function ResetPassword() {
           </div>
 
           <h2 className="app-name">
-            New Password
+            {t("pwd.newPasswordTitle")}
           </h2>
 
           <p className="app-description">
-            Choose a strong password for your account.
+            {t("pwd.newPasswordSubtitle")}
           </p>
 
           {done ? (
@@ -127,8 +129,7 @@ function ResetPassword() {
               role="status"
             >
               <p>
-                Your password has been updated
-                successfully.
+                {t("pwd.success")}
               </p>
 
               <button
@@ -136,7 +137,7 @@ function ResetPassword() {
                 className="sign-in-button"
                 onClick={() => navigate("/")}
               >
-                Back to Sign In
+                {t("pwd.backToSignIn")}
               </button>
             </div>
           ) : (
@@ -150,15 +151,14 @@ function ResetPassword() {
                   role="alert"
                 >
                   <p>
-                    This password reset link is
-                    invalid or has expired.
+                    {t("pwd.invalidOrExpired")}
                   </p>
                 </div>
               )}
 
               <div className="form-group">
                 <label htmlFor="reset-new">
-                  New Password
+                  {t("pwd.newPassword")}
                 </label>
 
                 <div className="input-container">
@@ -167,7 +167,7 @@ function ResetPassword() {
                     type={
                       showPassword ? "text" : "password"
                     }
-                    placeholder="At least 8 characters"
+                    placeholder={t("pwd.newPasswordPh")}
                     autoComplete="new-password"
                     value={newPassword}
                     onChange={(event) =>
@@ -181,14 +181,14 @@ function ResetPassword() {
                     className="show-password"
                     aria-label={
                       showPassword
-                        ? "Hide password"
-                        : "Show password"
+                        ? t("pwd.hidePassword")
+                        : t("pwd.showPassword")
                     }
                     onClick={() =>
                       setShowPassword((open) => !open)
                     }
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword ? t("pwd.hide") : t("pwd.show")}
                   </button>
                 </div>
 
@@ -202,7 +202,7 @@ function ResetPassword() {
                     <span />
                     <span />
                     <small>
-                      Password strength: {strength.label}
+                      {t("pwd.strength").replace("{strength}", strength.label)}
                     </small>
                   </div>
                 )}
@@ -210,7 +210,7 @@ function ResetPassword() {
 
               <div className="form-group">
                 <label htmlFor="reset-confirm">
-                  Confirm Password
+                  {t("pwd.confirmPassword")}
                 </label>
 
                 <div className="input-container">
@@ -219,7 +219,7 @@ function ResetPassword() {
                     type={
                       showPassword ? "text" : "password"
                     }
-                    placeholder="Repeat the new password"
+                    placeholder={t("pwd.confirmPasswordPh")}
                     autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(event) =>
@@ -246,8 +246,8 @@ function ResetPassword() {
               >
                 <span>
                   {saving
-                    ? "Resetting password..."
-                    : "Reset Password"}
+                    ? t("pwd.resetting")
+                    : t("pwd.resetPassword")}
                 </span>
               </button>
 
@@ -257,7 +257,7 @@ function ResetPassword() {
                   className="forgot-password"
                   onClick={() => navigate("/")}
                 >
-                  Back to Sign In
+                  {t("pwd.backToSignIn")}
                 </button>
               </div>
             </form>
@@ -267,11 +267,11 @@ function ResetPassword() {
 
       <footer className="page-footer">
         <div className="page-footer-copy">
-          © Aboelyazed Hatem Aboelyazed
+          {t("footer.copy")}
         </div>
 
         <div className="page-footer-uni">
-          Badr University in Assiut
+          {t("footer.uni")}
         </div>
       </footer>
     </div>

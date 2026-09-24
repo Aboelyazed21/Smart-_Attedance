@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../utils/i18n";
 import {
   getLecturerAttendanceReport,
   getLecturerSections,
@@ -8,6 +9,7 @@ import "./LecturerReports.css";
 
 export default function LecturerReports() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [user] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "null");
@@ -79,7 +81,7 @@ export default function LecturerReports() {
       setRows(data);
     } catch (error) {
       console.error("Lecturer report error:", error);
-      setError(error.message || "Failed to load report.");
+      setError(error.message || t("lecReports.loadError"));
       setRows([]);
     } finally {
       setGenerating(false);
@@ -203,12 +205,11 @@ export default function LecturerReports() {
         <header className="lecturer-reports-header">
           <div>
             <div className="lecturer-reports-eyebrow">
-              ATTENDANCE ANALYTICS
+              {t("lecReports.eyebrow")}
             </div>
-            <h1>Lecturer Reports</h1>
+            <h1>{t("lecReports.title")}</h1>
             <p>
-              Attendance summaries and statistics for your assigned
-              sections.
+              {t("lecReports.subtitle")}
             </p>
           </div>
 
@@ -218,7 +219,7 @@ export default function LecturerReports() {
               className="reports-secondary-button"
               onClick={() => navigate("/lecturer/attendance")}
             >
-              Attendance
+              {t("nav.attendance")}
             </button>
 
             <button
@@ -227,7 +228,7 @@ export default function LecturerReports() {
               onClick={generateReport}
               disabled={generating}
             >
-              {generating ? "Loading..." : "Refresh Report"}
+              {generating ? t("lecReports.loadingShort") : t("lecReports.refreshReport")}
             </button>
           </div>
         </header>
@@ -235,38 +236,38 @@ export default function LecturerReports() {
         <main className="lecturer-reports-content">
           {error && (
             <div className="reports-error" role="alert">
-              <strong>Unable to load report.</strong>
+              <strong>{t("lecReports.errorTitle")}</strong>
               <span>{error}</span>
             </div>
           )}
 
           <section className="reports-stats-grid">
             <StatCard
-              label="Total Records"
+              label={t("lecReports.statTotal")}
               value={statistics.total}
               type="blue"
               icon="#"
             />
             <StatCard
-              label="Present"
+              label={t("lecReports.statPresent")}
               value={statistics.present}
               type="green"
               icon="+"
             />
             <StatCard
-              label="Late"
+              label={t("lecReports.statLate")}
               value={statistics.late}
               type="orange"
               icon="T"
             />
             <StatCard
-              label="Absent"
+              label={t("lecReports.statAbsent")}
               value={statistics.absent}
               type="red"
               icon="-"
             />
             <StatCard
-              label="Attendance Rate"
+              label={t("lecReports.statRate")}
               value={`${statistics.attendanceRate}%`}
               type="purple"
               icon="%"
@@ -277,10 +278,10 @@ export default function LecturerReports() {
             <div className="reports-filter-heading">
               <div>
                 <span className="reports-section-kicker">
-                  REPORT BUILDER
+                  {t("lecReports.builderEyebrow")}
                 </span>
-                <h2>Report Overview</h2>
-                <p>Filter attendance data by section and date range.</p>
+                <h2>{t("lecReports.overviewTitle")}</h2>
+                <p>{t("lecReports.overviewDesc")}</p>
               </div>
 
               <button
@@ -289,19 +290,19 @@ export default function LecturerReports() {
                 onClick={clearFilters}
                 disabled={generating}
               >
-                Clear Filters
+                {t("lecReports.clearFilters")}
               </button>
             </div>
 
             <div className="reports-filter-grid">
               <div className="reports-field">
-                <label htmlFor="report-section">Section</label>
+                <label htmlFor="report-section">{t("lecReports.fieldSection")}</label>
                 <select
                   id="report-section"
                   value={sectionId}
                   onChange={(e) => setSectionId(e.target.value)}
                 >
-                  <option value="">All Sections</option>
+                  <option value="">{t("lecReports.allSections")}</option>
                   {sections.map((section) => {
                     const id = section.section_id || section.id;
 
@@ -312,7 +313,7 @@ export default function LecturerReports() {
                           : ""}
                         {section.section_name ||
                           section.name ||
-                          "Section"}
+                          t("lecReports.sectionFallback")}
                       </option>
                     );
                   })}
@@ -320,7 +321,7 @@ export default function LecturerReports() {
               </div>
 
               <div className="reports-field">
-                <label htmlFor="report-from">From Date</label>
+                <label htmlFor="report-from">{t("lecReports.fieldFrom")}</label>
                 <input
                   id="report-from"
                   type="date"
@@ -330,7 +331,7 @@ export default function LecturerReports() {
               </div>
 
               <div className="reports-field">
-                <label htmlFor="report-to">To Date</label>
+                <label htmlFor="report-to">{t("lecReports.fieldTo")}</label>
                 <input
                   id="report-to"
                   type="date"
@@ -345,7 +346,7 @@ export default function LecturerReports() {
                 onClick={generateReport}
                 disabled={generating}
               >
-                {generating ? "Generating..." : "Generate Report"}
+                {generating ? t("lecReports.generating") : t("lecReports.generate")}
               </button>
             </div>
           </section>
@@ -354,16 +355,15 @@ export default function LecturerReports() {
             {loading ? (
               <div className="reports-empty-state">
                 <div className="reports-spinner" />
-                <h3>Loading Report</h3>
-                <p>Please wait while attendance data is loaded.</p>
+                <h3>{t("lecReports.loadingTitle")}</h3>
+                <p>{t("lecReports.loadingDesc")}</p>
               </div>
             ) : rows.length === 0 ? (
               <div className="reports-empty-state">
                 <div className="reports-empty-icon">R</div>
-                <h3>No Report Data</h3>
+                <h3>{t("lecReports.emptyTitle")}</h3>
                 <p>
-                  Select a section and date range, then generate the
-                  report.
+                  {t("lecReports.emptyDesc")}
                 </p>
               </div>
             ) : (
@@ -371,12 +371,11 @@ export default function LecturerReports() {
                 <div className="reports-table-heading">
                   <div>
                     <span className="reports-section-kicker">
-                      GENERATED REPORT
+                      {t("lecReports.generatedEyebrow")}
                     </span>
-                    <h2>Attendance Report</h2>
+                    <h2>{t("lecReports.reportTitle")}</h2>
                     <p>
-                      {rows.length} attendance record
-                      {rows.length !== 1 ? "s" : ""}
+                      {t("lecReports.recordCount").replace("{n}", rows.length)}
                     </p>
                   </div>
                 </div>
@@ -385,12 +384,12 @@ export default function LecturerReports() {
                   <table>
                     <thead>
                       <tr>
-                        <th>Student</th>
-                        <th>Course</th>
-                        <th>Section</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Source</th>
+                        <th>{t("lecReports.colStudent")}</th>
+                        <th>{t("lecReports.colCourse")}</th>
+                        <th>{t("lecReports.colSection")}</th>
+                        <th>{t("lecReports.colDate")}</th>
+                        <th>{t("lecReports.colStatus")}</th>
+                        <th>{t("lecReports.colSource")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -412,7 +411,7 @@ export default function LecturerReports() {
                             <td>{getSectionName(row)}</td>
                             <td>{getDate(row)}</td>
                             <td>
-                              <StatusBadge status={status} />
+                              <StatusBadge status={status} t={t} />
                             </td>
                             <td>{row.source || "-"}</td>
                           </tr>
@@ -438,28 +437,28 @@ export default function LecturerReports() {
                         <div className="report-mobile-card-top">
                           <div>
                             <span className="report-mobile-label">
-                              Student
+                              {t("lecReports.colStudent")}
                             </span>
                             <strong>{getStudentName(row)}</strong>
                           </div>
-                          <StatusBadge status={status} />
+                          <StatusBadge status={status} t={t} />
                         </div>
 
                         <div className="report-mobile-grid">
                           <InfoItem
-                            label="Course"
+                            label={t("lecReports.colCourse")}
                             value={getCourseCode(row)}
                           />
                           <InfoItem
-                            label="Section"
+                            label={t("lecReports.colSection")}
                             value={getSectionName(row)}
                           />
                           <InfoItem
-                            label="Date"
+                            label={t("lecReports.colDate")}
                             value={getDate(row)}
                           />
                           <InfoItem
-                            label="Source"
+                            label={t("lecReports.colSource")}
                             value={row.source || "-"}
                           />
                         </div>
@@ -476,9 +475,9 @@ export default function LecturerReports() {
   );
 }
 
-function StatusBadge({ status }) {
+function StatusBadge({ status, t }) {
   const label =
-    status && status !== "-" ? status : "Unknown";
+    status && status !== "-" ? status : t ? t("lecReports.unknownStatus") : "Unknown";
 
   return (
     <span className={`report-status report-status-${label}`}>

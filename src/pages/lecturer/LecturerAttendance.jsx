@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "../../utils/i18n";
 import { getLecturerAttendanceReport, getLecturerSections } from "../../services/api";
 import "./LecturerAttendance.css";
 
@@ -75,6 +76,7 @@ function getSectionLabel(section) {
 }
 
 export default function LecturerAttendance() {
+  const { t } = useLanguage();
 
   const savedUser = useMemo(() => {
     try {
@@ -91,7 +93,7 @@ export default function LecturerAttendance() {
     savedUser?.fullName ||
     savedUser?.username ||
     savedUser?.email ||
-    "Lecturer";
+    t("role.lecturer");
 
   const lecturerInitials = lecturerName
     .split(" ")
@@ -127,7 +129,7 @@ export default function LecturerAttendance() {
     } catch (err) {
       console.error("Lecturer sections error:", err);
       setSectionsError(
-        err?.message || "Failed to load lecturer sections."
+        err?.message || t("lecAttendance.sectionsError")
       );
     } finally {
       setSectionsLoading(false);
@@ -167,7 +169,7 @@ export default function LecturerAttendance() {
     } catch (err) {
       console.error("Lecturer attendance error:", err);
       setError(
-        err?.message || "Failed to load attendance records."
+        err?.message || t("lecAttendance.loadError")
       );
     } finally {
       setLoading(false);
@@ -262,16 +264,16 @@ export default function LecturerAttendance() {
       <main className="lecturer-attendance-main">
           <header className="lecturer-attendance-topbar">
             <div>
-              <span className="topbar-label">LECTURER PORTAL</span>
-              <h1>Attendance</h1>
+              <span className="topbar-label">{t("lecAttendance.eyebrow")}</span>
+              <h1>{t("nav.attendance")}</h1>
               <p>
-                Review attendance records for your assigned sections.
+                {t("lecAttendance.subtitle")}
               </p>
             </div>
 
             <div className="topbar-user">
               <span className="topbar-user-context">
-                Attendance monitoring
+                {t("lecAttendance.workspaceLabel")}
               </span>
               <div className="topbar-avatar">
                 {lecturerInitials}
@@ -283,14 +285,13 @@ export default function LecturerAttendance() {
             <div className="attendance-hero">
               <div>
                 <span className="hero-label">
-                  ATTENDANCE MONITORING
+                  {t("lecAttendance.heroEyebrow")}
                 </span>
 
-                <h2>Attendance records</h2>
+                <h2>{t("lecAttendance.heroTitle")}</h2>
 
                 <p>
-                  Filter and review attendance activity across
-                  your teaching sections.
+                  {t("lecAttendance.heroDesc")}
                 </p>
               </div>
 
@@ -300,7 +301,7 @@ export default function LecturerAttendance() {
                 onClick={() => loadAttendance(true)}
                 disabled={refreshing}
               >
-                {refreshing ? "Refreshing..." : "Refresh"}
+                {refreshing ? t("lecAttendance.refreshing") : t("action.refresh")}
               </button>
             </div>
 
@@ -326,7 +327,7 @@ export default function LecturerAttendance() {
 
                 <div className="alert-content">
                   <strong>
-                    Unable to load attendance
+                    {t("lecAttendance.errorTitle")}
                   </strong>
                   <p>{error}</p>
                 </div>
@@ -336,7 +337,7 @@ export default function LecturerAttendance() {
                   onClick={() => loadAttendance(true)}
                   disabled={refreshing}
                 >
-                  {refreshing ? "Retrying..." : "Retry"}
+                  {refreshing ? t("lecAttendance.retrying") : t("lecAttendance.retry")}
                 </button>
               </div>
             )}
@@ -345,10 +346,10 @@ export default function LecturerAttendance() {
               <div className="attendance-stat-card">
                 <div className="stat-icon">AT</div>
                 <div>
-                  <span>Total records</span>
+                  <span>{t("lecAttendance.statTotal")}</span>
                   <strong>{stats.total}</strong>
                   <small>
-                    Records matching the current filters
+                    {t("lecAttendance.statTotalDesc")}
                   </small>
                 </div>
               </div>
@@ -356,27 +357,27 @@ export default function LecturerAttendance() {
               <div className="attendance-stat-card">
                 <div className="stat-icon">PR</div>
                 <div>
-                  <span>Present</span>
+                  <span>{t("lecAttendance.statPresent")}</span>
                   <strong>{stats.present}</strong>
-                  <small>Students marked present</small>
+                  <small>{t("lecAttendance.statPresentDesc")}</small>
                 </div>
               </div>
 
               <div className="attendance-stat-card">
                 <div className="stat-icon">LT</div>
                 <div>
-                  <span>Late</span>
+                  <span>{t("lecAttendance.statLate")}</span>
                   <strong>{stats.late}</strong>
-                  <small>Students marked late</small>
+                  <small>{t("lecAttendance.statLateDesc")}</small>
                 </div>
               </div>
 
               <div className="attendance-stat-card">
                 <div className="stat-icon">AR</div>
                 <div>
-                  <span>Attendance rate</span>
+                  <span>{t("lecAttendance.statRate")}</span>
                   <strong>{stats.attendanceRate}%</strong>
-                  <small>Present + late records</small>
+                  <small>{t("lecAttendance.statRateDesc")}</small>
                 </div>
               </div>
             </div>
@@ -385,14 +386,13 @@ export default function LecturerAttendance() {
               <div className="attendance-panel-header">
                 <div>
                   <span className="panel-label">
-                    RECORD FILTERS
+                    {t("lecAttendance.filtersEyebrow")}
                   </span>
 
-                  <h3>Attendance history</h3>
+                  <h3>{t("lecAttendance.filtersTitle")}</h3>
 
                   <p>
-                    Use the filters to inspect specific
-                    attendance records.
+                    {t("lecAttendance.filtersDesc")}
                   </p>
                 </div>
               </div>
@@ -407,14 +407,14 @@ export default function LecturerAttendance() {
                     onChange={(event) =>
                       setSearch(event.target.value)
                     }
-                    placeholder="Search student, course or section..."
-                    aria-label="Search student, course or section"
+                    placeholder={t("lecAttendance.searchPh")}
+                    aria-label={t("lecAttendance.searchAria")}
                   />
                 </div>
 
                 <div className="attendance-filter-field">
                   <label htmlFor="attendance-section">
-                    Section
+                    {t("lecAttendance.fieldSection")}
                   </label>
 
                   <select
@@ -425,7 +425,7 @@ export default function LecturerAttendance() {
                     }
                     disabled={sectionsLoading}
                   >
-                    <option value="all">All sections</option>
+                    <option value="all">{t("lecAttendance.allSections")}</option>
 
                     {sections.map((section) => {
                       const id = getSectionId(section);
@@ -441,7 +441,7 @@ export default function LecturerAttendance() {
 
                 <div className="attendance-filter-field">
                   <label htmlFor="attendance-status">
-                    Status
+                    {t("lecAttendance.fieldStatus")}
                   </label>
 
                   <select
@@ -451,16 +451,16 @@ export default function LecturerAttendance() {
                       setStatusFilter(event.target.value)
                     }
                   >
-                    <option value="all">All statuses</option>
-                    <option value="present">Present</option>
-                    <option value="late">Late</option>
-                    <option value="absent">Absent</option>
-                    <option value="excused">Excused</option>
+                    <option value="all">{t("lecAttendance.allStatuses")}</option>
+                    <option value="present">{t("lecAttendance.statusPresent")}</option>
+                    <option value="late">{t("lecAttendance.statusLate")}</option>
+                    <option value="absent">{t("lecAttendance.statusAbsent")}</option>
+                    <option value="excused">{t("lecAttendance.statusExcused")}</option>
                   </select>
                 </div>
 
                 <div className="attendance-filter-field">
-                  <label htmlFor="attendance-from">From</label>
+                  <label htmlFor="attendance-from">{t("lecAttendance.fieldFrom")}</label>
 
                   <input
                     id="attendance-from"
@@ -473,7 +473,7 @@ export default function LecturerAttendance() {
                 </div>
 
                 <div className="attendance-filter-field">
-                  <label htmlFor="attendance-to">To</label>
+                  <label htmlFor="attendance-to">{t("lecAttendance.fieldTo")}</label>
 
                   <input
                     id="attendance-to"
@@ -490,7 +490,7 @@ export default function LecturerAttendance() {
                   className="clear-attendance-filters"
                   onClick={clearFilters}
                 >
-                  Clear
+                  {t("lecAttendance.clear")}
                 </button>
               </div>
 
@@ -506,28 +506,28 @@ export default function LecturerAttendance() {
                     <div className="loading-spinner" />
 
                     <strong>
-                      Loading attendance records
+                      {t("lecAttendance.loadingTitle")}
                     </strong>
 
                     <span>
-                      Reading attendance data...
+                      {t("lecAttendance.loadingDesc")}
                     </span>
                   </div>
                 ) : filteredRecords.length === 0 ? (
                   <div className="attendance-empty">
                     <div className="empty-icon">AT</div>
 
-                    <h3>No attendance records</h3>
+                    <h3>{t("lecAttendance.emptyTitle")}</h3>
 
                     <p>
-                      No records match the current filters.
+                      {t("lecAttendance.emptyDesc")}
                     </p>
 
                     <button
                       type="button"
                       onClick={clearFilters}
                     >
-                      Clear Filters
+                      {t("lecAttendance.clearFilters")}
                     </button>
                   </div>
                 ) : (
@@ -568,7 +568,7 @@ export default function LecturerAttendance() {
                                     {row?.student_code ||
                                       row?.studentCode ||
                                       row?.email ||
-                                      "Student"}
+                                      t("lecAttendance.studentFallback")}
                                   </span>
                                 </div>
                               </div>
@@ -583,7 +583,7 @@ export default function LecturerAttendance() {
 
                             <div className="attendance-mobile-grid">
                               <div>
-                                <span>Course</span>
+                                <span>{t("lecAttendance.colCourse")}</span>
                                 <strong>
                                   {row?.course_code ||
                                     row?.courseCode ||
@@ -592,7 +592,7 @@ export default function LecturerAttendance() {
                               </div>
 
                               <div>
-                                <span>Section</span>
+                                <span>{t("lecAttendance.colSection")}</span>
                                 <strong>
                                   {row?.section_name ||
                                     row?.sectionName ||
@@ -601,7 +601,7 @@ export default function LecturerAttendance() {
                               </div>
 
                               <div>
-                                <span>Date</span>
+                                <span>{t("lecAttendance.colDate")}</span>
                                 <strong>
                                   {formatDate(
                                     row?.session_date ||
@@ -611,7 +611,7 @@ export default function LecturerAttendance() {
                               </div>
 
                               <div>
-                                <span>Time</span>
+                                <span>{t("lecAttendance.colTime")}</span>
                                 <strong>
                                   {formatTime(
                                     row?.scheduled_start ||
@@ -626,14 +626,14 @@ export default function LecturerAttendance() {
                               </div>
 
                               <div>
-                                <span>Source</span>
+                                <span>{t("lecAttendance.colSource")}</span>
                                 <strong>
                                   {row?.source || "-"}
                                 </strong>
                               </div>
 
                               <div>
-                                <span>Validation</span>
+                                <span>{t("lecAttendance.colValidation")}</span>
                                 <strong>
                                   {row?.validation_status ||
                                     row?.validationStatus ||
@@ -650,14 +650,14 @@ export default function LecturerAttendance() {
                       <table className="lecturer-attendance-table">
                         <thead>
                           <tr>
-                            <th>Student</th>
-                            <th>Course</th>
-                            <th>Section</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                            <th>Source</th>
-                            <th>Validation</th>
+                            <th>{t("lecAttendance.colStudent")}</th>
+                            <th>{t("lecAttendance.colCourse")}</th>
+                            <th>{t("lecAttendance.colSection")}</th>
+                            <th>{t("lecAttendance.colDate")}</th>
+                            <th>{t("lecAttendance.colTime")}</th>
+                            <th>{t("lecAttendance.colStatus")}</th>
+                            <th>{t("lecAttendance.colSource")}</th>
+                            <th>{t("lecAttendance.colValidation")}</th>
                           </tr>
                         </thead>
 
@@ -694,7 +694,7 @@ export default function LecturerAttendance() {
                                         {row?.student_code ||
                                           row?.studentCode ||
                                           row?.email ||
-                                          "Student"}
+                                          t("lecAttendance.studentFallback")}
                                       </span>
                                     </div>
                                   </div>
@@ -711,7 +711,7 @@ export default function LecturerAttendance() {
                                     <span>
                                       {row?.course_name ||
                                         row?.courseName ||
-                                        "Course"}
+                                        t("lecAttendance.courseFallback")}
                                     </span>
                                   </div>
                                 </td>

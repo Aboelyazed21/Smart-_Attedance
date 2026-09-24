@@ -16,6 +16,7 @@ import {
   } from "../../services/api";
   
   import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../utils/i18n";
 import "./LecturerSession.css";
   
   
@@ -69,6 +70,7 @@ import "./LecturerSession.css";
   ========================================================= */
   
   export default function LecturerSessions() {
+    const { t } = useLanguage();
   
     const navigate = useNavigate();
   
@@ -255,7 +257,7 @@ import "./LecturerSession.css";
   
         setError(
           err.message ||
-            "Failed to load attendance sessions."
+            t("lecSessions.loadError")
         );
   
       } finally {
@@ -338,7 +340,7 @@ import "./LecturerSession.css";
       ) {
   
         setError(
-          "Please complete all required session fields."
+          t("lecSessions.completeFields")
         );
   
         return;
@@ -351,7 +353,7 @@ import "./LecturerSession.css";
       ) {
   
         setError(
-          "End time must be after start time."
+          t("lecSessions.endAfterStart")
         );
   
         return;
@@ -409,7 +411,7 @@ import "./LecturerSession.css";
   
         setError(
           err.message ||
-            "Failed to create session."
+            t("lecSessions.createError")
         );
   
       } finally {
@@ -467,7 +469,7 @@ import "./LecturerSession.css";
 
         setError(
           err.message ||
-            "Failed to open attendance session."
+            t("lecSessions.openError")
         );
 
       } finally {
@@ -610,7 +612,7 @@ import "./LecturerSession.css";
   
         setError(
           err.message ||
-            "Failed to refresh QR code."
+            t("lecSessions.refreshQrError")
         );
       }
     }
@@ -626,7 +628,7 @@ import "./LecturerSession.css";
   
       const confirmed =
         window.confirm(
-          "Are you sure you want to close this attendance session?"
+          t("lecSessions.closeConfirm")
         );
   
       if (!confirmed) {
@@ -669,7 +671,7 @@ import "./LecturerSession.css";
   
         setError(
           err.message ||
-            "Failed to close session."
+            t("lecSessions.closeError")
         );
   
       } finally {
@@ -728,7 +730,7 @@ import "./LecturerSession.css";
   
         setError(
           err.message ||
-            "Failed to load attendance roster."
+            t("lecSessions.rosterError")
         );
   
       } finally {
@@ -805,16 +807,15 @@ import "./LecturerSession.css";
   
             <div>
               <div style={eyebrow}>
-                LECTURER PORTAL
+                {t("lecSessions.eyebrow")}
               </div>
   
               <h1 style={title}>
-                Attendance Sessions
+                {t("nav.sessions")}
               </h1>
   
               <p style={subtitle}>
-                Manage attendance sessions
-                and QR attendance.
+                {t("lecSessions.loadingSubtitle")}
               </p>
             </div>
   
@@ -828,12 +829,11 @@ import "./LecturerSession.css";
               <div style={spinner}></div>
   
               <h3>
-                Loading sessions
+                {t("lecSessions.loadingTitle")}
               </h3>
   
               <p>
-                Preparing your attendance
-                sessions.
+                {t("lecSessions.loadingDesc")}
               </p>
   
             </div>
@@ -862,16 +862,15 @@ import "./LecturerSession.css";
           <div>
   
             <div style={eyebrow}>
-              LECTURER PORTAL
+              {t("lecSessions.eyebrow")}
             </div>
   
             <h1 style={title}>
-              Attendance Sessions
+              {t("nav.sessions")}
             </h1>
   
             <p style={subtitle}>
-              Create sessions, open QR attendance,
-              and monitor your students.
+              {t("lecSessions.subtitle")}
             </p>
   
           </div>
@@ -888,7 +887,7 @@ import "./LecturerSession.css";
                 )
               }
             >
-              My Sections
+              {t("nav.mySections")}
             </button>
   
   
@@ -897,7 +896,7 @@ import "./LecturerSession.css";
               style={secondaryButton}
               onClick={loadData}
             >
-              Refresh
+              {t("action.refresh")}
             </button>
   
   
@@ -910,7 +909,7 @@ import "./LecturerSession.css";
                 )
               }
             >
-              Create Session
+              {t("lecSessions.createSession")}
             </button>
   
           </div>
@@ -929,7 +928,7 @@ import "./LecturerSession.css";
             <div style={errorBox}>
   
               <strong>
-                Attention
+                {t("lecSessions.attention")}
               </strong>
   
               <span>
@@ -948,11 +947,11 @@ import "./LecturerSession.css";
             <div>
   
               <span style={filterLabel}>
-                SECTION
+                {t("lecSessions.sectionEyebrow")}
               </span>
   
               <h3 style={filterTitle}>
-                Attendance sessions
+                {t("lecSessions.filterTitle")}
               </h3>
   
             </div>
@@ -971,7 +970,7 @@ import "./LecturerSession.css";
             >
   
               <option value="all">
-                All my sections
+                {t("lecSessions.allSections")}
               </option>
   
               {sections.map(
@@ -988,10 +987,10 @@ import "./LecturerSession.css";
                     }
                   >
                     {section.course_code ||
-                      "COURSE"}{" "}
+                      t("lecSessions.courseFallback")}{" "}
                     —{" "}
                     {section.section_name ||
-                      "Section"}
+                      t("lecSessions.sectionFallback")}
                   </option>
   
                 )
@@ -1015,12 +1014,11 @@ import "./LecturerSession.css";
               </div>
   
               <h2>
-                No attendance sessions
+                {t("lecSessions.emptyTitle")}
               </h2>
   
               <p>
-                Create your first attendance
-                session to start taking attendance.
+                {t("lecSessions.emptyDesc")}
               </p>
   
               <button
@@ -1032,7 +1030,7 @@ import "./LecturerSession.css";
                   )
                 }
               >
-                Create Session
+                {t("lecSessions.createSession")}
               </button>
   
             </div>
@@ -1081,7 +1079,7 @@ import "./LecturerSession.css";
                         <span style={courseBadge}>
                           {section?.course_code ||
                             session.course_code ||
-                            "COURSE"}
+                            t("lecSessions.courseFallback")}
                         </span>
   
                         <span
@@ -1095,7 +1093,7 @@ import "./LecturerSession.css";
                           }}
                         >
                           {status ||
-                            "scheduled"}
+                            t("lecSessions.statusScheduled")}
                         </span>
   
                       </div>
@@ -1104,12 +1102,12 @@ import "./LecturerSession.css";
                       <h2 style={sessionTitle}>
                         {section?.course_name ||
                           session.course_name ||
-                          "Attendance Session"}
+                          t("lecSessions.sessionFallback")}
                       </h2>
   
   
                       <p style={sectionText}>
-                        Section{" "}
+                        {t("lecSessions.sectionWord")}{" "}
                         {section?.section_name ||
                           session.section_name ||
                           "—"}
@@ -1121,7 +1119,7 @@ import "./LecturerSession.css";
                         <div style={detailRow}>
   
                           <span>
-                            Date
+                            {t("lecSessions.dateLabel")}
                           </span>
   
                           <strong>
@@ -1136,7 +1134,7 @@ import "./LecturerSession.css";
                         <div style={detailRow}>
   
                           <span>
-                            Time
+                            {t("lecSessions.timeLabel")}
                           </span>
   
                           <strong>
@@ -1155,13 +1153,13 @@ import "./LecturerSession.css";
                         <div style={detailRow}>
   
                           <span>
-                            Room
+                            {t("lecSessions.roomLabel")}
                           </span>
   
                           <strong>
                             {session.room_name ||
                               session.room ||
-                              "Not assigned"}
+                              t("lecSessions.noRoom")}
                           </strong>
   
                         </div>
@@ -1186,8 +1184,8 @@ import "./LecturerSession.css";
                             }
                           >
                             {status === "active"
-                              ? "Open QR"
-                              : "Start Attendance"}
+                              ? t("lecSessions.openQr")
+                              : t("lecSessions.startAttendance")}
                           </button>
   
                         )}
@@ -1202,7 +1200,7 @@ import "./LecturerSession.css";
                             )
                           }
                         >
-                          View Attendance
+                          {t("lecSessions.viewAttendance")}
                         </button>
   
                       </div>
@@ -1235,16 +1233,15 @@ import "./LecturerSession.css";
                 <div>
   
                   <span style={modalEyebrow}>
-                    NEW SESSION
+                    {t("lecSessions.newSessionEyebrow")}
                   </span>
   
                   <h2>
-                    Create Attendance Session
+                    {t("lecSessions.createTitle")}
                   </h2>
   
                   <p>
-                    Set the section, date,
-                    time and room.
+                    {t("lecSessions.createDesc")}
                   </p>
   
                 </div>
@@ -1276,7 +1273,7 @@ import "./LecturerSession.css";
                   <div style={formGroup}>
   
                     <label>
-                      Section
+                      {t("lecSessions.fieldSection")}
                     </label>
   
                     <select
@@ -1292,7 +1289,7 @@ import "./LecturerSession.css";
                     >
   
                       <option value="">
-                        Select section
+                        {t("lecSessions.selectSection")}
                       </option>
   
                       {sections.map(
@@ -1309,10 +1306,10 @@ import "./LecturerSession.css";
                             }
                           >
                             {section.course_code ||
-                              "COURSE"}{" "}
+                              t("lecSessions.courseFallback")}{" "}
                             —{" "}
                             {section.section_name ||
-                              "Section"}
+                              t("lecSessions.sectionFallback")}
                           </option>
   
                         )
@@ -1326,7 +1323,7 @@ import "./LecturerSession.css";
                   <div style={formGroup}>
   
                     <label>
-                      Room
+                      {t("lecSessions.fieldRoom")}
                     </label>
   
                     <select
@@ -1341,7 +1338,7 @@ import "./LecturerSession.css";
                     >
   
                       <option value="">
-                        No room selected
+                        {t("lecSessions.noRoomSelected")}
                       </option>
   
                       {rooms.map(
@@ -1361,7 +1358,7 @@ import "./LecturerSession.css";
                             {room.room_name ||
                               room.roomName ||
                               room.name ||
-                              `Room ${room.id}`}
+                              t("lecSessions.roomFallback").replace("{n}", room.id)}
                           </option>
   
                         )
@@ -1375,7 +1372,7 @@ import "./LecturerSession.css";
                   <div style={formGroup}>
   
                     <label>
-                      Session Date
+                      {t("lecSessions.fieldDate")}
                     </label>
   
                     <input
@@ -1397,7 +1394,7 @@ import "./LecturerSession.css";
                   <div style={formGroup}>
   
                     <label>
-                      Start Time
+                      {t("lecSessions.fieldStart")}
                     </label>
   
                     <input
@@ -1419,7 +1416,7 @@ import "./LecturerSession.css";
                   <div style={formGroup}>
   
                     <label>
-                      End Time
+                      {t("lecSessions.fieldEnd")}
                     </label>
   
                     <input
@@ -1454,7 +1451,7 @@ import "./LecturerSession.css";
                       loadingAction
                     }
                   >
-                    Cancel
+                    {t("lecSessions.cancel")}
                   </button>
   
   
@@ -1466,8 +1463,8 @@ import "./LecturerSession.css";
                     }
                   >
                     {loadingAction
-                      ? "Creating..."
-                      : "Create Session"}
+                      ? t("lecSessions.creating")
+                      : t("lecSessions.createSession")}
                   </button>
   
                 </div>
@@ -1496,17 +1493,16 @@ import "./LecturerSession.css";
                 <div>
   
                   <span style={modalEyebrow}>
-                    ATTENDANCE SESSION
+                    {t("lecSessions.qrEyebrow")}
                   </span>
   
                   <h2>
                     {selectedSession?.course_name ||
-                      "Attendance QR"}
+                      t("lecSessions.qrFallback")}
                   </h2>
   
                   <p>
-                    Students can scan this QR
-                    code to record attendance.
+                    {t("lecSessions.qrDesc")}
                   </p>
   
                 </div>
@@ -1532,14 +1528,14 @@ import "./LecturerSession.css";
   
                   <img
                     src={qrDataUrl}
-                    alt="Attendance QR Code"
+                    alt={t("lecSessions.qrAlt")}
                     style={qrImage}
                   />
   
                 ) : (
   
                   <div style={qrEmpty}>
-                    QR code unavailable
+                    {t("lecSessions.qrUnavailable")}
                   </div>
   
                 )}
@@ -1549,14 +1545,14 @@ import "./LecturerSession.css";
   
                   <div style={liveIndicator}>
                     <span style={liveDot}></span>
-                    Session Active
+                    {t("lecSessions.sessionActive")}
                   </div>
   
   
                   <div style={countdownBox}>
   
                     <span>
-                      QR refreshes in
+                      {t("lecSessions.qrRefreshIn")}
                     </span>
   
                     <strong>
@@ -1568,7 +1564,7 @@ import "./LecturerSession.css";
   
                   {qrVersion && (
                     <div style={versionText}>
-                      QR Version {qrVersion}
+                      {t("lecSessions.qrVersion").replace("{n}", qrVersion)}
                     </div>
                   )}
   
@@ -1589,7 +1585,7 @@ import "./LecturerSession.css";
                       loadingAction
                     }
                   >
-                    Refresh QR
+                    {t("lecSessions.refreshQr")}
                   </button>
   
   
@@ -1605,7 +1601,7 @@ import "./LecturerSession.css";
                       loadingAction
                     }
                   >
-                    Close Session
+                    {t("lecSessions.closeSession")}
                   </button>
   
                 </div>
@@ -1634,16 +1630,16 @@ import "./LecturerSession.css";
                 <div>
   
                   <span style={modalEyebrow}>
-                    ATTENDANCE
+                    {t("lecSessions.rosterEyebrow")}
                   </span>
   
                   <h2>
-                    Session Roster
+                    {t("lecSessions.rosterTitle")}
                   </h2>
   
                   <p>
                     {selectedSession?.course_name ||
-                      "Attendance session"}
+                      t("lecSessions.rosterFallback")}
                   </p>
   
                 </div>
@@ -1667,13 +1663,13 @@ import "./LecturerSession.css";
               {loadingRoster ? (
   
                 <div style={rosterLoading}>
-                  Loading attendance...
+                  {t("lecSessions.rosterLoading")}
                 </div>
   
               ) : roster.length === 0 ? (
   
                 <div style={rosterEmpty}>
-                  No attendance records yet.
+                  {t("lecSessions.rosterEmpty")}
                 </div>
   
               ) : (
@@ -1687,15 +1683,15 @@ import "./LecturerSession.css";
                       <tr>
   
                         <th>
-                          Student
+                          {t("lecSessions.colStudent")}
                         </th>
   
                         <th>
-                          Status
+                          {t("lecSessions.colStatus")}
                         </th>
   
                         <th>
-                          Time
+                          {t("lecSessions.colTime")}
                         </th>
   
                       </tr>
@@ -1751,7 +1747,7 @@ import "./LecturerSession.css";
                                     <strong>
                                       {student.student_name ||
                                         student.name ||
-                                        "Student"}
+                                        t("lecSessions.studentFallback")}
                                     </strong>
   
                                     <small>
@@ -1780,9 +1776,9 @@ import "./LecturerSession.css";
                                   {present
                                     ? attendanceStatus ===
                                       "late"
-                                      ? "Late"
-                                      : "Present"
-                                    : "Absent"}
+                                      ? t("lecSessions.statusLate")
+                                      : t("lecSessions.statusPresent")
+                                    : t("lecSessions.statusAbsent")}
                                 </span>
   
                               </td>

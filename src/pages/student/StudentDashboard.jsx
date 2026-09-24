@@ -5,6 +5,7 @@ import {
 } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
+import { useLanguage } from "../../utils/i18n";
 import "../../App.css";
 import "./StudentDashboard.css";
 
@@ -98,6 +99,7 @@ function formatStatus(value) {
 }
 
 function StudentDashboard() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -132,7 +134,7 @@ function StudentDashboard() {
     } catch (err) {
       setError(
         err.message ||
-          "Failed to load attendance data."
+          t("stuDash.loadError")
       );
     } finally {
       setLoading(false);
@@ -222,7 +224,7 @@ function StudentDashboard() {
   }
 
   const firstName =
-    user?.first_name || user?.firstName || "Student";
+    user?.first_name || user?.firstName || t("role.student");
 
   const lastName =
     user?.last_name || user?.lastName || "";
@@ -285,7 +287,7 @@ function StudentDashboard() {
       item.session_date;
 
     if (!value) {
-      return "Not available";
+      return t("stuDash.notAvailable");
     }
 
     const date = new Date(value);
@@ -309,29 +311,29 @@ function StudentDashboard() {
       item.course_name ||
       item.course_code ||
       item.section_name ||
-      "Attendance Session"
+      t("stuDash.sessionFallback")
     );
   }
 
   const navItems = [
     {
       path: "/dashboard",
-      label: "Dashboard",
+      label: t("nav.dashboard"),
       icon: "dashboard",
     },
     {
       path: "/student/attendance",
-      label: "My Attendance",
+      label: t("nav.myAttendance"),
       icon: "calendar",
     },
     {
       path: "/student/scan",
-      label: "Scan Attendance",
+      label: t("nav.scan"),
       icon: "scan",
     },
     {
       path: "/student/correction-requests",
-      label: "Correction Requests",
+      label: t("nav.corrections"),
       icon: "edit",
     },
   ];
@@ -339,20 +341,20 @@ function StudentDashboard() {
   const quickActions = [
     {
       path: "/student/scan",
-      title: "Scan Attendance",
-      text: "Mark your attendance",
+      title: t("stuDash.quickScanTitle"),
+      text: t("stuDash.quickScanText"),
       icon: "scan",
     },
     {
       path: "/student/attendance",
-      title: "My Attendance",
-      text: "View full attendance",
+      title: t("stuDash.quickHistoryTitle"),
+      text: t("stuDash.quickHistoryText"),
       icon: "calendar",
     },
     {
       path: "/student/correction-requests",
-      title: "Correction Request",
-      text: "Report an issue",
+      title: t("stuDash.quickCorrectionTitle"),
+      text: t("stuDash.quickCorrectionText"),
       icon: "edit",
     },
   ];
@@ -361,30 +363,30 @@ function StudentDashboard() {
     {
       tone: "blue",
       icon: "chart",
-      label: "Attendance Rate",
+      label: t("stuDash.rateLabel"),
       value: loading ? "..." : `${stats.percentage}%`,
-      hint: "Overall attendance",
+      hint: t("stuDash.rateHint"),
     },
     {
       tone: "green",
       icon: "calendar",
-      label: "Present",
+      label: t("stuDash.presentLabel"),
       value: loading ? "..." : stats.present,
-      hint: "Accepted attendance",
+      hint: t("stuDash.presentHint"),
     },
     {
       tone: "orange",
       icon: "clock",
-      label: "Late",
+      label: t("stuDash.lateLabel"),
       value: loading ? "..." : stats.late,
-      hint: "Late attendance",
+      hint: t("stuDash.lateHint"),
     },
     {
       tone: "red",
       icon: "layers",
-      label: "Absent",
+      label: t("stuDash.absentLabel"),
       value: loading ? "..." : stats.absent,
-      hint: "Missing attendance",
+      hint: t("stuDash.absentHint"),
     },
   ];
 
@@ -411,7 +413,7 @@ function StudentDashboard() {
             <h2>Attendify</h2>
 
             <span>
-              SMART ATTENDANCE
+              {t("brand.tagline")}
             </span>
           </div>
 
@@ -429,13 +431,13 @@ function StudentDashboard() {
             </strong>
 
             <span>
-              Student
+              {t("role.student")}
             </span>
           </div>
 
         </div>
 
-        <nav className="student-nav" aria-label="Student pages">
+        <nav className="student-nav" aria-label={t("stuDash.navLabel")}>
 
           {navItems.map((item) => (
             <button
@@ -467,7 +469,7 @@ function StudentDashboard() {
             <span>
               <Icon name="logout" size={16} />
             </span>
-            Logout
+            {t("action.logout")}
           </button>
 
         </div>
@@ -477,13 +479,13 @@ function StudentDashboard() {
       <label
         htmlFor="student-dashboard-drawer"
         className="sidebar-overlay"
-        aria-label="Close navigation menu"
+        aria-label={t("a11y.closeNav")}
       />
 
       <label
         htmlFor="student-dashboard-drawer"
         className="mobile-menu-btn"
-        aria-label="Open navigation menu"
+        aria-label={t("a11y.openNav")}
       >
         <span />
         <span />
@@ -496,11 +498,11 @@ function StudentDashboard() {
 
           <div>
             <h1>
-              Student Dashboard
+              {t("stuDash.title")}
             </h1>
 
             <p>
-              Welcome back, {firstName}
+              {t("stuDash.welcome").replace("{n}", firstName)}
             </p>
           </div>
 
@@ -527,7 +529,7 @@ function StudentDashboard() {
                 type="button"
                 onClick={loadAttendance}
               >
-                Try again
+                {t("stuDash.tryAgain")}
               </button>
             </div>
           )}
@@ -573,11 +575,11 @@ function StudentDashboard() {
 
                 <div>
                   <h2>
-                    Recent Attendance
+                    {t("stuDash.recentTitle")}
                   </h2>
 
                   <p>
-                    Your latest attendance records
+                    {t("stuDash.recentSub")}
                   </p>
                 </div>
 
@@ -588,16 +590,14 @@ function StudentDashboard() {
                       "/student/attendance"
                     )
                   }
-                >
-                  View All
-                </button>
+                >{t("stuDash.viewAll")}</button>
 
               </div>
 
               {loading ? (
                 <div className="student-empty-state">
                   <div className="student-loading">
-                    Loading attendance...
+                    {t("stuDash.loading")}
                   </div>
                 </div>
               ) : recentAttendance.length ===
@@ -609,12 +609,11 @@ function StudentDashboard() {
                   </div>
 
                   <h3>
-                    No attendance records
+                    {t("stuDash.emptyTitle")}
                   </h3>
 
                   <p>
-                    Your attendance records
-                    will appear here.
+                    {t("stuDash.emptyText")}
                   </p>
 
                   <button
@@ -626,7 +625,7 @@ function StudentDashboard() {
                       )
                     }
                   >
-                    Scan Attendance
+                    {t("nav.scan")}
                   </button>
 
                 </div>
@@ -691,7 +690,7 @@ function StudentDashboard() {
 
                 <div>
                   <h2>
-                    Quick Actions
+                    {t("stuDash.quickTitle")}
                   </h2>
 
                   <p>
@@ -749,11 +748,11 @@ function StudentDashboard() {
 
               <div>
                 <h2>
-                  My Information
+                  {t("stuDash.infoTitle")}
                 </h2>
 
                 <p>
-                  Your account information
+                  {t("stuDash.infoSub")}
                 </p>
               </div>
 
@@ -763,7 +762,7 @@ function StudentDashboard() {
 
               <div>
                 <span>
-                  Full Name
+                  {t("stuDash.fullName")}
                 </span>
 
                 <strong>
@@ -773,17 +772,17 @@ function StudentDashboard() {
 
               <div>
                 <span>
-                  Email
+                  {t("stuDash.email")}
                 </span>
 
                 <strong>
-                  {user?.email || "Not provided"}
+                  {user?.email || t("stuDash.notProvided")}
                 </strong>
               </div>
 
               <div>
                 <span>
-                  Student ID
+                  {t("stuDash.studentId")}
                 </span>
 
                 <strong>
@@ -791,13 +790,13 @@ function StudentDashboard() {
                     user?.studentCode ||
                     user?.university_id ||
                     user?.student_id ||
-                    "Not assigned"}
+                    t("stuDash.notAssigned")}
                 </strong>
               </div>
 
               <div>
                 <span>
-                  Account Status
+                  {t("stuDash.accountStatus")}
                 </span>
 
                 <strong className="student-active-text">

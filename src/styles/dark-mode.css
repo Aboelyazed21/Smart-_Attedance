@@ -8,38 +8,38 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --att-navy: #e6ebf4;
-  --att-navy-soft: #c4cede;
-  --att-page: #0e1626;
-  --att-card: #16203a;
-  --att-primary: #6ea8ff;
-  --att-primary-dark: #9cc2ff;
-  --att-primary-soft: #1b2a4d;
-  --att-text: #e6ebf4;
-  --att-muted: #9aa7bd;
-  --att-subtle: #7c8aa0;
-  --att-border: #26334f;
-  --att-border-soft: #1d2942;
-  --att-header: #0b1222;
-  --att-heading: #e6ebf4;
+  --att-navy: #edf1f9;
+  --att-navy-soft: #ccd6e8;
+  --att-page: #1d2a47;
+  --att-card: #26365a;
+  --att-primary: #7fb0ff;
+  --att-primary-dark: #aecbff;
+  --att-primary-soft: #31487c;
+  --att-text: #edf1f9;
+  --att-muted: #a9b7d0;
+  --att-subtle: #8e9cb8;
+  --att-border: #3a4e78;
+  --att-border-soft: #2e4066;
+  --att-header: #16213a;
+  --att-heading: #edf1f9;
   --att-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 /* ---------- Page base ---------- */
 
 [data-theme="dark"] body {
-  background: #0e1626;
-  color: #e6ebf4;
+  background: #1d2a47;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] #root {
-  background: #0e1626;
+  background: #1d2a47;
 }
 
 /* ---------- Auth (login / register / forgot / reset) ---------- */
 
 [data-theme="dark"] .login-page {
-  background: #0e1626;
+  background: #1d2a47;
 }
 
 [data-theme="dark"] .login-page::after {
@@ -47,7 +47,7 @@
 }
 
 [data-theme="dark"] .login-page.auth-split {
-  background: #0e1626;
+  background: #1d2a47;
 }
 
 [data-theme="dark"] .login-page.auth-split .brand,
@@ -57,7 +57,7 @@
 }
 
 [data-theme="dark"] .login-page.auth-split .brand-text p {
-  color: #9aa7bd;
+  color: #a9b7d0;
 }
 
 [data-theme="dark"] .login-page.auth-split .brand-logo {
@@ -67,55 +67,55 @@
 
 [data-theme="dark"] .login-card,
 [data-theme="dark"] .register-card {
-  background: #16203a;
-  border-color: #26334f;
+  background: #26365a;
+  border-color: #3a4e78;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="dark"] .app-name,
 [data-theme="dark"] .welcome-section h3 {
-  color: #e6ebf4;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] .app-description,
 [data-theme="dark"] .welcome-section p {
-  color: #9aa7bd;
+  color: #a9b7d0;
 }
 
 [data-theme="dark"] .form-group label {
-  color: #c4cede;
+  color: #ccd6e8;
 }
 
 [data-theme="dark"] .input-container {
-  background: #101a30;
-  border-color: #2c3a5c;
+  background: #1a2540;
+  border-color: #42567f;
 }
 
 [data-theme="dark"] .input-container input {
-  color: #e6ebf4;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] .input-container input::placeholder {
-  color: #7c8aa0;
+  color: #8e9cb8;
 }
 
 [data-theme="dark"] .login-page.auth-split .page-footer,
 [data-theme="dark"] .page-footer {
-  color: #9aa7bd;
+  color: #a9b7d0;
 }
 
 [data-theme="dark"] .page-footer .tagline {
-  color: #c4cede;
+  color: #ccd6e8;
   text-shadow: none;
 }
 
 [data-theme="dark"] .page-footer .university-name {
-  color: #7c8aa0;
+  color: #8e9cb8;
   opacity: 1;
 }
 
 [data-theme="dark"] .page-footer .tagline-line {
-  background: #2c3a5c;
+  background: #42567f;
 }
 
 [data-theme="dark"] .login-page .form-error {
@@ -135,34 +135,34 @@
 [data-theme="dark"] .top-header,
 [data-theme="dark"] .chatbot-topbar,
 [data-theme="dark"] .lecturer-mobile-header {
-  background: #101a30;
-  border-bottom-color: #26334f;
+  background: #1a2540;
+  border-bottom-color: #3a4e78;
 }
 
 [data-theme="dark"] .lecturer-mobile-header-text strong {
-  color: #e6ebf4;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] .lecturer-mobile-header-text span,
 [data-theme="dark"] .chatbot-topbar-title span {
-  color: #9aa7bd;
+  color: #a9b7d0;
 }
 
 [data-theme="dark"] .chatbot-topbar-title strong {
-  color: #e6ebf4;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] .language-button,
 [data-theme="dark"] .lecturer-menu-button,
 [data-theme="dark"] .hamburger {
-  background: #16203a;
-  border-color: #2c3a5c;
-  color: #e6ebf4;
+  background: #26365a;
+  border-color: #42567f;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] .lecturer-menu-button span,
 [data-theme="dark"] .hamburger span {
-  background: #e6ebf4;
+  background: #edf1f9;
 }
 
 /* ---------- Cards / panels ---------- */
@@ -182,26 +182,26 @@
 [data-theme="dark"] .chatbot-hero,
 [data-theme="dark"] .dashboard-panel,
 [data-theme="dark"] .stat-card {
-  background: #16203a;
-  border-color: #26334f;
+  background: #26365a;
+  border-color: #3a4e78;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 /* ---------- Tables ---------- */
 
 [data-theme="dark"] table {
-  background: #16203a;
+  background: #26365a;
 }
 
 [data-theme="dark"] th {
-  background: #101a30;
-  color: #9aa7bd;
-  border-bottom-color: #26334f;
+  background: #1a2540;
+  color: #a9b7d0;
+  border-bottom-color: #3a4e78;
 }
 
 [data-theme="dark"] td {
-  border-bottom-color: #1d2942;
-  color: #c4cede;
+  border-bottom-color: #2e4066;
+  color: #ccd6e8;
 }
 
 /* ---------- Forms ---------- */
@@ -209,14 +209,14 @@
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background: #101a30;
-  border-color: #2c3a5c;
-  color: #e6ebf4;
+  background: #1a2540;
+  border-color: #42567f;
+  color: #edf1f9;
 }
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: #7c8aa0;
+  color: #8e9cb8;
 }
 
 [data-theme="dark"] input:focus,
@@ -235,27 +235,27 @@
 [data-theme="dark"] .user-modal,
 [data-theme="dark"] .request-modal,
 [data-theme="dark"] .details-modal {
-  background: #16203a;
-  border: 1px solid #26334f;
+  background: #26365a;
+  border: 1px solid #3a4e78;
 }
 
 /* ---------- Pagination ---------- */
 
 [data-theme="dark"] .tt-pagination-count {
-  color: #9aa7bd;
+  color: #a9b7d0;
 }
 
 [data-theme="dark"] .tt-pagination-controls button,
 [data-theme="dark"] .tt-pagination-perpage {
-  background: #16203a;
-  border-color: #2c3a5c;
-  color: #c4cede;
+  background: #26365a;
+  border-color: #42567f;
+  color: #ccd6e8;
 }
 
 [data-theme="dark"]
   .tt-pagination-controls
   button.current {
-  background: #1b2a4d;
+  background: #31487c;
   border-color: #4f8cff;
   color: #cfe1ff;
 }
@@ -263,31 +263,31 @@
 /* ---------- Chatbot ---------- */
 
 [data-theme="dark"] .student-assistant-panel {
-  background: #16203a;
-  border-color: #26334f;
+  background: #26365a;
+  border-color: #3a4e78;
 }
 
 [data-theme="dark"] .student-assistant-header {
-  border-bottom-color: #26334f;
+  border-bottom-color: #3a4e78;
 }
 
 [data-theme="dark"] .student-assistant-msg {
   background: #1b2745;
-  border-color: #2c3a5c;
+  border-color: #42567f;
   color: #dbe4f3;
 }
 
 [data-theme="dark"] .student-assistant-week {
-  background: #101a30;
-  border-bottom-color: #26334f;
+  background: #1a2540;
+  border-bottom-color: #3a4e78;
 }
 
 [data-theme="dark"] .student-assistant-suggest button,
 [data-theme="dark"] .student-assistant-full,
 [data-theme="dark"] .student-assistant-close {
-  background: #101a30;
-  border-color: #2c3a5c;
-  color: #c4cede;
+  background: #1a2540;
+  border-color: #42567f;
+  color: #ccd6e8;
 }
 
 /* ---------- QR scanner ---------- */
@@ -296,8 +296,8 @@
 [data-theme="dark"] .ready-card,
 [data-theme="dark"] .manual-code-card,
 [data-theme="dark"] .info-card {
-  background: #16203a;
-  border-color: #26334f;
+  background: #26365a;
+  border-color: #3a4e78;
 }
 
 [data-theme="dark"] .confirmation-card,
@@ -305,15 +305,15 @@
 [data-theme="dark"] .recent-attendance-card,
 [data-theme="dark"] .summary-card,
 [data-theme="dark"] .next-card {
-  background: #16203a;
-  border-color: #26334f;
+  background: #26365a;
+  border-color: #3a4e78;
 }
 
 /* ---------- Footer ---------- */
 
 [data-theme="dark"] .app-footer {
-  background: #101a30;
-  border-top-color: #26334f;
+  background: #1a2540;
+  border-top-color: #3a4e78;
 }
 
 /* ---------- Theme toggle ---------- */
@@ -337,7 +337,339 @@
 }
 
 [data-theme="dark"] .theme-toggle {
-  background: #16203a;
-  border-color: #2c3a5c;
-  color: #c4cede;
+  background: #26365a;
+  border-color: #42567f;
+  color: #ccd6e8;
+}
+
+/* ============================================================
+   FULL-PAGE COVERAGE — page scopes with hardcoded light
+   surfaces. html[] prefix outranks page CSS without !important.
+   Palette: light dark mode (#1d2a47 page / #26365a cards).
+   ============================================================ */
+
+/* ---------- Page roots ---------- */
+
+html[data-theme="dark"] .admin-users-page,
+html[data-theme="dark"] .admin-courses-page,
+html[data-theme="dark"] .admin-sections-page,
+html[data-theme="dark"] .admin-settings-page,
+html[data-theme="dark"] .attendance-page,
+html[data-theme="dark"] .rooms-page,
+html[data-theme="dark"] .timetable-page,
+html[data-theme="dark"] .course-details-page,
+html[data-theme="dark"] .lecturer-sections-page,
+html[data-theme="dark"] .lecturer-attendance-page,
+html[data-theme="dark"] .lecturer-session-page,
+html[data-theme="dark"] .sessions-page,
+html[data-theme="dark"] .scan-page,
+html[data-theme="dark"] .confirmation-page,
+html[data-theme="dark"] .correction-page,
+html[data-theme="dark"] .chatbot-page,
+html[data-theme="dark"] .student-profile-page {
+  background: #1d2a47;
+  color: #edf1f9;
+}
+
+/* ---------- Headings inside light pages ---------- */
+
+html[data-theme="dark"] .admin-users-page h1,
+html[data-theme="dark"] .admin-courses-page h1,
+html[data-theme="dark"] .admin-sections-page h1,
+html[data-theme="dark"] .admin-settings-page h1,
+html[data-theme="dark"] .attendance-page h1,
+html[data-theme="dark"] .rooms-page h1,
+html[data-theme="dark"] .timetable-page h1,
+html[data-theme="dark"] .course-details-page h1,
+html[data-theme="dark"] .lecturer-sections-page h1,
+html[data-theme="dark"] .lecturer-attendance-page h1,
+html[data-theme="dark"] .lecturer-session-page h1,
+html[data-theme="dark"] .sessions-page h1,
+html[data-theme="dark"] .scan-page h1,
+html[data-theme="dark"] .confirmation-page h1,
+html[data-theme="dark"] .correction-page h1,
+html[data-theme="dark"] .chatbot-page h1,
+html[data-theme="dark"] .student-profile-page h1,
+html[data-theme="dark"] .admin-users-page h2,
+html[data-theme="dark"] .admin-courses-page h2,
+html[data-theme="dark"] .lecturer-sections-page h2,
+html[data-theme="dark"] .lecturer-attendance-page h2,
+html[data-theme="dark"] .sessions-page h2,
+html[data-theme="dark"] .scan-page h2,
+html[data-theme="dark"] .confirmation-page h2,
+html[data-theme="dark"] .student-profile-page h2,
+html[data-theme="dark"] .lecturer-sections-page h3,
+html[data-theme="dark"] .section-card-content h3,
+html[data-theme="dark"] .sections-empty h3,
+html[data-theme="dark"] .student-profile-page h3 {
+  color: #edf1f9;
+}
+
+/* ---------- Shared admin surfaces ---------- */
+
+html[data-theme="dark"] .dashboard-header,
+html[data-theme="dark"] .dashboard-panel,
+html[data-theme="dark"] .users-panel {
+  background: #26365a;
+  border-color: #3a4e78;
+}
+
+html[data-theme="dark"] .dashboard-header h1,
+html[data-theme="dark"] .users-toolbar h2,
+html[data-theme="dark"] .panel-header h2 {
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .dashboard-header p,
+html[data-theme="dark"] .users-toolbar p,
+html[data-theme="dark"] .panel-header p {
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .users-search,
+html[data-theme="dark"] .users-filter,
+html[data-theme="dark"] .rows-per-page select {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .users-table thead th {
+  background: #22304f;
+  border-bottom-color: #3a4e78;
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .users-table tbody td {
+  border-bottom-color: #2e4066;
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .users-table tbody tr:hover td {
+  background: #22304f;
+}
+
+html[data-theme="dark"] .user-cell strong {
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .user-table-avatar {
+  background: #31487c;
+  color: #cfe1ff;
+}
+
+html[data-theme="dark"] .action-button.edit-button,
+html[data-theme="dark"] .professional-cancel-button,
+html[data-theme="dark"] .modal-close {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .users-pagination,
+html[data-theme="dark"] .pagination-count,
+html[data-theme="dark"] .rows-per-page {
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .users-pagination {
+  border-top-color: #2e4066;
+}
+
+html[data-theme="dark"] .pagination-button {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .form-group input,
+html[data-theme="dark"] .form-group select {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .empty-icon {
+  background: #31487c;
+  color: #cfe1ff;
+}
+
+html[data-theme="dark"] .users-empty h3,
+html[data-theme="dark"] .sections-empty h3 {
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .users-empty p,
+html[data-theme="dark"] .users-loading p {
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .loading-spinner {
+  border-color: #3a4e78;
+}
+
+/* ---------- Lecturer sections surfaces ---------- */
+
+html[data-theme="dark"] .lecturer-sections-topbar,
+html[data-theme="dark"] .sections-hero,
+html[data-theme="dark"] .section-stat-card,
+html[data-theme="dark"] .sections-panel,
+html[data-theme="dark"] .section-card {
+  background: #26365a;
+  border-color: #3a4e78;
+}
+
+html[data-theme="dark"] .sections-toolbar,
+html[data-theme="dark"] .section-card-footer {
+  background: #22304f;
+  border-color: #2e4066;
+}
+
+html[data-theme="dark"] .sections-search input {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .sections-count strong,
+html[data-theme="dark"] .section-stat-card strong,
+html[data-theme="dark"] .student-count strong {
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .refresh-button,
+html[data-theme="dark"] .sections-empty button,
+html[data-theme="dark"] .section-card-footer button {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .student-count,
+html[data-theme="dark"] .section-meta {
+  border-color: #2e4066;
+}
+
+html[data-theme="dark"] .student-count {
+  background: #22304f;
+}
+
+/* ---------- Student topbars and cards ---------- */
+
+html[data-theme="dark"] .student-topbar,
+html[data-theme="dark"] .sessions-topbar,
+html[data-theme="dark"] .scan-topbar,
+html[data-theme="dark"] .confirmation-topbar,
+html[data-theme="dark"] .correction-topbar,
+html[data-theme="dark"] .chatbot-topbar,
+html[data-theme="dark"] .lecturer-attendance-topbar {
+  background: #22304f;
+  border-bottom-color: #2e4066;
+}
+
+html[data-theme="dark"] .brand-text strong,
+html[data-theme="dark"] .top-profile-info strong {
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .profile-logout-btn {
+  background: #1a2540;
+  border-color: #3a4e78;
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .student-main-nav {
+  background: #26365a;
+  border-color: #3a4e78;
+}
+
+html[data-theme="dark"] .student-main-nav button {
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .side-card,
+html[data-theme="dark"] .profile-stat-card,
+html[data-theme="dark"] .scan-card,
+html[data-theme="dark"] .confirmation-card,
+html[data-theme="dark"] .manual-code-card,
+html[data-theme="dark"] .ready-card,
+html[data-theme="dark"] .success-card,
+html[data-theme="dark"] .next-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .info-card,
+html[data-theme="dark"] .chatbot-card,
+html[data-theme="dark"] .chatbot-panel,
+html[data-theme="dark"] .details-modal {
+  background: #26365a;
+  border-color: #3a4e78;
+  color: #edf1f9;
+}
+
+/* ---------- Lecturer attendance / QR / reports ---------- */
+
+html[data-theme="dark"] .attendance-hero,
+html[data-theme="dark"] .attendance-stat-card,
+html[data-theme="dark"] .attendance-panel,
+html[data-theme="dark"] .students-card,
+html[data-theme="dark"] .qr-card {
+  background: #26365a;
+  border-color: #3a4e78;
+}
+
+html[data-theme="dark"] .attendance-filters {
+  background: #22304f;
+}
+
+html[data-theme="dark"] .students-table th {
+  background: #22304f;
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .students-table td {
+  border-bottom-color: #2e4066;
+  color: #ccd6e8;
+}
+
+html[data-theme="dark"] .students-table-wrap {
+  border-color: #2e4066;
+}
+
+/* ---------- Logout page ---------- */
+
+html[data-theme="dark"] .logout-page {
+  background: #1d2a47;
+}
+
+html[data-theme="dark"] .logout-card {
+  background: #26365a;
+  border-color: #3a4e78;
+}
+
+html[data-theme="dark"] .logout-card h1 {
+  color: #edf1f9;
+}
+
+html[data-theme="dark"] .logout-text {
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .logout-footer div:first-child {
+  color: #ccd6e8;
+}
+
+/* ---------- Language toggle ---------- */
+
+html[data-theme="dark"] .lang-toggle {
+  background: #1a2540;
+  border-color: #3a4e78;
+}
+
+html[data-theme="dark"] .lang-toggle button {
+  color: #a9b7d0;
+}
+
+html[data-theme="dark"] .lang-toggle button.active {
+  background: #4f8cff;
+  color: #0c1830;
 }

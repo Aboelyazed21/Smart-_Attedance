@@ -189,7 +189,7 @@ export default function StudentProfile() {
   // Client mirrors of the backend authority in
   // src/utils/validation.js (backend repo).
   const PASSWORD_ERROR =
-    "Password must be 8–12 characters and contain uppercase, lowercase, number, and special character.";
+    t("stuProfile.passwordRule");
 
   const normalizeName = (value) =>
     String(value || "")
@@ -349,7 +349,7 @@ export default function StudentProfile() {
     } catch (requestError) {
       setError(
         requestError.message ||
-          "Could not load your profile."
+          t("stuProfile.loadError")
       );
     } finally {
       setLoading(false);
@@ -484,21 +484,21 @@ export default function StudentProfile() {
       !editForm.email.trim()
     ) {
       setSaveError(
-        "First name, last name, and email are required."
+        t("stuProfile.requiredError")
       );
       return;
     }
 
     if (!isValidName(normalizeName(editForm.firstName))) {
       setSaveError(
-        "Please enter a valid first name."
+        t("stuProfile.firstNameError")
       );
       return;
     }
 
     if (!isValidName(normalizeName(editForm.lastName))) {
       setSaveError(
-        "Please enter a valid last name."
+        t("stuProfile.lastNameError")
       );
       return;
     }
@@ -512,7 +512,7 @@ export default function StudentProfile() {
       !isValidEgyptianPhone(normalizedProfilePhone)
     ) {
       setSaveError(
-        "Phone number must start with 010, 011, or 012 and contain exactly 11 digits."
+        t("stuProfile.phoneError")
       );
       return;
     }
@@ -550,11 +550,11 @@ export default function StudentProfile() {
       }
 
       setEditing(false);
-      setSaveNotice("Your profile was updated.");
+      setSaveNotice(t("stuProfile.saveNotice"));
     } catch (requestError) {
       setSaveError(
         requestError.message ||
-          "Could not update your profile."
+          t("stuProfile.saveError")
       );
     } finally {
       setSaving(false);
@@ -584,7 +584,7 @@ export default function StudentProfile() {
       !passwordForm.newPassword
     ) {
       setPasswordError(
-        "Enter your current and new password."
+        t("stuProfile.passwordRequired")
       );
       return;
     }
@@ -600,7 +600,7 @@ export default function StudentProfile() {
       passwordForm.newPassword !==
       passwordForm.confirmPassword
     ) {
-      setPasswordError("The new passwords do not match.");
+      setPasswordError(t("stuProfile.passwordMismatch"));
       return;
     }
 
@@ -627,12 +627,12 @@ export default function StudentProfile() {
       });
       setShowPasswordForm(false);
       setPasswordNotice(
-        data.message || "Your password was changed."
+        data.message || t("stuProfile.passwordNotice")
       );
     } catch (requestError) {
       setPasswordError(
         requestError.message ||
-          "Could not change your password."
+          t("stuProfile.passwordError")
       );
     } finally {
       setChangingPassword(false);
@@ -660,7 +660,7 @@ export default function StudentProfile() {
           type="button"
           className="student-brand"
           onClick={() => navigateAndClose("/dashboard")}
-          aria-label="Go to dashboard"
+          aria-label={t("a11y.goDashboard")}
         >
           <span
             className="brand-icon"
@@ -678,7 +678,7 @@ export default function StudentProfile() {
         <button
           type="button"
           className="student-profile-mobile-menu"
-          aria-label="Open navigation"
+          aria-label={t("a11y.openNav")}
           aria-expanded={sidebarOpen}
           onClick={() => setSidebarOpen(true)}
         >
@@ -691,7 +691,7 @@ export default function StudentProfile() {
           <button
             type="button"
             className="student-profile-nav-overlay"
-            aria-label="Close navigation"
+            aria-label={t("a11y.closeNav")}
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -726,12 +726,10 @@ export default function StudentProfile() {
             type="button"
             className="profile-logout-btn"
             onClick={handleLogout}
-            aria-label="Logout"
-            title="Logout"
+            aria-label={t("a11y.logout")}
+            title={t("action.logout")}
           >
-            <Icon name="logout" size={15} />
-            Logout
-          </button>
+            <Icon name="logout" size={15} />{t("action.logout")}</button>
         </div>
       </header>
 
@@ -739,16 +737,15 @@ export default function StudentProfile() {
         <div className="profile-page-heading">
           <div>
             <p className="breadcrumb">
-              <span>Home</span>
+              <span>{t("nav.home")}</span>
               <span aria-hidden="true">/</span>
-              <span>My Profile</span>
+              <span>{t("stuProfile.title")}</span>
             </p>
 
-            <h1>My Profile</h1>
+            <h1>{t("stuProfile.title")}</h1>
 
             <p>
-              View and manage your personal account
-              information.
+              {t("stuProfile.headingSub")}
             </p>
           </div>
 
@@ -759,7 +756,7 @@ export default function StudentProfile() {
             disabled={loading}
           >
             <Icon name="refresh" size={15} />
-            {loading ? "Loading" : "Refresh"}
+            {loading ? t("stuProfile.loading") : t("action.refresh")}
           </button>
         </div>
 
@@ -769,17 +766,17 @@ export default function StudentProfile() {
             aria-live="polite"
           >
             <div className="loading-spinner" aria-hidden="true" />
-            <p>Loading profile...</p>
+            <p>{t("stuProfile.loadingProfile")}</p>
           </div>
         )}
 
         {!loading && error && (
           <div className="profile-error" role="alert">
-            <strong>Profile Error</strong>
+            <strong>{t("stuProfile.errorTitle")}</strong>
             <span>{error}</span>
 
             <button type="button" onClick={loadProfile}>
-              Try Again
+              {t("stuProfile.tryAgain")}
             </button>
           </div>
         )}
@@ -798,7 +795,7 @@ export default function StudentProfile() {
 
                 <div className="hero-user-info">
                   <span className="hero-label">
-                    STUDENT ACCOUNT
+                    {t("stuProfile.accountLabel")}
                   </span>
 
                   <h2>{getFullName()}</h2>
@@ -806,17 +803,17 @@ export default function StudentProfile() {
                   <div className="hero-contact">
                     <span>
                       <Icon name="mail" size={14} />
-                      {displayUser.email || "No email"}
+                      {displayUser.email || t("stuProfile.noEmail")}
                     </span>
 
                     <span>
                       <Icon name="phone" size={14} />
-                      {displayUser.phone || "No phone"}
+                      {displayUser.phone || t("stuProfile.noPhone")}
                     </span>
                   </div>
 
                   <div className="hero-badges">
-                    <span className="badge role">Student</span>
+                    <span className="badge role">{t("role.student")}</span>
 
                     <span
                       className={`badge status ${accountStatus}`}
@@ -825,7 +822,7 @@ export default function StudentProfile() {
                     </span>
 
                     <span className="badge code">
-                      ID: {studentCode || "Not assigned"}
+                      {t("stuProfile.idLabel").replace("{n}", studentCode || t("stuProfile.notAssigned"))}
                     </span>
                   </div>
                 </div>
@@ -837,7 +834,7 @@ export default function StudentProfile() {
                 onClick={startEditing}
               >
                 <Icon name="edit" size={15} />
-                Edit Profile
+                {t("stuProfile.editProfile")}
               </button>
             </section>
 
@@ -851,9 +848,9 @@ export default function StudentProfile() {
                 </span>
 
                 <div>
-                  <span>Total Attendance</span>
+                  <span>{t("stuProfile.totalLabel")}</span>
                   <strong>{attendanceRate}%</strong>
-                  <small>Present and late records</small>
+                  <small>{t("stuProfile.totalHint")}</small>
                 </div>
               </div>
 
@@ -863,9 +860,9 @@ export default function StudentProfile() {
                 </span>
 
                 <div>
-                  <span>Present</span>
+                  <span>{t("stuProfile.presentLabel")}</span>
                   <strong>{presentCount}</strong>
-                  <small>Classes attended</small>
+                  <small>{t("stuProfile.presentHint")}</small>
                 </div>
               </div>
 
@@ -875,9 +872,9 @@ export default function StudentProfile() {
                 </span>
 
                 <div>
-                  <span>Late</span>
+                  <span>{t("stuProfile.lateLabel")}</span>
                   <strong>{lateCount}</strong>
-                  <small>Arrived late</small>
+                  <small>{t("stuProfile.lateHint")}</small>
                 </div>
               </div>
 
@@ -887,9 +884,9 @@ export default function StudentProfile() {
                 </span>
 
                 <div>
-                  <span>Records</span>
+                  <span>{t("stuProfile.recordsLabel")}</span>
                   <strong>{recordsCount}</strong>
-                  <small>Total records</small>
+                  <small>{t("stuProfile.recordsHint")}</small>
                 </div>
               </div>
             </section>
@@ -901,8 +898,8 @@ export default function StudentProfile() {
               >
                 <div className="card-header">
                   <div>
-                    <h3>Personal Information</h3>
-                    <p>Your basic account details</p>
+                    <h3>{t("stuProfile.personalTitle")}</h3>
+                    <p>{t("stuProfile.personalSub")}</p>
                   </div>
 
                   {!editing && (
@@ -911,7 +908,7 @@ export default function StudentProfile() {
                       className="small-edit-btn"
                       onClick={startEditing}
                     >
-                      Edit
+                      {t("stuProfile.editBtn")}
                     </button>
                   )}
                 </div>
@@ -928,7 +925,7 @@ export default function StudentProfile() {
                     onSubmit={handleSaveProfile}
                   >
                     <label>
-                      First Name
+                      {t("stuProfile.firstName")}
                       <input
                         name="firstName"
                         value={editForm.firstName}
@@ -939,7 +936,7 @@ export default function StudentProfile() {
                     </label>
 
                     <label>
-                      Last Name
+                      {t("stuProfile.lastName")}
                       <input
                         name="lastName"
                         value={editForm.lastName}
@@ -950,7 +947,7 @@ export default function StudentProfile() {
                     </label>
 
                     <label className="form-full">
-                      Email Address
+                      {t("stuProfile.email")}
                       <input
                         type="email"
                         name="email"
@@ -962,7 +959,7 @@ export default function StudentProfile() {
                     </label>
 
                     <label>
-                      Phone Number
+                      {t("stuProfile.phone")}
                       <input
                         name="phone"
                         type="tel"
@@ -972,13 +969,12 @@ export default function StudentProfile() {
                         autoComplete="tel"
                       />
                       <small className="profile-hint">
-                        Egyptian mobile starting
-                        with 010, 011, or 012.
+                        {t("stuProfile.phoneHint")}
                       </small>
                     </label>
 
                     <label>
-                      Account Status
+                      {t("stuProfile.accountStatus")}
                       <input
                         value={formatStatus(accountStatus)}
                         disabled
@@ -1004,7 +1000,7 @@ export default function StudentProfile() {
                           setSaveError("");
                         }}
                       >
-                        Cancel
+                        {t("stuProfile.cancelBtn")}
                       </button>
 
                       <button
@@ -1013,49 +1009,49 @@ export default function StudentProfile() {
                         disabled={saving}
                       >
                         {saving
-                          ? "Saving..."
-                          : "Save Changes"}
+                          ? t("stuProfile.saving")
+                          : t("stuProfile.saveBtn")}
                       </button>
                     </div>
                   </form>
                 ) : (
                   <div className="information-grid">
                     <div className="info-item">
-                      <span>First Name</span>
+                      <span>{t("stuProfile.firstName")}</span>
                       <strong>
                         {displayUser.first_name ||
                           displayUser.firstName ||
-                          "Not provided"}
+                          t("stuProfile.notProvided")}
                       </strong>
                     </div>
 
                     <div className="info-item">
-                      <span>Last Name</span>
+                      <span>{t("stuProfile.lastName")}</span>
                       <strong>
                         {displayUser.last_name ||
                           displayUser.lastName ||
-                          "Not provided"}
+                          t("stuProfile.notProvided")}
                       </strong>
                     </div>
 
                     <div className="info-item info-full">
-                      <span>Email Address</span>
+                      <span>{t("stuProfile.email")}</span>
                       <strong>
                         {displayUser.email ||
-                          "Not provided"}
+                          t("stuProfile.notProvided")}
                       </strong>
                     </div>
 
                     <div className="info-item">
-                      <span>Phone Number</span>
+                      <span>{t("stuProfile.phone")}</span>
                       <strong>
                         {displayUser.phone ||
-                          "Not provided"}
+                          t("stuProfile.notProvided")}
                       </strong>
                     </div>
 
                     <div className="info-item">
-                      <span>Account Status</span>
+                      <span>{t("stuProfile.accountStatus")}</span>
                       <strong>
                         <span
                           className={`badge status ${accountStatus}`}
@@ -1071,51 +1067,48 @@ export default function StudentProfile() {
               <div className="profile-card academic-card">
                 <div className="card-header">
                   <div>
-                    <h3>Academic Information</h3>
+                    <h3>{t("stuProfile.academicTitle")}</h3>
                     <p>
-                      Information linked to your student
-                      record
+                      {t("stuProfile.academicSub")}
                     </p>
                   </div>
                 </div>
 
                 <div className="information-grid">
                   <div className="info-item">
-                    <span>Student ID</span>
+                    <span>{t("stuProfile.studentId")}</span>
                     <strong>
-                      {studentCode || "Not assigned"}
+                      {studentCode || t("stuProfile.notAssigned")}
                     </strong>
                   </div>
 
                   {department && (
                     <div className="info-item">
-                      <span>Department</span>
+                      <span>{t("stuProfile.department")}</span>
                       <strong>{department}</strong>
                     </div>
                   )}
 
                   {level && (
                     <div className="info-item">
-                      <span>Level / Year</span>
+                      <span>{t("stuProfile.level")}</span>
                       <strong>{level}</strong>
                     </div>
                   )}
 
                   {!department && !level && (
                     <p className="info-note">
-                      Additional academic details are not
-                      available for this account yet.
+                      {t("stuProfile.academicEmpty")}
                     </p>
                   )}
                 </div>
               </div>
 
               <div className="side-card security-card">
-                <h3>Account Security</h3>
+                <h3>{t("stuProfile.securityTitle")}</h3>
 
                 <p>
-                  Keep your account secure by using a
-                  strong private password.
+                  {t("stuProfile.securityText")}
                 </p>
 
                 {passwordNotice && (
@@ -1133,7 +1126,7 @@ export default function StudentProfile() {
                     onSubmit={handleSavePassword}
                   >
                     <label className="form-full">
-                      Current Password
+                      {t("stuProfile.currentPassword")}
                       <input
                         type="password"
                         name="currentPassword"
@@ -1147,7 +1140,7 @@ export default function StudentProfile() {
                     </label>
 
                     <label className="form-full">
-                      New Password
+                      {t("stuProfile.newPassword")}
                       <input
                         type="password"
                         name="newPassword"
@@ -1160,7 +1153,7 @@ export default function StudentProfile() {
                     </label>
 
                     <label className="form-full">
-                      Confirm New Password
+                      {t("stuProfile.confirmPassword")}
                       <input
                         type="password"
                         name="confirmPassword"
@@ -1197,7 +1190,7 @@ export default function StudentProfile() {
                           });
                         }}
                       >
-                        Cancel
+                        {t("stuProfile.cancelBtn")}
                       </button>
 
                       <button
@@ -1206,8 +1199,8 @@ export default function StudentProfile() {
                         disabled={changingPassword}
                       >
                         {changingPassword
-                          ? "Saving..."
-                          : "Change Password"}
+                          ? t("stuProfile.saving")
+                          : t("stuProfile.changePassword")}
                       </button>
                     </div>
                   </form>
@@ -1219,15 +1212,15 @@ export default function StudentProfile() {
                       setShowPasswordForm(true);
                     }}
                   >
-                    Change Password
+                    {t("stuProfile.changePassword")}
                   </button>
                 )}
               </div>
 
               <div className="side-card actions-card">
-                <h3>Quick Actions</h3>
+                <h3>{t("stuProfile.quickTitle")}</h3>
 
-                <p>Common account actions</p>
+                <p>{t("stuProfile.quickSub")}</p>
 
                 <button
                   type="button"
@@ -1236,7 +1229,7 @@ export default function StudentProfile() {
                     navigateAndClose("/student/attendance")
                   }
                 >
-                  View My Attendance
+                  {t("stuProfile.viewAttendance")}
                   <Icon name="arrow" size={15} />
                 </button>
 
@@ -1247,7 +1240,7 @@ export default function StudentProfile() {
                     navigateAndClose("/student/scan")
                   }
                 >
-                  Scan Attendance QR
+                  {t("stuProfile.scanQr")}
                   <Icon name="arrow" size={15} />
                 </button>
 
@@ -1259,9 +1252,7 @@ export default function StudentProfile() {
                       "/student/correction-requests"
                     )
                   }
-                >
-                  Correction Requests
-                  <Icon name="arrow" size={15} />
+                >{t("nav.corrections")}<Icon name="arrow" size={15} />
                 </button>
               </div>
             </section>
@@ -1269,8 +1260,8 @@ export default function StudentProfile() {
             <section className="recent-card">
               <div className="recent-header">
                 <div>
-                  <h3>Recent Activity</h3>
-                  <p>Your latest attendance activity</p>
+                  <h3>{t("stuProfile.recentTitle")}</h3>
+                  <p>{t("stuProfile.recentSub")}</p>
                 </div>
 
                 <button
@@ -1278,9 +1269,7 @@ export default function StudentProfile() {
                   onClick={() =>
                     navigateAndClose("/student/attendance")
                   }
-                >
-                  View All
-                  <Icon name="arrow" size={14} />
+                >{t("stuProfile.viewAll")}<Icon name="arrow" size={14} />
                 </button>
               </div>
 
@@ -1290,11 +1279,10 @@ export default function StudentProfile() {
                     <Icon name="clock" size={20} />
                   </span>
 
-                  <strong>No recent activity</strong>
+                  <strong>{t("stuProfile.noActivity")}</strong>
 
                   <span>
-                    Your latest attendance actions will
-                    appear here.
+                    {t("stuProfile.noActivityText")}
                   </span>
                 </div>
               ) : (
@@ -1303,7 +1291,7 @@ export default function StudentProfile() {
                     const course =
                       item.course_name ||
                       item.course_code ||
-                      "Attendance session";
+                      t("stuProfile.sessionFallback");
 
                     const when = formatDateTime(
                       item.scanned_at || item.session_date
@@ -1316,7 +1304,7 @@ export default function StudentProfile() {
                       >
                         <div>
                           <strong>
-                            Attendance Recorded
+                            {t("stuProfile.recordedLabel")}
                           </strong>
                           <span>{course}</span>
                           {when && <small>{when}</small>}
@@ -1345,13 +1333,11 @@ export default function StudentProfile() {
 
       <footer className="profile-footer">
         <span>
-          2026 Attendify. All rights reserved.
+          {t("stuProfile.footerCopy")}
         </span>
 
         <button type="button" onClick={handleLogout}>
-          <Icon name="logout" size={14} />
-          Logout
-        </button>
+          <Icon name="logout" size={14} />{t("action.logout")}</button>
       </footer>
     </div>
   );

@@ -262,7 +262,7 @@ function MySessions() {
       setSessions([]);
       setError(
         requestError.message ||
-          "Could not load your sessions."
+          t("stuSessions.loadError")
       );
     } finally {
       setLoading(false);
@@ -354,14 +354,14 @@ function MySessions() {
   }, [search, sessions, statusFilter]);
 
   const filterOptions = [
-    { value: "all", label: "All", count: counts.all },
+    { value: "all", label: t("stuSessions.filterAll"), count: counts.all },
     {
       value: "scheduled",
-      label: "Scheduled",
+      label: t("stuSessions.filterScheduled"),
       count: counts.scheduled,
     },
-    { value: "active", label: "Active", count: counts.active },
-    { value: "closed", label: "Closed", count: counts.closed },
+    { value: "active", label: t("stuSessions.filterActive"), count: counts.active },
+    { value: "closed", label: t("stuSessions.filterClosed"), count: counts.closed },
   ];
 
   function handleLogout() {
@@ -494,8 +494,8 @@ function MySessions() {
 
         <div className="sessions-sidebar-bottom">
           <div className="sessions-side-tip">
-            <strong>Keep going</strong>
-            <span>Every class counts.</span>
+            <strong>{t("stuSessions.keepGoing")}</strong>
+            <span>{t("stuSessions.keepGoingSub")}</span>
           </div>
 
           <LanguageToggle className="lang-toggle-block" />
@@ -522,7 +522,7 @@ function MySessions() {
 
             <div className="sessions-top-user-info">
               <strong>{fullName}</strong>
-              <span>Student</span>
+              <span>{t("role.student")}</span>
             </div>
           </div>
         </header>
@@ -530,11 +530,10 @@ function MySessions() {
         <section className="sessions-content">
           <div className="sessions-hero">
             <div>
-              <span className="sessions-eyebrow">ATTENDANCE</span>
-              <h1>My Sessions</h1>
+              <span className="sessions-eyebrow">{t("stuSessions.eyebrow")}</span>
+              <h1>{t("stuSessions.title")}</h1>
               <p>
-                View class sessions available to your enrolled
-                sections.
+                {t("stuSessions.heroDesc")}
               </p>
             </div>
 
@@ -544,49 +543,48 @@ function MySessions() {
               onClick={loadSessions}
               disabled={loading}
             >
-              {loading ? "Loading" : "Refresh"}
+              {loading ? t("stuSessions.loading") : t("action.refresh")}
             </button>
           </div>
 
           <div className="sessions-stats">
             <div className="sessions-stat-card total">
-              <span>All Sessions</span>
-              <strong>{loading ? "Loading" : counts.all}</strong>
-              <small>Available sessions</small>
+              <span>{t("stuSessions.allTitle")}</span>
+              <strong>{loading ? t("stuSessions.loading") : counts.all}</strong>
+              <small>{t("stuSessions.allSub")}</small>
             </div>
 
             <div className="sessions-stat-card scheduled">
-              <span>Scheduled</span>
+              <span>{t("stuSessions.scheduledTitle")}</span>
               <strong>
-                {loading ? "Loading" : counts.scheduled}
+                {loading ? t("stuSessions.loading") : counts.scheduled}
               </strong>
-              <small>Upcoming sessions</small>
+              <small>{t("stuSessions.scheduledSub")}</small>
             </div>
 
             <div className="sessions-stat-card active">
-              <span>Active</span>
-              <strong>{loading ? "Loading" : counts.active}</strong>
-              <small>Open for attendance</small>
+              <span>{t("stuSessions.activeTitle")}</span>
+              <strong>{loading ? t("stuSessions.loading") : counts.active}</strong>
+              <small>{t("stuSessions.activeSub")}</small>
             </div>
 
             <div className="sessions-stat-card closed">
-              <span>Closed</span>
-              <strong>{loading ? "Loading" : counts.closed}</strong>
-              <small>Completed sessions</small>
+              <span>{t("stuSessions.closedTitle")}</span>
+              <strong>{loading ? t("stuSessions.loading") : counts.closed}</strong>
+              <small>{t("stuSessions.closedSub")}</small>
             </div>
           </div>
 
           <section className="sessions-panel">
             <div className="sessions-panel-header">
               <div>
-                <h2>Class Sessions</h2>
-                <p>Sessions from your enrolled sections.</p>
+                <h2>{t("stuSessions.panelTitle")}</h2>
+                <p>{t("stuSessions.panelSub")}</p>
               </div>
 
               {!loading && !error && (
                 <span className="sessions-result-count">
-                  Showing {filteredSessions.length} of{" "}
-                  {sessions.length} sessions
+                  {t("stuSessions.resultCount").replace("{shown}", filteredSessions.length).replace("{total}", sessions.length)}
                 </span>
               )}
             </div>
@@ -601,14 +599,14 @@ function MySessions() {
                   onChange={(event) =>
                     setSearch(event.target.value)
                   }
-                  placeholder="Search course, section, or room"
-                  aria-label="Search sessions"
+                  placeholder={t("stuSessions.searchPh")}
+                  aria-label={t("stuSessions.searchLabel")}
                 />
               </label>
 
               <div
                 className="sessions-filter-buttons"
-                aria-label="Filter sessions by status"
+                aria-label={t("stuSessions.filterLabel")}
               >
                 {filterOptions.map((option) => (
                   <button
@@ -639,7 +637,7 @@ function MySessions() {
                   type="button"
                   onClick={loadSessions}
                 >
-                  Try again
+                  {t("stuSessions.tryAgain")}
                 </button>
               </div>
             ) : loading ? (
@@ -655,14 +653,14 @@ function MySessions() {
               <div className="sessions-empty">
                 <h3>
                   {sessions.length
-                    ? "No sessions match your filters"
-                    : "No sessions are available yet"}
+                    ? t("stuSessions.noMatchTitle")
+                    : t("stuSessions.emptyTitle")}
                 </h3>
 
                 <p>
                   {sessions.length
-                    ? "Change the search or status filter to see other sessions."
-                    : "Your enrolled class sessions will appear here when available."}
+                    ? t("stuSessions.noMatchText")
+                    : t("stuSessions.emptyText")}
                 </p>
 
                 {sessions.length > 0 && (
@@ -673,7 +671,7 @@ function MySessions() {
                       setStatusFilter("all");
                     }}
                   >
-                    Reset filters
+                    {t("stuSessions.resetFilters")}
                   </button>
                 )}
               </div>
@@ -695,7 +693,7 @@ function MySessions() {
                   const timeRange =
                     startTime && endTime
                       ? `${startTime} to ${endTime}`
-                      : startTime || endTime || "Not available";
+                      : startTime || endTime || t("stuSessions.notAvailable");
 
                   const room = [
                     session.building,
@@ -723,13 +721,13 @@ function MySessions() {
 
                           <h3>
                             {session.course_name ||
-                              "Course not available"}
+                              t("stuSessions.courseUnavailable")}
                           </h3>
 
                           <p>
                             {session.section_name
-                              ? `Section ${session.section_name}`
-                              : "Section not available"}
+                              ? t("stuSessions.sectionLabel").replace("{n}", session.section_name)
+                              : t("stuSessions.sectionUnavailable")}
                           </p>
                         </div>
 
@@ -742,20 +740,20 @@ function MySessions() {
 
                       <div className="session-meta">
                         <div>
-                          <span>Date</span>
+                          <span>{t("stuSessions.colDate")}</span>
                           <strong>
                             {formatDate(session.session_date)}
                           </strong>
                         </div>
 
                         <div>
-                          <span>Time</span>
+                          <span>{t("stuSessions.colTime")}</span>
                           <strong>{timeRange}</strong>
                         </div>
 
                         <div>
-                          <span>Room</span>
-                          <strong>{room || "Not assigned"}</strong>
+                          <span>{t("stuSessions.colRoom")}</span>
+                          <strong>{room || t("stuSessions.notAssigned")}</strong>
                         </div>
                       </div>
 
@@ -773,7 +771,7 @@ function MySessions() {
                               navigate("/student/scan")
                             }
                           >
-                            Scan attendance
+                            {t("stuSessions.scanBtn")}
                           </button>
                         )}
                       </div>

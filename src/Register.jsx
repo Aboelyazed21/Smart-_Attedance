@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "./services/api";
+import { useLanguage } from "./utils/i18n";
 import ThemeToggle from "./components/ThemeToggle";
 import "./App.css";
 
@@ -82,12 +83,6 @@ function AuthIcon({ name, size = 17 }) {
    CLIENT VALIDATION — mirrors the backend authority in
    src/utils/validation.js. Never the only line of defense.
    ========================================================= */
-
-const PASSWORD_ERROR =
-  "Password must be 8–12 characters and contain uppercase, lowercase, number, and special character.";
-
-const PHONE_ERROR =
-  "Phone number must start with 010, 011, or 012 and contain exactly 11 digits.";
 
 function normalizeName(value) {
   return String(value || "")
@@ -180,6 +175,7 @@ function passwordStrength(value) {
 }
 
 function Register() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -222,21 +218,21 @@ function Register() {
     const result = {};
 
     if (!values.firstName) {
-      result.firstName = "First name is required.";
+      result.firstName = t("reg.firstNameRequired");
     } else if (!isValidName(values.firstName)) {
       result.firstName =
-        "Please enter a valid first name.";
+        t("reg.firstNameInvalid");
     }
 
     if (!values.lastName) {
-      result.lastName = "Last name is required.";
+      result.lastName = t("reg.lastNameRequired");
     } else if (!isValidName(values.lastName)) {
       result.lastName =
-        "Please enter a valid last name.";
+        t("reg.lastNameInvalid");
     }
 
     if (!values.email) {
-      result.email = "University email is required.";
+      result.email = t("reg.emailRequired");
     } else if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
         values.email
@@ -244,42 +240,42 @@ function Register() {
       values.email.length > 255
     ) {
       result.email =
-        "Please enter a valid email address.";
+        t("reg.emailInvalid");
     }
 
     if (!values.phone) {
-      result.phone = "Phone number is required.";
+      result.phone = t("reg.phoneRequired");
     } else if (
       !isValidEgyptianPhone(values.phone)
     ) {
-      result.phone = PHONE_ERROR;
+      result.phone = t("reg.phoneError");
     }
 
     if (!values.studentCode) {
-      result.studentCode = "University ID is required.";
+      result.studentCode = t("reg.studentCodeRequired");
     } else if (values.studentCode.length > 50) {
       result.studentCode =
-        "Please enter a valid University ID.";
+        t("reg.studentCodeInvalid");
     }
 
     if (!values.password) {
-      result.password = "Password is required.";
+      result.password = t("reg.passwordRequired");
     } else if (!isValidPassword(values.password)) {
-      result.password = PASSWORD_ERROR;
+      result.password = t("reg.passwordError");
     }
 
     if (!values.confirmPassword) {
       result.confirmPassword =
-        "Please confirm your password.";
+        t("reg.confirmRequired");
     } else if (
       values.confirmPassword !== values.password
     ) {
       result.confirmPassword =
-        "Passwords do not match.";
+        t("reg.passwordMismatch");
     }
 
     return result;
-  }, [values]);
+  }, [values, t]);
 
   const isValid =
     Object.keys(errors).length === 0;
@@ -339,7 +335,7 @@ function Register() {
       console.log("Registration successful:", data);
 
       alert(
-        "Account created successfully! You can now sign in."
+        t("reg.success")
       );
 
       // Go back to Login
@@ -348,7 +344,7 @@ function Register() {
       console.error("Registration error:", error);
       setSubmitError(
         error.message ||
-          "Registration failed. Please try again."
+          t("reg.registerFailed")
       );
     } finally {
       setLoading(false);
@@ -374,7 +370,7 @@ function Register() {
 
           <div className="brand-text">
             <h1>Attendify</h1>
-            <p>SMART ATTENDANCE SYSTEM</p>
+            <p>{t("brand.tagline")}</p>
           </div>
 
         </div>
@@ -395,11 +391,11 @@ function Register() {
           </div>
 
           <h2 className="app-name">
-            Create Account
+            {t("reg.title")}
           </h2>
 
           <p className="app-description">
-            Join the Attendify Smart Campus
+            {t("reg.subtitle")}
           </p>
 
 
@@ -425,7 +421,7 @@ function Register() {
               <div className="form-group">
 
                 <label htmlFor="reg-first-name">
-                  First Name
+                  {t("reg.firstName")}
                 </label>
 
                 <div className="input-container">
@@ -437,7 +433,7 @@ function Register() {
                   <input
                     id="reg-first-name"
                     type="text"
-                    placeholder="First name"
+                    placeholder={t("reg.firstNamePh")}
                     autoComplete="given-name"
                     aria-invalid={
                       errorFor("firstName")
@@ -468,7 +464,7 @@ function Register() {
               <div className="form-group">
 
                 <label htmlFor="reg-last-name">
-                  Last Name
+                  {t("reg.lastName")}
                 </label>
 
                 <div className="input-container">
@@ -480,7 +476,7 @@ function Register() {
                   <input
                     id="reg-last-name"
                     type="text"
-                    placeholder="Last name"
+                    placeholder={t("reg.lastNamePh")}
                     autoComplete="family-name"
                     aria-invalid={
                       errorFor("lastName")
@@ -515,7 +511,7 @@ function Register() {
             <div className="form-group">
 
               <label htmlFor="reg-email">
-                University Email
+                {t("reg.email")}
               </label>
 
               <div className="input-container">
@@ -527,7 +523,7 @@ function Register() {
                 <input
                   id="reg-email"
                   type="email"
-                  placeholder="Enter your university email"
+                  placeholder={t("reg.emailPh")}
                   autoComplete="email"
                   aria-invalid={
                     errorFor("email")
@@ -560,7 +556,7 @@ function Register() {
             <div className="form-group">
 
               <label htmlFor="reg-phone">
-                Phone Number
+                {t("reg.phone")}
               </label>
 
               <div className="input-container">
@@ -594,8 +590,7 @@ function Register() {
                 id="reg-phone-hint"
                 className="field-hint"
               >
-                Use an Egyptian mobile number
-                starting with 010, 011, or 012.
+                {t("reg.phoneHint")}
               </p>
 
               {errorFor("phone") && (
@@ -615,7 +610,7 @@ function Register() {
             <div className="form-group">
 
               <label htmlFor="reg-student-code">
-                University ID
+                {t("reg.studentCode")}
               </label>
 
               <div className="input-container">
@@ -627,7 +622,7 @@ function Register() {
                 <input
                   id="reg-student-code"
                   type="text"
-                  placeholder="Enter your university ID"
+                  placeholder={t("reg.studentCodePh")}
                   autoComplete="off"
                   aria-invalid={
                     errorFor("studentCode")
@@ -660,7 +655,7 @@ function Register() {
             <div className="form-group">
 
               <label htmlFor="reg-password">
-                Password
+                {t("reg.password")}
               </label>
 
               <div className="input-container">
@@ -676,7 +671,7 @@ function Register() {
                       ? "text"
                       : "password"
                   }
-                  placeholder="Create a password"
+                  placeholder={t("reg.passwordPh")}
                   autoComplete="new-password"
                   aria-invalid={
                     errorFor("password")
@@ -696,8 +691,8 @@ function Register() {
                   className="show-password"
                   aria-label={
                     showPassword
-                      ? "Hide password"
-                      : "Show password"
+                      ? t("reg.hidePassword")
+                      : t("reg.showPassword")
                   }
                   onClick={() =>
                     setShowPassword(!showPassword)
@@ -716,7 +711,7 @@ function Register() {
               >
 
                 <p>
-                  Password must contain:
+                  {t("reg.passwordMustContain")}
                 </p>
 
                 <ul>
@@ -725,35 +720,35 @@ function Register() {
                       passwordChecks(password).length
                     }
                   >
-                    8–12 characters
+                    {t("reg.ruleLength")}
                   </li>
                   <li
                     data-met={
                       passwordChecks(password).upper
                     }
                   >
-                    uppercase letter
+                    {t("reg.ruleUpper")}
                   </li>
                   <li
                     data-met={
                       passwordChecks(password).lower
                     }
                   >
-                    lowercase letter
+                    {t("reg.ruleLower")}
                   </li>
                   <li
                     data-met={
                       passwordChecks(password).number
                     }
                   >
-                    number
+                    {t("reg.ruleNumber")}
                   </li>
                   <li
                     data-met={
                       passwordChecks(password).special
                     }
                   >
-                    special character (! @ # $ % ^ &amp; * _ - . ?)
+                    {t("reg.ruleSpecial")}
                   </li>
                 </ul>
 
@@ -766,7 +761,7 @@ function Register() {
                       <span />
                     </div>
                     <small>
-                      Strength: {strength}
+                      {t("reg.strength").replace("{strength}", strength)}
                     </small>
                   </div>
                 )}
@@ -790,7 +785,7 @@ function Register() {
             <div className="form-group">
 
               <label htmlFor="reg-confirm-password">
-                Confirm Password
+                {t("reg.confirmPassword")}
               </label>
 
               <div className="input-container">
@@ -806,7 +801,7 @@ function Register() {
                       ? "text"
                       : "password"
                   }
-                  placeholder="Confirm your password"
+                  placeholder={t("reg.confirmPasswordPh")}
                   autoComplete="new-password"
                   aria-invalid={
                     errorFor("confirmPassword")
@@ -829,8 +824,8 @@ function Register() {
                   className="show-password"
                   aria-label={
                     showConfirmPassword
-                      ? "Hide password"
-                      : "Show password"
+                      ? t("reg.hidePassword")
+                      : t("reg.showPassword")
                   }
                   onClick={() =>
                     setShowConfirmPassword(
@@ -867,8 +862,8 @@ function Register() {
 
               <span>
                 {loading
-                  ? "Creating Account..."
-                  : "Create Account"}
+                  ? t("reg.creatingAccount")
+                  : t("reg.createAccount")}
               </span>
 
               {!loading && (
@@ -885,14 +880,14 @@ function Register() {
             <div className="register-login">
 
               <span>
-                Already have an account?
+                {t("reg.haveAccount")}
               </span>
 
               <Link
                 to="/"
                 className="forgot-password"
               >
-                Sign In
+                {t("reg.signIn")}
               </Link>
 
             </div>
@@ -909,11 +904,11 @@ function Register() {
       <footer className="page-footer">
 
         <div className="page-footer-copy">
-          © Aboelyazed Hatem Aboelyazed
+          {t("footer.copy")}
         </div>
 
         <div className="page-footer-uni">
-          Badr University in Assiut
+          {t("footer.uni")}
         </div>
 
       </footer>

@@ -5,6 +5,7 @@ import ThemeToggle from "../../components/ThemeToggle";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
+import { useLanguage } from "../../utils/i18n";
 import "./AttendanceConfirmation.css";
 
 function Icon({ name, size = 18 }) {
@@ -156,6 +157,7 @@ function formatSource(value) {
 }
 
 function AttendanceConfirmation() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const user = getSavedUser();
@@ -173,7 +175,7 @@ function AttendanceConfirmation() {
   const firstName =
     user?.first_name ||
     user?.firstName ||
-    "Student";
+    t("role.student");
 
   const lastName =
     user?.last_name ||
@@ -202,7 +204,7 @@ function AttendanceConfirmation() {
     } catch (error) {
       setHistoryError(
         error.message ||
-          "Could not load your attendance history."
+          t("stuConfirm.historyLoadError")
       );
     } finally {
       setHistoryLoading(false);
@@ -251,7 +253,7 @@ function AttendanceConfirmation() {
       course:
         scanData.course ||
         scanData.courseName ||
-        "Not available",
+        t("stuConfirm.notAvailable"),
       courseCode:
         scanData.courseCode ||
         scanData.attendance?.course_code ||
@@ -260,7 +262,7 @@ function AttendanceConfirmation() {
         scanData.section ||
         scanData.sectionName ||
         scanData.attendance?.section_name ||
-        "Not available",
+        t("stuConfirm.notAvailable"),
       status: String(
         scanData.status ||
           scanData.attendance?.status ||
@@ -273,11 +275,11 @@ function AttendanceConfirmation() {
       method:
         scanData.method ||
         scanData.markedBy ||
-        "Not available",
+        t("stuConfirm.notAvailable"),
       duplicate: Boolean(scanData.duplicate),
       message:
         scanData.message ||
-        "Attendance result received from the attendance service.",
+        t("stuConfirm.defaultMessage"),
     };
   }, [scanData]);
 
@@ -320,7 +322,7 @@ function AttendanceConfirmation() {
       <button
         type="button"
         className="confirmation-mobile-menu-button"
-        aria-label="Open navigation menu"
+        aria-label={t("a11y.openNav")}
         aria-expanded={sidebarOpen}
         onClick={() => setSidebarOpen((open) => !open)}
       >
@@ -333,7 +335,7 @@ function AttendanceConfirmation() {
         <button
           type="button"
           className="confirmation-sidebar-overlay"
-          aria-label="Close navigation menu"
+          aria-label={t("a11y.closeNav")}
           onClick={closeSidebar}
         />
       )}
@@ -350,7 +352,7 @@ function AttendanceConfirmation() {
 
           <div>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -361,7 +363,7 @@ function AttendanceConfirmation() {
 
           <div className="confirmation-profile-info">
             <strong>{fullName}</strong>
-            <span>Student</span>
+            <span>{t("role.student")}</span>
           </div>
         </div>
 
@@ -373,9 +375,7 @@ function AttendanceConfirmation() {
           >
             <span className="confirmation-nav-icon">
               <Icon name="dashboard" size={16} />
-            </span>
-            Dashboard
-          </button>
+            </span>{t("nav.dashboard")}</button>
 
           <button
             type="button"
@@ -388,9 +388,7 @@ function AttendanceConfirmation() {
           >
             <span className="confirmation-nav-icon">
               <Icon name="calendar" size={16} />
-            </span>
-            My Attendance
-          </button>
+            </span>{t("nav.myAttendance")}</button>
 
           <button
             type="button"
@@ -399,9 +397,7 @@ function AttendanceConfirmation() {
           >
             <span className="confirmation-nav-icon">
               <Icon name="scan" size={16} />
-            </span>
-            Scan Attendance
-          </button>
+            </span>{t("nav.scan")}</button>
 
           <button
             type="button"
@@ -416,9 +412,7 @@ function AttendanceConfirmation() {
           >
             <span className="confirmation-nav-icon">
               <Icon name="edit" size={16} />
-            </span>
-            Correction Requests
-          </button>
+            </span>{t("nav.corrections")}</button>
 
           <button
             type="button"
@@ -429,15 +423,13 @@ function AttendanceConfirmation() {
           >
             <span className="confirmation-nav-icon">
               <Icon name="user" size={16} />
-            </span>
-            Profile
-          </button>
+            </span>{t("nav.profile")}</button>
         </nav>
 
         <div className="confirmation-sidebar-bottom">
           <div className="confirmation-motivation">
-            <strong>Keep going</strong>
-            <span>Every class counts.</span>
+            <strong>{t("stuConfirm.keepGoing")}</strong>
+            <span>{t("stuConfirm.keepGoingSub")}</span>
           </div>
 
           <button
@@ -448,7 +440,7 @@ function AttendanceConfirmation() {
             <span>
               <Icon name="logout" size={16} />
             </span>
-            Logout
+            {t("action.logout")}
           </button>
         </div>
       </aside>
@@ -461,7 +453,7 @@ function AttendanceConfirmation() {
 
             <div className="header-user-info">
               <strong>{fullName}</strong>
-              <span>Student</span>
+              <span>{t("role.student")}</span>
             </div>
           </div>
         </header>
@@ -469,22 +461,22 @@ function AttendanceConfirmation() {
         <section className="confirmation-content">
           <div className="confirmation-hero">
             <div>
-              <span className="hero-label">ATTENDANCE</span>
+              <span className="hero-label">{t("stuConfirm.eyebrow")}</span>
 
               <h1>
                 {confirmation
                   ? confirmation.duplicate
-                    ? "تم تسجيل حضورك بالفعل لهذه الجلسة"
-                    : "تم تسجيل حضورك بنجاح"
-                  : "Attendance Status"}
+                    ? t("stuConfirm.dupTitle")
+                    : t("stuConfirm.recordedTitle")
+                  : t("stuConfirm.statusTitle")}
               </h1>
 
               <p>
                 {confirmation
                   ? confirmation.duplicate
-                    ? "Attendance Already Recorded"
-                    : "Attendance Recorded"
-                  : "Review a recent attendance result or scan a new code."}
+                    ? t("stuConfirm.dupSub")
+                    : t("stuConfirm.recordedSub")
+                  : t("stuConfirm.statusSub")}
               </p>
 
               {confirmation && (
@@ -495,7 +487,7 @@ function AttendanceConfirmation() {
             </div>
 
             <p className="hero-note">
-              Attendance records are shown from your student account.
+              {t("stuConfirm.heroNote")}
             </p>
           </div>
 
@@ -507,14 +499,14 @@ function AttendanceConfirmation() {
                     <div>
                       <span className="confirmation-label">
                         {confirmation.duplicate
-                          ? "ALREADY RECORDED"
-                          : "ATTENDANCE"}
+                          ? t("stuConfirm.alreadyLabel")
+                          : t("stuConfirm.attendanceLabel")}
                       </span>
 
                       <h2>
                         {confirmation.duplicate
-                          ? "This attendance record already exists"
-                          : "Your attendance was recorded"}
+                          ? t("stuConfirm.existsTitle")
+                          : t("stuConfirm.recordedCardTitle")}
                       </h2>
 
                       <p>{confirmation.message}</p>
@@ -528,11 +520,11 @@ function AttendanceConfirmation() {
                   </div>
 
                   <div className="attendance-details">
-                    <h3>Attendance Details</h3>
+                    <h3>{t("stuConfirm.detailsTitle")}</h3>
 
                     <div className="details-grid">
                       <div className="detail-box">
-                        <span>Course</span>
+                        <span>{t("stuConfirm.colCourse")}</span>
                         <strong>{confirmation.course}</strong>
 
                         {confirmation.courseCode && (
@@ -541,12 +533,12 @@ function AttendanceConfirmation() {
                       </div>
 
                       <div className="detail-box">
-                        <span>Section</span>
+                        <span>{t("stuConfirm.colSection")}</span>
                         <strong>{confirmation.section}</strong>
                       </div>
 
                       <div className="detail-box">
-                        <span>Date</span>
+                        <span>{t("stuConfirm.colDate")}</span>
                         <strong>
                           {formatDate(confirmation.scannedAt)}
                         </strong>
@@ -556,14 +548,14 @@ function AttendanceConfirmation() {
                       </div>
 
                       <div className="detail-box">
-                        <span>Time</span>
+                        <span>{t("stuConfirm.colTime")}</span>
                         <strong>
                           {formatTime(confirmation.scannedAt)}
                         </strong>
                       </div>
 
                       <div className="detail-box">
-                        <span>Status</span>
+                        <span>{t("stuConfirm.colStatus")}</span>
                         <strong>
                           <span
                             className={`confirmation-status ${confirmation.status}`}
@@ -574,7 +566,7 @@ function AttendanceConfirmation() {
                       </div>
 
                       <div className="detail-box">
-                        <span>Recorded Through</span>
+                        <span>{t("stuConfirm.colSource")}</span>
                         <strong>{confirmation.method}</strong>
                       </div>
                     </div>
@@ -589,7 +581,7 @@ function AttendanceConfirmation() {
                       }
                     >
                       <Icon name="calendar" size={17} />
-                      View My Attendance
+                      {t("stuConfirm.viewAttendance")}
                     </button>
 
                     <button
@@ -600,18 +592,16 @@ function AttendanceConfirmation() {
                       }
                     >
                       <Icon name="scan" size={17} />
-                      Scan Another Code
+                      {t("stuConfirm.scanAnother")}
                     </button>
                   </div>
                 </section>
               ) : (
                 <section className="no-confirmation-card">
-                  <h2>No scan confirmation is available</h2>
+                  <h2>{t("stuConfirm.noResultTitle")}</h2>
 
                   <p>
-                    This page is opened without a current scan result.
-                    Scan the lecturer's active QR code to record
-                    attendance.
+                    {t("stuConfirm.noResultText")}
                   </p>
 
                   <div className="confirmation-actions">
@@ -623,7 +613,7 @@ function AttendanceConfirmation() {
                       }
                     >
                       <Icon name="scan" size={17} />
-                      Scan Attendance
+                      {t("nav.scan")}
                     </button>
 
                     <button
@@ -634,7 +624,7 @@ function AttendanceConfirmation() {
                       }
                     >
                       <Icon name="calendar" size={17} />
-                      View My Attendance
+                      {t("stuConfirm.viewAttendance")}
                     </button>
                   </div>
                 </section>
@@ -643,8 +633,8 @@ function AttendanceConfirmation() {
               <section className="recent-attendance-card">
                 <div className="recent-header">
                   <div>
-                    <h2>Recent Attendance</h2>
-                    <p>Your latest attendance records.</p>
+                    <h2>{t("stuConfirm.recentTitle")}</h2>
+                    <p>{t("stuConfirm.recentSub")}</p>
                   </div>
 
                   <button
@@ -652,9 +642,7 @@ function AttendanceConfirmation() {
                     onClick={() =>
                       navigate("/student/attendance")
                     }
-                  >
-                    View all
-                  </button>
+                  >{t("stuConfirm.viewAll")}</button>
                 </div>
 
                 {historyLoading ? (
@@ -674,21 +662,20 @@ function AttendanceConfirmation() {
                       type="button"
                       onClick={loadAttendanceHistory}
                     >
-                      Try again
+                      {t("stuConfirm.tryAgain")}
                     </button>
                   </div>
                 ) : latestAttendance.length === 0 ? (
                   <div className="history-empty">
-                    No attendance records are available yet.
-                  </div>
+                    {t("stuConfirm.recentEmpty")}</div>
                 ) : (
                   <div className="recent-table">
                     <div className="recent-table-row table-header">
-                      <span>Date and Time</span>
-                      <span>Course</span>
-                      <span>Section</span>
-                      <span>Status</span>
-                      <span>Source</span>
+                      <span>{t("stuConfirm.colDateTime")}</span>
+                      <span>{t("stuConfirm.colCourse")}</span>
+                      <span>{t("stuConfirm.colSection")}</span>
+                      <span>{t("stuConfirm.colStatus")}</span>
+                      <span>{t("stuConfirm.colSource")}</span>
                     </div>
 
                     {latestAttendance.map((record) => (
@@ -696,7 +683,7 @@ function AttendanceConfirmation() {
                         className="recent-table-row"
                         key={`${record.id}-${record.scanned_at}`}
                       >
-                        <span data-label="Date and Time">
+                        <span data-label={t("stuConfirm.colDateTime")}>
                           {formatDate(
                             record.scanned_at ||
                               record.session_date
@@ -709,10 +696,10 @@ function AttendanceConfirmation() {
                           </small>
                         </span>
 
-                        <span data-label="Course">
+                        <span data-label={t("stuConfirm.colCourse")}>
                           <strong>
                             {record.course_name ||
-                              "Not available"}
+                            t("stuConfirm.notAvailable")}
                           </strong>
 
                           {record.course_code && (
@@ -720,12 +707,12 @@ function AttendanceConfirmation() {
                           )}
                         </span>
 
-                        <span data-label="Section">
+                        <span data-label={t("stuConfirm.colSection")}>
                           {record.section_name ||
-                            "Not available"}
+                            t("stuConfirm.notAvailable")}
                         </span>
 
-                        <span data-label="Status">
+                        <span data-label={t("stuConfirm.colStatus")}>
                           <b
                             className={`recent-status ${
                               record.status || "recorded"
@@ -735,7 +722,7 @@ function AttendanceConfirmation() {
                           </b>
                         </span>
 
-                        <span data-label="Source">
+                        <span data-label={t("stuConfirm.colSource")}>
                           {formatSource(record.source)}
                         </span>
                       </div>
@@ -747,44 +734,43 @@ function AttendanceConfirmation() {
 
             <aside className="confirmation-right">
               <section className="summary-card">
-                <h2>Attendance Overview</h2>
+                <h2>{t("stuConfirm.overviewTitle")}</h2>
 
                 <div className="summary-stats">
                   <div className="summary-stat present">
-                    <small>Present Records</small>
+                    <small>{t("stuConfirm.presentRecords")}</small>
                     <strong>{summary.present}</strong>
                   </div>
 
                   <div className="summary-stat late">
-                    <small>Late Records</small>
+                    <small>{t("stuConfirm.lateRecords")}</small>
                     <strong>{summary.late}</strong>
                   </div>
 
                   <div className="summary-stat total">
-                    <small>Total Records</small>
+                    <small>{t("stuConfirm.totalRecords")}</small>
                     <strong>{summary.total}</strong>
                   </div>
                 </div>
 
                 <p className="summary-message">
                   {summary.total
-                    ? `Overview based on ${summary.total} attendance records returned by your account.`
-                    : "No attendance records are available for this overview yet."}
+                    ? t("stuConfirm.overviewText").replace("{n}", summary.total)
+                    : t("stuConfirm.overviewEmpty")}
                 </p>
               </section>
 
               <section className="next-card">
-                <h2>Next Steps</h2>
+                <h2>{t("stuConfirm.nextTitle")}</h2>
 
                 <div className="next-list">
                   <div className="next-item">
                     <span>1</span>
 
                     <div>
-                      <strong>Review your attendance</strong>
+                      <strong>{t("stuConfirm.next1Title")}</strong>
                       <p>
-                        Open your attendance history to review past
-                        sessions.
+                        {t("stuConfirm.next1Text")}
                       </p>
                     </div>
                   </div>
@@ -793,10 +779,9 @@ function AttendanceConfirmation() {
                     <span>2</span>
 
                     <div>
-                      <strong>Request a correction if needed</strong>
+                      <strong>{t("stuConfirm.next2Title")}</strong>
                       <p>
-                        Submit a request if a verified attendance
-                        record needs review.
+                        {t("stuConfirm.next2Text")}
                       </p>
                     </div>
                   </div>
@@ -809,7 +794,7 @@ function AttendanceConfirmation() {
                       navigate("/student/attendance")
                     }
                   >
-                    Open Attendance History
+                    {t("stuConfirm.openHistory")}
                   </button>
 
                   <button
@@ -818,7 +803,7 @@ function AttendanceConfirmation() {
                       navigate("/student/correction-requests")
                     }
                   >
-                    Open Correction Requests
+                    {t("stuConfirm.openCorrections")}
                   </button>
                 </div>
               </section>

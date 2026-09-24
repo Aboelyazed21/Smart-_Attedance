@@ -12,12 +12,13 @@ import {
   toRecords,
 } from "../../utils/attendanceInsights";
 import "./StudentAssistant.css";
+import { useLanguage } from "../../utils/i18n";
 
 const SUGGESTIONS = [
-  "How is my attendance?",
-  "Weekly summary",
-  "Missed classes",
-  "Attendance by course",
+  { text: "How is my attendance?", key: "stuAssistant.suggest1" },
+  { text: "Weekly summary", key: "stuAssistant.suggest2" },
+  { text: "Missed classes", key: "stuAssistant.suggest3" },
+  { text: "Attendance by course", key: "stuAssistant.suggest4" },
 ];
 
 function getRole() {
@@ -70,6 +71,7 @@ function normalizeSummary(payload, fallbackRecords) {
 }
 
 export default function StudentAssistant() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [role] = useState(getRole);
@@ -80,7 +82,7 @@ export default function StudentAssistant() {
     {
       id: "assistant-welcome",
       role: "assistant",
-      text: "Hello. I can help you understand your attendance using your recorded sessions. Try a suggested question below.",
+      text: t("stuAssistant.welcome"),
     },
   ]);
   const [input, setInput] = useState("");
@@ -107,7 +109,7 @@ export default function StudentAssistant() {
       loadedRef.current = true;
     } catch (err) {
       setLoadError(
-        err?.message || "Could not load your attendance overview."
+        err?.message || t("stuAssistant.loadError")
       );
     } finally {
       setLoading(false);
@@ -188,8 +190,8 @@ export default function StudentAssistant() {
         <button
           type="button"
           className="student-assistant-fab"
-          aria-label="Open Attendance Assistant"
-          title="Attendance Assistant"
+          aria-label={t("stuAssistant.openLabel")}
+          title={t("stuAssistant.title")}
           onClick={() => setOpen(true)}
         >
           <img
@@ -208,7 +210,7 @@ export default function StudentAssistant() {
           className="student-assistant-panel"
           role="dialog"
           aria-modal="false"
-          aria-label="Attendance Assistant"
+          aria-label={t("stuAssistant.title")}
         >
           <header className="student-assistant-header">
             <img
@@ -220,8 +222,8 @@ export default function StudentAssistant() {
               aria-hidden="true"
             />
             <div className="student-assistant-header-text">
-              <strong>Attendance Assistant</strong>
-              <span>Your attendance overview</span>
+              <strong>{t("stuAssistant.title")}</strong>
+              <span>{t("stuAssistant.headerSub")}</span>
             </div>
             <div className="student-assistant-header-actions">
               <button
@@ -232,12 +234,12 @@ export default function StudentAssistant() {
                   navigate("/student/chatbot");
                 }}
               >
-                Full view
+                {t("stuAssistant.fullView")}
               </button>
               <button
                 type="button"
                 className="student-assistant-close"
-                aria-label="Close Attendance Assistant"
+                aria-label={t("stuAssistant.closeLabel")}
                 onClick={() => setOpen(false)}
               >
                 <span aria-hidden="true">×</span>
@@ -250,7 +252,7 @@ export default function StudentAssistant() {
               className="student-assistant-state"
               role="status"
             >
-              Loading your attendance overview…
+              {t("stuAssistant.loading")}
             </div>
           ) : loadError && !summary ? (
             <div
@@ -259,7 +261,7 @@ export default function StudentAssistant() {
             >
               <span>{loadError}</span>
               <button type="button" onClick={loadSummary}>
-                Try again
+                {t("stuAssistant.tryAgain")}
               </button>
             </div>
           ) : (
@@ -267,9 +269,7 @@ export default function StudentAssistant() {
               {summary && (
                 <div className="student-assistant-week">
                   <span>
-                    This week: {summary.weekly.attended} of{" "}
-                    {summary.weekly.total} · {summary.weekly.rate}%
-                    overall {summary.overall.rate}%
+                    {t("stuAssistant.weekSummary").replace("{a}", summary.weekly.attended).replace("{b}", summary.weekly.total).replace("{c}", summary.weekly.rate).replace("{d}", summary.overall.rate)}
                   </span>
                 </div>
               )}
@@ -279,7 +279,7 @@ export default function StudentAssistant() {
                 ref={listRef}
                 role="log"
                 aria-live="polite"
-                aria-label="Attendance conversation"
+                aria-label={t("stuAssistant.conversationLabel")}
               >
                 {messages.map((message) => (
                   <div
@@ -292,8 +292,8 @@ export default function StudentAssistant() {
                   >
                     <span className="student-assistant-msg-role">
                       {message.role === "user"
-                        ? "You"
-                        : "Assistant"}
+                        ? t("stuAssistant.you")
+                        : t("stuAssistant.assistant")}
                     </span>
                     <p>{message.text}</p>
                   </div>
@@ -301,14 +301,14 @@ export default function StudentAssistant() {
                 {answering && (
                   <div className="student-assistant-msg assistant">
                     <span className="student-assistant-msg-role">
-                      Assistant
+                      {t("stuAssistant.assistant")}
                     </span>
                     <p className="student-assistant-typing">
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
                       <span className="sr-only">
-                        Writing answer…
+                        {t("stuAssistant.writing")}
                       </span>
                     </p>
                   </div>
@@ -317,16 +317,16 @@ export default function StudentAssistant() {
 
               <div
                 className="student-assistant-suggest"
-                aria-label="Suggested questions"
+                aria-label={t("stuAssistant.suggestLabel")}
               >
-                {SUGGESTIONS.map((question) => (
+                {SUGGESTIONS.map((suggestion) => (
                   <button
-                    key={question}
+                    key={suggestion.text}
                     type="button"
-                    onClick={() => send(question)}
+                    onClick={() => send(suggestion.text)}
                     disabled={answering || !context}
                   >
-                    {question}
+                    {t(suggestion.key)}
                   </button>
                 ))}
               </div>
@@ -339,7 +339,7 @@ export default function StudentAssistant() {
                   htmlFor="student-assistant-input"
                   className="sr-only"
                 >
-                  Ask about your attendance
+                  {t("stuAssistant.inputLabel")}
                 </label>
                 <input
                   id="student-assistant-input"
@@ -349,7 +349,7 @@ export default function StudentAssistant() {
                   onChange={(event) =>
                     setInput(event.target.value)
                   }
-                  placeholder="Ask about your attendance…"
+                  placeholder={t("stuAssistant.inputPlaceholder")}
                   autoComplete="off"
                 />
                 <button
@@ -358,7 +358,7 @@ export default function StudentAssistant() {
                     answering || !input.trim() || !context
                   }
                 >
-                  {answering ? "Sending…" : "Send"}
+                  {answering ? t("stuAssistant.sending") : t("stuAssistant.send")}
                 </button>
               </form>
             </>

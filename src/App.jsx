@@ -862,9 +862,11 @@ function Login() {
 
         </div>
 
-        <ThemeToggle />
+        <div className="top-header-actions">
+          <ThemeToggle />
 
-        <LanguageToggle />
+          <LanguageToggle />
+        </div>
 
       </header>
 

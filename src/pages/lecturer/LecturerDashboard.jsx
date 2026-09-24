@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useLanguage } from "../../utils/i18n";
+
 import {
   getLecturerDashboardStats,
   getLecturerSections,
@@ -208,6 +210,7 @@ const STAT_TONE_ICONS = {
 
 export default function LecturerDashboard() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [user] = useState(getSavedUser);
   const [data, setData] = useState(null);
@@ -232,7 +235,7 @@ export default function LecturerDashboard() {
 
       setError(
         requestError?.message ||
-          "Failed to load lecturer dashboard."
+          t("lecDash.loadError")
       );
     } finally {
       setLoading(false);
@@ -251,7 +254,7 @@ export default function LecturerDashboard() {
     user?.firstName ||
     lecturer?.firstName ||
     lecturer?.first_name ||
-    "Lecturer";
+    t("role.lecturer");
 
   const lastName =
     user?.last_name ||
@@ -267,13 +270,13 @@ export default function LecturerDashboard() {
 
   const statCards = [
     {
-      label: "Courses",
+      label: t("lecDash.statCourses"),
       value: formatNumber(stats.totalCourses),
       tone: "blue",
       action: () => navigate("/lecturer/sections"),
     },
     {
-      label: "Sections",
+      label: t("lecDash.statSections"),
       value: formatNumber(
         stats.totalSections ?? sections.length
       ),
@@ -281,37 +284,37 @@ export default function LecturerDashboard() {
       action: () => navigate("/lecturer/sections"),
     },
     {
-      label: "Enrolled Students",
+      label: t("lecDash.statEnrolledStudents"),
       value: formatNumber(stats.totalEnrolledStudents),
       tone: "green",
       action: () => navigate("/lecturer/sections"),
     },
     {
-      label: "Attendance Rate",
+      label: t("lecDash.statAttendanceRate"),
       value: formatPercent(stats.attendancePercentage),
       tone: "amber",
       action: () => navigate("/lecturer/attendance"),
     },
     {
-      label: "Total Sessions",
+      label: t("lecDash.statTotalSessions"),
       value: formatNumber(stats.totalSessions),
       tone: "cyan",
       action: () => navigate("/lecturer/sessions"),
     },
     {
-      label: "Active Sessions",
+      label: t("lecDash.statActiveSessions"),
       value: formatNumber(stats.activeSessions),
       tone: "red",
       action: () => navigate("/lecturer/sessions"),
     },
     {
-      label: "Attendance Records",
+      label: t("lecDash.statAttendanceRecords"),
       value: formatNumber(stats.totalAttendanceEvents),
       tone: "indigo",
       action: () => navigate("/lecturer/attendance"),
     },
     {
-      label: "Pending Corrections",
+      label: t("lecDash.statPendingCorrections"),
       value: formatNumber(
         stats?.correctionRequests?.pending
       ),
@@ -325,14 +328,13 @@ export default function LecturerDashboard() {
       <header className="lecturer-dashboard-header">
         <div className="lecturer-dashboard-heading">
           <span className="lecturer-dashboard-eyebrow">
-            LECTURER PORTAL
+            {t("lecDash.eyebrow")}
           </span>
 
-          <h1>Good to see you, {firstName}</h1>
+          <h1>{t("lecDash.greeting").replace("{n}", firstName)}</h1>
 
           <p>
-            Manage your assigned sections, attendance sessions,
-            and teaching activity from one place.
+            {t("lecDash.subtitle")}
           </p>
         </div>
 
@@ -346,14 +348,14 @@ export default function LecturerDashboard() {
             <LecturerIcon name="refresh" size={15} />
           </span>
 
-          {loading ? "Refreshing..." : "Refresh"}
+          {loading ? t("lecDash.refreshing") : t("action.refresh")}
         </button>
       </header>
 
       {error && (
         <div className="lecturer-dashboard-error">
           <div>
-            <strong>Could not load dashboard data</strong>
+            <strong>{t("lecDash.errorTitle")}</strong>
             <p>{error}</p>
           </div>
 
@@ -362,7 +364,7 @@ export default function LecturerDashboard() {
             onClick={loadDashboard}
             disabled={loading}
           >
-            Retry
+            {t("lecDash.retry")}
           </button>
         </div>
       )}
@@ -393,7 +395,7 @@ export default function LecturerDashboard() {
             </strong>
 
             <span className="lecturer-dashboard-stat-link">
-              View details
+              {t("lecDash.viewDetails")}
               <LecturerIcon name="arrow" size={13} />
             </span>
           </button>
@@ -405,13 +407,13 @@ export default function LecturerDashboard() {
           <div className="lecturer-dashboard-panel-header">
             <div>
               <span className="lecturer-dashboard-panel-eyebrow">
-                TEACHING
+                {t("lecDash.teachingEyebrow")}
               </span>
 
-              <h2>My Sections</h2>
+              <h2>{t("nav.mySections")}</h2>
 
               <p>
-                Sections currently assigned to your account.
+                {t("lecDash.mySectionsDesc")}
               </p>
             </div>
 
@@ -420,7 +422,7 @@ export default function LecturerDashboard() {
               className="lecturer-dashboard-text-button"
               onClick={() => navigate("/lecturer/sections")}
             >
-              View all
+              {t("lecDash.viewAll")}
             </button>
           </div>
 
@@ -443,11 +445,10 @@ export default function LecturerDashboard() {
                 <LecturerIcon name="layers" size={22} />
               </div>
 
-              <strong>No assigned sections</strong>
+              <strong>{t("lecDash.noSections")}</strong>
 
               <p>
-                No sections are currently assigned to this
-                lecturer account.
+                {t("lecDash.noSectionsDesc")}
               </p>
             </div>
           ) : (
@@ -475,13 +476,13 @@ export default function LecturerDashboard() {
 
                     <span className="lecturer-dashboard-section-info">
                       <strong>
-                        {getCourseCode(section)}, Section{" "}
+                        {getCourseCode(section)}, {t("lecDash.sectionWord")}{" "}
                         {getSectionName(section)}
                       </strong>
 
                       <small>
                         {getCourseName(section) ||
-                          "Assigned teaching section"}
+                          t("lecDash.assignedSectionFallback")}
                       </small>
                     </span>
 
@@ -490,7 +491,7 @@ export default function LecturerDashboard() {
                         getStudentCount(section)
                       )}
 
-                      <small>students</small>
+                      <small>{t("lecDash.students")}</small>
                     </span>
 
                     <span className="lecturer-dashboard-section-arrow">
@@ -507,13 +508,13 @@ export default function LecturerDashboard() {
           <div className="lecturer-dashboard-panel-header">
             <div>
               <span className="lecturer-dashboard-panel-eyebrow">
-                WORKSPACE
+                {t("lecDash.workspaceEyebrow")}
               </span>
 
-              <h2>Quick Actions</h2>
+              <h2>{t("lecDash.quickActions")}</h2>
 
               <p>
-                Jump directly to common tasks.
+                {t("lecDash.quickActionsDesc")}
               </p>
             </div>
           </div>
@@ -530,9 +531,9 @@ export default function LecturerDashboard() {
               </span>
 
               <span>
-                <strong>Attendance Sessions</strong>
+                <strong>{t("nav.sessions")}</strong>
                 <small>
-                  Create or manage QR sessions
+                  {t("lecDash.actionSessionsDesc")}
                 </small>
               </span>
 
@@ -552,9 +553,9 @@ export default function LecturerDashboard() {
               </span>
 
               <span>
-                <strong>Review Attendance</strong>
+                <strong>{t("lecDash.actionReviewAttendance")}</strong>
                 <small>
-                  Check attendance records
+                  {t("lecDash.actionReviewAttendanceDesc")}
                 </small>
               </span>
 
@@ -574,9 +575,9 @@ export default function LecturerDashboard() {
               </span>
 
               <span>
-                <strong>Reports</strong>
+                <strong>{t("nav.reports")}</strong>
                 <small>
-                  Review attendance summaries
+                  {t("lecDash.actionReportsDesc")}
                 </small>
               </span>
 
@@ -596,9 +597,9 @@ export default function LecturerDashboard() {
               </span>
 
               <span>
-                <strong>My Sections</strong>
+                <strong>{t("nav.mySections")}</strong>
                 <small>
-                  View assigned sections
+                  {t("lecDash.actionSectionsDesc")}
                 </small>
               </span>
 
@@ -617,7 +618,7 @@ export default function LecturerDashboard() {
 
         <div>
           <span className="lecturer-dashboard-panel-eyebrow">
-            TEACHING WORKSPACE
+            {t("lecDash.footerEyebrow")}
           </span>
 
           <strong>
@@ -625,8 +626,7 @@ export default function LecturerDashboard() {
           </strong>
 
           <p>
-            Your lecturer dashboard is connected to your
-            assigned sections and attendance services.
+            {t("lecDash.footerDesc")}
           </p>
         </div>
 
@@ -636,7 +636,7 @@ export default function LecturerDashboard() {
             navigate("/lecturer/sessions")
           }
         >
-          Open Sessions
+          {t("lecDash.openSessions")}
           <LecturerIcon name="arrow" size={15} />
         </button>
       </section>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword } from "./services/api";
+import { useLanguage } from "./utils/i18n";
 import "./App.css";
 
 function ForgotPassword() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [identifier, setIdentifier] = useState("");
@@ -17,7 +19,7 @@ function ForgotPassword() {
     const value = identifier.trim();
 
     if (!value) {
-      setError("Enter your email or university ID.");
+      setError(t("pwd.identifierRequired"));
       return;
     }
 
@@ -36,7 +38,7 @@ function ForgotPassword() {
     } catch (requestError) {
       setError(
         requestError.message ||
-          "Could not send the reset link. Try again."
+          t("pwd.sendFailed")
       );
     } finally {
       setSending(false);
@@ -53,7 +55,7 @@ function ForgotPassword() {
 
           <div className="brand-text">
             <h1>Attendify</h1>
-            <p>SMART ATTENDANCE SYSTEM</p>
+            <p>{t("brand.tagline")}</p>
           </div>
         </div>
       </header>
@@ -65,12 +67,11 @@ function ForgotPassword() {
           </div>
 
           <h2 className="app-name">
-            Reset Password
+            {t("pwd.title")}
           </h2>
 
           <p className="app-description">
-            Enter your account email or university ID and
-            we will send you a password reset link.
+            {t("pwd.subtitle")}
           </p>
 
           {sent ? (
@@ -81,7 +82,7 @@ function ForgotPassword() {
               <p>
                 {typeof sent === "string"
                   ? sent
-                  : "If the account exists, a password reset link has been sent."}
+                  : t("pwd.sentFallback")}
               </p>
 
               <button
@@ -89,7 +90,7 @@ function ForgotPassword() {
                 className="sign-in-button"
                 onClick={() => navigate("/")}
               >
-                Back to Sign In
+                {t("pwd.backToSignIn")}
               </button>
             </div>
           ) : (
@@ -99,14 +100,14 @@ function ForgotPassword() {
             >
               <div className="form-group">
                 <label htmlFor="forgot-identifier">
-                  Email or University ID
+                  {t("pwd.identifier")}
                 </label>
 
                 <div className="input-container">
                   <input
                     id="forgot-identifier"
                     type="text"
-                    placeholder="Enter your email or university ID"
+                    placeholder={t("pwd.identifierPh")}
                     autoComplete="username"
                     value={identifier}
                     onChange={(event) =>
@@ -133,8 +134,8 @@ function ForgotPassword() {
               >
                 <span>
                   {sending
-                    ? "Sending reset link..."
-                    : "Send Reset Link"}
+                    ? t("pwd.sending")
+                    : t("pwd.sendLink")}
                 </span>
               </button>
 
@@ -144,7 +145,7 @@ function ForgotPassword() {
                   className="forgot-password"
                   onClick={() => navigate("/")}
                 >
-                  Back to Sign In
+                  {t("pwd.backToSignIn")}
                 </button>
               </div>
             </form>
@@ -154,11 +155,11 @@ function ForgotPassword() {
 
       <footer className="page-footer">
         <div className="page-footer-copy">
-          © Aboelyazed Hatem Aboelyazed
+          {t("footer.copy")}
         </div>
 
         <div className="page-footer-uni">
-          Badr University in Assiut
+          {t("footer.uni")}
         </div>
       </footer>
     </div>

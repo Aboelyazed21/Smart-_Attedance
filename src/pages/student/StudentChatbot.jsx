@@ -13,6 +13,7 @@ import {
 import Footer from "../../components/Footer";
 import "../../components/Footer.css";
 import StudentMobileNav from "./StudentMobileNav";
+import { useLanguage } from "../../utils/i18n";
 import "./StudentChatbot.css";
 
 function getSavedUser() {
@@ -24,11 +25,12 @@ function getSavedUser() {
 }
 
 function StudentChatbot() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const user = getSavedUser();
-  const firstName = user?.first_name || user?.firstName || "Student";
+  const firstName = user?.first_name || user?.firstName || t("role.student");
   const lastName = user?.last_name || user?.lastName || "";
-  const fullName = `${firstName} ${lastName}`.trim() || "Student";
+  const fullName = `${firstName} ${lastName}`.trim() || t("role.student");
   const avatarLetter = (firstName.charAt(0) || "S").toUpperCase();
 
   const [records, setRecords] = useState([]);
@@ -39,7 +41,7 @@ function StudentChatbot() {
     {
       id: "welcome",
       role: "assistant",
-      text: "Hello. I can help you understand your attendance. Ask about this week, absences, percentage, or warnings. Your answers are based on your recorded sessions.",
+      text: t("stuChat.welcome"),
     },
   ]);
   const [input, setInput] = useState("");
@@ -65,7 +67,7 @@ function StudentChatbot() {
       const data = await getMyAttendance();
       setRecords(toRecords(data));
     } catch (err) {
-      setLoadError(err?.message || "Failed to load attendance data.");
+      setLoadError(err?.message || t("stuChat.loadError"));
       setRecords([]);
     } finally {
       setLoading(false);
@@ -153,7 +155,7 @@ function StudentChatbot() {
         <button
           type="button"
           className="chatbot-overlay"
-          aria-label="Close menu"
+          aria-label={t("a11y.closeNav")}
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -168,7 +170,7 @@ function StudentChatbot() {
           </div>
           <div>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -178,36 +180,26 @@ function StudentChatbot() {
           </div>
           <div className="chatbot-profile-info">
             <strong>{fullName}</strong>
-            <span>Student</span>
+            <span>{t("role.student")}</span>
           </div>
         </div>
 
-        <nav className="chatbot-nav" aria-label="Student navigation">
-          <button type="button" onClick={() => goTo("/dashboard")}>
-            Dashboard
-          </button>
-          <button type="button" onClick={() => goTo("/student/attendance")}>
-            My Attendance
-          </button>
-          <button type="button" onClick={() => goTo("/student/scan")}>
-            Scan Attendance
-          </button>
+        <nav className="chatbot-nav" aria-label={t("stuChat.navLabel")}>
+          <button type="button" onClick={() => goTo("/dashboard")}>{t("nav.dashboard")}</button>
+          <button type="button" onClick={() => goTo("/student/attendance")}>{t("nav.myAttendance")}</button>
+          <button type="button" onClick={() => goTo("/student/scan")}>{t("nav.scan")}</button>
           <button
             type="button"
             onClick={() => goTo("/student/correction-requests")}
-          >
-            Correction Requests
-          </button>
-          <button type="button" onClick={() => goTo("/student/profile")}>
-            Profile
-          </button>
+          >{t("nav.corrections")}</button>
+          <button type="button" onClick={() => goTo("/student/profile")}>{t("nav.profile")}</button>
           <button
             type="button"
             className="active"
             aria-current="page"
             onClick={() => goTo("/student/chatbot")}
           >
-            Attendance Assistant
+            {t("stuChat.assistantNav")}
           </button>
         </nav>
 
@@ -217,7 +209,7 @@ function StudentChatbot() {
             className="chatbot-logout"
             onClick={handleLogout}
           >
-            Logout
+            {t("action.logout")}
           </button>
         </div>
       </aside>
@@ -229,7 +221,7 @@ function StudentChatbot() {
             className="hamburger"
             aria-expanded={sidebarOpen}
             aria-controls="chatbot-sidebar"
-            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+            aria-label={sidebarOpen ? t("a11y.closeNav") : t("a11y.openNav")}
             onClick={() => setSidebarOpen((o) => !o)}
           >
             <span aria-hidden="true" />
@@ -237,8 +229,8 @@ function StudentChatbot() {
             <span aria-hidden="true" />
           </button>
           <div className="chatbot-topbar-title">
-            <strong>Attendance Assistant</strong>
-            <span>Answers use your recorded sessions</span>
+            <strong>{t("stuChat.title")}</strong>
+            <span>{t("stuChat.topbarSub")}</span>
           </div>
           <ThemeToggle />
           <div className="chatbot-user-area">
@@ -247,7 +239,7 @@ function StudentChatbot() {
             </div>
             <div className="chatbot-top-user">
               <strong>{fullName}</strong>
-              <span>Student</span>
+              <span>{t("role.student")}</span>
             </div>
           </div>
         </header>
@@ -263,11 +255,10 @@ function StudentChatbot() {
               aria-hidden="true"
             />
             <div>
-              <span className="chatbot-eyebrow">STUDENT ASSISTANT</span>
-              <h1>Attendance Assistant</h1>
+              <span className="chatbot-eyebrow">{t("stuChat.eyebrow")}</span>
+              <h1>{t("stuChat.title")}</h1>
               <p>
-                Weekly summary and warnings below are calculated from your
-                attendance records{weekRange ? ` for ${weekRange}` : ""}.
+                {t("stuChat.heroText").replace("{n}", weekRange ? ` for ${weekRange}` : "")}
               </p>
             </div>
           </div>
@@ -276,53 +267,53 @@ function StudentChatbot() {
             <div className="chatbot-error" role="alert">
               <span>{loadError}</span>
               <button type="button" onClick={load}>
-                Try again
+                {t("stuChat.tryAgain")}
               </button>
             </div>
           )}
 
           <div className="chatbot-summary-grid" aria-live="polite">
             <div className="chatbot-card">
-              <span>Total sessions (week)</span>
+              <span>{t("stuChat.totalWeek")}</span>
               <strong>{loading ? "—" : weekly.total}</strong>
-              <small>{weekRange || "Current week"}</small>
+              <small>{weekRange || t("stuChat.currentWeek")}</small>
             </div>
             <div className="chatbot-card">
-              <span>Attended</span>
+              <span>{t("stuChat.attended")}</span>
               <strong>{loading ? "—" : weekly.attended}</strong>
               <small>
                 {loading
-                  ? "Loading"
-                  : `${weekly.present} present · ${weekly.late} late`}
+                  ? t("stuChat.loadingShort")
+                  : t("stuChat.presentLate").replace("{p}", weekly.present).replace("{l}", weekly.late)}
               </small>
             </div>
             <div className="chatbot-card">
-              <span>Absent</span>
+              <span>{t("stuChat.absent")}</span>
               <strong>{loading ? "—" : weekly.absent}</strong>
-              <small>This week</small>
+              <small>{t("stuChat.thisWeek")}</small>
             </div>
             <div className="chatbot-card">
-              <span>Late</span>
+              <span>{t("stuChat.late")}</span>
               <strong>{loading ? "—" : weekly.late}</strong>
-              <small>This week</small>
+              <small>{t("stuChat.thisWeek")}</small>
             </div>
             <div className="chatbot-card">
-              <span>Attendance rate</span>
+              <span>{t("stuChat.rate")}</span>
               <strong>{loading ? "—" : `${weekly.rate}%`}</strong>
-              <small>{`Overall ${overall.rate}% · ${overall.total} sessions`}</small>
+              <small>{t("stuChat.overallLine").replace("{r}", overall.rate).replace("{s}", overall.total)}</small>
             </div>
             <div className="chatbot-card">
-              <span>Warnings</span>
+              <span>{t("stuChat.warnings")}</span>
               <strong>{loading ? "—" : warnings.length}</strong>
-              <small>Derived from your records</small>
+              <small>{t("stuChat.warningsSub")}</small>
             </div>
           </div>
 
           <div className="chatbot-panels">
-            <section className="chatbot-panel" aria-label="Conversation">
+            <section className="chatbot-panel" aria-label={t("stuChat.conversationLabel")}>
               <div className="chatbot-panel-head">
-                <h2>Conversation</h2>
-                <p>Ask about absences, percentage, weekly summary, warnings.</p>
+                <h2>{t("stuChat.conversation")}</h2>
+                <p>{t("stuChat.conversationSub")}</p>
               </div>
 
               <div
@@ -330,7 +321,7 @@ function StudentChatbot() {
                 ref={listRef}
                 role="log"
                 aria-live="polite"
-                aria-label="Attendance conversation"
+                aria-label={t("stuChat.conversationAria")}
               >
                 {messages.map((m) => (
                   <div
@@ -342,25 +333,25 @@ function StudentChatbot() {
                     }
                   >
                     <span className="chatbot-msg-role">
-                      {m.role === "user" ? "You" : "Assistant"}
+                      {m.role === "user" ? t("stuChat.you") : t("stuChat.assistant")}
                     </span>
                     <p>{m.text}</p>
                   </div>
                 ))}
                 {answering && (
                   <div className="chatbot-msg assistant" aria-live="polite">
-                    <span className="chatbot-msg-role">Assistant</span>
+                    <span className="chatbot-msg-role">{t("stuChat.assistant")}</span>
                     <p className="chatbot-typing">
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
                       <span aria-hidden="true" />
-                      <span className="sr-only">Writing answer…</span>
+                      <span className="sr-only">{t("stuChat.writing")}</span>
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="chatbot-suggest" aria-label="Suggested questions">
+              <div className="chatbot-suggest" aria-label={t("stuChat.suggestLabel")}>
                 {SUGGESTED_QUESTIONS.slice(0, 4).map((q) => (
                   <button
                     key={q}
@@ -375,14 +366,14 @@ function StudentChatbot() {
 
               <form className="chatbot-form" onSubmit={onSubmit}>
                 <label htmlFor="chatbot-input" className="sr-only">
-                  Ask about your attendance
+                  {t("stuChat.inputLabel")}
                 </label>
                 <input
                   id="chatbot-input"
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask: How many absences do I have?"
+                  placeholder={t("stuChat.inputPlaceholder")}
                   autoComplete="off"
                   disabled={loading}
                 />
@@ -390,26 +381,26 @@ function StudentChatbot() {
                   type="submit"
                   disabled={answering || loading || !input.trim()}
                 >
-                  {answering ? "Sending…" : "Send"}
+                  {answering ? t("stuChat.sending") : t("stuChat.send")}
                 </button>
               </form>
             </section>
 
-            <aside className="chatbot-side" aria-label="Warnings summary">
+            <aside className="chatbot-side" aria-label={t("stuChat.warningsLabel")}>
               <div className="chatbot-panel">
                 <div className="chatbot-panel-head">
-                  <h2>Warnings summary</h2>
-                  <p>Calculated from your recorded attendance.</p>
+                  <h2>{t("stuChat.warningsTitle")}</h2>
+                  <p>{t("stuChat.warningsText")}</p>
                 </div>
                 {loading ? (
-                  <p className="chatbot-muted">Loading warnings…</p>
+                  <p className="chatbot-muted">{t("stuChat.loadingWarnings")}</p>
                 ) : warnings.length === 0 ? (
                   <div className="chatbot-no-warnings">
-                    <strong>No warnings</strong>
+                    <strong>{t("stuChat.noWarnings")}</strong>
                     <p>
                       {records.length === 0
-                        ? "No attendance records yet. Your warnings will appear here once sessions are recorded."
-                        : "Your attendance looks consistent. Keep attending on time."}
+                        ? t("stuChat.noWarningsEmpty")
+                        : t("stuChat.noWarningsGood")}
                     </p>
                   </div>
                 ) : (
@@ -429,7 +420,7 @@ function StudentChatbot() {
                   </ul>
                 )}
                 <div className="chatbot-overall">
-                  <span>Overall</span>
+                  <span>{t("stuChat.overall")}</span>
                   <strong>
                     {overall.total} sessions · {overall.present} present ·{" "}
                     {overall.absent} absent · {overall.late} late ·{" "}

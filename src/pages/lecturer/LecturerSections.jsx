@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../utils/i18n";
 import { getLecturerSections } from "../../services/api";
 import "./LecturerSections.css";
 
@@ -39,6 +40,7 @@ function getStudentCount(section) {
 
 export default function LecturerSections() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export default function LecturerSections() {
 
       setError(
         err?.message ||
-          "Failed to load your assigned sections."
+          t("lecSections.loadError")
       );
     } finally {
       setLoading(false);
@@ -121,20 +123,19 @@ export default function LecturerSections() {
           <header className="lecturer-sections-topbar">
             <div>
               <span className="topbar-label">
-                LECTURER PORTAL
+                {t("lecSections.eyebrow")}
               </span>
 
-              <h1>My Sections</h1>
+              <h1>{t("nav.mySections")}</h1>
 
               <p>
-                Sections currently assigned to your lecturer
-                account.
+                {t("lecSections.subtitle")}
               </p>
             </div>
 
             <div className="topbar-user">
               <span className="topbar-user-context">
-                Teaching workspace
+                {t("workspace.title")}
               </span>
             </div>
           </header>
@@ -143,15 +144,13 @@ export default function LecturerSections() {
             <div className="sections-hero">
               <div>
                 <span className="hero-label">
-                  TEACHING SECTIONS
+                  {t("lecSections.heroEyebrow")}
                 </span>
 
-                <h2>Your assigned sections</h2>
+                <h2>{t("lecSections.heroTitle")}</h2>
 
                 <p>
-                  Review the sections assigned to your
-                  lecturer account and continue to attendance
-                  session management.
+                  {t("lecSections.heroDesc")}
                 </p>
               </div>
 
@@ -160,7 +159,7 @@ export default function LecturerSections() {
                 className="manage-sessions-button"
                 onClick={handleManageSessions}
               >
-                Manage Sessions
+                {t("lecSections.manageSessions")}
               </button>
             </div>
 
@@ -170,7 +169,7 @@ export default function LecturerSections() {
 
                 <div className="alert-content">
                   <strong>
-                    Unable to load sections
+                    {t("lecSections.errorTitle")}
                   </strong>
 
                   <p>{error}</p>
@@ -181,7 +180,7 @@ export default function LecturerSections() {
                   onClick={() => loadSections(true)}
                   disabled={refreshing}
                 >
-                  {refreshing ? "Retrying..." : "Retry"}
+                  {refreshing ? t("lecSections.retrying") : t("lecSections.retry")}
                 </button>
               </div>
             )}
@@ -191,10 +190,10 @@ export default function LecturerSections() {
                 <div className="stat-icon">SC</div>
 
                 <div>
-                  <span>Assigned sections</span>
+                  <span>{t("lecSections.statAssigned")}</span>
                   <strong>{sections.length}</strong>
                   <small>
-                    Sections assigned to your account
+                    {t("lecSections.statAssignedDesc")}
                   </small>
                 </div>
               </div>
@@ -203,10 +202,10 @@ export default function LecturerSections() {
                 <div className="stat-icon">ST</div>
 
                 <div>
-                  <span>Enrolled students</span>
+                  <span>{t("lecSections.statEnrolled")}</span>
                   <strong>{totalStudents}</strong>
                   <small>
-                    Students across your sections
+                    {t("lecSections.statEnrolledDesc")}
                   </small>
                 </div>
               </div>
@@ -215,10 +214,10 @@ export default function LecturerSections() {
                 <div className="stat-icon">AT</div>
 
                 <div>
-                  <span>Attendance</span>
-                  <strong>Active</strong>
+                  <span>{t("nav.attendance")}</span>
+                  <strong>{t("lecSections.activeValue")}</strong>
                   <small>
-                    Connected to attendance management
+                    {t("lecSections.statAttendanceDesc")}
                   </small>
                 </div>
               </div>
@@ -228,14 +227,13 @@ export default function LecturerSections() {
               <div className="sections-panel-header">
                 <div>
                   <span className="panel-label">
-                    SECTION MANAGEMENT
+                    {t("lecSections.panelEyebrow")}
                   </span>
 
-                  <h3>Your sections</h3>
+                  <h3>{t("lecSections.panelTitle")}</h3>
 
                   <p>
-                    Select a section to continue managing
-                    attendance sessions.
+                    {t("lecSections.panelDesc")}
                   </p>
                 </div>
 
@@ -246,8 +244,8 @@ export default function LecturerSections() {
                   disabled={refreshing}
                 >
                   {refreshing
-                    ? "Refreshing..."
-                    : "Refresh"}
+                    ? t("lecSections.refreshing")
+                    : t("action.refresh")}
                 </button>
               </div>
 
@@ -261,8 +259,8 @@ export default function LecturerSections() {
                     onChange={(event) =>
                       setSearch(event.target.value)
                     }
-                    placeholder="Search course or section..."
-                    aria-label="Search course or section"
+                    placeholder={t("lecSections.searchPh")}
+                    aria-label={t("lecSections.searchAria")}
                   />
                 </div>
 
@@ -271,7 +269,7 @@ export default function LecturerSections() {
                     {filteredSections.length}
                   </strong>
 
-                  <span>shown</span>
+                  <span>{t("lecSections.shown")}</span>
                 </div>
               </div>
 
@@ -280,12 +278,11 @@ export default function LecturerSections() {
                   <div className="loading-spinner" />
 
                   <strong>
-                    Loading your sections
+                    {t("lecSections.loadingTitle")}
                   </strong>
 
                   <span>
-                    Fetching sections assigned to your
-                    lecturer account...
+                    {t("lecSections.loadingDesc")}
                   </span>
                 </div>
               ) : filteredSections.length === 0 ? (
@@ -294,14 +291,14 @@ export default function LecturerSections() {
 
                   <h3>
                     {sections.length === 0
-                      ? "No assigned sections"
-                      : "No matching sections"}
+                      ? t("lecSections.emptyNoAssigned")
+                      : t("lecSections.emptyNoMatch")}
                   </h3>
 
                   <p>
                     {sections.length === 0
-                      ? "There are currently no sections assigned to your lecturer account."
-                      : "Try another course code or section name."}
+                      ? t("lecSections.emptyNoAssignedDesc")
+                      : t("lecSections.emptyNoMatchDesc")}
                   </p>
 
                   {search && (
@@ -309,7 +306,7 @@ export default function LecturerSections() {
                       type="button"
                       onClick={() => setSearch("")}
                     >
-                      Clear Search
+                      {t("lecSections.clearSearch")}
                     </button>
                   )}
                 </div>
@@ -325,12 +322,12 @@ export default function LecturerSections() {
                     const courseCode =
                       section?.course_code ||
                       section?.courseCode ||
-                      "COURSE";
+                      t("lecSections.courseFallback");
 
                     const courseName =
                       section?.course_name ||
                       section?.courseName ||
-                      "Course";
+                      t("lecSections.courseNameFallback");
 
                     const sectionName =
                       section?.section_name ||
@@ -356,7 +353,7 @@ export default function LecturerSections() {
                           </span>
 
                           <span className="assigned-badge">
-                            Assigned
+                            {t("lecSections.assignedBadge")}
                           </span>
                         </div>
 
@@ -364,13 +361,13 @@ export default function LecturerSections() {
                           <h3>{courseName}</h3>
 
                           <div className="section-name">
-                            Section {sectionName}
+                            {t("lecSections.sectionWord")} {sectionName}
                           </div>
 
                           <div className="section-meta">
                             <div>
                               <span>
-                                Academic year
+                                {t("lecSections.academicYear")}
                               </span>
 
                               <strong>
@@ -379,7 +376,7 @@ export default function LecturerSections() {
                             </div>
 
                             <div>
-                              <span>Semester</span>
+                              <span>{t("lecSections.semester")}</span>
 
                               <strong>
                                 {semester}
@@ -394,7 +391,7 @@ export default function LecturerSections() {
 
                             <div>
                               <span>
-                                Enrolled students
+                                {t("lecSections.statEnrolled")}
                               </span>
 
                               <strong>
@@ -409,7 +406,7 @@ export default function LecturerSections() {
                             type="button"
                             onClick={handleManageSessions}
                           >
-                            Manage Sessions
+                            {t("lecSections.manageSessions")}
                           </button>
                         </div>
                       </article>

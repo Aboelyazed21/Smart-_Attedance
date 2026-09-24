@@ -10,6 +10,7 @@ import ThemeToggle from "../../components/ThemeToggle";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
+import { useLanguage } from "../../utils/i18n";
 
 import "../../App.css";
 import "./StudentDashboard.css";
@@ -158,6 +159,7 @@ function getStatusClass(status) {
 ========================================================= */
 
 function StudentAttendance() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] =
@@ -176,7 +178,7 @@ function StudentAttendance() {
   const firstName =
     user?.first_name ||
     user?.firstName ||
-    (user?.name ? String(user.name).split(" ")[0] : "Student");
+    (user?.name ? String(user.name).split(" ")[0] : t("role.student"));
 
   const lastName =
     user?.last_name ||
@@ -189,7 +191,7 @@ function StudentAttendance() {
       : "");
 
   const fullName =
-    `${firstName} ${lastName}`.trim() || "Student";
+    `${firstName} ${lastName}`.trim() || t("role.student");
 
   const initial =
     firstName.charAt(0).toUpperCase() || "S";
@@ -322,7 +324,7 @@ function StudentAttendance() {
         row?.course ||
         row?.section_name ||
         row?.section ||
-        "Course"
+        t("stuAttendance.courseFallback")
     );
   }
 
@@ -331,7 +333,7 @@ function StudentAttendance() {
       row?.course_name ||
         row?.course ||
         row?.course_code ||
-        "Course"
+        t("stuAttendance.courseFallback")
     );
   }
 
@@ -448,34 +450,34 @@ function StudentAttendance() {
 
     return [
       {
-        title: "Attendance Rate",
+        title: t("stuAttendance.rateTitle"),
         value: `${rate}%`,
         note: loading
-          ? "Loading attendance data"
+          ? t("stuAttendance.rateLoading")
           : total > 0
-            ? "Based on recorded sessions"
-            : "No attendance recorded yet",
+            ? t("stuAttendance.rateNote")
+            : t("stuAttendance.rateEmpty"),
         icon: "chart",
         tone: "blue",
       },
       {
-        title: "Total Sessions",
+        title: t("stuAttendance.totalTitle"),
         value: String(total),
-        note: "Sessions recorded this semester",
+        note: t("stuAttendance.totalNote"),
         icon: "calendar",
         tone: "purple",
       },
       {
-        title: "Present",
+        title: t("stuAttendance.presentTitle"),
         value: String(present),
-        note: "Sessions marked present",
+        note: t("stuAttendance.presentNote"),
         icon: "user",
         tone: "green",
       },
       {
-        title: "Absent",
+        title: t("stuAttendance.absentTitle"),
         value: String(absent),
-        note: "Sessions marked absent",
+        note: t("stuAttendance.absentNote"),
         icon: "user",
         tone: "red",
       },
@@ -490,27 +492,27 @@ function StudentAttendance() {
 
   const navItems = [
     {
-      label: "Dashboard",
+      label: t("nav.dashboard"),
       path: "/dashboard",
       icon: "home",
     },
     {
-      label: "My Attendance",
+      label: t("nav.myAttendance"),
       path: "/student/attendance",
       icon: "chart",
     },
     {
-      label: "Scan Attendance",
+      label: t("nav.scan"),
       path: "/student/scan",
       icon: "qr",
     },
     {
-      label: "Correction Requests",
+      label: t("nav.corrections"),
       path: "/student/correction-requests",
       icon: "clock",
     },
     {
-      label: "Profile",
+      label: t("nav.profile"),
       path: "/student/profile",
       icon: "user",
     },
@@ -518,22 +520,22 @@ function StudentAttendance() {
 
   const quickActions = [
     {
-      title: "Scan QR Code",
-      description: "Mark your attendance",
+      title: t("stuAttendance.quickScanTitle"),
+      description: t("stuAttendance.quickScanDesc"),
       icon: "qr",
       tone: "scan",
       path: "/student/scan",
     },
     {
-      title: "My Attendance",
-      description: "View your attendance history",
+      title: t("stuAttendance.quickHistoryTitle"),
+      description: t("stuAttendance.quickHistoryDesc"),
       icon: "chart",
       tone: "history",
       path: "/student/attendance",
     },
     {
-      title: "Request Correction",
-      description: "Report an attendance issue",
+      title: t("stuAttendance.quickCorrectionTitle"),
+      description: t("stuAttendance.quickCorrectionDesc"),
       icon: "clock",
       tone: "correction",
       path: "/student/correction-requests",
@@ -585,7 +587,7 @@ function StudentAttendance() {
 
             <div>
               <h2>Attendify</h2>
-              <span>SMART ATTENDANCE</span>
+              <span>{t("brand.tagline")}</span>
             </div>
           </div>
 
@@ -596,13 +598,13 @@ function StudentAttendance() {
 
             <div className="student-profile-copy">
               <strong>{fullName}</strong>
-              <span>Student</span>
+              <span>{t("role.student")}</span>
             </div>
           </div>
 
           <nav
             className="student-navigation"
-            aria-label="Student navigation"
+            aria-label={t("stuAttendance.navLabel")}
           >
             {navItems.map((item) => (
               <button
@@ -632,8 +634,8 @@ function StudentAttendance() {
             </div>
 
             <div>
-              <strong>Keep going!</strong>
-              <span>Every class counts.</span>
+              <strong>{t("stuAttendance.tipTitle")}</strong>
+              <span>{t("stuAttendance.tipText")}</span>
             </div>
           </div>
 
@@ -643,7 +645,7 @@ function StudentAttendance() {
             onClick={handleLogout}
           >
             <Icon name="logout" size={17} />
-            Logout
+            {t("action.logout")}
           </button>
         </div>
       </aside>
@@ -656,7 +658,7 @@ function StudentAttendance() {
             ? "sidebar-overlay show"
             : "sidebar-overlay"
         }
-        aria-label="Close menu"
+        aria-label={t("a11y.closeNav")}
         onClick={() => setSidebarOpen(false)}
       />
 
@@ -665,7 +667,7 @@ function StudentAttendance() {
       <button
         className="mobile-menu-btn"
         type="button"
-        aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+        aria-label={sidebarOpen ? t("a11y.closeNav") : t("a11y.openNav")}
         aria-expanded={sidebarOpen}
         aria-controls="student-attendance-sidebar"
         onClick={() => setSidebarOpen((open) => !open)}
@@ -688,7 +690,7 @@ function StudentAttendance() {
 
               <div>
                 <strong>{fullName}</strong>
-                <span>Student</span>
+                <span>{t("role.student")}</span>
               </div>
             </div>
           </div>
@@ -702,11 +704,12 @@ function StudentAttendance() {
                 {formattedDate}
               </span>
 
-              <h1>My Attendance</h1>
+              <h1>{t("stuAttendance.title")}</h1>
 
               <p>
-                Your attendance history for this semester,
-                updated after every class.
+                {
+                 t("stuAttendance.subtitle")
+               }
               </p>
             </div>
           </div>
@@ -735,14 +738,14 @@ function StudentAttendance() {
           <div
             className="student-filter-bar"
             role="group"
-            aria-label="Filter attendance records"
+            aria-label={t("stuAttendance.filterLabel")}
           >
             <div className="student-filter-pills">
               {[
-                { value: "all", label: "All" },
-                { value: "present", label: "Present" },
-                { value: "absent", label: "Absent" },
-                { value: "late", label: "Late" },
+                { value: "all", label: t("stuAttendance.filterAll") },
+                { value: "present", label: t("stuAttendance.filterPresent") },
+                { value: "absent", label: t("stuAttendance.filterAbsent") },
+                { value: "late", label: t("stuAttendance.filterLate") },
               ].map((option) => (
                 <button
                   key={option.value}
@@ -765,7 +768,7 @@ function StudentAttendance() {
 
             <select
               className="student-filter-select"
-              aria-label="Filter by course or section"
+              aria-label={t("stuAttendance.courseFilterLabel")}
               value={activeCourse}
               onChange={(event) =>
                 updateFilter(
@@ -775,8 +778,8 @@ function StudentAttendance() {
               }
             >
               <option value="">
-                All courses &amp; sections
-              </option>
+                 {t("stuAttendance.allCourses")}
+               </option>
 
               {courseOptions.map((option) => (
                 <option
@@ -796,7 +799,7 @@ function StudentAttendance() {
                   updateFilter("all", "")
                 }
               >
-                Clear filters
+                {t("stuAttendance.clearFilters")}
               </button>
             )}
 
@@ -805,8 +808,8 @@ function StudentAttendance() {
               role="status"
             >
               {loading
-                ? "Loading records…"
-                : `${filteredRecords.length} of ${records.length} sessions shown`}
+                ? t("stuAttendance.loadingRecords")
+                 : t("stuAttendance.filterCount").replace("{shown}", filteredRecords.length).replace("{total}", records.length)}
             </span>
           </div>
 
@@ -821,15 +824,15 @@ function StudentAttendance() {
                   </div>
 
                   <div>
-                    <h2>Attendance History</h2>
-                    <p>All recorded sessions</p>
+                    <h2>{t("stuAttendance.historyTitle")}</h2>
+                    <p>{t("stuAttendance.historySub")}</p>
                   </div>
                 </div>
               </div>
 
               {loading && (
                 <p className="student-loading" role="status">
-                  Loading attendance…
+                  {t("stuAttendance.loading")}
                 </p>
               )}
 
@@ -841,11 +844,11 @@ function StudentAttendance() {
                   <p>{error}</p>
 
                   <button
-                    type="button"
-                    onClick={loadAttendance}
-                  >
-                    Try again
-                  </button>
+                     type="button"
+                     onClick={loadAttendance}
+                   >
+                     {t("stuAttendance.tryAgain")}
+                   </button>
                 </div>
               )}
 
@@ -857,11 +860,12 @@ function StudentAttendance() {
                         <Icon name="chart" size={26} />
                       </div>
 
-                      <h3>No attendance records yet</h3>
+                      <h3>{t("stuAttendance.emptyTitle")}</h3>
 
                       <p>
-                        Your records will appear here after
-                        your lecturers mark attendance.
+                        {
+                         t("stuAttendance.emptyText")
+                       }
                       </p>
                     </div>
                   ) : filteredRecords.length === 0 ? (
@@ -870,12 +874,12 @@ function StudentAttendance() {
                         <Icon name="search" size={26} />
                       </div>
 
-                      <h3>No sessions match these filters</h3>
+                      <h3>{t("stuAttendance.noMatchTitle")}</h3>
 
                       <p>
-                        Try a different status or course,
-                        or clear the filters to see
-                        everything.
+                        {
+                         t("stuAttendance.noMatchText")
+                       }
                       </p>
 
                       <button
@@ -885,7 +889,7 @@ function StudentAttendance() {
                           updateFilter("all", "")
                         }
                       >
-                        Clear filters
+                        {t("stuAttendance.clearFilters")}
                       </button>
                     </div>
                   ) : (
@@ -900,13 +904,13 @@ function StudentAttendance() {
                         const statusLabel = status
                           ? status.charAt(0).toUpperCase() +
                             status.slice(1)
-                          : "Recorded";
+                          : t("stuAttendance.recordedFallback");
 
                         const course =
                           row?.course_name ||
                           row?.course ||
                           row?.course_code ||
-                          "Course";
+                          t("stuAttendance.courseFallback");
 
                         const section =
                           row?.section_name ||
@@ -939,8 +943,8 @@ function StudentAttendance() {
                               <span>
                                 {formatDate(dateValue)}
                                 {section
-                                  ? ` · Section ${section}`
-                                  : ""}
+                                   ? ` · ${t("stuAttendance.sectionLabel").replace("{n}", section)}`
+                                   : ""}
                               </span>
                             </div>
 
@@ -969,8 +973,8 @@ function StudentAttendance() {
                   </div>
 
                   <div>
-                    <h2>Quick Actions</h2>
-                    <p>Frequently used actions</p>
+                    <h2>{t("stuAttendance.quickTitle")}</h2>
+                    <p>{t("stuAttendance.quickSub")}</p>
                   </div>
                 </div>
               </div>
@@ -1007,7 +1011,7 @@ function StudentAttendance() {
                   </div>
 
                   <div>
-                    <h2>Calendar</h2>
+                    <h2>{t("stuAttendance.calendarTitle")}</h2>
                     <p>
                       {monthName} {year}
                     </p>
@@ -1017,13 +1021,13 @@ function StudentAttendance() {
 
               <div className="student-calendar-week">
                 {[
-                  "Sun",
-                  "Mon",
-                  "Tue",
-                  "Wed",
-                  "Thu",
-                  "Fri",
-                  "Sat",
+                  t("stuAttendance.weekSun"),
+                  t("stuAttendance.weekMon"),
+                  t("stuAttendance.weekTue"),
+                  t("stuAttendance.weekWed"),
+                  t("stuAttendance.weekThu"),
+                  t("stuAttendance.weekFri"),
+                  t("stuAttendance.weekSat"),
                 ].map((day) => (
                   <span key={day}>{day}</span>
                 ))}
@@ -1046,9 +1050,9 @@ function StudentAttendance() {
 
           {/* ============ FOOTER ============ */}
           <footer className="student-footer">
-            <span>© Aboelyazed Hatem Aboelyazed</span>
+            <span>{t("footer.copy")}</span>
             <span aria-hidden="true">·</span>
-            <span>Badr University in Assiut</span>
+            <span>{t("footer.uni")}</span>
           </footer>
         </section>
       </main>

@@ -6,6 +6,7 @@ import ThemeToggle from "../../components/ThemeToggle";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
+import { useLanguage } from "../../utils/i18n";
 import "./AttendanceScanner.css";
 
 function Icon({ name, size = 18 }) {
@@ -152,6 +153,7 @@ function getCameraErrorMessage(error) {
 }
 
 function AttendanceScanner() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const user = getSavedUser();
@@ -179,7 +181,7 @@ function AttendanceScanner() {
   const firstName =
     user?.first_name ||
     user?.firstName ||
-    "Student";
+    t("role.student");
 
   const lastName =
     user?.last_name ||
@@ -210,7 +212,7 @@ function AttendanceScanner() {
     } catch (requestError) {
       setHistoryError(
         requestError.message ||
-          "Could not load your recent attendance activity."
+          t("stuScan.recentLoadError")
       );
     } finally {
       setHistoryLoading(false);
@@ -272,7 +274,7 @@ function AttendanceScanner() {
         const authToken = localStorage.getItem("token");
 
         if (!authToken) {
-          throw new Error("Your session has ended. Please sign in again.");
+          throw new Error(t("stuScan.sessionEnded"));
         }
 
         const apiUrl =
@@ -370,7 +372,7 @@ function AttendanceScanner() {
     );
 
     if (!reader) {
-      setError("The scanner view is not ready. Please try again.");
+      setError(t("stuScan.viewNotReady"));
       return;
     }
 
@@ -388,14 +390,14 @@ function AttendanceScanner() {
         !navigator.mediaDevices.getUserMedia
       ) {
         throw new Error(
-          "Camera access is not supported by this browser."
+          t("stuScan.noCameraSupport")
         );
       }
 
       const cameras = await Html5Qrcode.getCameras();
 
       if (!cameras?.length) {
-        throw new Error("No camera was found on this device.");
+        throw new Error(t("stuScan.noCamera"));
       }
 
       if (stopRequestedRef.current) return;
@@ -561,7 +563,7 @@ function AttendanceScanner() {
     const code = manualCode.trim();
 
     if (!code) {
-      setManualError("Enter the attendance code first.");
+      setManualError(t("stuScan.manualRequired"));
       return;
     }
 
@@ -585,30 +587,30 @@ function AttendanceScanner() {
   }, [cameraReady, error]);
 
   const cameraLabel = useMemo(() => {
-    if (error) return "Camera needs attention";
-    if (isProcessing) return "Verifying attendance";
-    if (cameraReady) return "Camera active";
-    return "Preparing camera";
+    if (error) return t("stuScan.camError");
+    if (isProcessing) return t("stuScan.camVerifying");
+    if (cameraReady) return t("stuScan.camActive");
+    return t("stuScan.camPreparing");
   }, [cameraReady, error, isProcessing]);
 
   const cameraMessage = useMemo(() => {
     if (error) {
-      return "Use the retry option or enter the code manually.";
+      return t("stuScan.camErrorHint");
     }
 
     if (isProcessing) {
-      return "Please wait while your attendance is verified.";
+      return t("stuScan.camVerifyingHint");
     }
 
     if (cameraReady) {
-      return "Position the QR code inside the scanning frame.";
+      return t("stuScan.camActiveHint");
     }
 
     if (scannerStarted) {
-      return "Requesting permission and preparing the camera stream.";
+      return t("stuScan.camRequestingHint");
     }
 
-    return "The scanner is preparing.";
+    return t("stuScan.camIdleHint");
   }, [cameraReady, error, isProcessing, scannerStarted]);
 
   return (
@@ -616,7 +618,7 @@ function AttendanceScanner() {
       <button
         type="button"
         className="scan-mobile-menu-button"
-        aria-label="Open navigation menu"
+        aria-label={t("a11y.openNav")}
         aria-expanded={sidebarOpen}
         onClick={() => setSidebarOpen((open) => !open)}
       >
@@ -629,7 +631,7 @@ function AttendanceScanner() {
         <button
           type="button"
           className="scan-sidebar-overlay"
-          aria-label="Close navigation menu"
+          aria-label={t("a11y.closeNav")}
           onClick={closeSidebar}
         />
       )}
@@ -644,7 +646,7 @@ function AttendanceScanner() {
 
           <div>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -655,7 +657,7 @@ function AttendanceScanner() {
 
           <div className="scan-profile-info">
             <strong>{fullName}</strong>
-            <span>Student</span>
+            <span>{t("role.student")}</span>
           </div>
         </div>
 
@@ -669,9 +671,7 @@ function AttendanceScanner() {
           >
             <span className="scan-nav-icon">
               <Icon name="dashboard" size={16} />
-            </span>
-            Dashboard
-          </button>
+            </span>{t("nav.dashboard")}</button>
 
           <button
             type="button"
@@ -686,9 +686,7 @@ function AttendanceScanner() {
           >
             <span className="scan-nav-icon">
               <Icon name="calendar" size={16} />
-            </span>
-            My Attendance
-          </button>
+            </span>{t("nav.myAttendance")}</button>
 
           <button
             type="button"
@@ -702,7 +700,7 @@ function AttendanceScanner() {
             <span className="scan-nav-icon">
               <Icon name="scan" size={16} />
             </span>
-            Scan Attendance
+            {t("nav.scan")}
           </button>
 
           <button
@@ -718,9 +716,7 @@ function AttendanceScanner() {
           >
             <span className="scan-nav-icon">
               <Icon name="edit" size={16} />
-            </span>
-            Correction Requests
-          </button>
+            </span>{t("nav.corrections")}</button>
 
           <button
             type="button"
@@ -733,15 +729,13 @@ function AttendanceScanner() {
           >
             <span className="scan-nav-icon">
               <Icon name="user" size={16} />
-            </span>
-            Profile
-          </button>
+            </span>{t("nav.profile")}</button>
         </nav>
 
         <div className="scan-sidebar-bottom">
           <div className="keep-going-card">
-            <strong>Keep going</strong>
-            <span>Every class counts.</span>
+            <strong>{t("stuScan.keepGoing")}</strong>
+            <span>{t("stuScan.keepGoingSub")}</span>
           </div>
 
           <button
@@ -752,7 +746,7 @@ function AttendanceScanner() {
             <span>
               <Icon name="logout" size={16} />
             </span>
-            Logout
+            {t("action.logout")}
           </button>
         </div>
       </aside>
@@ -765,7 +759,7 @@ function AttendanceScanner() {
 
             <div className="top-user-info">
               <strong>{fullName}</strong>
-              <span>Student</span>
+              <span>{t("role.student")}</span>
             </div>
           </div>
         </header>
@@ -773,16 +767,15 @@ function AttendanceScanner() {
         <section className="scan-content">
           <div className="scan-page-hero">
             <div>
-              <span className="hero-label">ATTENDANCE</span>
-              <h1>Scan Attendance</h1>
+              <span className="hero-label">{t("stuScan.eyebrow")}</span>
+              <h1>{t("stuScan.title")}</h1>
               <p>
-                Scan the active QR code provided by your lecturer
-                to record attendance.
+                {t("stuScan.heroDesc")}
               </p>
             </div>
 
             <p className="hero-note">
-              Keep the code clearly visible inside the scanning frame.
+              {t("stuScan.heroNote")}
             </p>
           </div>
 
@@ -790,10 +783,9 @@ function AttendanceScanner() {
             <div className="scan-left-column">
               <div className="ready-card">
                 <div className="ready-info">
-                  <strong>Ready to scan</strong>
+                  <strong>{t("stuScan.readyTitle")}</strong>
                   <p>
-                    Position the QR code within the frame. Your
-                    attendance is verified by the server.
+                    {t("stuScan.readyDesc")}
                   </p>
                 </div>
 
@@ -814,8 +806,7 @@ function AttendanceScanner() {
 
                   {!cameraReady && !error && !isProcessing && (
                     <div className="camera-loading">
-                      Preparing camera access
-                    </div>
+                      {t("stuScan.preparingCamera")}</div>
                   )}
 
                   {!error && !isProcessing && (
@@ -828,7 +819,7 @@ function AttendanceScanner() {
                       <span className="corner bottom-left" />
                       <span className="corner bottom-right" />
                       <span className="scan-line" />
-                      <p>Position the QR code within the frame</p>
+                      <p>{t("stuScan.overlayHint")}</p>
                     </div>
                   )}
 
@@ -837,10 +828,9 @@ function AttendanceScanner() {
                       className="scanner-message processing-state"
                       aria-live="polite"
                     >
-                      <h2>Verifying attendance</h2>
+                      <h2>{t("stuScan.verifyingTitle")}</h2>
                       <p>
-                        Your request is being checked. Keep this page
-                        open.
+                        {t("stuScan.verifyingText")}
                       </p>
                     </div>
                   )}
@@ -850,7 +840,7 @@ function AttendanceScanner() {
                       className="scanner-message error-state"
                       role="alert"
                     >
-                      <h2>Unable to use the scanner</h2>
+                      <h2>{t("stuScan.scannerErrorTitle")}</h2>
                       <p>{error}</p>
 
                       <button
@@ -858,7 +848,7 @@ function AttendanceScanner() {
                         className="primary-button"
                         onClick={handleRetry}
                       >
-                        Try again
+                        {t("stuScan.tryAgain")}
                       </button>
                     </div>
                   )}
@@ -874,10 +864,9 @@ function AttendanceScanner() {
                 </div>
 
                 <div className="manual-content">
-                  <h2>Enter attendance code manually</h2>
+                  <h2>{t("stuScan.manualTitle")}</h2>
                   <p>
-                    If your camera is unavailable, enter the code
-                    supplied by your lecturer.
+                    {t("stuScan.manualDesc")}
                   </p>
 
                   <div className="manual-form">
@@ -892,8 +881,8 @@ function AttendanceScanner() {
                           setManualCode(event.target.value);
                           setManualError("");
                         }}
-                        placeholder="Enter attendance code"
-                        aria-label="Attendance code"
+                        placeholder={t("stuScan.manualPlaceholder")}
+                        aria-label={t("stuScan.manualAriaLabel")}
                         autoComplete="off"
                       />
                     </div>
@@ -903,7 +892,7 @@ function AttendanceScanner() {
                       className="verify-button"
                       disabled={isProcessing}
                     >
-                      {isProcessing ? "Verifying" : "Verify Code"}
+                      {isProcessing ? t("stuScan.verifying") : t("stuScan.verifyCode")}
                     </button>
                   </div>
 
@@ -923,8 +912,8 @@ function AttendanceScanner() {
                     </span>
 
                     <div>
-                      <h2>Recent Attendance</h2>
-                      <p>Your latest attendance records.</p>
+                      <h2>{t("stuScan.recentTitle")}</h2>
+                      <p>{t("stuScan.recentSub")}</p>
                     </div>
                   </div>
 
@@ -934,9 +923,7 @@ function AttendanceScanner() {
                     onClick={() =>
                       navigate("/student/attendance")
                     }
-                  >
-                    View all
-                  </button>
+                  >{t("stuScan.viewAll")}</button>
                 </div>
 
                 {historyLoading ? (
@@ -956,20 +943,19 @@ function AttendanceScanner() {
                       className="retry-history-button"
                       onClick={loadRecentAttendance}
                     >
-                      Try again
+                      {t("stuScan.tryAgain")}
                     </button>
                   </div>
                 ) : recentAttendance.length === 0 ? (
                   <div className="recent-empty">
-                    No attendance records are available yet.
-                  </div>
+                    {t("stuScan.recentEmpty")}</div>
                 ) : (
                   <div className="recent-table">
                     <div className="recent-row table-head">
-                      <span>Date and Time</span>
-                      <span>Course</span>
-                      <span>Section</span>
-                      <span>Status</span>
+                      <span>{t("stuScan.colDate")}</span>
+                      <span>{t("stuScan.colCourse")}</span>
+                      <span>{t("stuScan.colSection")}</span>
+                      <span>{t("stuScan.colStatus")}</span>
                     </div>
 
                     {recentAttendance.map((record) => (
@@ -977,17 +963,17 @@ function AttendanceScanner() {
                         className="recent-row"
                         key={`${record.id}-${record.scanned_at}`}
                       >
-                        <span data-label="Date and Time">
+                        <span data-label={t("stuScan.colDate")}>
                           {formatDateTime(
                             record.scanned_at ||
                               record.session_date
                           )}
                         </span>
 
-                        <span data-label="Course">
+                        <span data-label={t("stuScan.colCourse")}>
                           <strong>
                             {record.course_name ||
-                              "Course unavailable"}
+                              t("stuScan.courseUnavailable")}
                           </strong>
 
                           {record.course_code && (
@@ -995,11 +981,11 @@ function AttendanceScanner() {
                           )}
                         </span>
 
-                        <span data-label="Section">
-                          {record.section_name || "Not available"}
+                        <span data-label={t("stuScan.colSection")}>
+                          {record.section_name || t("stuScan.notAvailable")}
                         </span>
 
-                        <span data-label="Status">
+                        <span data-label={t("stuScan.colStatus")}>
                           <b
                             className={`status-pill ${
                               record.status || "recorded"
@@ -1018,17 +1004,16 @@ function AttendanceScanner() {
             <aside className="scan-right-column">
               <div className="info-card">
                 <div className="info-card-title">
-                  <h2>How It Works</h2>
+                  <h2>{t("stuScan.howTitle")}</h2>
                 </div>
 
                 <div className="steps">
                   <div className="step">
                     <span className="step-number">1</span>
                     <div>
-                      <strong>Open the active QR code</strong>
+                      <strong>{t("stuScan.step1Title")}</strong>
                       <p>
-                        Ask your lecturer to display the attendance
-                        code for the current session.
+                        {t("stuScan.step1Text")}
                       </p>
                     </div>
                   </div>
@@ -1036,10 +1021,9 @@ function AttendanceScanner() {
                   <div className="step">
                     <span className="step-number">2</span>
                     <div>
-                      <strong>Place it inside the frame</strong>
+                      <strong>{t("stuScan.step2Title")}</strong>
                       <p>
-                        Hold your device still until the code is
-                        detected.
+                        {t("stuScan.step2Text")}
                       </p>
                     </div>
                   </div>
@@ -1047,10 +1031,9 @@ function AttendanceScanner() {
                   <div className="step">
                     <span className="step-number">3</span>
                     <div>
-                      <strong>Wait for server verification</strong>
+                      <strong>{t("stuScan.step3Title")}</strong>
                       <p>
-                        The system validates the session and your
-                        enrollment.
+                        {t("stuScan.step3Text")}
                       </p>
                     </div>
                   </div>
@@ -1058,10 +1041,9 @@ function AttendanceScanner() {
                   <div className="step">
                     <span className="step-number">4</span>
                     <div>
-                      <strong>Review the result</strong>
+                      <strong>{t("stuScan.step4Title")}</strong>
                       <p>
-                        Your confirmed attendance details appear on
-                        the next screen.
+                        {t("stuScan.step4Text")}
                       </p>
                     </div>
                   </div>
@@ -1070,28 +1052,28 @@ function AttendanceScanner() {
 
               <div className="info-card">
                 <div className="info-card-title">
-                  <h2>Before You Scan</h2>
+                  <h2>{t("stuScan.beforeTitle")}</h2>
                 </div>
 
                 <ul className="guidance-list">
-                  <li>Use the QR code for the active class session.</li>
-                  <li>Make sure you are signed in with your student account.</li>
-                  <li>Keep a stable internet connection while scanning.</li>
-                  <li>Use manual code entry if camera access is unavailable.</li>
+                  <li>{t("stuScan.before1")}</li>
+                  <li>{t("stuScan.before2")}</li>
+                  <li>{t("stuScan.before3")}</li>
+                  <li>{t("stuScan.before4")}</li>
                 </ul>
               </div>
 
               <div className="info-card tips-card">
                 <div className="info-card-title">
-                  <h2>Scanning Tips</h2>
+                  <h2>{t("stuScan.tipsTitle")}</h2>
                 </div>
 
                 <ul className="tips-list">
-                  <li>Use adequate lighting around the QR code.</li>
-                  <li>Keep the device steady while scanning.</li>
-                  <li>Keep the entire QR code inside the frame.</li>
-                  <li>Maintain a comfortable distance from the code.</li>
-                  <li>Ask the lecturer for a new code if it is unclear.</li>
+                  <li>{t("stuScan.tip1")}</li>
+                  <li>{t("stuScan.tip2")}</li>
+                  <li>{t("stuScan.tip3")}</li>
+                  <li>{t("stuScan.tip4")}</li>
+                  <li>{t("stuScan.tip5")}</li>
                 </ul>
               </div>
             </aside>

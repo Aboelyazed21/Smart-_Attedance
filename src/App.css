@@ -92,9 +92,21 @@ body {
 
   justify-content: space-between;
 
+  gap: 16px;
+
   position: relative;
 
   z-index: 10;
+}
+
+.top-header-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  flex: 0 0 auto;
 }
 
 

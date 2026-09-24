@@ -9,6 +9,7 @@ import StudentAssistant from "../../components/student/StudentAssistant";
 import ThemeToggle from "../../components/ThemeToggle";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
+import { useLanguage } from "../../utils/i18n";
 import "./CorrectionRequests.css";
 
 function Icon({ name, size = 18 }) {
@@ -86,10 +87,10 @@ function Icon({ name, size = 18 }) {
 }
 
 const REQUESTED_STATUS_OPTIONS = [
-  { value: "present", label: "Present" },
-  { value: "late", label: "Late" },
-  { value: "excused", label: "Excused" },
-  { value: "absent", label: "Absent" },
+  { value: "present", labelKey: "stuCorrections.statusPresent" },
+  { value: "late", labelKey: "stuCorrections.statusLate" },
+  { value: "excused", labelKey: "stuCorrections.statusExcused" },
+  { value: "absent", labelKey: "stuCorrections.statusAbsent" },
 ];
 
 const EMPTY_FORM = {
@@ -164,6 +165,7 @@ function capitalize(value) {
 }
 
 function CorrectionRequests() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const user = getSavedUser();
@@ -237,7 +239,7 @@ function CorrectionRequests() {
     } catch (error) {
       setLoadError(
         error.message ||
-          "Could not load your correction requests."
+          t("stuCorrections.loadError")
       );
     } finally {
       setLoading(false);
@@ -253,7 +255,7 @@ function CorrectionRequests() {
     } catch (error) {
       setRecordsError(
         error.message ||
-          "Could not load your attendance records."
+          t("stuCorrections.recordsError")
       );
     }
   }
@@ -408,13 +410,13 @@ function CorrectionRequests() {
 
     if (!form.attendanceEventId) {
       setSubmitError(
-        "Select the attendance record you want to correct."
+        t("stuCorrections.selectRecordError")
       );
       return;
     }
 
     if (!form.reason.trim()) {
-      setSubmitError("Explain the reason for this request.");
+      setSubmitError(t("stuCorrections.reasonRequired"));
       return;
     }
 
@@ -434,11 +436,11 @@ function CorrectionRequests() {
 
       setShowModal(false);
       setForm(EMPTY_FORM);
-      setNotice("Your correction request was submitted.");
+      setNotice(t("stuCorrections.submitNotice"));
       await loadRequests();
     } catch (error) {
       setSubmitError(
-        error.message || "Could not submit the request."
+        error.message || t("stuCorrections.submitError")
       );
     } finally {
       setSubmitting(false);
@@ -446,7 +448,7 @@ function CorrectionRequests() {
   }
 
   const firstName =
-    user?.first_name || user?.firstName || "Student";
+    user?.first_name || user?.firstName || t("role.student");
   const lastName = user?.last_name || user?.lastName || "";
   const fullName = `${firstName} ${lastName}`.trim();
   const avatarLetter = firstName.charAt(0).toUpperCase() || "S";
@@ -456,7 +458,7 @@ function CorrectionRequests() {
       <button
         type="button"
         className="correction-mobile-menu-button"
-        aria-label="Open navigation menu"
+        aria-label={t("a11y.openNav")}
         aria-expanded={sidebarOpen}
         onClick={() => setSidebarOpen((open) => !open)}
       >
@@ -469,7 +471,7 @@ function CorrectionRequests() {
         <button
           type="button"
           className="correction-sidebar-overlay"
-          aria-label="Close navigation menu"
+          aria-label={t("a11y.closeNav")}
           onClick={closeSidebar}
         />
       )}
@@ -482,7 +484,7 @@ function CorrectionRequests() {
 
           <div>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -491,7 +493,7 @@ function CorrectionRequests() {
 
           <div className="correction-profile-info">
             <strong>{fullName}</strong>
-            <span>Student</span>
+            <span>{t("role.student")}</span>
           </div>
         </div>
 
@@ -503,9 +505,7 @@ function CorrectionRequests() {
           >
             <span className="nav-icon">
               <Icon name="grid" size={16} />
-            </span>
-            Dashboard
-          </button>
+            </span>{t("nav.dashboard")}</button>
 
           <button
             type="button"
@@ -516,9 +516,7 @@ function CorrectionRequests() {
           >
             <span className="nav-icon">
               <Icon name="calendar" size={16} />
-            </span>
-            My Attendance
-          </button>
+            </span>{t("nav.myAttendance")}</button>
 
           <button
             type="button"
@@ -527,9 +525,7 @@ function CorrectionRequests() {
           >
             <span className="nav-icon">
               <Icon name="scan" size={16} />
-            </span>
-            Scan Attendance
-          </button>
+            </span>{t("nav.scan")}</button>
 
           <button
             type="button"
@@ -544,9 +540,7 @@ function CorrectionRequests() {
           >
             <span className="nav-icon">
               <Icon name="edit" size={16} />
-            </span>
-            Correction Requests
-          </button>
+            </span>{t("nav.corrections")}</button>
 
           <button
             type="button"
@@ -557,16 +551,14 @@ function CorrectionRequests() {
           >
             <span className="nav-icon">
               <Icon name="user" size={16} />
-            </span>
-            Profile
-          </button>
+            </span>{t("nav.profile")}</button>
         </nav>
 
         <div className="correction-sidebar-bottom">
           <div className="correction-side-tip">
             <div>
-              <strong>Keep going!</strong>
-              <span>Every class counts.</span>
+              <strong>{t("stuCorrections.keepGoing")}</strong>
+              <span>{t("stuCorrections.keepGoingSub")}</span>
             </div>
           </div>
 
@@ -578,7 +570,7 @@ function CorrectionRequests() {
             <span className="logout-icon">
               <Icon name="logout" size={16} />
             </span>
-            Logout
+            {t("action.logout")}
           </button>
         </div>
       </aside>
@@ -592,8 +584,8 @@ function CorrectionRequests() {
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search requests by course, reason, or ID"
-              aria-label="Search correction requests"
+              placeholder={t("stuCorrections.globalSearchPh")}
+              aria-label={t("stuCorrections.globalSearchLabel")}
             />
           </div>
 
@@ -602,7 +594,7 @@ function CorrectionRequests() {
 
             <div className="top-user-info">
               <strong>{fullName}</strong>
-              <span>Student</span>
+              <span>{t("role.student")}</span>
             </div>
           </div>
         </header>
@@ -611,11 +603,10 @@ function CorrectionRequests() {
           <div className="correction-hero">
             <div className="hero-copy">
               <div>
-                <span className="hero-label">ATTENDANCE</span>
-                <h1>Correction Requests</h1>
+                <span className="hero-label">{t("stuCorrections.eyebrow")}</span>
+                <h1>{t("stuCorrections.title")}</h1>
                 <p>
-                  Submit and track requests for attendance
-                  corrections.
+                  {t("stuCorrections.heroDesc")}
                 </p>
               </div>
             </div>
@@ -626,40 +617,40 @@ function CorrectionRequests() {
               onClick={openNewRequest}
             >
               <Icon name="plus" size={16} />
-              New Correction Request
+              {t("stuCorrections.newRequest")}
             </button>
           </div>
 
           <div className="stats-grid">
             <div className="stat-card pending">
               <div className="stat-body">
-                <span>Pending Requests</span>
+                <span>{t("stuCorrections.pendingTitle")}</span>
                 <strong>{pendingCount}</strong>
-                <small>Awaiting review</small>
+                <small>{t("stuCorrections.pendingSub")}</small>
               </div>
             </div>
 
             <div className="stat-card approved">
               <div className="stat-body">
-                <span>Approved Requests</span>
+                <span>{t("stuCorrections.approvedTitle")}</span>
                 <strong>{approvedCount}</strong>
-                <small>Attendance updated</small>
+                <small>{t("stuCorrections.approvedSub")}</small>
               </div>
             </div>
 
             <div className="stat-card rejected">
               <div className="stat-body">
-                <span>Rejected Requests</span>
+                <span>{t("stuCorrections.rejectedTitle")}</span>
                 <strong>{rejectedCount}</strong>
-                <small>Not approved</small>
+                <small>{t("stuCorrections.rejectedSub")}</small>
               </div>
             </div>
 
             <div className="stat-card total">
               <div className="stat-body">
-                <span>Total Requests</span>
+                <span>{t("stuCorrections.totalTitle")}</span>
                 <strong>{normalizedRequests.length}</strong>
-                <small>All time</small>
+                <small>{t("stuCorrections.totalSub")}</small>
               </div>
             </div>
           </div>
@@ -668,7 +659,7 @@ function CorrectionRequests() {
             <div className="correction-left">
               <div className="filter-card">
                 <div className="filter-field search-field">
-                  <label htmlFor="correction-search">Search</label>
+                  <label htmlFor="correction-search">{t("stuCorrections.searchLabel")}</label>
                   <div className="input-with-prefix">
                     <Icon name="search" size={15} />
                     <input
@@ -678,13 +669,13 @@ function CorrectionRequests() {
                       onChange={(event) =>
                         setSearch(event.target.value)
                       }
-                      placeholder="Search by course, reason..."
+                      placeholder={t("stuCorrections.searchPh")}
                     />
                   </div>
                 </div>
 
                 <div className="filter-field">
-                  <label htmlFor="correction-status">Status</label>
+                  <label htmlFor="correction-status">{t("stuCorrections.statusLabel")}</label>
                   <select
                     id="correction-status"
                     value={statusFilter}
@@ -692,15 +683,15 @@ function CorrectionRequests() {
                       setStatusFilter(event.target.value)
                     }
                   >
-                    <option value="all">All statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="all">{t("stuCorrections.allStatuses")}</option>
+                    <option value="pending">{t("stuCorrections.statusPending")}</option>
+                    <option value="approved">{t("stuCorrections.statusApproved")}</option>
+                    <option value="rejected">{t("stuCorrections.statusRejected")}</option>
                   </select>
                 </div>
 
                 <div className="filter-field">
-                  <label htmlFor="correction-course">Course</label>
+                  <label htmlFor="correction-course">{t("stuCorrections.courseLabel")}</label>
                   <select
                     id="correction-course"
                     value={courseFilter}
@@ -711,7 +702,7 @@ function CorrectionRequests() {
                     {courseOptions.map((course) => (
                       <option key={course} value={course}>
                         {course === "all-courses"
-                          ? "All courses"
+                          ? t("stuCorrections.allCourses")
                           : course}
                       </option>
                     ))}
@@ -719,7 +710,7 @@ function CorrectionRequests() {
                 </div>
 
                 <div className="filter-field">
-                  <label htmlFor="correction-from">From Date</label>
+                  <label htmlFor="correction-from">{t("stuCorrections.fromLabel")}</label>
                   <input
                     id="correction-from"
                     className="date-input"
@@ -732,7 +723,7 @@ function CorrectionRequests() {
                 </div>
 
                 <div className="filter-field">
-                  <label htmlFor="correction-to">To Date</label>
+                  <label htmlFor="correction-to">{t("stuCorrections.toLabel")}</label>
                   <input
                     id="correction-to"
                     className="date-input"
@@ -749,7 +740,7 @@ function CorrectionRequests() {
                   className="reset-filter-button"
                   onClick={resetFilters}
                 >
-                  Reset
+                  {t("stuCorrections.reset")}
                 </button>
               </div>
 
@@ -757,18 +748,16 @@ function CorrectionRequests() {
                 <div className="requests-card-header">
                   <div className="section-title">
                     <div>
-                      <h2>My Correction Requests</h2>
+                      <h2>{t("stuCorrections.listTitle")}</h2>
                       <p>
-                        Track your attendance correction
-                        submissions.
+                        {t("stuCorrections.listSub")}
                       </p>
                     </div>
                   </div>
 
                   {!loading && !loadError && (
                     <span className="result-count">
-                      Showing {filteredRequests.length} of{" "}
-                      {normalizedRequests.length} requests
+                      {t("stuCorrections.resultCount").replace("{shown}", filteredRequests.length).replace("{total}", normalizedRequests.length)}
                     </span>
                   )}
                 </div>
@@ -787,7 +776,7 @@ function CorrectionRequests() {
                       className="retry-button"
                       onClick={loadRequests}
                     >
-                      Try again
+                      {t("stuCorrections.tryAgain")}
                     </button>
                   </div>
                 ) : loading ? (
@@ -800,10 +789,9 @@ function CorrectionRequests() {
                   </div>
                 ) : normalizedRequests.length === 0 ? (
                   <div className="empty-state">
-                    <h3>No correction requests yet</h3>
+                    <h3>{t("stuCorrections.emptyTitle")}</h3>
                     <p>
-                      If a session record looks wrong, submit a
-                      request and your lecturer will review it.
+                      {t("stuCorrections.emptyText")}
                     </p>
                     <button
                       type="button"
@@ -811,7 +799,7 @@ function CorrectionRequests() {
                       onClick={openNewRequest}
                     >
                       <Icon name="plus" size={16} />
-                      New Correction Request
+                      {t("stuCorrections.newRequest")}
                     </button>
                   </div>
                 ) : (
@@ -819,51 +807,51 @@ function CorrectionRequests() {
                     <table className="requests-table">
                       <thead>
                         <tr>
-                          <th>Request ID</th>
-                          <th>Course</th>
-                          <th>Section</th>
-                          <th>Attendance Date</th>
-                          <th>Requested</th>
-                          <th>Status</th>
-                          <th>Reason</th>
-                          <th>Submitted At</th>
-                          <th>Action</th>
+                          <th>{t("stuCorrections.thRequest_ID")}</th>
+                          <th>{t("stuCorrections.thCourse")}</th>
+                          <th>{t("stuCorrections.thSection")}</th>
+                          <th>{t("stuCorrections.thAttendance_Date")}</th>
+                          <th>{t("stuCorrections.thRequested")}</th>
+                          <th>{t("stuCorrections.thStatus")}</th>
+                          <th>{t("stuCorrections.thReason")}</th>
+                          <th>{t("stuCorrections.thSubmitted_At")}</th>
+                          <th>{t("stuCorrections.thAction")}</th>
                         </tr>
                       </thead>
 
                       <tbody>
                         {filteredRequests.map((request) => (
                           <tr key={request.id}>
-                            <td data-label="Request ID">
+                            <td data-label={t("stuCorrections.thRequest_ID")}>
                               <strong className="request-id">
                                 #{request.id}
                               </strong>
                             </td>
 
-                            <td data-label="Course">
+                            <td data-label={t("stuCorrections.thCourse")}>
                               {request.hasRecord ? (
                                 <strong>{request.course}</strong>
                               ) : (
                                 <span className="muted-cell">
-                                  Not linked
+                                  {t("stuCorrections.notLinked")}
                                 </span>
                               )}
                             </td>
 
-                            <td data-label="Section">
-                              {request.section || "N/A"}
+                            <td data-label={t("stuCorrections.thSection")}>
+                              {request.section || t("stuCorrections.notApplicable")}
                             </td>
 
-                            <td data-label="Attendance Date">
+                            <td data-label={t("stuCorrections.thAttendance_Date")}>
                               {formatDate(request.attendanceDate) ||
-                                "N/A"}
+                                t("stuCorrections.notApplicable")}
                             </td>
 
-                            <td data-label="Requested">
+                            <td data-label={t("stuCorrections.thRequested")}>
                               {capitalize(request.requested)}
                             </td>
 
-                            <td data-label="Status">
+                            <td data-label={t("stuCorrections.thStatus")}>
                               <span
                                 className={`status-badge ${request.status}`}
                               >
@@ -871,15 +859,15 @@ function CorrectionRequests() {
                               </span>
                             </td>
 
-                            <td data-label="Reason" className="reason-cell">
+                            <td data-label={t("stuCorrections.thReason")} className="reason-cell">
                               {request.reason}
                             </td>
 
-                            <td data-label="Submitted At">
+                            <td data-label={t("stuCorrections.thSubmitted_At")}>
                               {formatDateTime(request.submittedAt)}
                             </td>
 
-                            <td data-label="Action">
+                            <td data-label={t("stuCorrections.thAction")}>
                               <button
                                 type="button"
                                 className="view-button"
@@ -887,7 +875,7 @@ function CorrectionRequests() {
                                   setSelectedRequest(request)
                                 }
                               >
-                                View
+                                {t("stuCorrections.viewBtn")}
                               </button>
                             </td>
                           </tr>
@@ -899,8 +887,7 @@ function CorrectionRequests() {
                               colSpan="9"
                               className="empty-table"
                             >
-                              No correction requests match your
-                              filters.
+                              {t("stuCorrections.noMatch")}
                             </td>
                           </tr>
                         )}
@@ -914,17 +901,16 @@ function CorrectionRequests() {
             <aside className="correction-right">
               <div className="side-card">
                 <div className="side-card-title">
-                  <h3>How Correction Requests Work</h3>
+                  <h3>{t("stuCorrections.howTitle")}</h3>
                 </div>
 
                 <div className="process-list">
                   <div className="process-item">
                     <span>1</span>
                     <div>
-                      <strong>Select the attendance record</strong>
+                      <strong>{t("stuCorrections.step1Title")}</strong>
                       <p>
-                        Choose the class and date you need to
-                        correct.
+                        {t("stuCorrections.step1Text")}
                       </p>
                     </div>
                   </div>
@@ -932,10 +918,9 @@ function CorrectionRequests() {
                   <div className="process-item">
                     <span>2</span>
                     <div>
-                      <strong>Explain the issue</strong>
+                      <strong>{t("stuCorrections.step2Title")}</strong>
                       <p>
-                        Provide a clear reason and supporting
-                        details.
+                        {t("stuCorrections.step2Text")}
                       </p>
                     </div>
                   </div>
@@ -943,10 +928,9 @@ function CorrectionRequests() {
                   <div className="process-item">
                     <span>3</span>
                     <div>
-                      <strong>Submit request</strong>
+                      <strong>{t("stuCorrections.step3Title")}</strong>
                       <p>
-                        Your request will be sent to the lecturer
-                        for review.
+                        {t("stuCorrections.step3Text")}
                       </p>
                     </div>
                   </div>
@@ -954,10 +938,9 @@ function CorrectionRequests() {
                   <div className="process-item">
                     <span>4</span>
                     <div>
-                      <strong>Lecturer reviews</strong>
+                      <strong>{t("stuCorrections.step4Title")}</strong>
                       <p>
-                        You will see the decision here after
-                        review.
+                        {t("stuCorrections.step4Text")}
                       </p>
                     </div>
                   </div>
@@ -966,32 +949,27 @@ function CorrectionRequests() {
 
               <div className="side-card help-card">
                 <div className="side-card-title">
-                  <h3>Need help?</h3>
+                  <h3>{t("stuCorrections.helpTitle")}</h3>
                 </div>
 
                 <p>
-                  If you believe there is a mistake in your
-                  attendance record, submit a correction request
-                  with accurate details and supporting evidence
-                  when available.
+                  {t("stuCorrections.helpText")}
                 </p>
               </div>
 
               <div className="side-card tips-card">
                 <div className="side-card-title">
-                  <h3>Tips for a Successful Request</h3>
+                  <h3>{t("stuCorrections.tipsTitle")}</h3>
                 </div>
 
                 <ul>
-                  <li>Select the correct course and date</li>
-                  <li>Provide a clear and honest reason</li>
+                  <li>{t("stuCorrections.tip1")}</li>
+                  <li>{t("stuCorrections.tip2")}</li>
                   <li>
-                    Attach supporting evidence when available
-                  </li>
+                    {t("stuCorrections.tip3")}</li>
                   <li>
-                    Submit your request as soon as possible
-                  </li>
-                  <li>Check back here for review updates</li>
+                    {t("stuCorrections.tip4")}</li>
+                  <li>{t("stuCorrections.tip5")}</li>
                 </ul>
               </div>
             </aside>
@@ -1012,15 +990,14 @@ function CorrectionRequests() {
             className="request-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="New correction request"
+            aria-label={t("stuCorrections.modalLabel")}
           >
             <div className="modal-header">
               <div>
-                <span>ATTENDANCE</span>
-                <h2>New Correction Request</h2>
+                <span>{t("stuCorrections.eyebrow")}</span>
+                <h2>{t("stuCorrections.modalTitle")}</h2>
                 <p>
-                  Select the record and explain what needs
-                  correction.
+                  {t("stuCorrections.modalSub")}
                 </p>
               </div>
 
@@ -1028,15 +1005,13 @@ function CorrectionRequests() {
                 type="button"
                 className="modal-close"
                 onClick={() => setShowModal(false)}
-              >
-                Close
-              </button>
+              >{t("stuCorrections.closeBtn")}</button>
             </div>
 
             <form onSubmit={submitRequest}>
               <div className="modal-grid">
                 <label className="full-width">
-                  Attendance record
+                  {t("stuCorrections.recordLabel")}
                   <select
                     name="attendanceEventId"
                     value={form.attendanceEventId}
@@ -1044,7 +1019,7 @@ function CorrectionRequests() {
                     required
                   >
                     <option value="">
-                      Select an attendance record
+                      {t("stuCorrections.selectRecordPh")}
                     </option>
 
                     {records.map((record) => (
@@ -1066,7 +1041,7 @@ function CorrectionRequests() {
                     ))}
 
                     <option value="none">
-                      No matching record in my history
+                      {t("stuCorrections.noMatchOption")}
                     </option>
                   </select>
                 </label>
@@ -1079,20 +1054,19 @@ function CorrectionRequests() {
                       className="retry-button"
                       onClick={loadRecords}
                     >
-                      Try again
+                      {t("stuCorrections.tryAgain")}
                     </button>
                   </div>
                 )}
 
                 {!recordsError && records.length === 0 && (
                   <p className="form-hint full-width">
-                    No attendance records found yet. You can still
-                    select the last option to describe the issue.
+                    {t("stuCorrections.noRecordsHint")}
                   </p>
                 )}
 
                 <label>
-                  Requested status
+                  {t("stuCorrections.requestedLabel")}
                   <select
                     name="requestedStatus"
                     value={form.requestedStatus}
@@ -1104,14 +1078,14 @@ function CorrectionRequests() {
                         key={option.value}
                         value={option.value}
                       >
-                        {option.label}
+                        {t(option.labelKey)}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 <label>
-                  Evidence link (optional)
+                  {t("stuCorrections.evidenceLabel")}
                   <input
                     type="url"
                     name="evidenceUrl"
@@ -1122,12 +1096,12 @@ function CorrectionRequests() {
                 </label>
 
                 <label className="full-width">
-                  Reason
+                  {t("stuCorrections.reasonLabel")}
                   <textarea
                     name="reason"
                     value={form.reason}
                     onChange={handleFormChange}
-                    placeholder="Explain what happened and why the record should be corrected."
+                    placeholder={t("stuCorrections.reasonPh")}
                     rows="4"
                     required
                   />
@@ -1147,7 +1121,7 @@ function CorrectionRequests() {
                   onClick={() => setShowModal(false)}
                   disabled={submitting}
                 >
-                  Cancel
+                  {t("stuCorrections.cancelBtn")}
                 </button>
 
                 <button
@@ -1155,7 +1129,7 @@ function CorrectionRequests() {
                   className="submit-request-button"
                   disabled={submitting}
                 >
-                  {submitting ? "Submitting..." : "Submit Request"}
+                  {submitting ? t("stuCorrections.submitting") : t("stuCorrections.submitBtn")}
                 </button>
               </div>
             </form>
@@ -1176,15 +1150,14 @@ function CorrectionRequests() {
             className="request-modal details-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="Request details"
+            aria-label={t("stuCorrections.detailsLabel")}
           >
             <div className="modal-header">
               <div>
-                <span>REQUEST DETAILS</span>
+                <span>{t("stuCorrections.detailsEyebrow")}</span>
                 <h2>#{selectedRequest.id}</h2>
                 <p>
-                  Submitted{" "}
-                  {formatDateTime(selectedRequest.submittedAt)}
+                  {t("stuCorrections.submittedAt").replace("{n}", formatDateTime(selectedRequest.submittedAt))}
                 </p>
               </div>
 
@@ -1192,14 +1165,12 @@ function CorrectionRequests() {
                 type="button"
                 className="modal-close"
                 onClick={() => setSelectedRequest(null)}
-              >
-                Close
-              </button>
+              >{t("stuCorrections.closeBtn")}</button>
             </div>
 
             <div className="details-grid">
               <div>
-                <span>Course</span>
+                <span>{t("stuCorrections.dCourse")}</span>
                 <strong>
                   {selectedRequest.hasRecord
                     ? `${selectedRequest.course}${
@@ -1207,32 +1178,32 @@ function CorrectionRequests() {
                           ? ` (${selectedRequest.courseCode})`
                           : ""
                       }`
-                    : "Not linked"}
+                    : t("stuCorrections.notLinked")}
                 </strong>
               </div>
 
               <div>
-                <span>Section</span>
-                <strong>{selectedRequest.section || "N/A"}</strong>
+                <span>{t("stuCorrections.dSection")}</span>
+                <strong>{selectedRequest.section || t("stuCorrections.notApplicable")}</strong>
               </div>
 
               <div>
-                <span>Attendance Date</span>
+                <span>{t("stuCorrections.dDate")}</span>
                 <strong>
                   {formatDate(selectedRequest.attendanceDate) ||
-                    "N/A"}
+                    t("stuCorrections.notApplicable")}
                 </strong>
               </div>
 
               <div>
-                <span>Requested Status</span>
+                <span>{t("stuCorrections.dRequested")}</span>
                 <strong>
                   {capitalize(selectedRequest.requested)}
                 </strong>
               </div>
 
               <div>
-                <span>Status</span>
+                <span>{t("stuCorrections.dStatus")}</span>
                 <strong>
                   <span
                     className={`status-badge ${selectedRequest.status}`}
@@ -1243,21 +1214,21 @@ function CorrectionRequests() {
               </div>
 
               <div>
-                <span>Reviewed At</span>
+                <span>{t("stuCorrections.dReviewed")}</span>
                 <strong>
                   {formatDateTime(selectedRequest.reviewedAt) ||
-                    "Not reviewed yet"}
+                    t("stuCorrections.notReviewed")}
                 </strong>
               </div>
 
               <div className="details-full">
-                <span>Reason</span>
+                <span>{t("stuCorrections.dReason")}</span>
                 <strong>{selectedRequest.reason}</strong>
               </div>
 
               {selectedRequest.evidenceUrl && (
                 <div className="details-full">
-                  <span>Evidence</span>
+                  <span>{t("stuCorrections.dEvidence")}</span>
                   <a
                     href={selectedRequest.evidenceUrl}
                     target="_blank"
@@ -1270,7 +1241,7 @@ function CorrectionRequests() {
 
               {selectedRequest.reviewerComment && (
                 <div className="details-full">
-                  <span>Reviewer Comment</span>
+                  <span>{t("stuCorrections.dComment")}</span>
                   <p>{selectedRequest.reviewerComment}</p>
                 </div>
               )}

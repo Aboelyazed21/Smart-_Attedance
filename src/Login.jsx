@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "./utils/i18n";
 
 import "./App.css";
 
 function Login() {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
@@ -27,7 +29,7 @@ function Login() {
 
           <div className="brand-text">
             <h1>Attendify</h1>
-            <p>SMART ATTENDANCE SYSTEM</p>
+            <p>{t("brand.tagline")}</p>
           </div>
 
         </div>
@@ -42,7 +44,7 @@ function Login() {
           </span>
 
           <span>
-            English
+            {t("login.language")}
           </span>
 
           <span className="chevron">
@@ -73,7 +75,7 @@ function Login() {
           </h2>
 
           <p className="app-description">
-            Smart Attendance System
+            {t("auth.system")}
           </p>
 
 
@@ -82,11 +84,11 @@ function Login() {
           <div className="welcome-section">
 
             <h3>
-              Welcome Back
+              {t("auth.welcome")}
             </h3>
 
             <p>
-              Sign in to your account
+              {t("auth.subtitle")}
             </p>
 
           </div>
@@ -104,7 +106,7 @@ function Login() {
             <div className="form-group">
 
               <label>
-                University Email or University ID
+                {t("auth.identifier")}
               </label>
 
               <div className="input-container">
@@ -115,7 +117,7 @@ function Login() {
 
                 <input
                   type="text"
-                  placeholder="Enter your university email or university ID"
+                  placeholder={t("auth.identifierPh")}
                   autoComplete="username"
                 />
 
@@ -129,7 +131,7 @@ function Login() {
             <div className="form-group">
 
               <label>
-                Password
+                {t("auth.password")}
               </label>
 
               <div className="input-container">
@@ -144,7 +146,7 @@ function Login() {
                       ? "text"
                       : "password"
                   }
-                  placeholder="Password"
+                  placeholder={t("auth.password")}
                   autoComplete="current-password"
                 />
 
@@ -171,7 +173,7 @@ function Login() {
                 type="button"
                 className="forgot-password"
               >
-                Forgot password?
+                {t("auth.forgot")}
               </button>
 
             </div>
@@ -185,7 +187,7 @@ function Login() {
             >
 
               <span>
-                Sign In
+                {t("auth.signIn")}
               </span>
 
               <span className="sign-arrow">
@@ -202,7 +204,7 @@ function Login() {
               <span></span>
 
               <p>
-                OR
+                {t("login.or")}
               </p>
 
               <span></span>
@@ -222,7 +224,7 @@ function Login() {
               </span>
 
               <span>
-                Create an Account
+                {t("auth.createAccount")}
               </span>
 
             </Link>
@@ -239,11 +241,11 @@ function Login() {
       <footer className="page-footer">
 
         <div className="page-footer-copy">
-          © Aboelyazed Hatem Aboelyazed
+          {t("footer.copy")}
         </div>
 
         <div className="page-footer-uni">
-          Badr University in Assiut
+          {t("footer.uni")}
         </div>
 
       </footer>

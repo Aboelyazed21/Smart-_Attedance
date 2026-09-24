@@ -11,6 +11,8 @@ import {
   updateAttendanceCorrection,
 } from "../../services/api";
 
+import { useLanguage } from "../../utils/i18n";
+
 import "./LecturerQRSession.css";
 
 function getSavedUser() {
@@ -98,14 +100,14 @@ function normalizeRoster(data) {
   }));
 }
 
-function getStatusLabel(status) {
+function getStatusLabel(status, t) {
   const value = String(status || "absent").toLowerCase();
 
-  if (value === "present") return "Present";
-  if (value === "late") return "Late";
-  if (value === "excused") return "Excused";
+  if (value === "present") return t ? t("lecQR.statusPresent") : "Present";
+  if (value === "late") return t ? t("lecQR.statusLate") : "Late";
+  if (value === "excused") return t ? t("lecQR.statusExcused") : "Excused";
 
-  return "Absent";
+  return t ? t("lecQR.statusAbsent") : "Absent";
 }
 
 function getStatusClass(status) {
@@ -120,6 +122,7 @@ function getStatusClass(status) {
 
 export default function LecturerQRSession() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { pathname } = useLocation();
 
   const sessionId =
@@ -158,7 +161,7 @@ export default function LecturerQRSession() {
   const firstName =
     savedUser?.first_name ||
     savedUser?.firstName ||
-    "Lecturer";
+    t("role.lecturer");
 
   const lastName =
     savedUser?.last_name ||
@@ -257,7 +260,7 @@ export default function LecturerQRSession() {
 
       if (!found) {
         throw new Error(
-          `Attendance session ${sessionId} was not found.`
+          t("lecQR.notFound").replace("{n}", sessionId)
         );
       }
 
@@ -282,7 +285,7 @@ export default function LecturerQRSession() {
       console.error("Load lecturer session error:", err);
       setError(
         err.message ||
-          "Failed to load the attendance session."
+          t("lecQR.loadError")
       );
     } finally {
       setLoading(false);
@@ -298,7 +301,7 @@ export default function LecturerQRSession() {
     } catch (err) {
       console.error("Load session roster error:", err);
       showToast(
-        err.message || "Failed to load registered students."
+        err.message || t("lecQR.rosterError")
       );
     } finally {
       setRosterLoading(false);
@@ -366,11 +369,11 @@ export default function LecturerQRSession() {
         session.id
       );
 
-      showToast("QR code generated.");
+      showToast(t("lecQR.qrGenerated"));
     } catch (err) {
       console.error("Generate QR error:", err);
       showToast(
-        err.message || "Failed to generate QR code."
+        err.message || t("lecQR.qrGenerateError")
       );
     } finally {
       setActionLoading(false);
@@ -405,7 +408,7 @@ export default function LecturerQRSession() {
       );
 
       if (!silent) {
-        showToast("QR code refreshed.");
+        showToast(t("lecQR.qrRefreshed"));
       }
     } catch (err) {
       console.error("Refresh QR error:", err);
@@ -413,7 +416,7 @@ export default function LecturerQRSession() {
 
       if (!silent) {
         showToast(
-          err.message || "Failed to refresh QR code."
+          err.message || t("lecQR.qrRefreshError")
         );
       }
     }
@@ -423,7 +426,7 @@ export default function LecturerQRSession() {
     if (!session?.id) return;
 
     const confirmed = window.confirm(
-      "Are you sure you want to end this attendance session?"
+      t("lecQR.endConfirm")
     );
 
     if (!confirmed) return;
@@ -444,11 +447,11 @@ export default function LecturerQRSession() {
       setQrExpiresAt(null);
       setCountdown(0);
 
-      showToast("Session ended successfully.");
+      showToast(t("lecQR.sessionEnded"));
     } catch (err) {
       console.error("Close session error:", err);
       showToast(
-        err.message || "Failed to end session."
+        err.message || t("lecQR.endError")
       );
     } finally {
       setActionLoading(false);
@@ -479,14 +482,14 @@ export default function LecturerQRSession() {
     event.preventDefault();
 
     if (!session?.id || !correctionStudent?.student_id) {
-      showToast("Session or student information is missing.");
+      showToast(t("lecQR.missingInfo"));
       return;
     }
 
     const reason = correctionReason.trim();
 
     if (!reason) {
-      showToast("Please enter a reason for the correction.");
+      showToast(t("lecQR.enterReason"));
       return;
     }
 
@@ -506,11 +509,11 @@ export default function LecturerQRSession() {
       await loadRoster(session.id);
 
       closeCorrection();
-      showToast("Attendance updated successfully.");
+      showToast(t("lecQR.updated"));
     } catch (err) {
       console.error("Attendance correction error:", err);
       showToast(
-        err.message || "Failed to update attendance."
+        err.message || t("lecQR.updateError")
       );
     } finally {
       setCorrectionLoading(false);
@@ -584,8 +587,8 @@ export default function LecturerQRSession() {
       <div className="lecturer-session-page">
         <div className="lecturer-session-loading">
           <div className="loading-spinner" />
-          <strong>Loading session...</strong>
-          <span>Please wait.</span>
+          <strong>{t("lecQR.loadingTitle")}</strong>
+          <span>{t("lecQR.loadingDesc")}</span>
         </div>
       </div>
     );
@@ -596,16 +599,16 @@ export default function LecturerQRSession() {
       <div className="lecturer-session-page">
         <div className="lecturer-session-error">
           <div className="error-icon">!</div>
-          <h2>Session unavailable</h2>
+          <h2>{t("lecQR.unavailableTitle")}</h2>
           <p>
             {error ||
-              "We could not find this attendance session."}
+              t("lecQR.unavailableDesc")}
           </p>
           <button
             type="button"
             onClick={() => navigate("/lecturer/sessions")}
           >
-            Back to Sessions
+            {t("lecQR.backToSessions")}
           </button>
         </div>
       </div>
@@ -630,10 +633,10 @@ export default function LecturerQRSession() {
                 navigate("/lecturer/sessions")
               }
             >
-              ← Sessions
+              ← {t("lecQR.backSessions")}
             </button>
 
-            <h1>My Session</h1>
+            <h1>{t("lecQR.title")}</h1>
           </div>
 
           <div className="session-user">
@@ -645,7 +648,7 @@ export default function LecturerQRSession() {
               <strong>
                 {firstName} {lastName}
               </strong>
-              <span>Lecturer</span>
+              <span>{t("role.lecturer")}</span>
             </div>
           </div>
         </header>
@@ -660,10 +663,10 @@ export default function LecturerQRSession() {
               <h2>
                 {session.course_name ||
                   session.course_code ||
-                  "Course"}{" "}
+                  t("lecQR.courseFallback")}{" "}
                 -{" "}
                 {session.section_name ||
-                  "Section"}
+                  t("lecQR.sectionFallback")}
               </h2>
 
               <span
@@ -687,7 +690,7 @@ export default function LecturerQRSession() {
                 ROOM{" "}
                 {session.room_name ||
                   session.room ||
-                  "Room not assigned"}
+                  t("lecQR.noRoom")}
               </span>
             </div>
           </div>
@@ -702,7 +705,7 @@ export default function LecturerQRSession() {
             }
           >
             QR
-            <span>Generate QR Code</span>
+            <span>{t("lecQR.generateQr")}</span>
           </button>
         </section>
 
@@ -712,10 +715,9 @@ export default function LecturerQRSession() {
               <div>
                 <span className="card-icon">QR</span>
                 <div>
-                  <h3>Session QR Code</h3>
+                  <h3>{t("lecQR.qrTitle")}</h3>
                   <p>
-                    Students scan this code to mark
-                    attendance.
+                    {t("lecQR.qrDesc")}
                   </p>
                 </div>
               </div>
@@ -725,14 +727,13 @@ export default function LecturerQRSession() {
               {qrDataUrl ? (
                 <img
                   src={qrDataUrl}
-                  alt="Attendance session QR code"
+                  alt={t("lecQR.qrAlt")}
                 />
               ) : (
                 <div className="qr-placeholder">
                   <strong>QR</strong>
                   <span>
-                    Generate the QR code to start
-                    attendance.
+                    {t("lecQR.qrPlaceholder")}
                   </span>
                 </div>
               )}
@@ -741,14 +742,14 @@ export default function LecturerQRSession() {
             {qrDataUrl && (
               <>
                 <div className="qr-session-code">
-                  SESSION #{session.id}
+                  {t("lecQR.sessionCode").replace("{n}", session.id)}
                 </div>
 
                 <div className="qr-validity">
                   <span className="live-dot" />
                   {countdown > 0
-                    ? `Valid for ${minutes}:${seconds}`
-                    : "QR expired — refreshing..."}
+                    ? t("lecQR.validFor").replace("{n}", `${minutes}:${seconds}`)
+                    : t("lecQR.qrExpired")}
                 </div>
 
                 <button
@@ -759,7 +760,7 @@ export default function LecturerQRSession() {
                   }
                   disabled={actionLoading}
                 >
-                  Refresh QR
+                  {t("lecQR.refreshQr")}
                 </button>
               </>
             )}
@@ -773,7 +774,7 @@ export default function LecturerQRSession() {
                 sessionStatus === "closed"
               }
             >
-              End Session
+              {t("lecQR.endSession")}
             </button>
           </div>
 
@@ -781,11 +782,10 @@ export default function LecturerQRSession() {
             <div className="students-card-header">
               <div>
                 <h3>
-                  Registered Students ({stats.total})
+                  {t("lecQR.registeredStudents").replace("{n}", stats.total)}
                 </h3>
                 <p>
-                  Live attendance updates every few
-                  seconds.
+                  {t("lecQR.liveDesc")}
                 </p>
               </div>
 
@@ -796,25 +796,25 @@ export default function LecturerQRSession() {
                 disabled={rosterLoading}
               >
                 {rosterLoading
-                  ? "Refreshing..."
-                  : "Refresh"}
+                  ? t("lecQR.refreshing")
+                  : t("action.refresh")}
               </button>
             </div>
 
             <div className="student-stats">
               <div>
                 <strong>{stats.present}</strong>
-                <span>Present</span>
+                <span>{t("lecQR.statPresent")}</span>
               </div>
 
               <div>
                 <strong>{stats.absent}</strong>
-                <span>Absent</span>
+                <span>{t("lecQR.statAbsent")}</span>
               </div>
 
               <div>
                 <strong>{stats.late}</strong>
-                <span>Late</span>
+                <span>{t("lecQR.statLate")}</span>
               </div>
             </div>
 
@@ -825,7 +825,7 @@ export default function LecturerQRSession() {
                 onChange={(event) =>
                   handleSearch(event.target.value)
                 }
-                placeholder="Search by name or ID..."
+                placeholder={t("lecQR.searchPh")}
               />
             </div>
 
@@ -834,10 +834,10 @@ export default function LecturerQRSession() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>{t("lecQR.colStudentId")}</th>
+                    <th>{t("lecQR.colName")}</th>
+                    <th>{t("lecQR.colStatus")}</th>
+                    <th>{t("lecQR.colAction")}</th>
                   </tr>
                 </thead>
 
@@ -848,7 +848,7 @@ export default function LecturerQRSession() {
                         colSpan="5"
                         className="empty-table"
                       >
-                        No registered students found.
+                        {t("lecQR.emptyStudents")}
                       </td>
                     </tr>
                   ) : (
@@ -857,7 +857,7 @@ export default function LecturerQRSession() {
                         const name =
                           `${student.first_name} ${student.last_name}`
                             .trim() ||
-                          "Student";
+                          t("lecQR.studentFallback");
 
                         return (
                           <tr
@@ -893,7 +893,7 @@ export default function LecturerQRSession() {
                                   <strong>{name}</strong>
                                   <span>
                                     {student.email ||
-                                      "Student account"}
+                                      t("lecQR.studentAccountFallback")}
                                   </span>
                                 </div>
                               </div>
@@ -906,7 +906,8 @@ export default function LecturerQRSession() {
                                 )}`}
                               >
                                 {getStatusLabel(
-                                  student.attendance_status
+                                  student.attendance_status,
+                                  t
                                 )}
                               </span>
                             </td>
@@ -919,7 +920,7 @@ export default function LecturerQRSession() {
                                   openCorrection(student)
                                 }
                               >
-                                Edit
+                                {t("lecQR.edit")}
                               </button>
                             </td>
                           </tr>
@@ -998,8 +999,8 @@ export default function LecturerQRSession() {
             >
               <div className="correction-header">
                 <div>
-                  <span>ATTENDANCE EDIT</span>
-                  <h3>Edit attendance</h3>
+                  <span>{t("lecQR.correctionEyebrow")}</span>
+                  <h3>{t("lecQR.correctionTitle")}</h3>
                 </div>
 
                 <button
@@ -1033,7 +1034,7 @@ export default function LecturerQRSession() {
 
               <form onSubmit={saveCorrection}>
                 <label>
-                  Attendance status
+                  {t("lecQR.correctionStatusLabel")}
                   <select
                     value={correctionStatus}
                     onChange={(event) =>
@@ -1044,22 +1045,22 @@ export default function LecturerQRSession() {
                     disabled={correctionLoading}
                   >
                     <option value="present">
-                      Present
+                      {t("lecQR.statusPresent")}
                     </option>
                     <option value="absent">
-                      Absent
+                      {t("lecQR.statusAbsent")}
                     </option>
                     <option value="late">
-                      Late
+                      {t("lecQR.statusLate")}
                     </option>
                     <option value="excused">
-                      Excused
+                      {t("lecQR.statusExcused")}
                     </option>
                   </select>
                 </label>
 
                 <label>
-                  Reason
+                  {t("lecQR.correctionReasonLabel")}
                   <textarea
                     value={correctionReason}
                     onChange={(event) =>
@@ -1067,7 +1068,7 @@ export default function LecturerQRSession() {
                         event.target.value
                       )
                     }
-                    placeholder="Why are you changing this attendance?"
+                    placeholder={t("lecQR.correctionReasonPh")}
                     rows="4"
                     disabled={correctionLoading}
                   />
@@ -1079,7 +1080,7 @@ export default function LecturerQRSession() {
                     onClick={closeCorrection}
                     disabled={correctionLoading}
                   >
-                    Cancel
+                    {t("lecQR.cancel")}
                   </button>
 
                   <button
@@ -1087,8 +1088,8 @@ export default function LecturerQRSession() {
                     disabled={correctionLoading}
                   >
                     {correctionLoading
-                      ? "Saving..."
-                      : "Save Changes"}
+                      ? t("lecQR.saving")
+                      : t("lecQR.saveChanges")}
                   </button>
                 </div>
               </form>
