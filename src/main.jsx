@@ -14,6 +14,25 @@ import { LanguageProvider } from "./utils/i18n";
 
 initTheme();
 
+/* Register the PWA service worker (production only). */
+try {
+  if (
+    typeof window !== "undefined" &&
+    "serviceWorker" in navigator &&
+    import.meta.env.PROD
+  ) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .catch(() => {
+          /* offline shell is optional */
+        });
+    });
+  }
+} catch {
+  /* service workers unavailable */
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
