@@ -180,7 +180,7 @@ export default function LecturerLayout({ children }) {
   function handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/logout");
   }
 
   function isActive(path) {

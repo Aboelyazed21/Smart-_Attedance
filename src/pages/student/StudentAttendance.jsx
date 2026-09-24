@@ -1046,13 +1046,9 @@ function StudentAttendance() {
 
           {/* ============ FOOTER ============ */}
           <footer className="student-footer">
-            <span>Attendify</span>
-            <span>Port Said University</span>
-            <span>
-              A Smarter Campus for a Brighter Tomorrow
-            </span>
-
-            <small>v1.0.0</small>
+            <span>© Aboelyazed Hatem Aboelyazed</span>
+            <span aria-hidden="true">·</span>
+            <span>Badr University in Assiut</span>
           </footer>
         </section>
       </main>

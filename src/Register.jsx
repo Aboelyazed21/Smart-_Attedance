@@ -908,22 +908,12 @@ function Register() {
 
       <footer className="page-footer">
 
-        <div className="tagline">
-
-          <span>
-            A Smarter Campus
-          </span>
-
-          <span>
-            For A Brighter Tomorrow
-          </span>
-
+        <div className="page-footer-copy">
+          © Aboelyazed Hatem Aboelyazed
         </div>
 
-        <div className="tagline-line"></div>
-
-        <div className="university-name">
-          PORT SAID UNIVERSITY
+        <div className="page-footer-uni">
+          Badr University in Assiut
         </div>
 
       </footer>

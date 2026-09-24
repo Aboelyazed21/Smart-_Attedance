@@ -6,7 +6,7 @@ function Footer() {
         <span className="app-footer-sep" aria-hidden="true">
           •
         </span>
-        <span className="app-footer-uni">Port Said University</span>
+        <span className="app-footer-uni">Badr University in Assiut</span>
       </div>
       <div className="app-footer-copy">© Aboelyazed Hatem Aboelyazed</div>
     </footer>

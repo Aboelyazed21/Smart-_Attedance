@@ -856,6 +856,281 @@ body {
 
 
 /* =====================================================
+   PROFESSIONAL FOOTER (centered copyright + university)
+===================================================== */
+
+.page-footer-copy {
+  font-size: 13px;
+
+  font-weight: 700;
+
+  line-height: 1.5;
+}
+
+.page-footer-uni {
+  margin-top: 4px;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  line-height: 1.5;
+}
+
+
+/* =====================================================
+   LOGIN UNIVERSITY LINE
+===================================================== */
+
+.login-page .app-uni {
+  margin: 4px 0 0;
+
+  color: #5b6b80;
+
+  font-size: 12.5px;
+
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+/* =====================================================
+   STUDENT FOOTER (centered, minimal)
+===================================================== */
+
+.student-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  width: 100%;
+
+  min-width: 0;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  border-top: 1px solid #e5e7eb;
+
+  background: #ffffff;
+
+  color: #6b7280;
+
+  font-size: 12.5px;
+
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+
+/* =====================================================
+   LOGOUT CONFIRMATION PAGE
+   Scoped to .logout-page only.
+===================================================== */
+
+.logout-page {
+  width: 100%;
+
+  min-height: 100vh;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 22px;
+
+  padding:
+    24px 16px
+    calc(24px + env(safe-area-inset-bottom, 0px));
+
+  padding-top:
+    calc(24px + env(safe-area-inset-top, 0px));
+
+  box-sizing: border-box;
+
+  background: #f4f7fb;
+
+  color: #172033;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.logout-card {
+  width: min(440px, 100%);
+
+  box-sizing: border-box;
+
+  padding: clamp(26px, 5vw, 40px) clamp(20px, 5vw, 36px);
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+
+  text-align: center;
+}
+
+.logout-logo {
+  width: 52px;
+
+  height: 52px;
+
+  margin: 0 auto 12px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 14px;
+
+  background: #0f2851;
+
+  color: #ffffff;
+
+  font-size: 22px;
+
+  font-weight: 800;
+}
+
+.logout-eyebrow {
+  margin: 0;
+
+  color: #0f2851;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.2px;
+
+  text-transform: uppercase;
+}
+
+.logout-card h1 {
+  margin: 8px 0 0;
+
+  color: #172033;
+
+  font-size: clamp(1.25rem, 1.1rem + 1vw, 1.5rem);
+
+  font-weight: 800;
+
+  letter-spacing: -0.01em;
+
+  line-height: 1.3;
+
+  overflow-wrap: break-word;
+}
+
+.logout-text {
+  margin: 8px 0 0;
+
+  color: #64748b;
+
+  font-size: 13.5px;
+
+  line-height: 1.6;
+}
+
+.logout-signin {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 100%;
+
+  min-height: 44px;
+
+  margin-top: 20px;
+
+  padding: 0 16px;
+
+  border: 1px solid #0f2851;
+
+  border-radius: 10px;
+
+  background: #0f2851;
+
+  color: #ffffff;
+
+  font: inherit;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.logout-signin:hover {
+  background: #0a1c3a;
+
+  border-color: #0a1c3a;
+}
+
+.logout-signin:focus-visible {
+  outline: 3px solid rgba(15, 40, 81, 0.25);
+
+  outline-offset: 2px;
+}
+
+.logout-footer {
+  text-align: center;
+
+  color: #64748b;
+
+  font-size: 12.5px;
+
+  line-height: 1.6;
+}
+
+.logout-footer div:first-child {
+  font-weight: 700;
+
+  color: #334155;
+}
+
+@media (max-width: 480px) {
+  .logout-card {
+    border-radius: 14px;
+  }
+
+  .student-footer {
+    font-size: 12px;
+
+    padding: 14px 12px;
+  }
+}
+
+
+/* =====================================================
    REGISTER CARD
 ===================================================== */
 

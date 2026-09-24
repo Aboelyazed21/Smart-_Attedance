@@ -61,7 +61,7 @@ function SettingsIcon({ name, size = 16 }) {
 function Settings() {
   const [settings, setSettings] = useState({
     systemName: "Attendify",
-    universityName: "Port Said University",
+    universityName: "Badr University in Assiut",
     academicYear: "2025/2026",
     semester: "Fall",
 

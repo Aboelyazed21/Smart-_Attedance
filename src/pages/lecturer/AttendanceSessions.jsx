@@ -710,7 +710,7 @@ function AttendanceSessions() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    navigate("/");
+    navigate("/logout");
   }
 
   function handleMobileNavigation(path) {

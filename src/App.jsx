@@ -149,6 +149,15 @@ function App() {
   }
 
   /* =========================================================
+     LOGOUT CONFIRMATION (public, presentational only)
+     Session clearing stays in each layout logout handler.
+  ========================================================= */
+
+  if (location.pathname === "/logout") {
+    return <LecturerLogout />;
+  }
+
+  /* =========================================================
      ADMIN USERS
   ========================================================= */
 
@@ -861,38 +870,34 @@ function Login() {
       >
         <div className="auth-brand-copy">
           <h2>
-            Building a
-            <br />
-            Smarter Campus
+            Attendify
           </h2>
 
           <p>
-            Attendify helps universities manage
-            attendance efficiently, ensuring a more
-            connected and productive academic
-            environment.
+            Smart Attendance System for Badr University
+            in Assiut. Sign in with your university
+            email or university ID.
           </p>
 
           <div className="auth-brand-features">
             <div>
               <AuthIcon name="cap" size={20} />
-              <span>Accurate Attendance</span>
+              <span>QR Code Attendance</span>
             </div>
 
             <div>
               <AuthIcon name="chart" size={20} />
-              <span>Better Management</span>
+              <span>Sections and Sessions</span>
             </div>
 
             <div>
               <AuthIcon name="shield" size={20} />
-              <span>A More Connected Campus</span>
+              <span>Attendance Reports</span>
             </div>
           </div>
 
           <p className="auth-brand-foot">
-            Education Today
-            <br />A Brighter Tomorrow
+            Badr University in Assiut
           </p>
         </div>
       </aside>
@@ -915,6 +920,10 @@ function Login() {
 
           <p className="app-description">
             Smart Attendance System
+          </p>
+
+          <p className="app-uni">
+            Badr University in Assiut
           </p>
 
           <div className="welcome-section">
@@ -1072,22 +1081,73 @@ function Login() {
 
       <footer className="page-footer">
 
-        <div className="tagline">
-
-          <span>
-            A Smarter Campus
-          </span>
-
-          <span>
-            For A Brighter Tomorrow
-          </span>
-
+        <div className="page-footer-copy">
+          © Aboelyazed Hatem Aboelyazed
         </div>
 
-        <div className="tagline-line"></div>
+        <div className="page-footer-uni">
+          Badr University in Assiut
+        </div>
 
-        <div className="university-name">
-          PORT SAID UNIVERSITY
+      </footer>
+
+    </div>
+  );
+}
+
+/* =========================================================
+   LECTURER LOGOUT CONFIRMATION
+   Presentational only. Each layout logout handler clears
+   localStorage and navigates here. Sign In Again reuses
+   the existing "/" login route.
+========================================================= */
+
+function LecturerLogout() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="logout-page">
+
+      <main className="logout-card">
+
+        <div
+          className="logout-logo"
+          aria-hidden="true"
+        >
+          A
+        </div>
+
+        <p className="logout-eyebrow">
+          Attendify
+        </p>
+
+        <h1>
+          Signed out successfully
+        </h1>
+
+        <p className="logout-text">
+          You have been safely signed out of your
+          account.
+        </p>
+
+        <button
+          type="button"
+          className="logout-signin"
+          onClick={() => navigate("/")}
+        >
+          Sign In Again
+        </button>
+
+      </main>
+
+      <footer className="logout-footer">
+
+        <div>
+          © Aboelyazed Hatem Aboelyazed
+        </div>
+
+        <div>
+          Badr University in Assiut
         </div>
 
       </footer>
@@ -2796,24 +2856,14 @@ function StudentDashboard() {
           <footer className="student-footer">
 
             <span>
-              Attendify
+              © Aboelyazed Hatem Aboelyazed
             </span>
 
-            <span aria-hidden="true">/</span>
+            <span aria-hidden="true">·</span>
 
             <span>
-              Port Said University
+              Badr University in Assiut
             </span>
-
-            <span aria-hidden="true">/</span>
-
-            <span>
-              A Smarter Campus for a Brighter Tomorrow
-            </span>
-
-            <small>
-              v1.0.0
-            </small>
 
           </footer>
 
