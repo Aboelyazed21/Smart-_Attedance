@@ -1419,6 +1419,91 @@ function StudentDashboard() {
     .sort((a, b) => recordTime(b) - recordTime(a))
     .slice(0, 4);
 
+  /* Stable key shared with /student/attendance filters:
+     course_code first so dashboard links match the details
+     page exactly. Display text may differ; the key must not. */
+  function courseKey(record) {
+    return String(
+      record.course_code ||
+        record.course_name ||
+        record.course ||
+        record.section_name ||
+        record.section ||
+        "Course"
+    );
+  }
+
+  function openAttendance(filter) {
+    const params = new URLSearchParams();
+
+    if (
+      filter?.status &&
+      filter.status !== "all"
+    ) {
+      params.set("status", filter.status);
+    }
+
+    if (filter?.course) {
+      params.set("course", filter.course);
+    }
+
+    const query = params.toString();
+
+    navigate(
+      query
+        ? `/student/attendance?${query}`
+        : "/student/attendance"
+    );
+  }
+
+  const sectionGroups = (() => {
+    const map = new Map();
+
+    for (const record of attendance) {
+      const key = courseKey(record);
+
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          course:
+            record.course_name ||
+            record.course_code ||
+            "Course",
+          section: record.section_name || "",
+          total: 0,
+          present: 0,
+          absent: 0,
+          late: 0,
+        });
+      }
+
+      const group = map.get(key);
+      const status = String(
+        record.status || ""
+      ).toLowerCase();
+
+      group.total += 1;
+
+      if (status === "present") group.present += 1;
+      else if (status === "absent") group.absent += 1;
+      else if (status === "late") group.late += 1;
+    }
+
+    return [...map.values()]
+      .map((group) => ({
+        ...group,
+        rate:
+          group.total > 0
+            ? Math.round(
+                ((group.present + group.late) /
+                  group.total) *
+                  100
+              )
+            : 0,
+      }))
+      .sort((a, b) => b.total - a.total);
+  })();
+
   function formatRecordDate(record) {
     const value =
       record.scanned_at || record.session_date;
@@ -1494,6 +1579,7 @@ function StudentDashboard() {
           : "No attendance recorded yet",
       icon: "chart",
       tone: "blue",
+      action: () => openAttendance({}),
     },
     {
       title: "Total Sessions",
@@ -1501,6 +1587,7 @@ function StudentDashboard() {
       note: "Sessions attended this semester",
       icon: "calendar",
       tone: "purple",
+      action: () => openAttendance({ status: "all" }),
     },
     {
       title: "Present",
@@ -1508,6 +1595,7 @@ function StudentDashboard() {
       note: "Keep building your streak",
       icon: "dot",
       tone: "green",
+      action: () => openAttendance({ status: "present" }),
     },
     {
       title: "Absent",
@@ -1515,6 +1603,7 @@ function StudentDashboard() {
       note: "Stay consistent",
       icon: "alert",
       tone: "red",
+      action: () => openAttendance({ status: "absent" }),
     },
   ];
 
@@ -1779,9 +1868,12 @@ function StudentDashboard() {
           <div className="student-stats">
 
             {stats.map((stat) => (
-              <article
+              <button
                 className={`student-stat-card ${stat.tone}`}
                 key={stat.title}
+                type="button"
+                onClick={stat.action}
+                aria-label={`${stat.title}: ${stat.value}. View attendance details.`}
               >
                 <div className="student-stat-icon">
                   <Icon
@@ -1805,10 +1897,92 @@ function StudentDashboard() {
                 </div>
 
                 <span className="student-stat-glow" />
-              </article>
+              </button>
             ))}
 
           </div>
+
+          {!dataLoading &&
+            !dataError &&
+            sectionGroups.length > 0 && (
+              <section
+                className="student-panel sections-panel"
+                aria-label="My sections"
+              >
+
+                <div className="student-panel-header">
+
+                  <div className="student-panel-title">
+
+                    <div className="student-panel-icon blue">
+                      <Icon
+                        name="chart"
+                        size={18}
+                      />
+                    </div>
+
+                    <div>
+                      <h2>
+                        My Sections
+                      </h2>
+
+                      <p>
+                        Attendance by course and section
+                      </p>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div className="student-attendance-list">
+                  {sectionGroups.map((group) => (
+                    <button
+                      className="student-attendance-row section-row-button"
+                      key={group.key}
+                      type="button"
+                      onClick={() =>
+                        openAttendance({
+                          course: group.key,
+                        })
+                      }
+                      aria-label={`${group.course}${
+                        group.section
+                          ? `, section ${group.section}`
+                          : ""
+                      }: ${group.rate}% attendance. View section details.`}
+                    >
+                      <div className="student-course-icon">
+                        <Icon
+                          name="chart"
+                          size={16}
+                        />
+                      </div>
+
+                      <div className="student-attendance-info">
+                        <strong>
+                          {group.course}
+                        </strong>
+
+                        <span>
+                          {group.section
+                            ? `Section ${group.section} · `
+                            : ""}
+                          {group.present} present ·{" "}
+                          {group.absent} absent ·{" "}
+                          {group.total} sessions
+                        </span>
+                      </div>
+
+                      <span className="student-status student-status-recorded">
+                        {group.rate}%
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+              </section>
+            )}
 
           <div className="student-main-grid">
 
@@ -2184,12 +2358,21 @@ function StudentDashboard() {
                       recordStatus(record);
 
                     return (
-                      <div
-                        className="student-attendance-row"
+                      <button
+                        className="student-attendance-row section-row-button"
                         key={
                           record.id ||
                           `${record.scanned_at}-${record.course_name}`
                         }
+                        type="button"
+                        onClick={() =>
+                          openAttendance({
+                            course: courseKey(record),
+                          })
+                        }
+                        aria-label={`${recordCourse(
+                          record
+                        )}, ${recordState.label}. View section details.`}
                       >
                         <div className="student-course-icon">
                           <Icon
@@ -2213,7 +2396,7 @@ function StudentDashboard() {
                         >
                           {recordState.label}
                         </span>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

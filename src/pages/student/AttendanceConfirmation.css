@@ -330,6 +330,14 @@ body.confirmation-sidebar-open {
   line-height: 1.6;
 }
 
+.confirmation-hero .hero-sub {
+  margin-top: 6px;
+  color: var(--confirmation-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
 .hero-note {
   max-width: 250px;
   padding-left: 14px;

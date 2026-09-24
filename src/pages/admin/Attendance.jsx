@@ -769,16 +769,6 @@ export default function Attendance() {
               / Attendance
             </span>
 
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/sessions"
-                )
-              }
-            >
-              + Take Attendance
-            </button>
-
           </div>
 
         </section>

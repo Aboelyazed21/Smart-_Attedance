@@ -451,16 +451,24 @@ function AttendanceConfirmation() {
               <h1>
                 {confirmation
                   ? confirmation.duplicate
-                    ? "Attendance Already Recorded"
-                    : "Attendance Recorded"
+                    ? "تم تسجيل حضورك بالفعل لهذه الجلسة"
+                    : "تم تسجيل حضورك بنجاح"
                   : "Attendance Status"}
               </h1>
 
               <p>
                 {confirmation
-                  ? confirmation.message
+                  ? confirmation.duplicate
+                    ? "Attendance Already Recorded"
+                    : "Attendance Recorded"
                   : "Review a recent attendance result or scan a new code."}
               </p>
+
+              {confirmation && (
+                <p className="hero-sub">
+                  {confirmation.message}
+                </p>
+              )}
             </div>
 
             <p className="hero-note">

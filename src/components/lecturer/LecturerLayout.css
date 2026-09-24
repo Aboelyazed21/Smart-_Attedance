@@ -563,7 +563,9 @@
 .lecturer-sidebar-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1050;
+  /* Below the drawer (1000) so nav taps reach the sidebar,
+     above page content and below the mobile header (1100). */
+  z-index: 990;
   padding: 0;
   border: 0;
   background: rgba(8, 25, 52, 0.45);

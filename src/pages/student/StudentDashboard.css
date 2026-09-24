@@ -2261,3 +2261,128 @@
     transform: none;
   }
 }
+
+/* ---------- Interactive cards + rows (deep links) ---------- */
+
+.student-dashboard button.student-stat-card {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.student-dashboard button.student-stat-card:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 8px 22px rgba(23, 100, 192, 0.1);
+}
+
+.student-dashboard button.student-stat-card:focus-visible {
+  outline: 2px solid #1764c0;
+  outline-offset: 2px;
+}
+
+.student-dashboard .section-row-button {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #edf1f6;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.student-dashboard .section-row-button:last-child {
+  border-bottom: 0;
+}
+
+.student-dashboard .section-row-button:hover {
+  background: #f6f9ff;
+}
+
+.student-dashboard .section-row-button:focus-visible {
+  outline: 2px solid #1764c0;
+  outline-offset: -2px;
+}
+
+/* ---------- Attendance filter bar (details page) ---------- */
+
+.student-dashboard .student-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid var(--student-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 17px rgba(31, 69, 113, 0.035);
+}
+
+.student-dashboard .student-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.student-dashboard .student-filter-pill {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid var(--student-border);
+  border-radius: 999px;
+  background: #f8fafd;
+  color: #4a6285;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.student-dashboard .student-filter-pill[aria-pressed="true"] {
+  border-color: #1764c0;
+  background: #eaf2ff;
+  color: #123f7b;
+}
+
+.student-dashboard .student-filter-select {
+  min-height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid var(--student-border);
+  border-radius: 9px;
+  background: #f8fafd;
+  color: #243b61;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.student-dashboard .student-filter-count {
+  width: 100%;
+  color: #7387a2;
+  font-size: 11.5px;
+}
+
+.student-dashboard .student-filter-clear {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #1764c0;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.student-dashboard .student-filter-clear:hover {
+  text-decoration: underline;
+}

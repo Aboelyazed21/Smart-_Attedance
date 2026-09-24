@@ -136,10 +136,12 @@ export default function LecturerLayout({ children }) {
   /* Close the mobile drawer whenever the route changes. */
   const [lastPath, setLastPath] = useState(location.pathname);
 
-  if (lastPath !== location.pathname) {
-    setLastPath(location.pathname);
-    setNavOpen(false);
-  }
+  useEffect(() => {
+    if (lastPath !== location.pathname) {
+      setLastPath(location.pathname);
+      setNavOpen(false);
+    }
+  }, [lastPath, location.pathname]);
 
   /* Escape closes the drawer and the page behind it stays still. */
   useEffect(() => {

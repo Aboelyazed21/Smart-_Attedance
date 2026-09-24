@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 import { getMyAttendance } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
@@ -154,6 +158,8 @@ function getStatusClass(status) {
 function StudentAttendance() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] =
+    useSearchParams();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -294,6 +300,131 @@ function StudentAttendance() {
       );
     });
   }, [records]);
+
+  /* ---------------------------------------------------------
+     FILTERS — driven by the URL so dashboard cards and
+     sections can deep-link here (?status=present&course=X).
+     Same course_key contract as the dashboard:
+     course_code, course_name, course, section_name, section.
+  ---------------------------------------------------------- */
+
+  const VALID_STATUSES = useMemo(
+    () => ["all", "present", "absent", "late"],
+    []
+  );
+
+  function courseKey(row) {
+    return String(
+      row?.course_code ||
+        row?.course_name ||
+        row?.course ||
+        row?.section_name ||
+        row?.section ||
+        "Course"
+    );
+  }
+
+  function courseLabel(row) {
+    return String(
+      row?.course_name ||
+        row?.course ||
+        row?.course_code ||
+        "Course"
+    );
+  }
+
+  const statusParam = (
+    searchParams.get("status") || "all"
+  ).toLowerCase();
+
+  const activeStatus = VALID_STATUSES.includes(
+    statusParam
+  )
+    ? statusParam
+    : "all";
+
+  const activeCourse =
+    searchParams.get("course") || "";
+
+  const courseOptions = useMemo(() => {
+    const map = new Map();
+
+    for (const row of records) {
+      const key = courseKey(row);
+
+      if (!map.has(key)) {
+        map.set(key, courseLabel(row));
+      }
+    }
+
+    return [...map.entries()]
+      .map(([key, label]) => ({ key, label }))
+      .sort((a, b) =>
+        a.label.localeCompare(b.label)
+      );
+  }, [records]);
+
+  // Drop unknown course keys from the URL (e.g. stale link).
+  useEffect(() => {
+    if (
+      activeCourse &&
+      records.length > 0 &&
+      !courseOptions.some(
+        (option) => option.key === activeCourse
+      )
+    ) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("course");
+      setSearchParams(next, { replace: true });
+    }
+  }, [
+    activeCourse,
+    records.length,
+    courseOptions,
+    searchParams,
+    setSearchParams,
+  ]);
+
+  function updateFilter(nextStatus, nextCourse) {
+    const next = new URLSearchParams();
+
+    if (nextStatus && nextStatus !== "all") {
+      next.set("status", nextStatus);
+    }
+
+    if (nextCourse) {
+      next.set("course", nextCourse);
+    }
+
+    setSearchParams(next);
+  }
+
+  const filteredRecords = useMemo(() => {
+    return sortedRecords.filter((row) => {
+      const status = String(row?.status || "")
+        .trim()
+        .toLowerCase();
+
+      if (
+        activeStatus !== "all" &&
+        status !== activeStatus
+      ) {
+        return false;
+      }
+
+      if (
+        activeCourse &&
+        courseKey(row) !== activeCourse
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [sortedRecords, activeStatus, activeCourse]);
+
+  const hasActiveFilter =
+    activeStatus !== "all" || activeCourse !== "";
 
   const stats = useMemo(() => {
     const total = records.length;
@@ -592,6 +723,85 @@ function StudentAttendance() {
             ))}
           </div>
 
+          {/* ============ FILTERS ============ */}
+          <div
+            className="student-filter-bar"
+            role="group"
+            aria-label="Filter attendance records"
+          >
+            <div className="student-filter-pills">
+              {[
+                { value: "all", label: "All" },
+                { value: "present", label: "Present" },
+                { value: "absent", label: "Absent" },
+                { value: "late", label: "Late" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className="student-filter-pill"
+                  aria-pressed={
+                    activeStatus === option.value
+                  }
+                  onClick={() =>
+                    updateFilter(
+                      option.value,
+                      activeCourse
+                    )
+                  }
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <select
+              className="student-filter-select"
+              aria-label="Filter by course or section"
+              value={activeCourse}
+              onChange={(event) =>
+                updateFilter(
+                  activeStatus,
+                  event.target.value
+                )
+              }
+            >
+              <option value="">
+                All courses &amp; sections
+              </option>
+
+              {courseOptions.map((option) => (
+                <option
+                  key={option.key}
+                  value={option.key}
+                >
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            {hasActiveFilter && (
+              <button
+                type="button"
+                className="student-filter-clear"
+                onClick={() =>
+                  updateFilter("all", "")
+                }
+              >
+                Clear filters
+              </button>
+            )}
+
+            <span
+              className="student-filter-count"
+              role="status"
+            >
+              {loading
+                ? "Loading records…"
+                : `${filteredRecords.length} of ${records.length} sessions shown`}
+            </span>
+          </div>
+
           {/* ============ MAIN GRID ============ */}
           <div className="student-main-grid">
             {/* Attendance history — real data */}
@@ -646,9 +856,33 @@ function StudentAttendance() {
                         your lecturers mark attendance.
                       </p>
                     </div>
+                  ) : filteredRecords.length === 0 ? (
+                    <div className="student-empty-state">
+                      <div className="student-empty-icon">
+                        <Icon name="search" size={26} />
+                      </div>
+
+                      <h3>No sessions match these filters</h3>
+
+                      <p>
+                        Try a different status or course,
+                        or clear the filters to see
+                        everything.
+                      </p>
+
+                      <button
+                        type="button"
+                        className="student-filter-clear"
+                        onClick={() =>
+                          updateFilter("all", "")
+                        }
+                      >
+                        Clear filters
+                      </button>
+                    </div>
                   ) : (
                     <div className="student-attendance-list">
-                      {sortedRecords.map((row, index) => {
+                      {filteredRecords.map((row, index) => {
                         const status = String(
                           row?.status || ""
                         )
@@ -665,6 +899,11 @@ function StudentAttendance() {
                           row?.course ||
                           row?.course_code ||
                           "Course";
+
+                        const section =
+                          row?.section_name ||
+                          row?.section ||
+                          "";
 
                         const dateValue =
                           row?.session_date ||
@@ -691,6 +930,9 @@ function StudentAttendance() {
                               <strong>{course}</strong>
                               <span>
                                 {formatDate(dateValue)}
+                                {section
+                                  ? ` · Section ${section}`
+                                  : ""}
                               </span>
                             </div>
 
