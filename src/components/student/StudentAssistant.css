@@ -9,30 +9,41 @@
   bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   z-index: 900;
 
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
 
   display: grid;
   place-items: center;
 
-  border: 0;
+  border: 1px solid var(--border, #e5e7eb);
   border-radius: 50%;
 
-  background: var(--primary, #2563eb);
-  color: #ffffff;
+  background: #ffffff;
+  color: var(--primary, #2563eb);
 
-  box-shadow: var(--shadow-lg, 0 12px 32px rgba(17, 24, 39, 0.12));
+  box-shadow: 0 4px 14px rgba(16, 42, 86, 0.14);
 
   cursor: pointer;
+  overflow: hidden;
 }
 
 .student-assistant-fab:hover {
-  background: var(--primary-hover, #1d4ed8);
+  border-color: var(--primary-border, #bfdbfe);
+  box-shadow: 0 6px 18px rgba(16, 42, 86, 0.18);
 }
 
-.student-assistant-fab svg {
+.student-assistant-fab:active {
+  transform: scale(0.97);
+}
+
+.student-assistant-fab-img {
   position: relative;
   z-index: 1;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #ffffff;
 }
 
 .student-assistant-fab-pulse {
@@ -88,13 +99,27 @@
 
 .student-assistant-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
   gap: 10px;
 
   padding: 12px 12px 10px;
 
   border-bottom: 1px solid var(--border, #e5e7eb);
+  background: #ffffff;
+}
+
+.student-assistant-header-img {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid var(--border, #e5e7eb);
+  background: #ffffff;
+}
+
+.student-assistant-header-text {
+  min-width: 0;
 }
 
 .student-assistant-header strong {
@@ -114,6 +139,7 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .student-assistant-full {
@@ -160,14 +186,16 @@
 
 .student-assistant-msg {
   padding: 8px 10px;
-  border: 1px solid var(--border, #e5e7eb);
+  border: 1px solid #dbe3ee;
   border-radius: 10px;
-  background: var(--bg-subtle, #fafbfc);
+  background: #edf1f7;
+  color: #102a56;
 }
 
 .student-assistant-msg.user {
-  background: var(--primary-soft, #eff6ff);
-  border-color: var(--primary-border, #bfdbfe);
+  background: var(--primary, #2563eb);
+  border-color: var(--primary-active, #1e40af);
+  color: #ffffff;
 }
 
 .student-assistant-msg-role {
@@ -175,7 +203,11 @@
   margin-bottom: 3px;
   font-size: 11px;
   font-weight: 800;
-  color: var(--text-secondary, #6b7280);
+  color: #475569;
+}
+
+.student-assistant-msg.user .student-assistant-msg-role {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .student-assistant-msg p {
@@ -219,7 +251,11 @@
 
 .student-assistant-suggest button:hover:not(:disabled) {
   border-color: var(--primary, #2563eb);
-  color: var(--primary, #2563eb);
+  color: var(--primary-active, #1e40af);
+}
+
+.student-assistant-suggest button:active:not(:disabled) {
+  background: var(--primary-soft, #eff6ff);
 }
 
 .student-assistant-form {
@@ -235,7 +271,19 @@
   padding: 0 12px;
   border: 1px solid var(--border-input, #d1d5db);
   border-radius: 8px;
+  background: #ffffff;
+  color: var(--text, #111827);
   font-size: 14px;
+}
+
+.student-assistant-form input::placeholder {
+  color: var(--text-secondary, #6b7280);
+}
+
+.student-assistant-form input:focus {
+  outline: none;
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
 .student-assistant-form button {
@@ -249,6 +297,16 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.student-assistant-form button:hover:not(:disabled) {
+  background: var(--primary-hover, #1d4ed8);
+  border-color: var(--primary-hover, #1d4ed8);
+}
+
+.student-assistant-form button:active:not(:disabled) {
+  background: var(--primary-active, #1e40af);
+  border-color: var(--primary-active, #1e40af);
 }
 
 .student-assistant-form button:disabled,

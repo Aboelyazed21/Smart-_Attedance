@@ -248,6 +248,14 @@ function StudentChatbot() {
 
         <section className="chatbot-content">
           <div className="chatbot-hero">
+            <img
+              src="/chatbot-launcher.jpg"
+              alt=""
+              width="52"
+              height="52"
+              className="chatbot-hero-img"
+              aria-hidden="true"
+            />
             <div>
               <span className="chatbot-eyebrow">STUDENT ASSISTANT</span>
               <h1>Attendance Assistant</h1>

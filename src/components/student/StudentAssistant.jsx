@@ -196,21 +196,14 @@ export default function StudentAssistant() {
             className="student-assistant-fab-pulse"
             aria-hidden="true"
           />
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <img
+            src="/chatbot-launcher.jpg"
+            alt=""
+            width="46"
+            height="46"
+            className="student-assistant-fab-img"
             aria-hidden="true"
-          >
-            <rect x="5" y="4" width="14" height="17" rx="2" />
-            <path d="M9 4a3 3 0 0 1 6 0" />
-            <path d="m9.5 13 2 2 3.5-4" />
-          </svg>
+          />
         </button>
       )}
 
@@ -222,7 +215,15 @@ export default function StudentAssistant() {
           aria-label="Attendance Assistant"
         >
           <header className="student-assistant-header">
-            <div>
+            <img
+              src="/chatbot-launcher.jpg"
+              alt=""
+              width="34"
+              height="34"
+              className="student-assistant-header-img"
+              aria-hidden="true"
+            />
+            <div className="student-assistant-header-text">
               <strong>Attendance Assistant</strong>
               <span>Your attendance overview</span>
             </div>

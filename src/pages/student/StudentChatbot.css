@@ -225,11 +225,24 @@
 }
 
 .chatbot-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   padding: 18px 20px;
   border: 1px solid var(--border, #e5e7eb);
   border-radius: 12px;
   background: #fff;
   margin-bottom: 14px;
+}
+
+.chatbot-hero-img {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid var(--border, #e5e7eb);
+  background: #ffffff;
 }
 
 .chatbot-eyebrow {
@@ -352,13 +365,15 @@
   max-width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--bg-subtle, #fafbfc);
+  border: 1px solid #dbe3ee;
+  background: #edf1f7;
+  color: #102a56;
 }
 
 .chatbot-msg.user {
-  background: var(--primary-soft, #eff6ff);
-  border-color: var(--primary-border, #bfdbfe);
+  background: var(--primary, #2563eb);
+  border-color: var(--primary-active, #1e40af);
+  color: #ffffff;
 }
 
 .chatbot-msg-role {
@@ -366,8 +381,12 @@
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.4px;
-  color: var(--text-secondary, #6b7280);
+  color: #475569;
   margin-bottom: 4px;
+}
+
+.chatbot-msg.user .chatbot-msg-role {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .chatbot-msg p {
@@ -414,7 +433,11 @@
 
 .chatbot-suggest button:hover:not(:disabled) {
   border-color: var(--primary, #2563eb);
-  color: var(--primary, #2563eb);
+  color: var(--primary-active, #1e40af);
+}
+
+.chatbot-suggest button:active:not(:disabled) {
+  background: var(--primary-soft, #eff6ff);
 }
 
 .chatbot-form {
@@ -430,7 +453,19 @@
   padding: 0 12px;
   border: 1px solid var(--border-input, #d1d5db);
   border-radius: 8px;
+  background: #ffffff;
+  color: var(--text, #111827);
   font-size: 14px;
+}
+
+.chatbot-form input::placeholder {
+  color: var(--text-secondary, #6b7280);
+}
+
+.chatbot-form input:focus {
+  outline: none;
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
 .chatbot-form button {
@@ -444,6 +479,16 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.chatbot-form button:hover:not(:disabled) {
+  background: var(--primary-hover, #1d4ed8);
+  border-color: var(--primary-hover, #1d4ed8);
+}
+
+.chatbot-form button:active:not(:disabled) {
+  background: var(--primary-active, #1e40af);
+  border-color: var(--primary-active, #1e40af);
 }
 
 .chatbot-form button:disabled {
