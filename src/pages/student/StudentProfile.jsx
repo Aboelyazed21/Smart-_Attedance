@@ -184,6 +184,47 @@ export default function StudentProfile() {
   const location = useLocation();
   const savedUser = useMemo(() => getSavedUser(), []);
 
+  // Client mirrors of the backend authority in
+  // src/utils/validation.js (backend repo).
+  const PASSWORD_ERROR =
+    "Password must be 8–12 characters and contain uppercase, lowercase, number, and special character.";
+
+  const normalizeName = (value) =>
+    String(value || "")
+      .trim()
+      .replace(/\s+/g, " ");
+
+  const isValidName = (value) => {
+    const text = String(value || "");
+    if (text.length < 2 || text.length > 50)
+      return false;
+    if (!/^(?:\p{L}.*){2,}$/u.test(text))
+      return false;
+    if (/[0-9@]/.test(text)) return false;
+    if (/https?:\/\//i.test(text)) return false;
+    return /^[\p{L}\p{M} .'\-]+$/u.test(text);
+  };
+
+  const normalizePhone = (value) =>
+    String(value || "")
+      .trim()
+      .replace(/[\s\-().]/g, "")
+      .replace(/\+(?=.*\+)/g, "");
+
+  const isValidEgyptianPhone = (normalized) =>
+    /^01[012][0-9]{8}$/.test(normalized || "");
+
+  const isValidPassword = (value) => {
+    const text = String(value || "");
+    return (
+      text.length >= 8 &&
+      text.length <= 12 &&
+      /[A-Z]/.test(text) &&
+      /[a-z]/.test(text) &&
+      /[0-9]/.test(text) &&
+      /[!@#$%^&*_\-.?]/.test(text)
+    );
+  };
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [student, setStudent] = useState(null);
@@ -446,6 +487,34 @@ export default function StudentProfile() {
       return;
     }
 
+    if (!isValidName(normalizeName(editForm.firstName))) {
+      setSaveError(
+        "Please enter a valid first name."
+      );
+      return;
+    }
+
+    if (!isValidName(normalizeName(editForm.lastName))) {
+      setSaveError(
+        "Please enter a valid last name."
+      );
+      return;
+    }
+
+    const normalizedProfilePhone = normalizePhone(
+      editForm.phone
+    );
+
+    if (
+      normalizedProfilePhone &&
+      !isValidEgyptianPhone(normalizedProfilePhone)
+    ) {
+      setSaveError(
+        "Phone number must start with 010, 011, or 012 and contain exactly 11 digits."
+      );
+      return;
+    }
+
     setSaving(true);
     setSaveError("");
 
@@ -456,10 +525,10 @@ export default function StudentProfile() {
         {
           method: "PUT",
           body: JSON.stringify({
-            firstName: editForm.firstName.trim(),
-            lastName: editForm.lastName.trim(),
+            firstName: normalizeName(editForm.firstName),
+            lastName: normalizeName(editForm.lastName),
             email: editForm.email.trim(),
-            phone: editForm.phone.trim(),
+            phone: normalizedProfilePhone || null,
           }),
         }
       );
@@ -515,6 +584,13 @@ export default function StudentProfile() {
       setPasswordError(
         "Enter your current and new password."
       );
+      return;
+    }
+
+    if (
+      !isValidPassword(passwordForm.newPassword)
+    ) {
+      setPasswordError(PASSWORD_ERROR);
       return;
     }
 
@@ -883,11 +959,16 @@ export default function StudentProfile() {
                       Phone Number
                       <input
                         name="phone"
+                        type="tel"
                         value={editForm.phone}
                         onChange={handleEditChange}
-                        placeholder="Optional"
+                        placeholder="01012345678"
                         autoComplete="tel"
                       />
+                      <small className="profile-hint">
+                        Egyptian mobile starting
+                        with 010, 011, or 012.
+                      </small>
                     </label>
 
                     <label>

@@ -718,6 +718,13 @@ body.student-profile-nav-open {
   color: var(--profile-subtle);
 }
 
+.profile-form .profile-hint {
+  color: var(--profile-subtle);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
 .form-error {
   margin: 0;
   padding: 11px 12px;

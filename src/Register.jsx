@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "./services/api";
 import "./App.css";
@@ -77,6 +77,107 @@ function AuthIcon({ name, size = 17 }) {
   );
 }
 
+/* =========================================================
+   CLIENT VALIDATION — mirrors the backend authority in
+   src/utils/validation.js. Never the only line of defense.
+   ========================================================= */
+
+const PASSWORD_ERROR =
+  "Password must be 8–12 characters and contain uppercase, lowercase, number, and special character.";
+
+const PHONE_ERROR =
+  "Phone number must start with 010, 011, or 012 and contain exactly 11 digits.";
+
+function normalizeName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function isValidName(value) {
+  const text = String(value || "");
+
+  if (text.length < 2 || text.length > 50) {
+    return false;
+  }
+
+  if (!/^(?:\p{L}.*){2,}$/u.test(text)) {
+    return false;
+  }
+
+  if (/[0-9@]/.test(text)) {
+    return false;
+  }
+
+  if (/https?:\/\//i.test(text)) {
+    return false;
+  }
+
+  return /^[\p{L}\p{M} .'\-]+$/u.test(text);
+}
+
+function normalizePhone(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[\s\-().]/g, "")
+    .replace(/\+(?=.*\+)/g, "");
+}
+
+function isValidEgyptianPhone(normalized) {
+  return /^01[012][0-9]{8}$/.test(
+    normalized || ""
+  );
+}
+
+function passwordChecks(value) {
+  const text = String(value || "");
+
+  return {
+    length: text.length >= 8 && text.length <= 12,
+    upper: /[A-Z]/.test(text),
+    lower: /[a-z]/.test(text),
+    number: /[0-9]/.test(text),
+    special: /[!@#$%^&*_\-.?]/.test(text),
+  };
+}
+
+function isValidPassword(value) {
+  const checks = passwordChecks(value);
+
+  return (
+    checks.length &&
+    checks.upper &&
+    checks.lower &&
+    checks.number &&
+    checks.special
+  );
+}
+
+function passwordStrength(value) {
+  const text = String(value || "");
+
+  if (!text) {
+    return "empty";
+  }
+
+  let score = 0;
+
+  if (text.length >= 8) score += 1;
+  if (/[A-Z]/.test(text)) score += 1;
+  if (/[a-z]/.test(text)) score += 1;
+  if (/[0-9]/.test(text)) score += 1;
+  if (/[!@#$%^&*_\-.?]/.test(text)) score += 1;
+
+  if (text.length > 12) {
+    return "weak";
+  }
+
+  if (score <= 2) return "weak";
+  if (score <= 4) return "fair";
+
+  return "strong";
+}
+
 function Register() {
   const navigate = useNavigate();
 
@@ -91,60 +192,147 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-  // Same rule as the backend: digits with an optional
-  // leading "+", 7-15 digits after separators are removed.
-  const normalizePhone = (value) =>
-    String(value || "")
-      .trim()
-      .replace(/[\s\-().]/g, "")
-      .replace(/\+(?=.*\+)/g, "");
+  const values = useMemo(
+    () => ({
+      firstName: normalizeName(firstName),
+      lastName: normalizeName(lastName),
+      email: email.trim(),
+      phone: normalizePhone(phone),
+      studentCode: studentCode.trim(),
+      password,
+      confirmPassword,
+    }),
+    [
+      firstName,
+      lastName,
+      email,
+      phone,
+      studentCode,
+      password,
+      confirmPassword,
+    ]
+  );
 
-  const isValidPhone = (normalized) =>
-    /^\+?[0-9]{7,15}$/.test(normalized || "");
+  const errors = useMemo(() => {
+    const result = {};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (!values.firstName) {
+      result.firstName = "First name is required.";
+    } else if (!isValidName(values.firstName)) {
+      result.firstName =
+        "Please enter a valid first name.";
+    }
 
-    // Check required fields
-    if (
-      !firstName.trim() ||
-      !lastName.trim() ||
-      !email.trim() ||
-      !phone.trim() ||
-      !studentCode.trim() ||
-      !password ||
-      !confirmPassword
+    if (!values.lastName) {
+      result.lastName = "Last name is required.";
+    } else if (!isValidName(values.lastName)) {
+      result.lastName =
+        "Please enter a valid last name.";
+    }
+
+    if (!values.email) {
+      result.email = "University email is required.";
+    } else if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        values.email
+      ) ||
+      values.email.length > 255
     ) {
-      alert("Please fill in all fields");
+      result.email =
+        "Please enter a valid email address.";
+    }
+
+    if (!values.phone) {
+      result.phone = "Phone number is required.";
+    } else if (
+      !isValidEgyptianPhone(values.phone)
+    ) {
+      result.phone = PHONE_ERROR;
+    }
+
+    if (!values.studentCode) {
+      result.studentCode = "University ID is required.";
+    } else if (values.studentCode.length > 50) {
+      result.studentCode =
+        "Please enter a valid University ID.";
+    }
+
+    if (!values.password) {
+      result.password = "Password is required.";
+    } else if (!isValidPassword(values.password)) {
+      result.password = PASSWORD_ERROR;
+    }
+
+    if (!values.confirmPassword) {
+      result.confirmPassword =
+        "Please confirm your password.";
+    } else if (
+      values.confirmPassword !== values.password
+    ) {
+      result.confirmPassword =
+        "Passwords do not match.";
+    }
+
+    return result;
+  }, [values]);
+
+  const isValid =
+    Object.keys(errors).length === 0;
+
+  const strength = passwordStrength(password);
+
+  function markTouched(name) {
+    setTouched((current) =>
+      current[name]
+        ? current
+        : { ...current, [name]: true }
+    );
+  }
+
+  function handleBlur(name) {
+    return () => markTouched(name);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    setSubmitError("");
+
+    // Reveal every inline error at submit time.
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      studentCode: true,
+      password: true,
+      confirmPassword: true,
+    });
+
+    const firstError = Object.values(errors)[0];
+
+    if (firstError) {
+      setSubmitError(firstError);
       return;
     }
 
-    const normalizedPhone =
-      normalizePhone(phone);
+    registerAccount();
+  }
 
-    if (!isValidPhone(normalizedPhone)) {
-      alert("Please enter a valid phone number");
-      return;
-    }
-
-    // Check password match
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
+  async function registerAccount() {
     try {
       setLoading(true);
 
       const data = await registerUser({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
-        phone: normalizedPhone,
-        password,
-        studentCode: studentCode.trim(),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        studentCode: values.studentCode,
       });
 
       console.log("Registration successful:", data);
@@ -157,11 +345,18 @@ function Register() {
       navigate("/");
     } catch (error) {
       console.error("Registration error:", error);
-      alert(error.message);
+      setSubmitError(
+        error.message ||
+          "Registration failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  function errorFor(name) {
+    return touched[name] ? errors[name] : "";
+  }
 
   return (
     <div className="login-page">
@@ -208,7 +403,17 @@ function Register() {
           <form
             className="login-form"
             onSubmit={handleSubmit}
+            noValidate
           >
+
+            {submitError && (
+              <div
+                className="form-error"
+                role="alert"
+              >
+                {submitError}
+              </div>
+            )}
 
             {/* FIRST + LAST NAME */}
 
@@ -216,7 +421,7 @@ function Register() {
 
               <div className="form-group">
 
-                <label>
+                <label htmlFor="reg-first-name">
                   First Name
                 </label>
 
@@ -227,23 +432,39 @@ function Register() {
                   </span>
 
                   <input
+                    id="reg-first-name"
                     type="text"
                     placeholder="First name"
                     autoComplete="given-name"
+                    aria-invalid={
+                      errorFor("firstName")
+                        ? "true"
+                        : "false"
+                    }
                     value={firstName}
                     onChange={(e) =>
                       setFirstName(e.target.value)
                     }
+                    onBlur={handleBlur("firstName")}
                   />
 
                 </div>
+
+                {errorFor("firstName") && (
+                  <p
+                    className="field-error"
+                    role="alert"
+                  >
+                    {errorFor("firstName")}
+                  </p>
+                )}
 
               </div>
 
 
               <div className="form-group">
 
-                <label>
+                <label htmlFor="reg-last-name">
                   Last Name
                 </label>
 
@@ -254,16 +475,32 @@ function Register() {
                   </span>
 
                   <input
+                    id="reg-last-name"
                     type="text"
                     placeholder="Last name"
                     autoComplete="family-name"
+                    aria-invalid={
+                      errorFor("lastName")
+                        ? "true"
+                        : "false"
+                    }
                     value={lastName}
                     onChange={(e) =>
                       setLastName(e.target.value)
                     }
+                    onBlur={handleBlur("lastName")}
                   />
 
                 </div>
+
+                {errorFor("lastName") && (
+                  <p
+                    className="field-error"
+                    role="alert"
+                  >
+                    {errorFor("lastName")}
+                  </p>
+                )}
 
               </div>
 
@@ -274,7 +511,7 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-email">
                 University Email
               </label>
 
@@ -285,16 +522,32 @@ function Register() {
                 </span>
 
                 <input
+                  id="reg-email"
                   type="email"
                   placeholder="Enter your university email"
                   autoComplete="email"
+                  aria-invalid={
+                    errorFor("email")
+                      ? "true"
+                      : "false"
+                  }
                   value={email}
                   onChange={(e) =>
                     setEmail(e.target.value)
                   }
+                  onBlur={handleBlur("email")}
                 />
 
               </div>
+
+              {errorFor("email") && (
+                <p
+                  className="field-error"
+                  role="alert"
+                >
+                  {errorFor("email")}
+                </p>
+              )}
 
             </div>
 
@@ -303,7 +556,7 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-phone">
                 Phone Number
               </label>
 
@@ -314,16 +567,42 @@ function Register() {
                 </span>
 
                 <input
+                  id="reg-phone"
                   type="tel"
-                  placeholder="Enter your phone number"
+                  placeholder="01012345678"
                   autoComplete="tel"
+                  inputMode="numeric"
+                  aria-invalid={
+                    errorFor("phone")
+                      ? "true"
+                      : "false"
+                  }
+                  aria-describedby="reg-phone-hint"
                   value={phone}
                   onChange={(e) =>
                     setPhone(e.target.value)
                   }
+                  onBlur={handleBlur("phone")}
                 />
 
               </div>
+
+              <p
+                id="reg-phone-hint"
+                className="field-hint"
+              >
+                Use an Egyptian mobile number
+                starting with 010, 011, or 012.
+              </p>
+
+              {errorFor("phone") && (
+                <p
+                  className="field-error"
+                  role="alert"
+                >
+                  {errorFor("phone")}
+                </p>
+              )}
 
             </div>
 
@@ -332,7 +611,7 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-student-code">
                 University ID
               </label>
 
@@ -343,16 +622,32 @@ function Register() {
                 </span>
 
                 <input
+                  id="reg-student-code"
                   type="text"
                   placeholder="Enter your university ID"
                   autoComplete="off"
+                  aria-invalid={
+                    errorFor("studentCode")
+                      ? "true"
+                      : "false"
+                  }
                   value={studentCode}
                   onChange={(e) =>
                     setStudentCode(e.target.value)
                   }
+                  onBlur={handleBlur("studentCode")}
                 />
 
               </div>
+
+              {errorFor("studentCode") && (
+                <p
+                  className="field-error"
+                  role="alert"
+                >
+                  {errorFor("studentCode")}
+                </p>
+              )}
 
             </div>
 
@@ -361,7 +656,7 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-password">
                 Password
               </label>
 
@@ -372,6 +667,7 @@ function Register() {
                 </span>
 
                 <input
+                  id="reg-password"
                   type={
                     showPassword
                       ? "text"
@@ -379,15 +675,27 @@ function Register() {
                   }
                   placeholder="Create a password"
                   autoComplete="new-password"
+                  aria-invalid={
+                    errorFor("password")
+                      ? "true"
+                      : "false"
+                  }
+                  aria-describedby="reg-password-rules"
                   value={password}
                   onChange={(e) =>
                     setPassword(e.target.value)
                   }
+                  onBlur={handleBlur("password")}
                 />
 
                 <button
                   type="button"
                   className="show-password"
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
                   onClick={() =>
                     setShowPassword(!showPassword)
                   }
@@ -399,6 +707,78 @@ function Register() {
 
               </div>
 
+              <div
+                id="reg-password-rules"
+                className="password-requirements"
+              >
+
+                <p>
+                  Password must contain:
+                </p>
+
+                <ul>
+                  <li
+                    data-met={
+                      passwordChecks(password).length
+                    }
+                  >
+                    8–12 characters
+                  </li>
+                  <li
+                    data-met={
+                      passwordChecks(password).upper
+                    }
+                  >
+                    uppercase letter
+                  </li>
+                  <li
+                    data-met={
+                      passwordChecks(password).lower
+                    }
+                  >
+                    lowercase letter
+                  </li>
+                  <li
+                    data-met={
+                      passwordChecks(password).number
+                    }
+                  >
+                    number
+                  </li>
+                  <li
+                    data-met={
+                      passwordChecks(password).special
+                    }
+                  >
+                    special character (! @ # $ % ^ &amp; * _ - . ?)
+                  </li>
+                </ul>
+
+                {password && (
+                  <div className="password-strength">
+                    <div
+                      className="password-strength-bar"
+                      data-strength={strength}
+                    >
+                      <span />
+                    </div>
+                    <small>
+                      Strength: {strength}
+                    </small>
+                  </div>
+                )}
+
+              </div>
+
+              {errorFor("password") && (
+                <p
+                  className="field-error"
+                  role="alert"
+                >
+                  {errorFor("password")}
+                </p>
+              )}
+
             </div>
 
 
@@ -406,7 +786,7 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-confirm-password">
                 Confirm Password
               </label>
 
@@ -417,6 +797,7 @@ function Register() {
                 </span>
 
                 <input
+                  id="reg-confirm-password"
                   type={
                     showConfirmPassword
                       ? "text"
@@ -424,15 +805,30 @@ function Register() {
                   }
                   placeholder="Confirm your password"
                   autoComplete="new-password"
+                  aria-invalid={
+                    errorFor("confirmPassword")
+                      ? "true"
+                      : "false"
+                  }
                   value={confirmPassword}
                   onChange={(e) =>
-                    setConfirmPassword(e.target.value)
+                    setConfirmPassword(
+                      e.target.value
+                    )
                   }
+                  onBlur={handleBlur(
+                    "confirmPassword"
+                  )}
                 />
 
                 <button
                   type="button"
                   className="show-password"
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
                   onClick={() =>
                     setShowConfirmPassword(
                       !showConfirmPassword
@@ -446,6 +842,15 @@ function Register() {
 
               </div>
 
+              {errorFor("confirmPassword") && (
+                <p
+                  className="field-error"
+                  role="alert"
+                >
+                  {errorFor("confirmPassword")}
+                </p>
+              )}
+
             </div>
 
 
@@ -454,7 +859,7 @@ function Register() {
             <button
               type="submit"
               className="sign-in-button"
-              disabled={loading}
+              disabled={loading || !isValid}
             >
 
               <span>
