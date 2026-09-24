@@ -138,6 +138,11 @@
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.025);
 }
 
+.sections-hero > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .hero-label,
 .panel-label {
   display: block;
@@ -266,6 +271,11 @@
   box-shadow: 0 3px 12px rgba(15, 23, 42, 0.02);
 }
 
+.section-stat-card > div:last-child {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .stat-icon {
   width: 42px;
   height: 42px;
@@ -330,6 +340,15 @@
   gap: 18px;
   padding: 20px 22px;
   border-bottom: 1px solid var(--sections-border-soft);
+}
+
+.sections-panel-header > div:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sections-panel-header .refresh-button {
+  flex: 0 0 auto;
 }
 
 .sections-panel-header h3 {
@@ -763,6 +782,73 @@
 
   .sections-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   SMALL TABLET — stats reflow before cards get squeezed
+========================================================= */
+
+@media (max-width: 1024px) {
+  .sections-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   MOBILE — single column, full-width controls
+========================================================= */
+
+@media (max-width: 640px) {
+  .lecturer-sections-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .lecturer-sections-content {
+    padding: 16px 16px 32px;
+  }
+
+  .sections-hero {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 20px 18px;
+  }
+
+  .manage-sessions-button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .sections-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sections-panel-header {
+    padding: 18px;
+  }
+
+  .sections-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 18px;
+  }
+
+  .sections-search {
+    width: 100%;
+  }
+
+  .sections-count {
+    justify-content: flex-start;
+  }
+
+  .sections-grid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px 16px 20px;
   }
 }
 

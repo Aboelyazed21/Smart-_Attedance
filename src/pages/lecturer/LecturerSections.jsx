@@ -216,7 +216,7 @@ export default function LecturerSections() {
 
                 <div>
                   <span>Attendance</span>
-                  <strong>Live</strong>
+                  <strong>Active</strong>
                   <small>
                     Connected to attendance management
                   </small>

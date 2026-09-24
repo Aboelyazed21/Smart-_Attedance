@@ -1839,7 +1839,7 @@ import "./LecturerSession.css";
   const header = {
     background: "#ffffff",
     borderBottom: "1px solid #e5eaf1",
-    padding: "28px 36px",
+    padding: "clamp(18px, 4vw, 28px) clamp(16px, 4vw, 36px)",
     boxSizing: "border-box",
     display: "flex",
     alignItems: "center",
@@ -1858,7 +1858,7 @@ import "./LecturerSession.css";
   
   const title = {
     margin: 0,
-    fontSize: 30,
+    fontSize: "clamp(1.4rem, 1.2rem + 2vw, 1.875rem)",
     fontWeight: 700,
     letterSpacing: "-0.5px",
   };
@@ -1879,7 +1879,7 @@ import "./LecturerSession.css";
   const main = {
     maxWidth: 1400,
     margin: "0 auto",
-    padding: "30px 36px 50px",
+    padding: "clamp(18px, 4vw, 30px) clamp(16px, 4vw, 36px) clamp(32px, 6vw, 50px)",
     boxSizing: "border-box",
   };
   
@@ -1911,7 +1911,9 @@ import "./LecturerSession.css";
   };
   
   const select = {
-    minWidth: 260,
+    minWidth: 0,
+    width: "100%",
+    maxWidth: 260,
     border: "1px solid #dbe2ea",
     background: "#ffffff",
     borderRadius: 9,
@@ -1924,7 +1926,7 @@ import "./LecturerSession.css";
   const grid = {
     display: "grid",
     gridTemplateColumns:
-      "repeat(auto-fill, minmax(310px, 1fr))",
+      "repeat(auto-fill, minmax(min(310px, 100%), 1fr))",
     gap: 20,
   };
   
@@ -2179,7 +2181,7 @@ import "./LecturerSession.css";
     padding: 24,
     display: "grid",
     gridTemplateColumns:
-      "repeat(2, minmax(0, 1fr))",
+      "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",
     gap: 18,
   };
   
@@ -2215,8 +2217,8 @@ import "./LecturerSession.css";
   };
   
   const qrImage = {
-    width: 280,
-    height: 280,
+    width: "min(280px, 100%)",
+    height: "auto",
     objectFit: "contain",
     border: "1px solid #e2e8f0",
     borderRadius: 12,
@@ -2225,8 +2227,8 @@ import "./LecturerSession.css";
   };
   
   const qrEmpty = {
-    width: 280,
-    height: 280,
+    width: "min(280px, 100%)",
+    aspectRatio: "1",
     margin: "0 auto",
     display: "grid",
     placeItems: "center",
