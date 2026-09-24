@@ -104,7 +104,7 @@ function Login() {
             <div className="form-group">
 
               <label>
-                Email or University ID
+                University Email or University ID
               </label>
 
               <div className="input-container">
@@ -115,7 +115,7 @@ function Login() {
 
                 <input
                   type="text"
-                  placeholder="Email or University ID"
+                  placeholder="Enter your university email or university ID"
                   autoComplete="username"
                 />
 

@@ -59,7 +59,7 @@ async function apiRequest(
 ========================================================= */
 
 export async function loginUser(
-  email,
+  identifier,
   password
 ) {
   return apiRequest(
@@ -67,8 +67,11 @@ export async function loginUser(
     {
       method: "POST",
 
+      // `identifier` is the new contract (email or University ID).
+      // `email` is kept so older backends keep working.
       body: JSON.stringify({
-        email,
+        identifier,
+        email: identifier,
         password,
       }),
     }
@@ -82,6 +85,7 @@ export async function registerUser({
   email,
   password,
   studentCode,
+  phone,
 }) {
   return apiRequest(
     "/register",
@@ -94,6 +98,7 @@ export async function registerUser({
         email,
         password,
         studentCode,
+        phone,
       }),
     }
   );

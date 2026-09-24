@@ -729,8 +729,8 @@ function Login() {
   ] = useState(false);
 
   const [
-    email,
-    setEmail,
+    identifier,
+    setIdentifier,
   ] = useState("");
 
   const [
@@ -746,9 +746,9 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
+    if (!identifier || !password) {
       alert(
-        "Please enter email and password"
+        "Please enter your university email or university ID and password"
       );
 
       return;
@@ -758,7 +758,7 @@ function Login() {
       setLoading(true);
 
       const data = await loginUser(
-        email,
+        identifier,
         password
       );
 
@@ -904,7 +904,7 @@ function Login() {
             <div className="form-group">
 
               <label>
-                Email or University ID
+                University Email or University ID
               </label>
 
               <div className="input-container">
@@ -915,11 +915,11 @@ function Login() {
 
                 <input
                   type="text"
-                  placeholder="Email or University ID"
+                  placeholder="Enter your university email or university ID"
                   autoComplete="username"
-                  value={email}
+                  value={identifier}
                   onChange={(e) =>
-                    setEmail(e.target.value)
+                    setIdentifier(e.target.value)
                   }
                 />
 

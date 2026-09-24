@@ -35,6 +35,12 @@ function AuthIcon({ name, size = 17 }) {
       </>
     ),
 
+    phone: (
+      <>
+        <path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+      </>
+    ),
+
     eye: (
       <>
         <path d="M3 12a9 9 0 0 1 18 0" />
@@ -80,25 +86,46 @@ function Register() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [studentCode, setStudentCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
 
+  // Same rule as the backend: digits with an optional
+  // leading "+", 7-15 digits after separators are removed.
+  const normalizePhone = (value) =>
+    String(value || "")
+      .trim()
+      .replace(/[\s\-().]/g, "")
+      .replace(/\+(?=.*\+)/g, "");
+
+  const isValidPhone = (normalized) =>
+    /^\+?[0-9]{7,15}$/.test(normalized || "");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Check required fields
     if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !studentCode ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !email.trim() ||
+      !phone.trim() ||
+      !studentCode.trim() ||
       !password ||
       !confirmPassword
     ) {
       alert("Please fill in all fields");
+      return;
+    }
+
+    const normalizedPhone =
+      normalizePhone(phone);
+
+    if (!isValidPhone(normalizedPhone)) {
+      alert("Please enter a valid phone number");
       return;
     }
 
@@ -112,11 +139,12 @@ function Register() {
       setLoading(true);
 
       const data = await registerUser({
-        firstName,
-        lastName,
-        email,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: normalizedPhone,
         password,
-        studentCode,
+        studentCode: studentCode.trim(),
       });
 
       console.log("Registration successful:", data);
@@ -263,6 +291,35 @@ function Register() {
                   value={email}
                   onChange={(e) =>
                     setEmail(e.target.value)
+                  }
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* PHONE NUMBER */}
+
+            <div className="form-group">
+
+              <label>
+                Phone Number
+              </label>
+
+              <div className="input-container">
+
+                <span className="input-icon">
+                  <AuthIcon name="phone" />
+                </span>
+
+                <input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  autoComplete="tel"
+                  value={phone}
+                  onChange={(e) =>
+                    setPhone(e.target.value)
                   }
                 />
 
