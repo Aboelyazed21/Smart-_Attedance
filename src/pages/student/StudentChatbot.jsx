@@ -55,7 +55,7 @@ function StudentChatbot() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setSidebarOpen(false);
-    navigate("/");
+    navigate("/logout");
   }
 
   async function load() {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "../ThemeToggle";
+import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import "./AdminLayout.css";
 
 /* =========================================================
@@ -277,66 +278,67 @@ function MenuIcon({ open }) {
 export default function AdminLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigationItems = [
     {
-      label: "Dashboard",
+      label: "nav.dashboard",
       short: "DB",
       path: "/dashboard",
       icon: "dashboard",
     },
     {
-      label: "Users",
+      label: "nav.users",
       short: "US",
       path: "/admin/users",
       icon: "users",
     },
     {
-      label: "Courses",
+      label: "nav.courses",
       short: "CO",
       path: "/admin/courses",
       icon: "courses",
     },
     {
-      label: "Sections",
+      label: "nav.sections",
       short: "SC",
       path: "/admin/sections",
       icon: "sections",
     },
     {
-      label: "Rooms",
+      label: "nav.rooms",
       short: "RM",
       path: "/admin/rooms",
       icon: "rooms",
     },
     {
-      label: "Timetable",
+      label: "nav.timetable",
       short: "TM",
       path: "/admin/timetable",
       icon: "calendar",
     },
     {
-      label: "Attendance",
+      label: "nav.attendance",
       short: "AT",
       path: "/admin/attendance",
       icon: "attendance",
     },
     {
-      label: "Reports",
+      label: "nav.reports",
       short: "RP",
       path: "/admin/reports",
       icon: "reports",
     },
     {
-      label: "Settings",
+      label: "nav.settings",
       short: "ST",
       path: "/admin/settings",
       icon: "settings",
     },
     {
-      label: "Enrollments",
+      label: "nav.enrollments",
       short: "EN",
       path: "/admin/enrollments",
       icon: "enrollments",
@@ -475,7 +477,7 @@ export default function AdminLayout({ children }) {
 
           <div className="admin-brand-text">
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -502,7 +504,7 @@ export default function AdminLayout({ children }) {
                 </span>
 
                 <span className="admin-nav-label">
-                  {item.label}
+                  {t(item.label)}
                 </span>
 
                 <span className="admin-nav-short">
@@ -526,7 +528,7 @@ export default function AdminLayout({ children }) {
             </span>
 
             <span className="admin-nav-label">
-              Logout
+              {t("action.logout")}
             </span>
 
             <span className="admin-nav-short">
@@ -534,9 +536,11 @@ export default function AdminLayout({ children }) {
             </span>
           </button>
 
+          <LanguageToggle className="lang-toggle-block" />
+
           <div className="admin-theme-row">
             <span className="admin-nav-label">
-              Theme
+              {t("common.theme")}
             </span>
             <ThemeToggle />
           </div>

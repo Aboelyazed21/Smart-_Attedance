@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLanguage } from "../../utils/i18n";
 import "./StudentMobileNav.css";
 
 function NavIcon({ type }) {
@@ -62,27 +63,28 @@ function NavIcon({ type }) {
 function StudentMobileNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { lang, setLang, t } = useLanguage();
 
   const currentPath = location.pathname;
 
   const items = [
     {
-      label: "Home",
+      label: t("nav.home"),
       path: "/dashboard",
       icon: "home",
     },
     {
-      label: "Attendance",
+      label: t("nav.attendance"),
       path: "/student/attendance",
       icon: "attendance",
     },
     {
-      label: "Scan",
+      label: t("nav.scanShort"),
       path: "/student/scan",
       icon: "scan",
     },
     {
-      label: "Requests",
+      label: t("nav.requests"),
       path: "/student/correction-requests",
       icon: "correction",
     },
@@ -121,6 +123,27 @@ function StudentMobileNav() {
           </span>
         </button>
       ))}
+
+      <button
+        type="button"
+        className="student-mobile-nav-item student-mobile-lang"
+        onClick={() =>
+          setLang(lang === "ar" ? "en" : "ar")
+        }
+        aria-label={t("lang.label")}
+        title={t("lang.label")}
+      >
+        <span
+          className="student-mobile-nav-icon"
+          aria-hidden="true"
+        >
+          {lang === "ar" ? "EN" : "ع"}
+        </span>
+
+        <span className="student-mobile-nav-label">
+          {lang === "ar" ? "EN" : "عربي"}
+        </span>
+      </button>
     </nav>
   );
 }

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../Footer";
 import "../Footer.css";
 import ThemeToggle from "../ThemeToggle";
+import { useLanguage, LanguageToggle } from "../../utils/i18n";
 
 import "./LecturerLayout.css";
 
@@ -24,24 +25,24 @@ function getInitials(firstName = "", lastName = "") {
 }
 
 const navigationItems = [
-  { label: "Dashboard", icon: "dashboard", path: "/dashboard" },
+  { label: "nav.dashboard", icon: "dashboard", path: "/dashboard" },
   {
-    label: "Attendance Sessions",
+    label: "nav.sessions",
     icon: "sessions",
     path: "/lecturer/sessions",
   },
   {
-    label: "My Sections",
+    label: "nav.mySections",
     icon: "sections",
     path: "/lecturer/sections",
   },
   {
-    label: "Attendance",
+    label: "nav.attendance",
     icon: "attendance",
     path: "/lecturer/attendance",
   },
   {
-    label: "Reports",
+    label: "nav.reports",
     icon: "reports",
     path: "/lecturer/reports",
   },
@@ -129,6 +130,7 @@ function NavIcon({ name }) {
 export default function LecturerLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   const [navOpen, setNavOpen] = useState(false);
 
@@ -211,7 +213,7 @@ export default function LecturerLayout({ children }) {
           type="button"
           className="lecturer-menu-button"
           aria-label={
-            navOpen ? "Close navigation" : "Open navigation"
+            navOpen ? t("a11y.closeNav") : t("a11y.openNav")
           }
           aria-expanded={navOpen}
           aria-controls="lecturer-sidebar"
@@ -241,7 +243,7 @@ export default function LecturerLayout({ children }) {
         <button
           type="button"
           className="lecturer-sidebar-overlay"
-          aria-label="Close navigation"
+          aria-label={t("a11y.closeNav")}
           onClick={() => setNavOpen(false)}
         />
       )}
@@ -249,7 +251,7 @@ export default function LecturerLayout({ children }) {
       <button
         type="button"
         className="lecturer-sidebar-close"
-        aria-label="Close navigation"
+        aria-label={t("a11y.closeNav")}
         aria-expanded={navOpen}
         aria-controls="lecturer-sidebar"
         onClick={() => setNavOpen(false)}
@@ -269,7 +271,7 @@ export default function LecturerLayout({ children }) {
 
           <div className="lecturer-layout-brand-text">
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -282,7 +284,7 @@ export default function LecturerLayout({ children }) {
             <strong>
               {firstName} {lastName}
             </strong>
-            <span>Lecturer</span>
+            <span>{t("role.lecturer")}</span>
           </div>
         </div>
 
@@ -310,7 +312,7 @@ export default function LecturerLayout({ children }) {
                 </span>
 
                 <span className="lecturer-layout-nav-label">
-                  {item.label}
+                  {t(item.label)}
                 </span>
               </button>
             );
@@ -319,12 +321,9 @@ export default function LecturerLayout({ children }) {
 
         <div className="lecturer-layout-footer">
           <div className="lecturer-layout-workspace">
-            <strong>Teaching workspace</strong>
+            <strong>{t("workspace.title")}</strong>
 
-            <p>
-              View your assigned sections and manage
-              attendance sessions.
-            </p>
+            <p>{t("workspace.text")}</p>
           </div>
 
           <button
@@ -336,11 +335,13 @@ export default function LecturerLayout({ children }) {
               <NavIcon name="logout" />
             </span>
 
-            <span>Logout</span>
+            <span>{t("action.logout")}</span>
           </button>
 
+          <LanguageToggle className="lang-toggle-block" />
+
           <div className="lecturer-layout-theme">
-            <span>Theme</span>
+            <span>{t("common.theme")}</span>
             <ThemeToggle />
           </div>
         </div>

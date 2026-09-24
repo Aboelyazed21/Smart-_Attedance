@@ -308,7 +308,7 @@ function AttendanceConfirmation() {
     closeSidebar();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/logout");
   }
 
   const scanRouteActive =

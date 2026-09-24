@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import "./StudentProfile.css";
 
 const API_BASE_URL =
@@ -182,6 +183,7 @@ async function requestJson(path, token, options = {}) {
 export default function StudentProfile() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const savedUser = useMemo(() => getSavedUser(), []);
 
   // Client mirrors of the backend authority in
@@ -436,7 +438,7 @@ export default function StudentProfile() {
     setSidebarOpen(false);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/logout");
   }
 
   function startEditing() {
@@ -638,12 +640,12 @@ export default function StudentProfile() {
   }
 
   const navItems = [
-    { path: "/dashboard", label: "Dashboard" },
-    { path: "/student/attendance", label: "My Attendance" },
-    { path: "/student/scan", label: "Scan Attendance" },
+    { path: "/dashboard", label: "nav.dashboard" },
+    { path: "/student/attendance", label: "nav.myAttendance" },
+    { path: "/student/scan", label: "nav.scan" },
     {
       path: "/student/correction-requests",
-      label: "Correction Requests",
+      label: "nav.corrections",
     },
   ];
 
@@ -669,7 +671,7 @@ export default function StudentProfile() {
 
           <span className="brand-text">
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </span>
         </button>
 
@@ -705,9 +707,11 @@ export default function StudentProfile() {
               className={isActive(item.path) ? "active" : ""}
               onClick={() => navigateAndClose(item.path)}
             >
-              {item.label}
+              {t(item.label)}
             </button>
           ))}
+
+          <LanguageToggle />
         </nav>
 
         <div className="top-profile">
@@ -715,13 +719,15 @@ export default function StudentProfile() {
 
           <div className="top-profile-info">
             <strong>{getFullName()}</strong>
-            <span>Student</span>
+            <span>{t("role.student")}</span>
           </div>
 
           <button
             type="button"
             className="profile-logout-btn"
             onClick={handleLogout}
+            aria-label="Logout"
+            title="Logout"
           >
             <Icon name="logout" size={15} />
             Logout

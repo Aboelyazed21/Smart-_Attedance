@@ -575,7 +575,7 @@ function AttendanceScanner() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    navigate("/");
+    navigate("/logout");
   }
 
   const cameraState = useMemo(() => {

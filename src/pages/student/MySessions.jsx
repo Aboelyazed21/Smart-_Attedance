@@ -9,6 +9,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { getMySessions } from "../../services/api";
+import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import "./MySessions.css";
 
 function Icon({ name, size = 18 }) {
@@ -218,6 +219,7 @@ function getAttendanceStatus(session) {
 function MySessions() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const user = getSavedUser();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -366,7 +368,7 @@ function MySessions() {
     closeSidebar();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/logout");
   }
 
   return (
@@ -404,7 +406,7 @@ function MySessions() {
 
           <div>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>{t("brand.tagline")}</span>
           </div>
         </div>
 
@@ -413,7 +415,7 @@ function MySessions() {
 
           <div className="sessions-profile-info">
             <strong>{fullName}</strong>
-            <span>Student</span>
+            <span>{t("role.student")}</span>
           </div>
         </div>
 
@@ -426,7 +428,7 @@ function MySessions() {
             <span className="sessions-nav-icon">
               <Icon name="dashboard" size={16} />
             </span>
-            Dashboard
+            {t("nav.dashboard")}
           </button>
 
           <button
@@ -441,7 +443,7 @@ function MySessions() {
             <span className="sessions-nav-icon">
               <Icon name="calendar" size={16} />
             </span>
-            My Attendance
+            {t("nav.myAttendance")}
           </button>
 
           <button
@@ -454,7 +456,7 @@ function MySessions() {
             <span className="sessions-nav-icon">
               <Icon name="scan" size={16} />
             </span>
-            Scan Attendance
+            {t("nav.scan")}
           </button>
 
           <button
@@ -469,7 +471,7 @@ function MySessions() {
             <span className="sessions-nav-icon">
               <Icon name="sessions" size={16} />
             </span>
-            My Sessions
+            {t("nav.mySessions")}
           </button>
 
           <button
@@ -486,7 +488,7 @@ function MySessions() {
             <span className="sessions-nav-icon">
               <Icon name="edit" size={16} />
             </span>
-            Correction Requests
+            {t("nav.corrections")}
           </button>
         </nav>
 
@@ -496,6 +498,8 @@ function MySessions() {
             <span>Every class counts.</span>
           </div>
 
+          <LanguageToggle className="lang-toggle-block" />
+
           <button
             type="button"
             className="sessions-logout"
@@ -504,7 +508,7 @@ function MySessions() {
             <span>
               <Icon name="logout" size={16} />
             </span>
-            Logout
+            {t("action.logout")}
           </button>
         </div>
       </aside>

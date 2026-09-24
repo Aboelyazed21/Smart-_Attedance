@@ -1,0 +1,190 @@
+/* ============================================================
+   RTL SUPPORT — activated when <html dir="rtl"> (Arabic).
+   Flips fixed sidebars, content offsets, drawers and
+   floating controls. Flex/grid auto-flip needs no rules.
+   Loaded last so these win ties in specificity.
+   ============================================================ */
+
+/* ---------- Lecturer layout ---------- */
+
+[dir="rtl"] .lecturer-layout-sidebar {
+  inset: 0 0 0 auto;
+  border-right: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[dir="rtl"] .lecturer-layout-content {
+  margin-left: 0;
+  margin-right: 290px;
+}
+
+[dir="rtl"] .lecturer-mobile-header-avatar {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+@media (max-width: 1100px) {
+  [dir="rtl"] .lecturer-layout-content {
+    margin-right: 250px;
+  }
+}
+
+@media (max-width: 900px) {
+  [dir="rtl"] .lecturer-layout-content {
+    margin-right: 230px;
+  }
+}
+
+@media (max-width: 640px) {
+  [dir="rtl"] .lecturer-layout-sidebar {
+    transform: translateX(105%);
+  }
+
+  [dir="rtl"] .lecturer-layout.sidebar-is-open .lecturer-layout-sidebar {
+    transform: translateX(0);
+  }
+
+  [dir="rtl"] .lecturer-layout-content {
+    margin-right: 0;
+  }
+
+  [dir="rtl"] .lecturer-sidebar-close {
+    right: auto;
+    left: 12px;
+  }
+}
+
+/* ---------- Admin layout ---------- */
+
+[dir="rtl"] .admin-layout-sidebar {
+  left: auto;
+  right: 0;
+  border-right: 0;
+  border-left: 1px solid #e2e8f0;
+}
+
+[dir="rtl"] .admin-mobile-menu-button {
+  left: auto;
+  right: 14px;
+}
+
+@media (max-width: 768px) {
+  [dir="rtl"] .admin-layout-sidebar {
+    transform: translateX(105%);
+  }
+
+  [dir="rtl"] .admin-sidebar-is-open .admin-layout-sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* ---------- Lecturer attendance inner sidebar (drawer only) ---------- */
+
+@media (max-width: 780px) {
+  [dir="rtl"] .lecturer-attendance-sidebar {
+    left: auto;
+    right: 0;
+    transform: translateX(105%);
+  }
+
+  [dir="rtl"] .lecturer-attendance-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+/* ---------- Student pages: desktop offsets ---------- */
+
+@media (min-width: 961px) {
+  [dir="rtl"] .sessions-sidebar,
+  [dir="rtl"] .scan-sidebar,
+  [dir="rtl"] .confirmation-sidebar,
+  [dir="rtl"] .correction-sidebar {
+    inset: 0 0 0 auto;
+  }
+
+  [dir="rtl"] .sessions-main,
+  [dir="rtl"] .scan-main,
+  [dir="rtl"] .confirmation-main,
+  [dir="rtl"] .correction-main {
+    margin-left: 0;
+    margin-right: var(--sidebar-width);
+  }
+}
+
+@media (min-width: 901px) {
+  [dir="rtl"] .chatbot-sidebar {
+    inset: 0 0 0 auto;
+  }
+
+  [dir="rtl"] .chatbot-main {
+    margin-left: 0;
+    margin-right: 250px;
+  }
+}
+
+@media (min-width: 721px) {
+  [dir="rtl"] .student-dashboard .student-sidebar {
+    inset: 0 0 0 auto;
+  }
+
+  [dir="rtl"] .student-dashboard .student-main,
+  [dir="rtl"] .student-dashboard .student-dashboard-main {
+    margin-left: 0;
+    margin-right: var(--student-sidebar-width);
+  }
+}
+
+/* ---------- Student pages: drawers ---------- */
+
+@media (max-width: 960px) {
+  [dir="rtl"] .sessions-sidebar,
+  [dir="rtl"] .scan-sidebar,
+  [dir="rtl"] .confirmation-sidebar,
+  [dir="rtl"] .correction-sidebar {
+    left: auto;
+    right: 0;
+    transform: translateX(105%);
+  }
+
+  [dir="rtl"] .sessions-sidebar.is-open,
+  [dir="rtl"] .scan-sidebar.is-open,
+  [dir="rtl"] .confirmation-sidebar.is-open,
+  [dir="rtl"] .correction-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  [dir="rtl"] .sessions-mobile-menu-button,
+  [dir="rtl"] .scan-mobile-menu-button,
+  [dir="rtl"] .confirmation-mobile-menu-button,
+  [dir="rtl"] .correction-mobile-menu-button {
+    left: auto;
+    right: 16px;
+  }
+
+  [dir="rtl"] .sessions-topbar,
+  [dir="rtl"] .scan-topbar,
+  [dir="rtl"] .confirmation-topbar,
+  [dir="rtl"] .correction-topbar {
+    padding-left: 16px;
+    padding-right: 72px;
+  }
+}
+
+@media (max-width: 900px) {
+  [dir="rtl"] .student-dashboard .mobile-menu-btn {
+    left: auto;
+    right: 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  [dir="rtl"] .student-dashboard .student-sidebar {
+    left: auto;
+    right: 0;
+    transform: translateX(105%);
+  }
+
+  [dir="rtl"] .student-dashboard .student-sidebar.open {
+    transform: translateX(0);
+  }
+}

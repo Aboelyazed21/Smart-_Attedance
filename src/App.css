@@ -977,6 +977,13 @@ body {
     sans-serif;
 }
 
+.logout-lang {
+  display: flex;
+  justify-content: flex-end;
+  width: min(440px, 100%);
+  box-sizing: border-box;
+}
+
 .logout-card {
   width: min(440px, 100%);
 

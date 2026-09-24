@@ -8,6 +8,7 @@ import {
 
 import Register from "./Register";
 import ThemeToggle from "./components/ThemeToggle";
+import { useLanguage, LanguageToggle } from "./utils/i18n";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 
@@ -762,6 +763,7 @@ function AuthIcon({ name, size = 17 }) {
 
 function Login() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [
     showPassword,
@@ -862,6 +864,8 @@ function Login() {
 
         <ThemeToggle />
 
+        <LanguageToggle />
+
       </header>
 
       <aside
@@ -874,30 +878,28 @@ function Login() {
           </h2>
 
           <p>
-            Smart Attendance System for Badr University
-            in Assiut. Sign in with your university
-            email or university ID.
+            {t("auth.panelText")}
           </p>
 
           <div className="auth-brand-features">
             <div>
               <AuthIcon name="cap" size={20} />
-              <span>QR Code Attendance</span>
+              <span>{t("auth.f1")}</span>
             </div>
 
             <div>
               <AuthIcon name="chart" size={20} />
-              <span>Sections and Sessions</span>
+              <span>{t("auth.f2")}</span>
             </div>
 
             <div>
               <AuthIcon name="shield" size={20} />
-              <span>Attendance Reports</span>
+              <span>{t("auth.f3")}</span>
             </div>
           </div>
 
           <p className="auth-brand-foot">
-            Badr University in Assiut
+            {t("brand.uni")}
           </p>
         </div>
       </aside>
@@ -919,21 +921,21 @@ function Login() {
           </h2>
 
           <p className="app-description">
-            Smart Attendance System
+            {t("auth.system")}
           </p>
 
           <p className="app-uni">
-            Badr University in Assiut
+            {t("brand.uni")}
           </p>
 
           <div className="welcome-section">
 
             <h3>
-              Welcome Back
+              {t("auth.welcome")}
             </h3>
 
             <p>
-              Sign in to your account
+              {t("auth.subtitle")}
             </p>
 
           </div>
@@ -946,7 +948,7 @@ function Login() {
             <div className="form-group">
 
               <label>
-                University Email or University ID
+                {t("auth.identifier")}
               </label>
 
               <div className="input-container">
@@ -957,7 +959,7 @@ function Login() {
 
                 <input
                   type="text"
-                  placeholder="Enter your university email or university ID"
+                  placeholder={t("auth.identifierPh")}
                   autoComplete="username"
                   value={identifier}
                   onChange={(e) =>
@@ -972,7 +974,7 @@ function Login() {
             <div className="form-group">
 
               <label>
-                Password
+                {t("auth.password")}
               </label>
 
               <div className="input-container">
@@ -987,7 +989,7 @@ function Login() {
                       ? "text"
                       : "password"
                   }
-                  placeholder="Password"
+                  placeholder={t("auth.password")}
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) =>
@@ -1020,7 +1022,7 @@ function Login() {
                 className="forgot-password"
                 onClick={() => navigate("/forgot-password")}
               >
-                Forgot password?
+                {t("auth.forgot")}
               </button>
 
             </div>
@@ -1032,8 +1034,8 @@ function Login() {
             >
               <span>
                 {loading
-                  ? "Signing In..."
-                  : "Sign In"}
+                  ? t("auth.signingIn")
+                  : t("auth.signIn")}
               </span>
 
               {!loading && (
@@ -1065,7 +1067,7 @@ function Login() {
               </span>
 
               <span>
-                Create an Account
+                {t("auth.createAccount")}
               </span>
             </Link>
 
@@ -1082,11 +1084,11 @@ function Login() {
       <footer className="page-footer">
 
         <div className="page-footer-copy">
-          © Aboelyazed Hatem Aboelyazed
+          {t("footer.copy")}
         </div>
 
         <div className="page-footer-uni">
-          Badr University in Assiut
+          {t("brand.uni")}
         </div>
 
       </footer>
@@ -1104,9 +1106,14 @@ function Login() {
 
 function LecturerLogout() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="logout-page">
+
+      <div className="logout-lang">
+        <LanguageToggle />
+      </div>
 
       <main className="logout-card">
 
@@ -1122,12 +1129,11 @@ function LecturerLogout() {
         </p>
 
         <h1>
-          Signed out successfully
+          {t("logout.title")}
         </h1>
 
         <p className="logout-text">
-          You have been safely signed out of your
-          account.
+          {t("logout.text")}
         </p>
 
         <button
@@ -1135,7 +1141,7 @@ function LecturerLogout() {
           className="logout-signin"
           onClick={() => navigate("/")}
         >
-          Sign In Again
+          {t("logout.signInAgain")}
         </button>
 
       </main>
@@ -1143,11 +1149,11 @@ function LecturerLogout() {
       <footer className="logout-footer">
 
         <div>
-          © Aboelyazed Hatem Aboelyazed
+          {t("footer.copy")}
         </div>
 
         <div>
-          Badr University in Assiut
+          {t("brand.uni")}
         </div>
 
       </footer>
@@ -1162,6 +1168,7 @@ function LecturerLogout() {
 
 function StudentDashboard() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [user] = useState(() =>
     getSavedUser()
@@ -1424,7 +1431,7 @@ function StudentDashboard() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    navigate("/");
+    navigate("/logout");
   };
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1851,7 +1858,7 @@ function StudentDashboard() {
             <div>
               <h2>Attendify</h2>
               <span>
-                SMART ATTENDANCE
+                {t("brand.tagline")}
               </span>
             </div>
           </div>
@@ -1867,7 +1874,7 @@ function StudentDashboard() {
               </strong>
 
               <span>
-                Student
+                {t("role.student")}
               </span>
             </div>
           </div>
@@ -1887,7 +1894,7 @@ function StudentDashboard() {
               />
 
               <span>
-                Dashboard
+                {t("nav.dashboard")}
               </span>
             </button>
 
@@ -1906,7 +1913,7 @@ function StudentDashboard() {
               />
 
               <span>
-                My Attendance
+                {t("nav.myAttendance")}
               </span>
             </button>
 
@@ -1925,7 +1932,7 @@ function StudentDashboard() {
               />
 
               <span>
-                Scan Attendance
+                {t("nav.scan")}
               </span>
             </button>
 
@@ -1944,7 +1951,7 @@ function StudentDashboard() {
               />
 
               <span>
-                Correction Requests
+                {t("nav.corrections")}
               </span>
             </button>
 
@@ -1961,7 +1968,7 @@ function StudentDashboard() {
               />
 
               <span>
-                Profile
+                {t("nav.profile")}
               </span>
             </button>
 
@@ -2001,7 +2008,7 @@ function StudentDashboard() {
               size={17}
             />
 
-            Logout
+            {t("action.logout")}
           </button>
 
         </div>
@@ -2023,6 +2030,8 @@ function StudentDashboard() {
 
           <ThemeToggle />
 
+          <LanguageToggle />
+
           <div
             className="student-topbar-right"
             style={{ marginLeft: "auto" }}
@@ -2040,7 +2049,7 @@ function StudentDashboard() {
                 </strong>
 
                 <span>
-                  Student
+                  {t("role.student")}
                 </span>
               </div>
 

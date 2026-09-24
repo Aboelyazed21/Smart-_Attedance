@@ -380,7 +380,7 @@ function CorrectionRequests() {
     setSidebarOpen(false);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/logout");
   }
 
   const closeSidebar = () => setSidebarOpen(false);

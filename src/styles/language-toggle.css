@@ -1,0 +1,55 @@
+/* ============================================================
+   LANGUAGE TOGGLE — segmented EN / عربي control.
+   Neutral component; inherits surrounding context colors.
+   ============================================================ */
+
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 40px;
+  padding: 3px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 11px;
+  background: var(--bg-surface, #ffffff);
+}
+
+.lang-toggle button {
+  min-width: 44px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lang-toggle button:hover {
+  color: var(--text, #172033);
+  background: var(--bg-muted, #f1f5f9);
+}
+
+.lang-toggle button.active {
+  background: #0f2851;
+  color: #ffffff;
+}
+
+.lang-toggle button:focus-visible {
+  outline: 3px solid rgba(15, 40, 81, 0.25);
+  outline-offset: 2px;
+}
+
+/* Full-width variant for sidebar footers. */
+
+.lang-toggle-block {
+  width: 100%;
+}
+
+.lang-toggle-block button {
+  flex: 1 1 0;
+}

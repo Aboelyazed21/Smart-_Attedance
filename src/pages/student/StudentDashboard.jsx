@@ -218,7 +218,7 @@ function StudentDashboard() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    navigate("/");
+    navigate("/logout");
   }
 
   const firstName =

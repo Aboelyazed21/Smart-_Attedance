@@ -556,7 +556,7 @@ function StudentAttendance() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/logout");
   };
 
   /* ---------------------------------------------------------

@@ -1066,7 +1066,27 @@ body.student-profile-nav-open {
 
 @media (max-width: 900px) {
   .student-topbar {
-    gap: 12px;
+    gap: 10px;
+  }
+
+  .student-profile-page .student-brand {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+
+  .student-profile-page .brand-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .student-profile-page .brand-text strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .student-profile-page .top-profile {
+    flex: 0 0 auto;
   }
 
   .student-profile-mobile-menu {
@@ -1142,6 +1162,27 @@ body.student-profile-nav-open {
 }
 
 @media (max-width: 640px) {
+  .student-profile-page .top-profile {
+    gap: 8px;
+  }
+
+  .student-profile-page .profile-logout-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+    gap: 0;
+    flex: 0 0 auto;
+    font-size: 0;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .student-profile-page .student-profile-mobile-menu {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+  }
+
   .profile-page-heading {
     align-items: flex-start;
     flex-direction: column;
