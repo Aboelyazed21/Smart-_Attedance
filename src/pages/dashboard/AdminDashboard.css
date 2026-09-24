@@ -473,21 +473,20 @@
 .admin-dashboard .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   flex: 0 0 auto;
   min-height: 32px;
   padding: 0 13px;
-  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #334155;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .admin-dashboard .hero-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
+  display: none;
 }
 
 .admin-dashboard .dashboard-error {

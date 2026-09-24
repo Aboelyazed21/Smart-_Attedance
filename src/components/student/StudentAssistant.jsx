@@ -192,10 +192,6 @@ export default function StudentAssistant() {
           title="Attendance Assistant"
           onClick={() => setOpen(true)}
         >
-          <span
-            className="student-assistant-fab-pulse"
-            aria-hidden="true"
-          />
           <img
             src="/chatbot-launcher.jpg"
             alt=""

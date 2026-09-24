@@ -319,11 +319,6 @@ export default function LecturerLayout({ children }) {
 
         <div className="lecturer-layout-footer">
           <div className="lecturer-layout-workspace">
-            <span className="lecturer-layout-live">
-              <span />
-              LIVE
-            </span>
-
             <strong>Teaching workspace</strong>
 
             <p>

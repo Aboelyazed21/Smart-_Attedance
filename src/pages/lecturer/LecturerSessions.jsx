@@ -1496,7 +1496,7 @@ import "./LecturerSession.css";
                 <div>
   
                   <span style={modalEyebrow}>
-                    LIVE ATTENDANCE
+                    ATTENDANCE SESSION
                   </span>
   
                   <h2>

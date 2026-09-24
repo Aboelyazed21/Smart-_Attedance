@@ -447,34 +447,6 @@
   background: rgba(255, 255, 255, 0.035);
 }
 
-.lecturer-layout-live {
-  display: inline-flex;
-  align-items: center;
-
-  gap: 6px;
-
-  margin-bottom: 6px;
-
-  color: #7fd5a4;
-
-  font-size: 8px;
-  font-weight: 800;
-
-  letter-spacing: 0.8px;
-}
-
-.lecturer-layout-live span {
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #51d38a;
-
-  box-shadow:
-    0 0 0 4px rgba(81, 211, 138, 0.08);
-}
-
 .lecturer-layout-workspace strong {
   display: block;
 

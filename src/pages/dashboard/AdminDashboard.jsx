@@ -277,7 +277,6 @@ function AdminDashboard() {
             </div>
 
             <div className="hero-badge">
-              <span className="hero-status-dot" />
               System Active
             </div>
           </div>

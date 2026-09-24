@@ -1639,7 +1639,7 @@ function AttendanceSessions() {
           >
             <div className="qr-modal-header">
               <div>
-                <span className="section-kicker">LIVE ATTENDANCE</span>
+                <span className="section-kicker">ATTENDANCE SESSION</span>
                 <h2>Attendance QR</h2>
                 <p>
                   {selectedSession?.course_code || "Course"}{" "}

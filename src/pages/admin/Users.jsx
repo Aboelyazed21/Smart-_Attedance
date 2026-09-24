@@ -77,6 +77,11 @@ function Users() {
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage, setUsersPerPage] = useState(10);
 
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -125,12 +130,28 @@ function Users() {
 
   const filteredUsers = useMemo(() => {
     const value = search.toLowerCase().trim();
-
-    if (!value) {
-      return users;
-    }
+    const roleValue = roleFilter.toLowerCase();
+    const statusValue = statusFilter.toLowerCase();
 
     return users.filter((user) => {
+      if (
+        roleValue !== "all" &&
+        (user.role || "").toLowerCase() !== roleValue
+      ) {
+        return false;
+      }
+
+      if (
+        statusValue !== "all" &&
+        (user.status || "").toLowerCase() !== statusValue
+      ) {
+        return false;
+      }
+
+      if (!value) {
+        return true;
+      }
+
       const fullName =
         `${user.first_name || ""} ${
           user.last_name || ""
@@ -145,14 +166,127 @@ function Users() {
       const phone =
         (user.phone || "").toLowerCase();
 
+      const userId = String(user.id || "").toLowerCase();
+
       return (
         fullName.includes(value) ||
         email.includes(value) ||
         role.includes(value) ||
-        phone.includes(value)
+        phone.includes(value) ||
+        userId.includes(value)
       );
     });
-  }, [users, search]);
+  }, [users, search, roleFilter, statusFilter]);
+
+  /* =========================================================
+     PAGINATION (frontend — GET /users returns full list)
+  ========================================================= */
+
+  const totalUsers = filteredUsers.length;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalUsers / usersPerPage)
+  );
+
+  const safeCurrentPage = Math.min(
+    Math.max(1, currentPage),
+    totalPages
+  );
+
+  const startIndex =
+    (safeCurrentPage - 1) * usersPerPage;
+
+  const endIndex = startIndex + usersPerPage;
+
+  const currentUsers = filteredUsers.slice(
+    startIndex,
+    endIndex
+  );
+
+  const rangeStart =
+    totalUsers === 0 ? 0 : startIndex + 1;
+
+  const rangeEnd = Math.min(endIndex, totalUsers);
+
+  const isFiltering =
+    search.trim() !== "" ||
+    roleFilter !== "all" ||
+    statusFilter !== "all";
+
+  /* Keep page in range when data shrinks (e.g. after delete). */
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  function getPageNumbers() {
+    if (totalPages <= 7) {
+      return Array.from(
+        { length: totalPages },
+        (_, index) => index + 1
+      );
+    }
+
+    const pages = [1];
+    const windowStart = Math.max(
+      2,
+      safeCurrentPage - 1
+    );
+    const windowEnd = Math.min(
+      totalPages - 1,
+      safeCurrentPage + 1
+    );
+
+    if (windowStart > 2) {
+      pages.push("ellipsis-start");
+    }
+
+    for (
+      let page = windowStart;
+      page <= windowEnd;
+      page += 1
+    ) {
+      pages.push(page);
+    }
+
+    if (windowEnd < totalPages - 1) {
+      pages.push("ellipsis-end");
+    }
+
+    pages.push(totalPages);
+
+    return pages;
+  }
+
+  function handleSearchChange(event) {
+    setSearch(event.target.value);
+    setCurrentPage(1);
+  }
+
+  function handleRoleFilterChange(event) {
+    setRoleFilter(event.target.value);
+    setCurrentPage(1);
+  }
+
+  function handleStatusFilterChange(event) {
+    setStatusFilter(event.target.value);
+    setCurrentPage(1);
+  }
+
+  function handleUsersPerPageChange(event) {
+    setUsersPerPage(Number(event.target.value));
+    setCurrentPage(1);
+  }
+
+  function goToPage(page) {
+    const next = Math.min(
+      Math.max(1, page),
+      totalPages
+    );
+    setCurrentPage(next);
+  }
 
   /* =========================================================
      FORM CHANGE
@@ -289,11 +423,25 @@ function Users() {
 
       await deleteUser(user.id);
 
+      const nextTotal = Math.max(
+        0,
+        filteredUsers.length - 1
+      );
+
+      const nextPages = Math.max(
+        1,
+        Math.ceil(nextTotal / usersPerPage)
+      );
+
       setUsers((previous) =>
         previous.filter(
           (item) => item.id !== user.id
         )
       );
+
+      if (safeCurrentPage > nextPages) {
+        setCurrentPage(nextPages);
+      }
     } catch (err) {
       console.error(
         "Delete user error:",
@@ -420,27 +568,66 @@ function Users() {
                 <p>
                   {loading
                     ? "Loading users..."
-                    : `${users.length} users found`}
+                    : `${totalUsers} ${
+                        totalUsers === 1
+                          ? "user"
+                          : "users"
+                      } found`}
                 </p>
               </div>
 
-              <div className="users-search">
+              <div className="users-controls">
+                <div className="users-search">
 
-                <span>
-                  <AdminIcon name="search" size={16} />
-                </span>
+                  <span>
+                    <AdminIcon name="search" size={16} />
+                  </span>
 
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={search}
-                  onChange={(event) =>
-                    setSearch(
-                      event.target.value
-                    )
-                  }
-                />
+                  <input
+                    type="text"
+                    placeholder="Search by name, email, phone, ID..."
+                    value={search}
+                    onChange={handleSearchChange}
+                    aria-label="Search users"
+                  />
 
+                </div>
+
+                <div className="users-filters">
+                  <label className="users-filter">
+                    <span className="users-filter-label">
+                      Role
+                    </span>
+                    <select
+                      value={roleFilter}
+                      onChange={handleRoleFilterChange}
+                      aria-label="Filter by role"
+                    >
+                      <option value="all">All roles</option>
+                      <option value="student">Student</option>
+                      <option value="lecturer">Lecturer</option>
+                      <option value="ta">Teaching Assistant</option>
+                      <option value="auditor">Auditor</option>
+                      <option value="admin">Administrator</option>
+                    </select>
+                  </label>
+
+                  <label className="users-filter">
+                    <span className="users-filter-label">
+                      Status
+                    </span>
+                    <select
+                      value={statusFilter}
+                      onChange={handleStatusFilterChange}
+                      aria-label="Filter by status"
+                    >
+                      <option value="all">All statuses</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="suspended">Suspended</option>
+                    </select>
+                  </label>
+                </div>
               </div>
 
             </div>
@@ -476,8 +663,9 @@ function Users() {
                   </h3>
 
                   <p>
-                    Try another search or add
-                    a new user.
+                    {isFiltering
+                      ? "No users match your search."
+                      : "Try another search or add a new user."}
                   </p>
 
                 </div>
@@ -524,7 +712,7 @@ function Users() {
 
                   <tbody>
 
-                    {filteredUsers.map(
+                    {currentUsers.map(
                       (user) => {
 
                         const fullName =
@@ -682,6 +870,101 @@ function Users() {
               )}
 
             </div>
+
+            {/* =================================================
+                PAGINATION
+            ================================================= */}
+
+            {!loading && totalUsers > 0 && (
+              <div className="users-pagination">
+                <p
+                  className="pagination-count"
+                  aria-live="polite"
+                >
+                  Showing {rangeStart}–{rangeEnd} of{" "}
+                  {totalUsers}{" "}
+                  {isFiltering ? "matching users" : "users"}
+                </p>
+
+                <div className="pagination-controls">
+                  <label className="rows-per-page">
+                    <span>Rows per page:</span>
+                    <select
+                      value={usersPerPage}
+                      onChange={handleUsersPerPageChange}
+                      aria-label="Rows per page"
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </label>
+
+                  <nav
+                    className="pagination-pages"
+                    aria-label="Users pages"
+                  >
+                    <button
+                      type="button"
+                      className="pagination-button pagination-prev"
+                      onClick={() =>
+                        goToPage(safeCurrentPage - 1)
+                      }
+                      disabled={safeCurrentPage <= 1}
+                      aria-label="Previous page"
+                    >
+                      ‹<span className="pagination-prev-text"> Previous</span>
+                    </button>
+
+                    {getPageNumbers().map((page) =>
+                      typeof page === "string" ? (
+                        <span
+                          key={page}
+                          className="pagination-ellipsis"
+                          aria-hidden="true"
+                        >
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={page}
+                          type="button"
+                          className={
+                            page === safeCurrentPage
+                              ? "pagination-button pagination-number active"
+                              : "pagination-button pagination-number"
+                          }
+                          onClick={() => goToPage(page)}
+                          disabled={page === safeCurrentPage}
+                          aria-label={`Go to page ${page}`}
+                          aria-current={
+                            page === safeCurrentPage
+                              ? "page"
+                              : undefined
+                          }
+                        >
+                          {page}
+                        </button>
+                      )
+                    )}
+
+                    <button
+                      type="button"
+                      className="pagination-button pagination-next"
+                      onClick={() =>
+                        goToPage(safeCurrentPage + 1)
+                      }
+                      disabled={
+                        safeCurrentPage >= totalPages
+                      }
+                      aria-label="Next page"
+                    >
+                      <span className="pagination-next-text">Next </span>›
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            )}
 
           </section>
 
