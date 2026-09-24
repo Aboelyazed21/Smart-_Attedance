@@ -33,11 +33,13 @@ import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
 import AttendanceConfirmation from "./pages/student/AttendanceConfirmation";
 import CorrectionRequests from "./pages/student/CorrectionRequests";
+import StudentProfile from "./pages/student/StudentProfile";
+import StudentMobileNav from "./pages/student/StudentMobileNav";
 import StudentChatbot from "./pages/student/StudentChatbot";
 import StudentDashboardPage from "./pages/student/StudentDashboard";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
 
-import { getMyAttendance, loginUser } from "./services/api";
+import { getMyAttendance, getMySessions, loginUser } from "./services/api";
 
 import "./App.css";
 import "./pages/student/StudentDashboard.css";
@@ -540,6 +542,34 @@ function App() {
     }
 
     return <StudentChatbot />;
+  }
+
+  /* =========================================================
+     STUDENT PROFILE
+  ========================================================= */
+
+  if (
+    location.pathname === "/student/profile"
+  ) {
+    const user = getSavedUser();
+
+    if (!user) {
+      return <Login />;
+    }
+
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
+
+    if (role !== "student") {
+      return <Login />;
+    }
+
+    return <StudentProfile />;
   }
 
   /* =========================================================
@@ -1281,6 +1311,17 @@ function StudentDashboard() {
         </>
       ),
 
+      user: (
+        <>
+          <circle
+            cx="12"
+            cy="8"
+            r="4"
+          />
+          <path d="M4 21a8 8 0 0 1 16 0" />
+        </>
+      ),
+
       light: (
         <>
           <path d="M9 18h6" />
@@ -1343,19 +1384,34 @@ function StudentDashboard() {
   const [attendance, setAttendance] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError, setDataError] = useState("");
+  const [mySessions, setMySessions] = useState([]);
 
   async function loadDashboardData() {
     try {
       setDataLoading(true);
       setDataError("");
 
-      const data = await getMyAttendance();
+      const [attendanceData, sessionsData] =
+        await Promise.all([
+          getMyAttendance(),
+          getMySessions().catch(() => []),
+        ]);
 
       setAttendance(
-        Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-          ? data.data
+        Array.isArray(attendanceData)
+          ? attendanceData
+          : Array.isArray(attendanceData?.data)
+          ? attendanceData.data
+          : []
+      );
+
+      setMySessions(
+        Array.isArray(sessionsData)
+          ? sessionsData
+          : Array.isArray(sessionsData?.data)
+          ? sessionsData.data
+          : Array.isArray(sessionsData?.sessions)
+          ? sessionsData.sessions
           : []
       );
     } catch (err) {
@@ -1418,6 +1474,89 @@ function StudentDashboard() {
   const recentRecords = [...attendance]
     .sort((a, b) => recordTime(b) - recordTime(a))
     .slice(0, 4);
+
+  /* Upcoming sessions from the real sessions API.
+     Shown only when the backend returns future or
+     scheduled sessions; otherwise the panel is omitted. */
+  const upcomingSessions = (() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return mySessions
+      .filter((session) => {
+        const status = String(
+          session.status || ""
+        ).toLowerCase();
+
+        const rawDate =
+          session.session_date || session.date || "";
+
+        const time = Date.parse(String(rawDate));
+
+        if (!Number.isNaN(time)) {
+          return time >= today.getTime();
+        }
+
+        return ["scheduled", "active", "open", "upcoming"].includes(
+          status
+        );
+      })
+      .sort((a, b) => {
+        const timeA = Date.parse(
+          String(a.session_date || a.date || "")
+        );
+        const timeB = Date.parse(
+          String(b.session_date || b.date || "")
+        );
+
+        return (
+          (Number.isNaN(timeA) ? Infinity : timeA) -
+          (Number.isNaN(timeB) ? Infinity : timeB)
+        );
+      })
+      .slice(0, 3);
+  })();
+
+  function formatSessionDate(session) {
+    const value =
+      session.session_date || session.date;
+
+    if (!value) {
+      return "Date to be announced";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+
+    return date.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+    });
+  }
+
+  function formatSessionTime(session) {
+    const start =
+      session.scheduled_start ||
+      session.start_time ||
+      session.time ||
+      "";
+    const end =
+      session.scheduled_end ||
+      session.end_time ||
+      "";
+
+    if (start && end) {
+      return `${String(start).slice(0, 5)} - ${String(
+        end
+      ).slice(0, 5)}`;
+    }
+
+    return start ? String(start).slice(0, 5) : "";
+  }
 
   /* Stable key shared with /student/attendance filters:
      course_code first so dashboard links match the details
@@ -1746,6 +1885,23 @@ function StudentDashboard() {
               </span>
             </button>
 
+            <button
+              className="student-nav-item"
+              type="button"
+              onClick={() =>
+                navigate("/student/profile")
+              }
+            >
+              <Icon
+                name="user"
+                size={18}
+              />
+
+              <span>
+                Profile
+              </span>
+            </button>
+
           </nav>
         </div>
 
@@ -1979,6 +2135,85 @@ function StudentDashboard() {
                       </span>
                     </button>
                   ))}
+                </div>
+
+              </section>
+            )}
+
+          {!dataLoading &&
+            !dataError &&
+            upcomingSessions.length > 0 && (
+              <section
+                className="student-panel upcoming-panel"
+                aria-label="Upcoming sessions"
+              >
+
+                <div className="student-panel-header">
+
+                  <div className="student-panel-title">
+
+                    <div className="student-panel-icon blue">
+                      <Icon
+                        name="calendar"
+                        size={18}
+                      />
+                    </div>
+
+                    <div>
+                      <h2>
+                        Upcoming Sessions
+                      </h2>
+
+                      <p>
+                        Your next scheduled classes
+                      </p>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div className="student-attendance-list">
+                  {upcomingSessions.map(
+                    (session, index) => (
+                      <div
+                        className="student-attendance-row"
+                        key={
+                          session.id ||
+                          `${session.session_date}-${index}`
+                        }
+                      >
+                        <div className="student-course-icon">
+                          <Icon
+                            name="calendar"
+                            size={16}
+                          />
+                        </div>
+
+                        <div className="student-attendance-info">
+                          <strong>
+                            {session.course_name ||
+                              session.course_code ||
+                              "Upcoming session"}
+                          </strong>
+
+                          <span>
+                            {formatSessionDate(session)}
+                            {formatSessionTime(
+                              session
+                            )
+                              ? ` · ${formatSessionTime(
+                                  session
+                                )}`
+                              : ""}
+                            {session.section_name
+                              ? ` · Section ${session.section_name}`
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  )}
                 </div>
 
               </section>
@@ -2580,6 +2815,8 @@ function StudentDashboard() {
         </section>
 
       </main>
+
+      <StudentMobileNav />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
+import StudentMobileNav from "./StudentMobileNav";
 import "./AttendanceScanner.css";
 
 function Icon({ name, size = 18 }) {
@@ -64,6 +65,13 @@ function Icon({ name, size = 18 }) {
       <>
         <circle cx="11" cy="11" r="7" />
         <path d="m20 20-3.5-3.5" />
+      </>
+    ),
+
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
       </>
     ),
   };
@@ -712,6 +720,21 @@ function AttendanceScanner() {
             </span>
             Correction Requests
           </button>
+
+          <button
+            type="button"
+            className={
+              isActive("/student/profile")
+                ? "scan-nav-item active"
+                : "scan-nav-item"
+            }
+            onClick={() => navigateAndClose("/student/profile")}
+          >
+            <span className="scan-nav-icon">
+              <Icon name="user" size={16} />
+            </span>
+            Profile
+          </button>
         </nav>
 
         <div className="scan-sidebar-bottom">
@@ -1075,6 +1098,7 @@ function AttendanceScanner() {
       </main>
 
       <StudentAssistant />
+      <StudentMobileNav />
     </div>
   );
 }

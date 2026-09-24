@@ -1222,3 +1222,9 @@ body.confirmation-sidebar-open {
     transform: none;
   }
 }
+
+@media (max-width: 768px) {
+  .confirmation-content {
+    padding-bottom: 96px;
+  }
+}

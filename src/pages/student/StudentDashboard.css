@@ -1368,9 +1368,9 @@
   width: 100%;
   min-width: 0;
   padding: clamp(18px, 2.6vw, 30px);
-  border: 1px solid var(--student-border);
+  border: 1px solid #0f2851;
   border-radius: 16px;
-  background: #fff;
+  background: #0f2851;
 }
 
 .student-dashboard .student-hero-copy {
@@ -1381,14 +1381,14 @@
 .student-dashboard .student-hero-date {
   display: block;
   margin-bottom: 6px;
-  color: var(--student-muted);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 12px;
   font-weight: 700;
 }
 
 .student-dashboard .student-hero-copy h1 {
   margin: 0;
-  color: var(--student-text);
+  color: #ffffff;
   font-size: clamp(1.45rem, 1.1rem + 1.6vw, 2.05rem);
   line-height: 1.2;
   letter-spacing: -0.4px;
@@ -1398,9 +1398,13 @@
 .student-dashboard .student-hero-copy p {
   margin: 8px 0 0;
   max-width: 560px;
-  color: var(--student-muted);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 13.5px;
   line-height: 1.55;
+}
+
+.student-dashboard .student-hero-art {
+  display: none;
 }
 
 .student-dashboard .student-hero-art {
@@ -2099,6 +2103,14 @@
 
   .student-dashboard .student-goal-content {
     flex-wrap: wrap;
+  }
+}
+
+/* Clearance for the fixed mobile bottom navigation (≤768px). */
+
+@media (max-width: 768px) {
+  .student-dashboard .student-content {
+    padding-bottom: 96px;
   }
 }
 

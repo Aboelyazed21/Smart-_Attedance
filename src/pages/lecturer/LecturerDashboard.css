@@ -789,6 +789,45 @@
   }
 }
 
+/* Mobile navy greeting header. Desktop header above stays light. */
+@media (max-width: 640px) {
+  .lecturer-dashboard-header {
+    padding: 18px 16px;
+    border-radius: 14px;
+    background: #0f2851;
+  }
+
+  .lecturer-dashboard-eyebrow {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .lecturer-dashboard-heading h1 {
+    color: #ffffff;
+  }
+
+  .lecturer-dashboard-heading p {
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .lecturer-dashboard-refresh {
+    border-color: rgba(255, 255, 255, 0.65);
+    background: transparent;
+    color: #ffffff;
+    box-shadow: none;
+  }
+
+  .lecturer-dashboard-refresh-icon {
+    color: #ffffff;
+  }
+
+  .lecturer-dashboard-refresh:hover:not(:disabled) {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    box-shadow: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lecturer-dashboard-page *,
   .lecturer-dashboard-page *::before,

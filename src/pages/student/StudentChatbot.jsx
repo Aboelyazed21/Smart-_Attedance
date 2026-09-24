@@ -11,6 +11,7 @@ import {
 } from "../../utils/attendanceInsights";
 import Footer from "../../components/Footer";
 import "../../components/Footer.css";
+import StudentMobileNav from "./StudentMobileNav";
 import "./StudentChatbot.css";
 
 function getSavedUser() {
@@ -195,6 +196,9 @@ function StudentChatbot() {
             onClick={() => goTo("/student/correction-requests")}
           >
             Correction Requests
+          </button>
+          <button type="button" onClick={() => goTo("/student/profile")}>
+            Profile
           </button>
           <button
             type="button"
@@ -437,6 +441,8 @@ function StudentChatbot() {
 
         <Footer />
       </main>
+
+      <StudentMobileNav />
     </div>
   );
 }

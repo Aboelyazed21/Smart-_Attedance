@@ -342,12 +342,22 @@
     right: calc(12px + env(safe-area-inset-right, 0px));
     left: calc(12px + env(safe-area-inset-left, 0px));
     width: auto;
-    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(152px + env(safe-area-inset-bottom, 0px));
     max-height: min(560px, calc(100dvh - 110px));
   }
 
   .student-assistant-fab {
     right: calc(16px + env(safe-area-inset-right, 0px));
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 768px) {
+  .student-assistant-fab {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .student-assistant-panel {
+    bottom: calc(152px + env(safe-area-inset-bottom, 0px));
   }
 }

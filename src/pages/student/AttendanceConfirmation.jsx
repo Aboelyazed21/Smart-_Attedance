@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
+import StudentMobileNav from "./StudentMobileNav";
 import "./AttendanceConfirmation.css";
 
 function Icon({ name, size = 18 }) {
@@ -49,6 +50,13 @@ function Icon({ name, size = 18 }) {
       <>
         <circle cx="12" cy="12" r="9" />
         <path d="M12 7v5l3 2" />
+      </>
+    ),
+
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
       </>
     ),
   };
@@ -409,6 +417,19 @@ function AttendanceConfirmation() {
               <Icon name="edit" size={16} />
             </span>
             Correction Requests
+          </button>
+
+          <button
+            type="button"
+            className={
+              isActive("/student/profile") ? "active" : ""
+            }
+            onClick={() => navigateAndClose("/student/profile")}
+          >
+            <span className="confirmation-nav-icon">
+              <Icon name="user" size={16} />
+            </span>
+            Profile
           </button>
         </nav>
 
@@ -805,6 +826,7 @@ function AttendanceConfirmation() {
       </main>
 
       <StudentAssistant />
+      <StudentMobileNav />
     </div>
   );
 }

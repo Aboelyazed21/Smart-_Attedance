@@ -8,6 +8,7 @@ import {
 import { getMyAttendance } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
+import StudentMobileNav from "./StudentMobileNav";
 
 import "../../App.css";
 import "./StudentDashboard.css";
@@ -506,6 +507,11 @@ function StudentAttendance() {
       label: "Correction Requests",
       path: "/student/correction-requests",
       icon: "clock",
+    },
+    {
+      label: "Profile",
+      path: "/student/profile",
+      icon: "user",
     },
   ];
 
@@ -1050,6 +1056,7 @@ function StudentAttendance() {
       </main>
 
       <StudentAssistant />
+      <StudentMobileNav />
     </div>
   );
 }

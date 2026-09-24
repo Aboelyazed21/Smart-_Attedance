@@ -1442,3 +1442,9 @@ button:disabled {
     transform: none;
   }
 }
+
+@media (max-width: 768px) {
+  .scan-content {
+    padding-bottom: 96px;
+  }
+}

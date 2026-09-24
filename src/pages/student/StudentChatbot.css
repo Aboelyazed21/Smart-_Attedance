@@ -680,3 +680,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .chatbot-content {
+    padding-bottom: 96px;
+  }
+}
