@@ -610,6 +610,121 @@
   background: #16a566;
 }
 
+.tt-status.scheduled {
+  color: #1764c0;
+  background: #eaf2ff;
+}
+
+.tt-status.scheduled i {
+  background: #287cf0;
+}
+
+.tt-status.muted {
+  color: #64748b;
+  background: #f1f5f9;
+}
+
+.tt-status.muted i {
+  background: #94a3b8;
+}
+
+/* ---------- Pagination ---------- */
+
+.tt-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 13px 4px 2px;
+}
+
+.tt-pagination-count {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.tt-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.tt-pagination-controls button,
+.tt-pagination-perpage {
+  min-height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.tt-pagination-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tt-pagination-controls button.current {
+  border-color: #1764c0;
+  background: #eaf2ff;
+  color: #123f7b;
+}
+
+.tt-pagination-perpage {
+  margin-left: 6px;
+}
+
+/* ---------- Conflict results ---------- */
+
+.tt-conflict-ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border: 1px solid #bbe7cd;
+  border-radius: 11px;
+  background: #effaf4;
+  color: #20704e;
+  font-size: 12.5px;
+}
+
+.tt-conflict-ok button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.tt-conflict-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .tt-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tt-pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
 .tt-actions {
   display: flex;
   align-items: center;

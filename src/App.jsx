@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import Register from "./Register";
+import ThemeToggle from "./components/ThemeToggle";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 
@@ -849,6 +850,8 @@ function Login() {
           </div>
 
         </div>
+
+        <ThemeToggle />
 
       </header>
 
@@ -1957,6 +1960,8 @@ function StudentDashboard() {
       <main className="student-main">
 
         <header className="student-topbar">
+
+          <ThemeToggle />
 
           <div
             className="student-topbar-right"

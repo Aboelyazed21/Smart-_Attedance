@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getTimetable,
   createTimetable,
@@ -191,6 +192,10 @@ function TtIcon({ name, size = 16 }) {
       </>
     ),
 
+    check: (
+      <path d="m5 12 4 4L19 6" />
+    ),
+
     target: (
       <>
         <circle cx="12" cy="12" r="8.5" />
@@ -234,6 +239,13 @@ export default function Timetable() {
   const [dayFilter, setDayFilter] = useState("all");
 
   const [viewMode, setViewMode] = useState("list");
+
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+
+  const [conflicts, setConflicts] = useState(null);
+
+  const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -459,6 +471,247 @@ export default function Timetable() {
     roomFilter,
     dayFilter,
   ]);
+
+  /* =========================================================
+     PAGINATION (list view, client-side over filtered rows)
+  ========================================================= */
+
+  useEffect(() => {
+    setPage(1);
+  }, [
+    search,
+    courseFilter,
+    sectionFilter,
+    roomFilter,
+    dayFilter,
+    viewMode,
+    perPage,
+  ]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTimetable.length / perPage)
+  );
+
+  const safePage = Math.min(page, totalPages);
+
+  const paginatedTimetable = useMemo(() => {
+    const start = (safePage - 1) * perPage;
+
+    return filteredTimetable.slice(
+      start,
+      start + perPage
+    );
+  }, [filteredTimetable, safePage, perPage]);
+
+  /* =========================================================
+     CONFLICT DETECTION (same predicate as the backend:
+     same room + same day + overlapping date ranges +
+     overlapping times)
+  ========================================================= */
+
+  function dateOrNull(value) {
+    if (!value) return null;
+
+    const text = String(value).slice(0, 10);
+
+    return /^\d{4}-\d{2}-\d{2}$/.test(text)
+      ? text
+      : null;
+  }
+
+  function slotsOverlap(a, b) {
+    if (
+      !a.room_id ||
+      !b.room_id ||
+      Number(a.room_id) !== Number(b.room_id)
+    ) {
+      return false;
+    }
+
+    if (
+      !a.day_of_week ||
+      a.day_of_week !== b.day_of_week
+    ) {
+      return false;
+    }
+
+    const aStartDate = dateOrNull(a.start_date);
+    const aEndDate = dateOrNull(a.end_date);
+    const bStartDate = dateOrNull(b.start_date);
+    const bEndDate = dateOrNull(b.end_date);
+
+    // Open-ended ranges always overlap each other.
+    if (
+      aStartDate &&
+      bEndDate &&
+      aStartDate > bEndDate
+    ) {
+      return false;
+    }
+
+    if (
+      aEndDate &&
+      bStartDate &&
+      aEndDate < bStartDate
+    ) {
+      return false;
+    }
+
+    const aStart = String(a.start_time || "");
+    const aEnd = String(a.end_time || "");
+    const bStart = String(b.start_time || "");
+    const bEnd = String(b.end_time || "");
+
+    if (!aStart || !aEnd || !bStart || !bEnd) {
+      return false;
+    }
+
+    return aStart < bEnd && aEnd > bStart;
+  }
+
+  function findConflicts(rows) {
+    const pairs = [];
+
+    for (let i = 0; i < rows.length; i += 1) {
+      for (let j = i + 1; j < rows.length; j += 1) {
+        if (slotsOverlap(rows[i], rows[j])) {
+          pairs.push([rows[i], rows[j]]);
+        }
+      }
+    }
+
+    return pairs;
+  }
+
+  function handleViewConflicts() {
+    setError("");
+    setConflicts(findConflicts(timetable));
+  }
+
+  function slotStatus(item) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = dateOrNull(item.start_date);
+    const end = dateOrNull(item.end_date);
+
+    if (end) {
+      const endTime = Date.parse(end);
+
+      if (!Number.isNaN(endTime) && endTime < today.getTime()) {
+        return { label: "Ended", tone: "muted" };
+      }
+    }
+
+    if (start) {
+      const startTime = Date.parse(start);
+
+      if (
+        !Number.isNaN(startTime) &&
+        startTime > today.getTime()
+      ) {
+        return { label: "Scheduled", tone: "scheduled" };
+      }
+    }
+
+    return { label: "Active", tone: "active" };
+  }
+
+  function conflictLabel(item) {
+    const room =
+      item.room_name ||
+      (item.building
+        ? `${item.building}`
+        : "Room " + (item.room_id || "?"));
+
+    return `${formatDay(item.day_of_week)} ${formatTime(
+      item.start_time
+    )}-${formatTime(item.end_time)} · ${room}`;
+  }
+
+  function describeConflict(conflict) {
+    if (!conflict || typeof conflict !== "object") {
+      return "";
+    }
+
+    const roomName =
+      rooms.find(
+        (room) =>
+          Number(room.id) ===
+          Number(conflict.room_id)
+      )?.room_name ||
+      (conflict.room_id
+        ? `Room ${conflict.room_id}`
+        : "the selected room");
+
+    return `${formatDay(
+      conflict.day_of_week
+    )} ${formatTime(
+      conflict.start_time
+    )}-${formatTime(conflict.end_time)} · ${roomName}`;
+  }
+
+  /* =========================================================
+     CSV EXPORT (real download of the filtered rows)
+  ========================================================= */
+
+  function escapeCsvCell(value) {
+    return `"${String(value ?? "").replace(/"/g, '""')}"`;
+  }
+
+  function handleExportCsv() {
+    if (filteredTimetable.length === 0) {
+      setError("Nothing to export with current filters.");
+      return;
+    }
+
+    const header = [
+      "Course Code",
+      "Course Name",
+      "Section",
+      "Room",
+      "Building",
+      "Day",
+      "Start Time",
+      "End Time",
+      "Start Date",
+      "End Date",
+    ];
+
+    const lines = filteredTimetable.map((item) =>
+      [
+        item.course_code,
+        item.course_name,
+        item.section_name,
+        item.room_name,
+        item.building,
+        formatDay(item.day_of_week),
+        formatTime(item.start_time),
+        formatTime(item.end_time),
+        getDateValue(item.start_date),
+        getDateValue(item.end_date),
+      ]
+        .map(escapeCsvCell)
+        .join(",")
+    );
+
+    const blob = new Blob(
+      [[...header].map(escapeCsvCell).join(","), ...lines].join(
+        "\n"
+      ),
+      { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "timetable.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
 
   /* =========================================================
      STATISTICS
@@ -697,6 +950,20 @@ export default function Timetable() {
         err
       );
 
+      // 409 comes straight from backend room-conflict
+      // validation and carries the conflicting slot.
+      if (err?.status === 409 && err?.details) {
+        const detail = describeConflict(err.details);
+
+        setError(
+          `${err.message}${
+            detail ? ` (${detail}).` : ""
+          }`
+        );
+
+        return;
+      }
+
       setError(
         err.message ||
           "Failed to save timetable"
@@ -879,6 +1146,76 @@ export default function Timetable() {
             </div>
           )}
 
+          {conflicts !== null && (
+            <div
+              className={
+                conflicts.length > 0
+                  ? "tt-error"
+                  : "tt-conflict-ok"
+              }
+              role="status"
+            >
+              <span>
+                <TtIcon
+                  name={
+                    conflicts.length > 0
+                      ? "alert"
+                      : "check"
+                  }
+                  size={15}
+                />
+              </span>
+
+              <div>
+                {conflicts.length > 0 ? (
+                  <>
+                    <strong>
+                      {conflicts.length}{" "}
+                      conflicting{" "}
+                      {conflicts.length === 1
+                        ? "pair"
+                        : "pairs"}{" "}
+                      found:
+                    </strong>
+
+                    <ul className="tt-conflict-list">
+                      {conflicts.map(
+                        ([first, second], pairIndex) => (
+                          <li
+                            key={`${first.id}-${second.id}-${pairIndex}`}
+                          >
+                            {first.course_code ||
+                              first.course_name ||
+                              `Slot ${first.id}`}{" "}
+                            ↔{" "}
+                            {second.course_code ||
+                              second.course_name ||
+                              `Slot ${second.id}`}{" "}
+                            ({conflictLabel(first)})
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </>
+                ) : (
+                  <span>
+                    No scheduling conflicts found in
+                    the loaded timetable.
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={() =>
+                  setConflicts(null)
+                }
+                aria-label="Dismiss conflict results"
+              >
+                <TtIcon name="close" size={15} />
+              </button>
+            </div>
+          )}
+
           {/* =================================================
               STATISTICS
           ================================================= */}
@@ -901,10 +1238,6 @@ export default function Timetable() {
                 <small>
                   This semester
                 </small>
-              </div>
-
-              <div className="tt-stat-badge green">
-                + 12%
               </div>
 
             </div>
@@ -1277,6 +1610,7 @@ export default function Timetable() {
 
                 </div>
               ) : (
+                <>
                 <div className="tt-table-scroll">
 
                   <table className="tt-table">
@@ -1298,7 +1632,7 @@ export default function Timetable() {
 
                     <tbody>
 
-                      {filteredTimetable.map(
+                      {paginatedTimetable.map(
                         (item, index) => {
 
                           const dayColor =
@@ -1315,7 +1649,10 @@ export default function Timetable() {
                               <td>
                                 <span className="tt-row-number">
                                   {String(
-                                    index + 1
+                                    (safePage - 1) *
+                                      perPage +
+                                      index +
+                                      1
                                   ).padStart(
                                     2,
                                     "0"
@@ -1403,10 +1740,19 @@ export default function Timetable() {
                               </td>
 
                               <td>
-                                <span className="tt-status active">
-                                  <i />
-                                  Active
-                                </span>
+                                {(() => {
+                                  const slot =
+                                    slotStatus(item);
+
+                                  return (
+                                    <span
+                                      className={`tt-status ${slot.tone}`}
+                                    >
+                                      <i />
+                                      {slot.label}
+                                    </span>
+                                  );
+                                })()}
                               </td>
 
                               <td>
@@ -1449,6 +1795,113 @@ export default function Timetable() {
                   </table>
 
                 </div>
+
+                <div className="tt-pagination">
+
+                  <span className="tt-pagination-count">
+                    Showing{" "}
+                    {filteredTimetable.length === 0
+                      ? 0
+                      : (safePage - 1) * perPage + 1}
+                    –{" "}
+                    {Math.min(
+                      safePage * perPage,
+                      filteredTimetable.length
+                    )}{" "}
+                    of {filteredTimetable.length}
+                  </span>
+
+                  <div className="tt-pagination-controls">
+
+                    <button
+                      type="button"
+                      disabled={safePage <= 1}
+                      onClick={() =>
+                        setPage(safePage - 1)
+                      }
+                      aria-label="Previous page"
+                    >
+                      ‹
+                    </button>
+
+                    {Array.from(
+                      { length: totalPages },
+                      (_, index) => index + 1
+                    )
+                      .filter(
+                        (pageNumber) =>
+                          pageNumber === 1 ||
+                          pageNumber ===
+                            totalPages ||
+                          Math.abs(
+                            pageNumber - safePage
+                          ) <= 1
+                      )
+                      .map(
+                        (
+                          pageNumber,
+                          position,
+                          visible
+                        ) => (
+                          <span key={pageNumber}>
+                            {position > 0 &&
+                              visible[position - 1] !==
+                                pageNumber - 1 &&
+                              "…"}
+                            <button
+                              type="button"
+                              className={
+                                pageNumber === safePage
+                                  ? "current"
+                                  : ""
+                              }
+                              aria-current={
+                                pageNumber === safePage
+                                  ? "page"
+                                  : undefined
+                              }
+                              onClick={() =>
+                                setPage(pageNumber)
+                              }
+                            >
+                              {pageNumber}
+                            </button>
+                          </span>
+                        )
+                      )}
+
+                    <button
+                      type="button"
+                      disabled={
+                        safePage >= totalPages
+                      }
+                      onClick={() =>
+                        setPage(safePage + 1)
+                      }
+                      aria-label="Next page"
+                    >
+                      ›
+                    </button>
+
+                    <select
+                      className="tt-pagination-perpage"
+                      aria-label="Rows per page"
+                      value={perPage}
+                      onChange={(event) =>
+                        setPerPage(
+                          Number(event.target.value)
+                        )
+                      }
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+
+                  </div>
+
+                </div>
+                </>
               )}
 
             </div>
@@ -1576,7 +2029,7 @@ export default function Timetable() {
                 <button
                   className="tt-quick-action gray"
                   onClick={() =>
-                    goTo(
+                    navigate(
                       "/admin/rooms"
                     )
                   }
@@ -1589,10 +2042,8 @@ export default function Timetable() {
 
                 <button
                   className="tt-quick-action red"
-                  onClick={() =>
-                    setError(
-                      "Conflict detection can be connected to the timetable backend."
-                    )
+                  onClick={
+                    handleViewConflicts
                   }
                 >
                   <span>
@@ -1603,9 +2054,9 @@ export default function Timetable() {
 
                 <button
                   className="tt-quick-action green"
-                  onClick={() => {
-                    window.print();
-                  }}
+                  onClick={
+                    handleExportCsv
+                  }
                 >
                   <span>
                     <TtIcon name="download" size={15} />

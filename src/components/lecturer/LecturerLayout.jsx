@@ -2,6 +2,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../Footer";
 import "../Footer.css";
+import ThemeToggle from "../ThemeToggle";
 
 import "./LecturerLayout.css";
 
@@ -226,6 +227,8 @@ export default function LecturerLayout({ children }) {
           <span>{getPageTitle(location.pathname)}</span>
         </div>
 
+        <ThemeToggle />
+
         <div
           className="lecturer-mobile-header-avatar"
           aria-hidden="true"
@@ -340,6 +343,11 @@ export default function LecturerLayout({ children }) {
 
             <span>Logout</span>
           </button>
+
+          <div className="lecturer-layout-theme">
+            <span>Theme</span>
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
 

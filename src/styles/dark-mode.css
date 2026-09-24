@@ -1,0 +1,343 @@
+/* ============================================================
+   ATTENDIFY DARK MODE — calm dark navy/charcoal theme.
+   Activated by data-theme="dark" on <html> (see utils/theme).
+   All selectors are scoped with the attribute so light mode
+   is untouched. No !important, no pure black.
+   ============================================================ */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --att-navy: #e6ebf4;
+  --att-navy-soft: #c4cede;
+  --att-page: #0e1626;
+  --att-card: #16203a;
+  --att-primary: #6ea8ff;
+  --att-primary-dark: #9cc2ff;
+  --att-primary-soft: #1b2a4d;
+  --att-text: #e6ebf4;
+  --att-muted: #9aa7bd;
+  --att-subtle: #7c8aa0;
+  --att-border: #26334f;
+  --att-border-soft: #1d2942;
+  --att-header: #0b1222;
+  --att-heading: #e6ebf4;
+  --att-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Page base ---------- */
+
+[data-theme="dark"] body {
+  background: #0e1626;
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] #root {
+  background: #0e1626;
+}
+
+/* ---------- Auth (login / register / forgot / reset) ---------- */
+
+[data-theme="dark"] .login-page {
+  background: #0e1626;
+}
+
+[data-theme="dark"] .login-page::after {
+  display: none;
+}
+
+[data-theme="dark"] .login-page.auth-split {
+  background: #0e1626;
+}
+
+[data-theme="dark"] .login-page.auth-split .brand,
+[data-theme="dark"] .login-page.auth-split .brand-text h1 {
+  color: #ffffff;
+  text-shadow: none;
+}
+
+[data-theme="dark"] .login-page.auth-split .brand-text p {
+  color: #9aa7bd;
+}
+
+[data-theme="dark"] .login-page.auth-split .brand-logo {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .register-card {
+  background: #16203a;
+  border-color: #26334f;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .app-name,
+[data-theme="dark"] .welcome-section h3 {
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] .app-description,
+[data-theme="dark"] .welcome-section p {
+  color: #9aa7bd;
+}
+
+[data-theme="dark"] .form-group label {
+  color: #c4cede;
+}
+
+[data-theme="dark"] .input-container {
+  background: #101a30;
+  border-color: #2c3a5c;
+}
+
+[data-theme="dark"] .input-container input {
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] .input-container input::placeholder {
+  color: #7c8aa0;
+}
+
+[data-theme="dark"] .login-page.auth-split .page-footer,
+[data-theme="dark"] .page-footer {
+  color: #9aa7bd;
+}
+
+[data-theme="dark"] .page-footer .tagline {
+  color: #c4cede;
+  text-shadow: none;
+}
+
+[data-theme="dark"] .page-footer .university-name {
+  color: #7c8aa0;
+  opacity: 1;
+}
+
+[data-theme="dark"] .page-footer .tagline-line {
+  background: #2c3a5c;
+}
+
+[data-theme="dark"] .login-page .form-error {
+  background: #2a1620;
+  border-color: #5b2330;
+  color: #f3b8c2;
+}
+
+[data-theme="dark"] .login-page .form-notice {
+  background: #0f2a22;
+  border-color: #1d4d3c;
+  color: #9fe3c3;
+}
+
+/* ---------- Top headers / nav chrome ---------- */
+
+[data-theme="dark"] .top-header,
+[data-theme="dark"] .chatbot-topbar,
+[data-theme="dark"] .lecturer-mobile-header {
+  background: #101a30;
+  border-bottom-color: #26334f;
+}
+
+[data-theme="dark"] .lecturer-mobile-header-text strong {
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] .lecturer-mobile-header-text span,
+[data-theme="dark"] .chatbot-topbar-title span {
+  color: #9aa7bd;
+}
+
+[data-theme="dark"] .chatbot-topbar-title strong {
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] .language-button,
+[data-theme="dark"] .lecturer-menu-button,
+[data-theme="dark"] .hamburger {
+  background: #16203a;
+  border-color: #2c3a5c;
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] .lecturer-menu-button span,
+[data-theme="dark"] .hamburger span {
+  background: #e6ebf4;
+}
+
+/* ---------- Cards / panels ---------- */
+
+[data-theme="dark"] .student-panel,
+[data-theme="dark"] .student-stat-card,
+[data-theme="dark"] .student-side-card,
+[data-theme="dark"] .lecturer-dashboard-stat,
+[data-theme="dark"] .lecturer-dashboard-panel,
+[data-theme="dark"] .lecturer-dashboard-footer-card,
+[data-theme="dark"] .tt-stat-card,
+[data-theme="dark"] .tt-table-card,
+[data-theme="dark"] .tt-side-card,
+[data-theme="dark"] .att-card,
+[data-theme="dark"] .chatbot-panel,
+[data-theme="dark"] .chatbot-card,
+[data-theme="dark"] .chatbot-hero,
+[data-theme="dark"] .dashboard-panel,
+[data-theme="dark"] .stat-card {
+  background: #16203a;
+  border-color: #26334f;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Tables ---------- */
+
+[data-theme="dark"] table {
+  background: #16203a;
+}
+
+[data-theme="dark"] th {
+  background: #101a30;
+  color: #9aa7bd;
+  border-bottom-color: #26334f;
+}
+
+[data-theme="dark"] td {
+  border-bottom-color: #1d2942;
+  color: #c4cede;
+}
+
+/* ---------- Forms ---------- */
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: #101a30;
+  border-color: #2c3a5c;
+  color: #e6ebf4;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #7c8aa0;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+  border-color: #4f8cff;
+}
+
+/* ---------- Modals ---------- */
+
+[data-theme="dark"] .modal-overlay,
+[data-theme="dark"] .modal-backdrop {
+  background: rgba(4, 8, 18, 0.72);
+}
+
+[data-theme="dark"] .user-modal,
+[data-theme="dark"] .request-modal,
+[data-theme="dark"] .details-modal {
+  background: #16203a;
+  border: 1px solid #26334f;
+}
+
+/* ---------- Pagination ---------- */
+
+[data-theme="dark"] .tt-pagination-count {
+  color: #9aa7bd;
+}
+
+[data-theme="dark"] .tt-pagination-controls button,
+[data-theme="dark"] .tt-pagination-perpage {
+  background: #16203a;
+  border-color: #2c3a5c;
+  color: #c4cede;
+}
+
+[data-theme="dark"]
+  .tt-pagination-controls
+  button.current {
+  background: #1b2a4d;
+  border-color: #4f8cff;
+  color: #cfe1ff;
+}
+
+/* ---------- Chatbot ---------- */
+
+[data-theme="dark"] .student-assistant-panel {
+  background: #16203a;
+  border-color: #26334f;
+}
+
+[data-theme="dark"] .student-assistant-header {
+  border-bottom-color: #26334f;
+}
+
+[data-theme="dark"] .student-assistant-msg {
+  background: #1b2745;
+  border-color: #2c3a5c;
+  color: #dbe4f3;
+}
+
+[data-theme="dark"] .student-assistant-week {
+  background: #101a30;
+  border-bottom-color: #26334f;
+}
+
+[data-theme="dark"] .student-assistant-suggest button,
+[data-theme="dark"] .student-assistant-full,
+[data-theme="dark"] .student-assistant-close {
+  background: #101a30;
+  border-color: #2c3a5c;
+  color: #c4cede;
+}
+
+/* ---------- QR scanner ---------- */
+
+[data-theme="dark"] .scanner-card,
+[data-theme="dark"] .ready-card,
+[data-theme="dark"] .manual-code-card,
+[data-theme="dark"] .info-card {
+  background: #16203a;
+  border-color: #26334f;
+}
+
+[data-theme="dark"] .confirmation-card,
+[data-theme="dark"] .success-card,
+[data-theme="dark"] .recent-attendance-card,
+[data-theme="dark"] .summary-card,
+[data-theme="dark"] .next-card {
+  background: #16203a;
+  border-color: #26334f;
+}
+
+/* ---------- Footer ---------- */
+
+[data-theme="dark"] .app-footer {
+  background: #101a30;
+  border-top-color: #26334f;
+}
+
+/* ---------- Theme toggle ---------- */
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary, #2563eb);
+  color: var(--primary, #2563eb);
+}
+
+[data-theme="dark"] .theme-toggle {
+  background: #16203a;
+  border-color: #2c3a5c;
+  color: #c4cede;
+}

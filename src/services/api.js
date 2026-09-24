@@ -43,11 +43,23 @@ async function apiRequest(
   }
 
   if (!response.ok) {
-    throw new Error(
+    // Attach machine-readable context so callers can
+    // branch on real backend states (e.g. 409 conflict
+    // with a `conflict` payload). The message behavior
+    // relied upon by existing callers is unchanged.
+    const error = new Error(
       data.message ||
         data.error ||
         `Request failed with status ${response.status}`
     );
+
+    error.status = response.status;
+    error.details =
+      data.conflict !== undefined
+        ? data.conflict
+        : data.details;
+
+    throw error;
   }
 
   return data;
@@ -321,7 +333,7 @@ export async function updateCourse(
   return apiRequest(
     `/courses/${id}`,
     {
-      method: "PATCH",
+      method: "PUT",
 
       body: JSON.stringify({
         courseName,

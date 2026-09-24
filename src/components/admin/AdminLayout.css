@@ -348,6 +348,22 @@ body {
   border-top: 1px solid #edf1f5;
 }
 
+.admin-theme-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-theme-row .theme-toggle {
+  width: 36px;
+  height: 36px;
+}
+
 .admin-logout-item {
   color: #64748b;
 }

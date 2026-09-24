@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "./services/api";
+import ThemeToggle from "./components/ThemeToggle";
 import "./App.css";
 
 function AuthIcon({ name, size = 17 }) {
@@ -377,6 +378,8 @@ function Register() {
           </div>
 
         </div>
+
+        <ThemeToggle />
 
       </header>
 

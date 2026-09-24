@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import ThemeToggle from "../ThemeToggle";
 import "./AdminLayout.css";
 
 /* =========================================================
@@ -532,6 +533,13 @@ export default function AdminLayout({ children }) {
               OUT
             </span>
           </button>
+
+          <div className="admin-theme-row">
+            <span className="admin-nav-label">
+              Theme
+            </span>
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
 

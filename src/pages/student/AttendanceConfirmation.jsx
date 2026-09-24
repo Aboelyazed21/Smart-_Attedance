@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
+import ThemeToggle from "../../components/ThemeToggle";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
@@ -454,6 +455,7 @@ function AttendanceConfirmation() {
 
       <main className="confirmation-main">
         <header className="confirmation-topbar">
+          <ThemeToggle />
           <div className="confirmation-user">
             <div className="header-avatar">{avatarLetter}</div>
 

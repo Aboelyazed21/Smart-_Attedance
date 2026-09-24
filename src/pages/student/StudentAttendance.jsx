@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import { getMyAttendance } from "../../services/api";
+import ThemeToggle from "../../components/ThemeToggle";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
@@ -675,6 +676,7 @@ function StudentAttendance() {
       {/* ============ MAIN ============ */}
       <main className="student-main">
         <header className="student-topbar">
+          <ThemeToggle />
           <div
             className="student-topbar-right"
             style={{ marginLeft: "auto" }}

@@ -7613,6 +7613,30 @@ button {
     z-index: 5;
   }
 
+  /* Branding sits on the light page background here, so it
+     must use dark navy — never white-on-white. */
+  .login-page.auth-split .brand {
+    color: #0f2851;
+  }
+
+  .login-page.auth-split .brand-logo {
+    background: #0f2851;
+    border-color: #0f2851;
+  }
+
+  .login-page.auth-split .brand-logo span {
+    color: #ffffff;
+  }
+
+  .login-page.auth-split .brand-text h1 {
+    color: #0f2851;
+    text-shadow: none;
+  }
+
+  .login-page.auth-split .brand-text p {
+    color: #5b6b80;
+  }
+
   .login-page.auth-split .auth-brand-panel {
     display: flex;
     align-items: center;
@@ -7705,6 +7729,21 @@ button {
   .login-page.auth-split .page-footer {
     grid-column: 2;
     grid-row: 3;
+    color: #5b6b80;
+  }
+
+  .login-page.auth-split .page-footer .tagline {
+    color: #334155;
+    text-shadow: none;
+  }
+
+  .login-page.auth-split .page-footer .university-name {
+    color: #7c8aa0;
+    opacity: 1;
+  }
+
+  .login-page.auth-split .page-footer .tagline-line {
+    background: #cbd5e1;
   }
 }
 
@@ -7758,6 +7797,24 @@ button {
 
   .login-page.auth-split .top-header {
     display: none;
+  }
+
+  .login-page.auth-split .page-footer {
+    color: #5b6b80;
+  }
+
+  .login-page.auth-split .page-footer .tagline {
+    color: #334155;
+    text-shadow: none;
+  }
+
+  .login-page.auth-split .page-footer .university-name {
+    color: #7c8aa0;
+    opacity: 1;
+  }
+
+  .login-page.auth-split .page-footer .tagline-line {
+    background: #cbd5e1;
   }
 }
 

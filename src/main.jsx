@@ -6,6 +6,10 @@ import App from "./App";
 import "./index.css";
 import "./components/Footer.css";
 import "./styles/responsive-system.css";
+import "./styles/dark-mode.css";
+import { initTheme } from "./utils/theme";
+
+initTheme();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

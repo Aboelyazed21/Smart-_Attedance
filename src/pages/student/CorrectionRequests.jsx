@@ -6,6 +6,7 @@ import {
   getMyCorrections,
 } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
+import ThemeToggle from "../../components/ThemeToggle";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
 import "./CorrectionRequests.css";
@@ -584,6 +585,7 @@ function CorrectionRequests() {
 
       <main className="correction-main">
         <header className="correction-topbar">
+          <ThemeToggle />
           <div className="correction-global-search">
             <Icon name="search" size={16} />
             <input
