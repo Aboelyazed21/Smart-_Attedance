@@ -97,12 +97,6 @@
   font-weight: 600;
 }
 
-.settings-nav-icon {
-  width: 17px;
-  text-align: center;
-  font-size: 15px;
-}
-
 /* ============================================================
    SIDEBAR BOTTOM
    ============================================================ */
@@ -158,66 +152,15 @@
   border-bottom: 1px solid #e6edf5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0 28px;
   box-sizing: border-box;
-}
-
-.settings-search {
-  width: 305px;
-  height: 38px;
-  border-radius: 7px;
-  background: #f3f6fa;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  box-sizing: border-box;
-}
-
-.settings-search span {
-  font-size: 13px;
-}
-
-.settings-search input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #18345f;
-  font-size: 10px;
-}
-
-.settings-search input::placeholder {
-  color: #91a0b5;
 }
 
 .settings-user-area {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.settings-notification {
-  position: relative;
-  font-size: 15px;
-  margin-right: 5px;
-}
-
-.settings-notification span {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background: #f04444;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  font-weight: 700;
 }
 
 .settings-avatar {
@@ -275,18 +218,6 @@
   gap: 12px;
 }
 
-.settings-title-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
-  background: #e9f3ff;
-  color: #147ef5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
 .settings-page-header h1 {
   margin: 0;
   color: #102a56;
@@ -323,18 +254,6 @@
   align-items: center;
   gap: 11px;
   margin-bottom: 21px;
-}
-
-.settings-card-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: #eaf4ff;
-  color: #147ef5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
 }
 
 .settings-card-header h2 {
@@ -553,10 +472,6 @@
   transform: translateY(-1px);
 }
 
-.settings-save-button span {
-  font-size: 13px;
-}
-
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -593,10 +508,6 @@
     padding: 20px 15px;
   }
 
-  .settings-search {
-    width: 220px;
-  }
-
   .settings-form-grid,
   .notification-settings-grid {
     grid-template-columns: 1fr;
@@ -612,10 +523,6 @@
 }
 
 @media (max-width: 550px) {
-  .settings-search {
-    width: 160px;
-  }
-
   .settings-user-info {
     display: none;
   }

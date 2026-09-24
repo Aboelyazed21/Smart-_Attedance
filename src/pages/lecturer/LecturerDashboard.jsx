@@ -166,7 +166,7 @@ export default function LecturerDashboard() {
       value: formatNumber(
         stats.totalSections ?? sections.length
       ),
-      tone: "violet",
+      tone: "blue",
       action: () => navigate("/lecturer/sections"),
     },
     {
@@ -184,7 +184,7 @@ export default function LecturerDashboard() {
     {
       label: "Total Sessions",
       value: formatNumber(stats.totalSessions),
-      tone: "cyan",
+      tone: "neutral",
       action: () => navigate("/lecturer/sessions"),
     },
     {
@@ -196,7 +196,7 @@ export default function LecturerDashboard() {
     {
       label: "Attendance Records",
       value: formatNumber(stats.totalAttendanceEvents),
-      tone: "indigo",
+      tone: "blue",
       action: () => navigate("/lecturer/attendance"),
     },
     {
@@ -204,7 +204,7 @@ export default function LecturerDashboard() {
       value: formatNumber(
         stats?.correctionRequests?.pending
       ),
-      tone: "orange",
+      tone: "amber",
       action: () => navigate("/lecturer/attendance"),
     },
   ];
@@ -231,16 +231,15 @@ export default function LecturerDashboard() {
           onClick={loadDashboard}
           disabled={loading}
         >
-          <span className="lecturer-dashboard-refresh-icon">
-            ↻
-          </span>
-
           {loading ? "Refreshing..." : "Refresh"}
         </button>
       </header>
 
       {error && (
-        <div className="lecturer-dashboard-error">
+        <div
+          className="lecturer-dashboard-error"
+          role="alert"
+        >
           <div>
             <strong>Could not load dashboard data</strong>
             <p>{error}</p>
@@ -251,7 +250,7 @@ export default function LecturerDashboard() {
             onClick={loadDashboard}
             disabled={loading}
           >
-            Retry
+            Try again
           </button>
         </div>
       )}
@@ -269,24 +268,32 @@ export default function LecturerDashboard() {
                 {card.label}
               </span>
 
-              <span className="lecturer-dashboard-stat-icon">
-                {card.label === "Courses" && "CR"}
-                {card.label === "Sections" && "SC"}
-                {card.label === "Enrolled Students" && "ST"}
-                {card.label === "Attendance Rate" && "%"}
-                {card.label === "Total Sessions" && "SE"}
-                {card.label === "Active Sessions" && "ON"}
-                {card.label === "Attendance Records" && "AT"}
-                {card.label === "Pending Corrections" && "PC"}
-              </span>
+              {card.label !== "Attendance Rate" && (
+                <span className="lecturer-dashboard-stat-icon">
+                  {card.label === "Courses" && "CR"}
+                  {card.label === "Sections" && "SC"}
+                  {card.label === "Enrolled Students" && "ST"}
+                  {card.label === "Total Sessions" && "SE"}
+                  {card.label === "Active Sessions" && "ON"}
+                  {card.label === "Attendance Records" && "AT"}
+                  {card.label === "Pending Corrections" && "PC"}
+                </span>
+              )}
             </span>
 
             <strong className="lecturer-dashboard-stat-value">
-              {loading ? "—" : card.value}
+              {loading ? (
+                <span
+                  className="lecturer-dashboard-stat-skeleton"
+                  aria-hidden="true"
+                />
+              ) : (
+                card.value
+              )}
             </strong>
 
             <span className="lecturer-dashboard-stat-link">
-              View details →
+              View details
             </span>
           </button>
         ))}
@@ -331,16 +338,20 @@ export default function LecturerDashboard() {
             </div>
           ) : sections.length === 0 ? (
             <div className="lecturer-dashboard-empty">
-              <div className="lecturer-dashboard-empty-icon">
-                SC
-              </div>
-
               <strong>No assigned sections</strong>
 
               <p>
                 No sections are currently assigned to this
                 lecturer account.
               </p>
+
+              <button
+                type="button"
+                onClick={loadDashboard}
+                disabled={loading}
+              >
+                Refresh
+              </button>
             </div>
           ) : (
             <div className="lecturer-dashboard-section-list">
@@ -367,7 +378,7 @@ export default function LecturerDashboard() {
 
                     <span className="lecturer-dashboard-section-info">
                       <strong>
-                        {getCourseCode(section)} · Section{" "}
+                        {getCourseCode(section)} - Section{" "}
                         {getSectionName(section)}
                       </strong>
 
@@ -383,10 +394,6 @@ export default function LecturerDashboard() {
                       )}
 
                       <small>students</small>
-                    </span>
-
-                    <span className="lecturer-dashboard-section-arrow">
-                      →
                     </span>
                   </button>
                 );
@@ -428,7 +435,6 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
             </button>
 
             <button
@@ -448,7 +454,6 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
             </button>
 
             <button
@@ -468,7 +473,6 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
             </button>
 
             <button
@@ -488,7 +492,6 @@ export default function LecturerDashboard() {
                 </small>
               </span>
 
-              <b>→</b>
             </button>
           </div>
         </div>
@@ -520,7 +523,7 @@ export default function LecturerDashboard() {
             navigate("/lecturer/sessions")
           }
         >
-          Open Sessions →
+          Open Sessions
         </button>
       </section>
     </div>

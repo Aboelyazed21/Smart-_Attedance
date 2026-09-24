@@ -1,69 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/Footer";
 import "./CorrectionRequests.css";
-
-const initialRequests = [
-  {
-    id: "CR-0010",
-    date: "Sep 20, 2026",
-    course: "Data Structures",
-    section: "Sec 1",
-    attendanceDate: "Sep 18, 2026",
-    status: "Pending",
-    reason: "Was present but marked absent",
-    submittedAt: "Sep 20, 2026 10:14 AM",
-  },
-  {
-    id: "CR-0009",
-    date: "Sep 19, 2026",
-    course: "Web Development",
-    section: "Sec 2",
-    attendanceDate: "Sep 17, 2026",
-    status: "Approved",
-    reason: "Late due to transportation issue",
-    submittedAt: "Sep 19, 2026 02:30 PM",
-  },
-  {
-    id: "CR-0008",
-    date: "Sep 15, 2026",
-    course: "Database Systems",
-    section: "Sec 1",
-    attendanceDate: "Sep 14, 2026",
-    status: "Rejected",
-    reason: "Was in the lab but QR didn't work",
-    submittedAt: "Sep 15, 2026 11:20 AM",
-  },
-  {
-    id: "CR-0007",
-    date: "Sep 12, 2026",
-    course: "Machine Learning",
-    section: "Sec 1",
-    attendanceDate: "Sep 11, 2026",
-    status: "Approved",
-    reason: "Medical appointment",
-    submittedAt: "Sep 12, 2026 09:15 AM",
-  },
-  {
-    id: "CR-0006",
-    date: "Sep 10, 2026",
-    course: "Software Security",
-    section: "Sec 2",
-    attendanceDate: "Sep 09, 2026",
-    status: "Pending",
-    reason: "System error during scanning",
-    submittedAt: "Sep 10, 2026 04:45 PM",
-  },
-  {
-    id: "CR-0005",
-    date: "Sep 05, 2026",
-    course: "Design & Testing",
-    section: "Sec 1",
-    attendanceDate: "Sep 04, 2026",
-    status: "Approved",
-    reason: "Attended offline session",
-    submittedAt: "Sep 05, 2026 01:10 PM",
-  },
-];
 
 const courseOptions = [
   "All Courses",
@@ -102,7 +40,8 @@ function CorrectionRequests() {
   const avatarLetter =
     firstName.charAt(0).toUpperCase() || "S";
 
-  const [requests, setRequests] = useState(initialRequests);
+  const [requests, setRequests] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [courseFilter, setCourseFilter] = useState("All Courses");
@@ -188,6 +127,32 @@ function CorrectionRequests() {
     navigate("/");
   }
 
+  function goTo(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      if (!showModal && !selectedRequest) document.body.style.overflow = "";
+      return undefined;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      if (!showModal && !selectedRequest) document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebarOpen, showModal, selectedRequest]);
+
   function openNewRequest() {
     setForm({
       course: "",
@@ -264,15 +229,27 @@ function CorrectionRequests() {
 
   return (
     <div className="correction-page">
-      <aside className="correction-sidebar">
+      {sidebarOpen && (
+        <button
+          className="correction-sidebar-overlay"
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside
+        id="correction-sidebar"
+        className={`correction-sidebar${sidebarOpen ? " open" : ""}`}
+      >
         <div className="correction-brand">
-          <div className="correction-brand-logo">
-            <span className="brand-mark" />
+          <div className="correction-brand-logo" aria-hidden="true">
+            A
           </div>
 
           <div>
             <strong>Attendify</strong>
-            <span>SMART ATTENDANCE</span>
+            <span>Student Portal</span>
           </div>
         </div>
 
@@ -287,65 +264,51 @@ function CorrectionRequests() {
           </div>
         </div>
 
-        <nav className="correction-nav">
+        <nav className="correction-nav" aria-label="Student navigation">
           <button
             type="button"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => goTo("/dashboard")}
           >
-            <span className="nav-icon">D</span>
             Dashboard
           </button>
 
           <button
             type="button"
-            onClick={() =>
-              navigate("/student/attendance")
-            }
+            onClick={() => goTo("/student/attendance")}
           >
-            <span className="nav-icon">A</span>
             My Attendance
           </button>
 
           <button
             type="button"
-            onClick={() =>
-              navigate("/student/scan")
-            }
+            onClick={() => goTo("/student/scan")}
           >
-            <span className="nav-icon">S</span>
             Scan Attendance
           </button>
 
           <button
             type="button"
             className="active"
+            aria-current="page"
+            onClick={() => goTo("/student/correction-requests")}
           >
-            <span className="nav-icon">C</span>
             Correction Requests
           </button>
 
-          <button type="button">
-            <span className="nav-icon">N</span>
-            Notifications
-            <b className="notification-badge">3</b>
+          <button
+            type="button"
+            onClick={() => goTo("/student/chatbot")}
+          >
+            Attendance Assistant
           </button>
         </nav>
 
         <div className="correction-sidebar-bottom">
-          <div className="correction-side-tip">
-            <div className="tip-dot">•</div>
-            <div>
-              <strong>Keep going!</strong>
-              <span>Every class counts.</span>
-            </div>
-          </div>
-
           <button
             type="button"
             className="correction-logout"
             onClick={handleLogout}
           >
-            <span className="logout-icon">L</span>
             Logout
           </button>
         </div>
@@ -353,25 +316,21 @@ function CorrectionRequests() {
 
       <main className="correction-main">
         <header className="correction-topbar">
-          <div className="correction-global-search">
-            <span>Search</span>
-            <input
-              type="text"
-              placeholder="Search courses, requests, or anything..."
-            />
-            <kbd>Ctrl + K</kbd>
-          </div>
+          <button
+            className="correction-menu-button hamburger"
+            type="button"
+            aria-expanded={sidebarOpen}
+            aria-controls="correction-sidebar"
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => setSidebarOpen((o) => !o)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
 
           <div className="correction-user-area">
-            <button
-              type="button"
-              className="notification-button"
-            >
-              <span className="notification-dot" />
-              Notifications
-            </button>
-
-            <div className="top-avatar">
+            <div className="top-avatar" aria-hidden="true">
               {avatarLetter}
             </div>
 
@@ -379,16 +338,12 @@ function CorrectionRequests() {
               <strong>{fullName}</strong>
               <span>Student</span>
             </div>
-
-            <span className="top-arrow">v</span>
           </div>
         </header>
 
         <section className="correction-content">
           <div className="correction-hero">
             <div className="hero-copy">
-              <div className="hero-icon">CR</div>
-
               <div>
                 <span className="hero-label">
                   ATTENDANCE
@@ -408,14 +363,12 @@ function CorrectionRequests() {
               className="new-request-button"
               onClick={openNewRequest}
             >
-              <span>+</span>
               New Correction Request
             </button>
           </div>
 
           <div className="stats-grid">
             <div className="stat-card pending">
-              <div className="stat-icon">P</div>
               <div>
                 <span>Pending Requests</span>
                 <strong>{pendingCount}</strong>
@@ -424,7 +377,6 @@ function CorrectionRequests() {
             </div>
 
             <div className="stat-card approved">
-              <div className="stat-icon">A</div>
               <div>
                 <span>Approved Requests</span>
                 <strong>{approvedCount}</strong>
@@ -433,7 +385,6 @@ function CorrectionRequests() {
             </div>
 
             <div className="stat-card rejected">
-              <div className="stat-icon">R</div>
               <div>
                 <span>Rejected Requests</span>
                 <strong>{rejectedCount}</strong>
@@ -442,7 +393,6 @@ function CorrectionRequests() {
             </div>
 
             <div className="stat-card total">
-              <div className="stat-icon">T</div>
               <div>
                 <span>Total Requests</span>
                 <strong>{requests.length}</strong>
@@ -455,10 +405,10 @@ function CorrectionRequests() {
             <div className="correction-left">
               <div className="filter-card">
                 <div className="filter-field search-field">
-                  <label>Search</label>
+                  <label htmlFor="filter-search">Search</label>
                   <div className="input-with-prefix">
-                    <span>Q</span>
                     <input
+                      id="filter-search"
                       type="text"
                       value={search}
                       onChange={(event) =>
@@ -470,8 +420,9 @@ function CorrectionRequests() {
                 </div>
 
                 <div className="filter-field">
-                  <label>Status</label>
+                  <label htmlFor="filter-status">Status</label>
                   <select
+                    id="filter-status"
                     value={statusFilter}
                     onChange={(event) =>
                       setStatusFilter(event.target.value)
@@ -485,8 +436,9 @@ function CorrectionRequests() {
                 </div>
 
                 <div className="filter-field">
-                  <label>Course</label>
+                  <label htmlFor="filter-course">Course</label>
                   <select
+                    id="filter-course"
                     value={courseFilter}
                     onChange={(event) =>
                       setCourseFilter(event.target.value)
@@ -501,8 +453,9 @@ function CorrectionRequests() {
                 </div>
 
                 <div className="filter-field">
-                  <label>From Date</label>
+                  <label htmlFor="filter-from-date">From Date</label>
                   <input
+                    id="filter-from-date"
                     className="date-input"
                     type="date"
                     value={fromDate}
@@ -513,8 +466,9 @@ function CorrectionRequests() {
                 </div>
 
                 <div className="filter-field">
-                  <label>To Date</label>
+                  <label htmlFor="filter-to-date">To Date</label>
                   <input
+                    id="filter-to-date"
                     className="date-input"
                     type="date"
                     value={toDate}
@@ -523,14 +477,6 @@ function CorrectionRequests() {
                     }
                   />
                 </div>
-
-                <button
-                  type="button"
-                  className="filter-search-button"
-                  onClick={() => {}}
-                >
-                  Search
-                </button>
 
                 <button
                   type="button"
@@ -544,10 +490,6 @@ function CorrectionRequests() {
               <div className="requests-card">
                 <div className="requests-card-header">
                   <div className="section-title">
-                    <div className="section-title-icon">
-                      CR
-                    </div>
-
                     <div>
                       <h2>My Correction Requests</h2>
                       <p>
@@ -640,8 +582,24 @@ function CorrectionRequests() {
                             colSpan="9"
                             className="empty-table"
                           >
-                            No correction requests match
-                            your filters.
+                            <p>
+                              {requests.length === 0
+                                ? "No correction requests yet."
+                                : "No correction requests match your filters."}
+                            </p>
+                            <button
+                              type="button"
+                              className="view-button"
+                              onClick={
+                                requests.length === 0
+                                  ? openNewRequest
+                                  : resetFilters
+                              }
+                            >
+                              {requests.length === 0
+                                ? "New Correction Request"
+                                : "Reset filters"}
+                            </button>
                           </td>
                         </tr>
                       )}
@@ -654,7 +612,6 @@ function CorrectionRequests() {
             <aside className="correction-right">
               <div className="side-card">
                 <div className="side-card-title">
-                  <div className="side-icon blue">1</div>
                   <h3>
                     How Correction Requests Work
                   </h3>
@@ -713,7 +670,6 @@ function CorrectionRequests() {
 
               <div className="side-card help-card">
                 <div className="side-card-title">
-                  <div className="side-icon help">?</div>
                   <h3>Need help?</h3>
                 </div>
 
@@ -724,15 +680,10 @@ function CorrectionRequests() {
                   details and supporting evidence when
                   available.
                 </p>
-
-                <button type="button">
-                  Contact Support
-                </button>
               </div>
 
               <div className="side-card tips-card">
                 <div className="side-card-title">
-                  <div className="side-icon tips">T</div>
                   <h3>Tips for a Successful Request</h3>
                 </div>
 
@@ -752,13 +703,15 @@ function CorrectionRequests() {
                     possible
                   </li>
                   <li>
-                    Check your notifications for updates
+                    Check this page for review updates
                   </li>
                 </ul>
               </div>
             </aside>
           </div>
         </section>
+
+        <Footer />
       </main>
 
       {showModal && (

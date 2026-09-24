@@ -1,8 +1,8 @@
 ﻿.lecturer-layout {
   min-height: 100vh;
   width: 100%;
-  background: #f6f8fc;
-  color: #172033;
+  background: var(--bg-app, #f7f8fa);
+  color: var(--text, #111827);
 }
 
 .lecturer-layout-sidebar {
@@ -18,13 +18,9 @@
 
   padding: 26px 18px 18px;
 
-  background: linear-gradient(
-    180deg,
-    #101827 0%,
-    #0c1422 100%
-  );
+  background: #071f4d;
 
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 
   box-sizing: border-box;
   overflow-y: auto;
@@ -50,18 +46,12 @@
 
   border-radius: 12px;
 
-  background: linear-gradient(
-    135deg,
-    #4f46e5,
-    #7c3aed
-  );
+  background: var(--primary, #2563eb);
 
   color: #ffffff;
 
   font-size: 19px;
   font-weight: 800;
-
-  box-shadow: 0 8px 22px rgba(79, 70, 229, 0.3);
 }
 
 .lecturer-layout-brand-text {
@@ -118,18 +108,12 @@
 
   border-radius: 50%;
 
-  background: linear-gradient(
-    135deg,
-    #6366f1,
-    #8b5cf6
-  );
+  background: var(--primary-hover, #1d4ed8);
 
   color: #ffffff;
 
   font-size: 13px;
   font-weight: 800;
-
-  box-shadow: 0 5px 15px rgba(99, 102, 241, 0.25);
 }
 
 .lecturer-layout-profile-info {
@@ -193,26 +177,18 @@
 
   transition:
     background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+    color 0.2s ease;
 }
 
 .lecturer-layout-nav-item:hover {
-  background: rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.07);
   color: #ffffff;
-  transform: translateX(2px);
 }
 
 .lecturer-layout-nav-item.active {
-  background: linear-gradient(
-    135deg,
-    rgba(79, 70, 229, 0.95),
-    rgba(99, 102, 241, 0.85)
-  );
+  background: var(--primary, #2563eb);
 
   color: #ffffff;
-
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
 }
 
 .lecturer-layout-nav-icon {
@@ -378,6 +354,91 @@
   border-radius: 10px;
 }
 
+/* =========================================================
+   MOBILE DRAWER CONTROLS
+   Hidden on desktop; revealed by the media query below.
+========================================================= */
+
+.lecturer-menu-button,
+.lecturer-sidebar-overlay {
+  display: none;
+}
+
+.lecturer-menu-button {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1200;
+
+  width: 44px;
+  height: 44px;
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  padding: 0;
+
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+
+  background: var(--bg-surface, #ffffff);
+
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(17, 23, 39, 0.07));
+
+  cursor: pointer;
+}
+
+.lecturer-menu-button span {
+  display: block;
+  width: 18px;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: var(--text, #111827);
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.lecturer-layout.sidebar-is-open
+  .lecturer-menu-button
+  span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.lecturer-layout.sidebar-is-open
+  .lecturer-menu-button
+  span:nth-child(2) {
+  opacity: 0;
+}
+
+.lecturer-layout.sidebar-is-open
+  .lecturer-menu-button
+  span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.lecturer-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+
+  padding: 0;
+  border: 0;
+
+  background: rgba(8, 25, 52, 0.45);
+
+  cursor: pointer;
+}
+
+body.lecturer-sidebar-open {
+  overflow: hidden;
+}
+
 @media (max-width: 1100px) {
   .lecturer-layout-sidebar {
     width: 250px;
@@ -389,128 +450,57 @@
   }
 }
 
+/* =========================================================
+   MOBILE / SMALL TABLET — off-canvas drawer navigation
+========================================================= */
+
 @media (max-width: 900px) {
   .lecturer-layout-sidebar {
-    width: 230px;
-    padding-left: 13px;
-    padding-right: 13px;
+    width: min(82vw, 300px);
+
+    transform: translateX(-105%);
+    visibility: hidden;
+
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
+
+    box-shadow: 18px 0 45px rgba(15, 23, 42, 0.18);
+  }
+
+  .lecturer-layout.sidebar-is-open .lecturer-layout-sidebar {
+    transform: translateX(0);
+    visibility: visible;
   }
 
   .lecturer-layout-content {
-    width: calc(100% - 230px);
-    margin-left: 230px;
+    width: 100%;
+    margin-left: 0;
+    padding-top: 60px;
   }
 
-  .lecturer-layout-brand {
-    padding-left: 7px;
-    padding-right: 7px;
+  .lecturer-menu-button {
+    display: flex;
   }
 
-  .lecturer-layout-brand-text strong {
-    font-size: 16px;
-  }
-
-  .lecturer-layout-nav-label {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 640px) {
-  .lecturer-layout-sidebar {
-    width: 76px;
-    padding: 18px 9px;
-    overflow-x: hidden;
-  }
-
-  .lecturer-layout-content {
-    width: calc(100% - 76px);
-    margin-left: 76px;
-  }
-
-  .lecturer-layout-brand {
-    justify-content: center;
-    padding: 0;
-    margin-bottom: 24px;
-  }
-
-  .lecturer-layout-brand-text {
-    display: none;
-  }
-
-  .lecturer-layout-profile {
-    justify-content: center;
-    padding: 8px;
-  }
-
-  .lecturer-layout-profile-avatar {
-    width: 38px;
-    height: 38px;
-    flex-basis: 38px;
-  }
-
-  .lecturer-layout-profile-info {
-    display: none;
-  }
-
-  .lecturer-layout-nav-item {
-    justify-content: center;
-    padding: 8px;
-    gap: 0;
-  }
-
-  .lecturer-layout-nav-icon {
-    width: 34px;
-    height: 34px;
-  }
-
-  .lecturer-layout-nav-label {
-    display: none;
-  }
-
-  .lecturer-layout-workspace {
-    display: none;
-  }
-
-  .lecturer-layout-logout {
-    justify-content: center;
-    padding: 8px;
-  }
-
-  .lecturer-layout-logout > span:last-child {
-    display: none;
-  }
-
-  .lecturer-layout-logout-icon {
-    width: 34px;
-    height: 34px;
+  .lecturer-sidebar-overlay {
+    display: block;
   }
 }
 
 @media (max-width: 400px) {
-  .lecturer-layout-sidebar {
-    width: 68px;
-    padding-left: 7px;
-    padding-right: 7px;
+  .lecturer-menu-button {
+    top: 10px;
+    left: 10px;
+    width: 42px;
+    height: 42px;
   }
 
   .lecturer-layout-content {
-    width: calc(100% - 68px);
-    margin-left: 68px;
+    padding-top: 56px;
   }
 
-  .lecturer-layout-brand-mark {
-    width: 38px;
-    height: 38px;
-  }
-
-  .lecturer-layout-profile-avatar {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
-  }
-
-  .lecturer-layout-nav-icon {
-    width: 31px;
-    height: 31px;
+  .lecturer-layout-sidebar {
+    width: min(88vw, 290px);
   }
 }

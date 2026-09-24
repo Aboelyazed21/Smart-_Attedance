@@ -1,395 +1,134 @@
 /* =========================================================
    ENROLLMENT MANAGEMENT
-========================================================= */
 
-.enrollment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 14px;
+   The page itself is styled inline. This stylesheet provides
+   what inline styles cannot express: the loading spinner and
+   the small-screen layout overrides.
 
-  max-height: 520px;
-  overflow-y: auto;
-
-  padding-right: 4px;
-}
-
-/* =========================================================
-   STUDENT ITEM
-========================================================= */
-
-.enrollment-list-item {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 12px;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-
-  background: transparent;
-  color: inherit;
-
-  text-align: left;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.enrollment-list-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-.enrollment-list-item.selected {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.enrollment-list-item:active {
-  transform: scale(0.99);
-}
+   NOTE: this file existed before but was never imported and
+   none of its selectors matched any element on the page. Its
+   generic class names (.primary-button, .status-badge,
+   .dashboard-grid, .dashboard-panel *, .alert ...) would have
+   leaked into other pages as global CSS once imported here,
+   so the dead rules were removed rather than activated.
+   ========================================================= */
 
 /* =========================================================
-   STUDENT INFORMATION
-========================================================= */
+   LOADING
+   ========================================================= */
 
-.enrollment-list-item > div:last-child {
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 3px;
-}
-
-.enrollment-list-item strong {
-  font-size: 14px;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.enrollment-list-item span {
-  font-size: 12px;
-  opacity: 0.75;
-}
-
-.enrollment-list-item small {
-  font-size: 11px;
-  opacity: 0.6;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* =========================================================
-   SMALL AVATAR
-========================================================= */
-
-.small-avatar {
-  flex: 0 0 42px;
-
-  width: 42px;
-  height: 42px;
-
+.enr-loading {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 
+  padding: 60px 20px;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+.enr-spinner {
+  flex-shrink: 0;
+
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid #d8e0ec;
+  border-top-color: #1677ff;
   border-radius: 50%;
 
-  font-size: 16px;
-  font-weight: 700;
+  animation: enr-spin 0.7s linear infinite;
 }
 
-/* =========================================================
-   SEARCH INPUT
-========================================================= */
-
-.enrollment-history-panel .search-input,
-.dashboard-panel .search-input {
-  width: 100%;
-  max-width: 100%;
-
-  box-sizing: border-box;
+@keyframes enr-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* =========================================================
-   SELECTION SUMMARY
-========================================================= */
-
-.selection-summary {
-  display: flex;
-  flex-direction: column;
-
-  gap: 5px;
-
-  margin: 14px 0;
-
-  padding: 14px;
-
-  border-radius: 12px;
-
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.selection-summary strong {
-  font-size: 15px;
-}
-
-.selection-summary span {
-  font-size: 13px;
-  opacity: 0.72;
-}
-
-/* =========================================================
-   FORM
-========================================================= */
-
-.dashboard-panel .form-group {
-  margin-bottom: 16px;
-}
-
-.dashboard-panel .form-group label {
-  display: block;
-
-  margin-bottom: 7px;
-
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* =========================================================
-   SELECT
-========================================================= */
-
-.dashboard-panel select {
-  width: 100%;
-  min-height: 44px;
-
-  padding: 0 12px;
-
-  border-radius: 10px;
-
-  box-sizing: border-box;
-}
-
-/* =========================================================
-   ALERTS
-========================================================= */
-
-.alert {
-  width: 100%;
-
-  box-sizing: border-box;
-
-  margin-bottom: 16px;
-
-  padding: 12px 14px;
-
-  border-radius: 10px;
-
-  font-size: 14px;
-}
-
-.error-alert {
-  background: rgba(220, 60, 60, 0.12);
-  color: #ff8b8b;
-
-  border: 1px solid rgba(220, 60, 60, 0.2);
-}
-
-.success-alert {
-  background: rgba(60, 190, 120, 0.12);
-  color: #76e0a5;
-
-  border: 1px solid rgba(60, 190, 120, 0.2);
-}
-
-/* =========================================================
-   ENROLLMENT HISTORY
-========================================================= */
-
-.enrollment-history-panel {
-  margin-top: 20px;
-}
-
-/* =========================================================
-   STATUS BADGE
-========================================================= */
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 5px 10px;
-
-  border-radius: 999px;
-
-  font-size: 12px;
-
-  text-transform: capitalize;
-
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* =========================================================
-   REMOVE BUTTON
-========================================================= */
-
-.danger-button {
-  border: 0;
-
-  border-radius: 8px;
-
-  padding: 7px 11px;
-
-  cursor: pointer;
-
-  background: rgba(220, 60, 60, 0.14);
-  color: #ff7777;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-
-.danger-button:hover {
-  background: rgba(220, 60, 60, 0.22);
-}
-
-.danger-button:active {
-  transform: scale(0.96);
-}
-
-/* =========================================================
-   PRIMARY BUTTON
-========================================================= */
-
-.primary-button {
-  width: 100%;
-}
-
-/* =========================================================
-   SECONDARY BUTTON
-========================================================= */
-
-.secondary-button {
-  cursor: pointer;
-}
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.enrollment-list .empty-state {
-  padding: 30px 15px;
-}
-
-/* =========================================================
-   TABLE
-========================================================= */
-
-.enrollment-history-panel .table-container {
-  width: 100%;
-
-  overflow-x: auto;
-}
-
-.enrollment-history-panel .data-table {
-  width: 100%;
-
-  min-width: 720px;
-
-  border-collapse: collapse;
-}
-
-.enrollment-history-panel .data-table th,
-.enrollment-history-panel .data-table td {
-  padding: 12px 10px;
-
-  text-align: left;
-}
-
-.enrollment-history-panel .data-table th {
-  font-size: 12px;
-
-  white-space: nowrap;
-}
-
-.enrollment-history-panel .data-table td {
-  font-size: 13px;
-}
-
-.enrollment-history-panel .data-table td small {
-  opacity: 0.65;
-}
-
-/* =========================================================
-   DASHBOARD GRID
-========================================================= */
-
-@media (max-width: 1000px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+@media (prefers-reduced-motion: reduce) {
+  .enr-spinner {
+    animation: none;
   }
 }
 
 /* =========================================================
-   TABLET
-========================================================= */
+   TABLET  (fixed sidebar becomes a static top bar)
+   ========================================================= */
 
-@media (max-width: 768px) {
-  .enrollment-list {
-    max-height: 400px;
+@media (max-width: 980px) {
+  .enr-page {
+    flex-direction: column !important;
   }
 
-  .selection-summary {
-    padding: 12px;
+  .enr-sidebar {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 20px 16px !important;
   }
 
-  .enrollment-history-panel {
-    margin-top: 16px;
+  .enr-logout {
+    position: static !important;
+    margin-top: 14px !important;
+  }
+
+  .enr-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .enr-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .enr-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
 /* =========================================================
    MOBILE
-========================================================= */
+   ========================================================= */
 
 @media (max-width: 600px) {
-  .enrollment-list-item {
-    padding: 10px;
+  .enr-stats {
+    grid-template-columns: 1fr !important;
   }
 
-  .small-avatar {
-    width: 38px;
-    height: 38px;
-
-    flex-basis: 38px;
+  .enr-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 20px 16px !important;
   }
 
-  .selection-summary {
-    padding: 11px;
+  .enr-header h1 {
+    font-size: 22px !important;
   }
 
-  .alert {
-    font-size: 13px;
+  .enr-header-actions {
+    flex-wrap: wrap !important;
+    width: 100% !important;
   }
 
-  .danger-button {
-    padding: 6px 9px;
-    font-size: 12px;
+  .enr-content {
+    padding: 18px 16px 40px !important;
+  }
+
+  .enr-form-grid,
+  .enr-details-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .enr-modal {
+    padding: 20px 16px !important;
+  }
+
+  .enr-loading {
+    padding: 40px 12px !important;
   }
 }

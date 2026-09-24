@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/Footer";
 
 import "./AttendanceScanner.css";
 
@@ -15,9 +16,41 @@ function AttendanceScanner() {
 
   const [scanResult, setScanResult] = useState(null);
   const [error, setError] = useState("");
-  const [scannerStarted, setScannerStarted] = useState(false);
   const [manualCode, setManualCode] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [scannerStarted, setScannerStarted] = useState(false);
+
+  /* =========================================================
+     MOBILE SIDEBAR
+  ========================================================= */
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebarOpen]);
+
+  function goTo(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
 
   /* =========================================================
      USER
@@ -467,7 +500,68 @@ function AttendanceScanner() {
       "user"
     );
 
+    setSidebarOpen(false);
     navigate("/");
+  }
+
+  /* =========================================================
+     STATUS PILL
+  ========================================================= */
+
+  function getStatusLabel(status) {
+    const value =
+      String(status || "").toLowerCase().trim();
+
+    if (
+      !value ||
+      value === "present" ||
+      value === "accepted"
+    ) {
+      return "Present";
+    }
+
+    if (value === "late") {
+      return "Late";
+    }
+
+    if (value === "absent") {
+      return "Absent";
+    }
+
+    if (value === "pending") {
+      return "Pending";
+    }
+
+    return (
+      value.charAt(0).toUpperCase() + value.slice(1)
+    );
+  }
+
+  function getStatusPillClass(status) {
+    const value =
+      String(status || "").toLowerCase().trim();
+
+    if (value === "late") {
+      return "status-pill late";
+    }
+
+    if (value === "absent") {
+      return "status-pill absent";
+    }
+
+    if (value === "pending") {
+      return "status-pill pending";
+    }
+
+    if (
+      !value ||
+      value === "present" ||
+      value === "accepted"
+    ) {
+      return "status-pill present";
+    }
+
+    return "status-pill neutral";
   }
 
   /* =========================================================
@@ -481,14 +575,21 @@ function AttendanceScanner() {
           SIDEBAR
       =================================================== */}
 
-      <aside className="scan-sidebar">
+      <aside
+        id="scan-sidebar"
+        className={
+          sidebarOpen
+            ? "scan-sidebar open"
+            : "scan-sidebar"
+        }
+      >
 
         {/* BRAND */}
 
         <div className="scan-brand">
 
           <div className="scan-brand-logo">
-            ✓
+            A
           </div>
 
           <div>
@@ -527,54 +628,62 @@ function AttendanceScanner() {
 
         {/* NAVIGATION */}
 
-        <nav className="scan-nav">
+        <nav
+          className="scan-nav"
+          aria-label="Student navigation"
+        >
 
           <button
+            type="button"
             className="scan-nav-item"
             onClick={() =>
-              navigate("/dashboard")
+              goTo("/dashboard")
             }
           >
-            <span>⌂</span>
             Dashboard
           </button>
 
           <button
+            type="button"
             className="scan-nav-item"
             onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
+              goTo("/student/attendance")
             }
           >
-            <span>▤</span>
             My Attendance
           </button>
 
           <button
+            type="button"
             className="scan-nav-item active"
+            aria-current="page"
+            onClick={() =>
+              goTo("/student/scan")
+            }
           >
-            <span>▦</span>
             Scan Attendance
           </button>
 
           <button
+            type="button"
             className="scan-nav-item"
+            onClick={() =>
+              goTo(
+                "/student/correction-requests"
+              )
+            }
           >
-            <span>▣</span>
             Correction Requests
           </button>
 
           <button
+            type="button"
             className="scan-nav-item"
+            onClick={() =>
+              goTo("/student/chatbot")
+            }
           >
-            <span>♧</span>
-
-            Notifications
-
-            <span className="notification-badge">
-              3
-            </span>
+            Attendance Assistant
           </button>
 
         </nav>
@@ -583,35 +692,26 @@ function AttendanceScanner() {
 
         <div className="scan-sidebar-bottom">
 
-          <div className="keep-going-card">
-
-            <div className="keep-going-icon">
-              ★
-            </div>
-
-            <div>
-              <strong>
-                Keep going!
-              </strong>
-
-              <span>
-                Every class counts.
-              </span>
-            </div>
-
-          </div>
-
           <button
+            type="button"
             className="scan-logout"
             onClick={handleLogout}
           >
-            <span>↪</span>
             Logout
           </button>
 
         </div>
 
       </aside>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="scan-sidebar-overlay"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* ===================================================
           MAIN
@@ -623,28 +723,22 @@ function AttendanceScanner() {
 
         <header className="scan-topbar">
 
-          <div className="scan-search">
-            <span>⌕</span>
-
-            <input
-              type="text"
-              placeholder="Search courses, sessions, or anything..."
-            />
-
-            <kbd>
-              Ctrl + K
-            </kbd>
-          </div>
+          <button
+            type="button"
+            className="scan-menu-button hamburger"
+            aria-expanded={sidebarOpen}
+            aria-controls="scan-sidebar"
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+            onClick={() =>
+              setSidebarOpen((open) => !open)
+            }
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
 
           <div className="scan-user-area">
-
-            <button className="bell-button">
-              ♧
-
-              <span>
-                3
-              </span>
-            </button>
 
             <div className="top-avatar">
               {avatarLetter}
@@ -662,10 +756,6 @@ function AttendanceScanner() {
 
             </div>
 
-            <span className="top-arrow">
-             ⌄
-            </span>
-
           </div>
 
         </header>
@@ -679,10 +769,6 @@ function AttendanceScanner() {
           <div className="scan-page-hero">
 
             <div className="hero-left">
-
-              <div className="hero-icon">
-                ▦
-              </div>
 
               <div>
 
@@ -698,25 +784,6 @@ function AttendanceScanner() {
                   Scan the lecturer's QR code to mark your attendance
                 </p>
 
-              </div>
-
-            </div>
-
-            <div className="hero-decoration">
-
-              <div className="hero-qr">
-                ▦
-              </div>
-
-              <div className="hero-message">
-                <strong>
-                  Be present
-                </strong>
-
-                <span>
-                  today, build a
-                  better tomorrow.
-                </span>
               </div>
 
             </div>
@@ -739,10 +806,6 @@ function AttendanceScanner() {
 
                 <div className="ready-info">
 
-                  <div className="ready-icon">
-                    ⓘ
-                  </div>
-
                   <div>
 
                     <strong>
@@ -758,7 +821,10 @@ function AttendanceScanner() {
 
                 </div>
 
-                <div className="camera-status">
+                <div
+                  className="camera-status"
+                  role="status"
+                >
 
                   <span
                     className={
@@ -822,11 +888,10 @@ function AttendanceScanner() {
                 {/* ERROR */}
 
                 {error && (
-                  <div className="scanner-message error-state">
-
-                    <div className="message-icon">
-                      !
-                    </div>
+                  <div
+                    className="scanner-message error-state"
+                    role="alert"
+                  >
 
                     <h2>
                       Attendance Error
@@ -837,10 +902,11 @@ function AttendanceScanner() {
                     </p>
 
                     <button
+                      type="button"
                       className="primary-button"
                       onClick={handleRetry}
                     >
-                      Try Again
+                      Try again
                     </button>
 
                   </div>
@@ -849,20 +915,18 @@ function AttendanceScanner() {
                 {/* SUCCESS */}
 
                 {scanResult && (
-                  <div className="scanner-message success-state">
-
-                    <div className="success-circle">
-                      ✓
-                    </div>
+                  <div
+                    className="scanner-message success-state centered-success"
+                    role="status"
+                    aria-live="polite"
+                  >
 
                     <span className="success-label">
                       ATTENDANCE CONFIRMED
                     </span>
 
                     <h2>
-                      {scanResult.duplicate
-                        ? "Already Recorded"
-                        : "Attendance Recorded"}
+                      Your attendance has been recorded successfully.
                     </h2>
 
                     <p>
@@ -873,10 +937,15 @@ function AttendanceScanner() {
 
                       <div>
                         <span>Status</span>
-                        <strong>
-                          {scanResult.status ||
-                            "Present"}
-                        </strong>
+                        <b
+                          className={getStatusPillClass(
+                            scanResult.status
+                          )}
+                        >
+                          {getStatusLabel(
+                            scanResult.status
+                          )}
+                        </b>
                       </div>
 
                       <div>
@@ -928,36 +997,6 @@ function AttendanceScanner() {
                   </div>
                 )}
 
-                {/* CAMERA CONTROLS */}
-
-                {!scanResult &&
-                  !error && (
-                    <div className="scanner-controls">
-
-                      <button className="scanner-control">
-                        <span>◉</span>
-                        <small>
-                          Switch Camera
-                        </small>
-                      </button>
-
-                      <button className="scanner-control selected">
-                        <span>▦</span>
-                        <small>
-                          Scan QR Code
-                        </small>
-                      </button>
-
-                      <button className="scanner-control">
-                        <span>☼</span>
-                        <small>
-                          Toggle Flash
-                        </small>
-                      </button>
-
-                    </div>
-                  )}
-
               </div>
 
               {/* MANUAL CODE */}
@@ -970,15 +1009,14 @@ function AttendanceScanner() {
                   }
                 >
 
-                  <div className="manual-icon">
-                    ▤
-                  </div>
-
                   <div className="manual-content">
 
-                    <div className="manual-title">
+                    <label
+                      className="manual-title"
+                      htmlFor="manual-attendance-code"
+                    >
                       Or enter attendance code manually
-                    </div>
+                    </label>
 
                     <p>
                       If you're unable to scan,
@@ -990,11 +1028,8 @@ function AttendanceScanner() {
 
                       <div className="manual-input-wrapper">
 
-                        <span>
-                          ⌕
-                        </span>
-
                         <input
+                          id="manual-attendance-code"
                           type="text"
                           value={manualCode}
                           onChange={(e) =>
@@ -1011,7 +1046,7 @@ function AttendanceScanner() {
                         type="submit"
                         className="verify-button"
                       >
-                        ✓ Verify Code
+                        Verify code
                       </button>
 
                     </div>
@@ -1020,120 +1055,6 @@ function AttendanceScanner() {
 
                 </form>
               )}
-
-              {/* RECENT SCANS */}
-
-              <div className="recent-card">
-
-                <div className="section-heading">
-
-                  <div className="section-heading-left">
-
-                    <div className="heading-icon">
-                      ◷
-                    </div>
-
-                    <div>
-                      <h3>
-                        Recent Scans
-                      </h3>
-
-                      <p>
-                        Your latest attendance attempts
-                      </p>
-                    </div>
-
-                  </div>
-
-                  <button>
-                    View All →
-                  </button>
-
-                </div>
-
-                <div className="recent-table">
-
-                  <div className="recent-row table-head">
-                    <span>
-                      Date & Time
-                    </span>
-
-                    <span>
-                      Course
-                    </span>
-
-                    <span>
-                      Section
-                    </span>
-
-                    <span>
-                      Status
-                    </span>
-                  </div>
-
-                  <div className="recent-row">
-                    <span>
-                      Sep 21, 2026 10:15 AM
-                    </span>
-
-                    <span>
-                      Data Structures
-                    </span>
-
-                    <span>
-                      Sec 1
-                    </span>
-
-                    <span>
-                      <b className="status-pill present">
-                        Present
-                      </b>
-                    </span>
-                  </div>
-
-                  <div className="recent-row">
-                    <span>
-                      Sep 19, 2026 09:05 AM
-                    </span>
-
-                    <span>
-                      Web Development
-                    </span>
-
-                    <span>
-                      Sec 2
-                    </span>
-
-                    <span>
-                      <b className="status-pill present">
-                        Present
-                      </b>
-                    </span>
-                  </div>
-
-                  <div className="recent-row">
-                    <span>
-                      Sep 17, 2026 11:30 AM
-                    </span>
-
-                    <span>
-                      Database Systems
-                    </span>
-
-                    <span>
-                      Sec 1
-                    </span>
-
-                    <span>
-                      <b className="status-pill failed">
-                        Failed
-                      </b>
-                    </span>
-                  </div>
-
-                </div>
-
-              </div>
 
             </div>
 
@@ -1149,19 +1070,15 @@ function AttendanceScanner() {
 
                 <div className="info-card-title">
 
-                  <div className="info-title-icon blue">
-                    ⚙
-                  </div>
-
                   <h3>
                     How It Works
                   </h3>
 
                 </div>
 
-                <div className="steps">
+                <ol className="steps">
 
-                  <div className="step">
+                  <li className="step">
 
                     <div className="step-number">
                       1
@@ -1177,11 +1094,11 @@ function AttendanceScanner() {
                       </span>
                     </div>
 
-                  </div>
+                  </li>
 
-                  <div className="step">
+                  <li className="step">
 
-                    <div className="step-number green">
+                    <div className="step-number">
                       2
                     </div>
 
@@ -1195,11 +1112,11 @@ function AttendanceScanner() {
                       </span>
                     </div>
 
-                  </div>
+                  </li>
 
-                  <div className="step">
+                  <li className="step">
 
-                    <div className="step-number purple">
+                    <div className="step-number">
                       3
                     </div>
 
@@ -1213,11 +1130,11 @@ function AttendanceScanner() {
                       </span>
                     </div>
 
-                  </div>
+                  </li>
 
-                  <div className="step">
+                  <li className="step">
 
-                    <div className="step-number pink">
+                    <div className="step-number">
                       4
                     </div>
 
@@ -1231,115 +1148,9 @@ function AttendanceScanner() {
                       </span>
                     </div>
 
-                  </div>
+                  </li>
 
-                </div>
-
-              </div>
-
-              {/* SECURITY */}
-
-              <div className="info-card security-card">
-
-                <div className="info-card-title">
-
-                  <div className="info-title-icon green">
-                    ♢
-                  </div>
-
-                  <h3>
-                    Security Status
-                  </h3>
-
-                </div>
-
-                <div className="security-list">
-
-                  <div className="security-item">
-
-                    <span className="security-check">
-                      ✓
-                    </span>
-
-                    <div>
-                      <strong>
-                        Authenticated
-                      </strong>
-
-                      <span>
-                        You are logged in as a student
-                      </span>
-                    </div>
-
-                  </div>
-
-                  <div className="security-item">
-
-                    <span className="security-check">
-                      ✓
-                    </span>
-
-                    <div>
-                      <strong>
-                        Session Valid
-                      </strong>
-
-                      <span>
-                        The QR code is from an active session
-                      </span>
-                    </div>
-
-                  </div>
-
-                  <div className="security-item">
-
-                    <span className="security-check">
-                      ✓
-                    </span>
-
-                    <div>
-                      <strong>
-                        Enrollment Verified
-                      </strong>
-
-                      <span>
-                        You are enrolled in this course
-                      </span>
-                    </div>
-
-                  </div>
-
-                  <div className="security-item">
-
-                    <span className="security-check">
-                      ✓
-                    </span>
-
-                    <div>
-                      <strong>
-                        Connection Secure
-                      </strong>
-
-                      <span>
-                        Your data is protected
-                      </span>
-                    </div>
-
-                  </div>
-
-                </div>
-
-                <div className="security-ready">
-                  <div>
-                    ✓
-                  </div>
-
-                  <strong>
-                    All Systems
-                    <br />
-                    Ready
-                  </strong>
-                </div>
+                </ol>
 
               </div>
 
@@ -1348,10 +1159,6 @@ function AttendanceScanner() {
               <div className="info-card tips-card">
 
                 <div className="info-card-title">
-
-                  <div className="info-title-icon yellow">
-                    !
-                  </div>
 
                   <h3>
                     Tips for Successful Scanning
@@ -1362,43 +1169,33 @@ function AttendanceScanner() {
                 <ul className="tips-list">
 
                   <li>
-                    <span>✓</span>
                     Make sure there is good lighting
                   </li>
 
                   <li>
-                    <span>✓</span>
                     Hold your device steady
                   </li>
 
                   <li>
-                    <span>✓</span>
                     Keep the QR code within the frame
                   </li>
 
                   <li>
-                    <span>✓</span>
                     Maintain a reasonable distance
                     (10-30 cm)
                   </li>
 
                   <li>
-                    <span>✓</span>
                     Ensure the QR code is not blurred or rotated
                   </li>
 
                   <li>
-                    <span>✓</span>
                     Contact your lecturer if you face any issues
                   </li>
 
                 </ul>
 
                 <div className="tip-footer">
-
-                  <span>
-                    !
-                  </span>
 
                   <p>
                     Tip: Scan your attendance as soon as
@@ -1414,6 +1211,8 @@ function AttendanceScanner() {
           </div>
 
         </section>
+
+        <Footer />
 
       </main>
 

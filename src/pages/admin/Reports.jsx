@@ -855,7 +855,7 @@ import {
           <div className="reports-brand">
   
             <div className="reports-brand-icon">
-              ✓
+              A
             </div>
   
             <div>
@@ -874,19 +874,18 @@ import {
   
   
           <nav className="reports-nav">
-  
+
             <button
               onClick={() =>
                 navigate(
-                  "/admin/dashboard"
+                  "/dashboard"
                 )
               }
             >
-              <span>⌂</span>
               Dashboard
             </button>
-  
-  
+
+
             <button
               onClick={() =>
                 navigate(
@@ -894,11 +893,10 @@ import {
                 )
               }
             >
-              <span>♙</span>
               Users
             </button>
-  
-  
+
+
             <button
               onClick={() =>
                 navigate(
@@ -906,11 +904,10 @@ import {
                 )
               }
             >
-              <span>▣</span>
               Courses
             </button>
-  
-  
+
+
             <button
               onClick={() =>
                 navigate(
@@ -918,11 +915,10 @@ import {
                 )
               }
             >
-              <span>§</span>
               Sections
             </button>
-  
-  
+
+
             <button
               onClick={() =>
                 navigate(
@@ -930,11 +926,10 @@ import {
                 )
               }
             >
-              <span>▦</span>
               Rooms
             </button>
-  
-  
+
+
             <button
               onClick={() =>
                 navigate(
@@ -942,11 +937,10 @@ import {
                 )
               }
             >
-              <span>▤</span>
               Timetable
             </button>
-  
-  
+
+
             <button
               onClick={() =>
                 navigate(
@@ -954,48 +948,54 @@ import {
                 )
               }
             >
-              <span>✓</span>
               Attendance
             </button>
-  
-  
-            <button className="active">
-              <span>▥</span>
+
+
+            <button
+              className="active"
+              aria-current="page"
+            >
               Reports
             </button>
-  
-  
-            <button>
-              <span>⚙</span>
+
+
+            <button
+              onClick={() =>
+                navigate(
+                  "/admin/settings"
+                )
+              }
+            >
               Settings
             </button>
-  
+
           </nav>
   
   
           <div className="reports-sidebar-bottom">
   
             <div className="reports-greeting">
-  
+
               <strong>
-                Good Morning 👋
+                Good Morning
               </strong>
-  
+
               <span>
                 Track and manage student
                 attendance efficiently.
               </span>
-  
+
             </div>
-  
-  
+
+
             <button
               className="reports-logout"
               onClick={
                 handleLogout
               }
             >
-              ↪ Logout
+              Logout
             </button>
   
           </div>
@@ -1012,22 +1012,9 @@ import {
           {/* HEADER */}
   
           <header className="reports-topbar">
-  
-            <div className="reports-search">
-              🔎
-              <input
-                placeholder="Search students, courses, sections..."
-              />
-            </div>
-  
-  
+
             <div className="reports-user">
-  
-              <span className="reports-bell">
-                🔔
-                <b>3</b>
-              </span>
-  
+
               <div className="reports-avatar">
                 {
                   (
@@ -1069,26 +1056,17 @@ import {
             <div className="reports-heading">
   
               <div>
+
+                <h1>
+                  Reports
+                </h1>
   
-                <div className="reports-title-icon">
-                  ▥
-                </div>
-  
-                <div>
-  
-                  <h1>
-                    Reports
-                  </h1>
-  
-                  <p>
-                    View attendance analytics
-                    and reports
-                  </p>
-  
-                </div>
+                <p>
+                  View attendance analytics
+                  and reports
+                </p>
   
               </div>
-  
   
               <div className="reports-heading-actions">
   
@@ -1102,7 +1080,7 @@ import {
                     handleExport
                   }
                 >
-                  ↓ Export Report
+                  Export Report
                 </button>
   
               </div>
@@ -1113,13 +1091,26 @@ import {
             {/* ERROR */}
   
             {error && (
-  
-              <div className="reports-error">
-  
-                {error}
-  
+
+              <div
+                className="reports-error"
+                role="alert"
+              >
+
+                <span>
+                  {error}
+                </span>
+
+                <button
+                  type="button"
+                  className="reports-retry-btn"
+                  onClick={loadReport}
+                >
+                  Try again
+                </button>
+
               </div>
-  
+
             )}
   
   
@@ -1128,12 +1119,13 @@ import {
             <section className="reports-filters">
   
               <div>
-  
-                <label>
+
+                <label htmlFor="reports-filter-course">
                   Course
                 </label>
-  
+
                 <select
+                  id="reports-filter-course"
                   value={courseId}
                   onChange={(e) =>
                     setCourseId(
@@ -1172,12 +1164,13 @@ import {
   
   
               <div>
-  
-                <label>
+
+                <label htmlFor="reports-filter-section">
                   Section
                 </label>
-  
+
                 <select
+                  id="reports-filter-section"
                   value={sectionId}
                   onChange={(e) =>
                     setSectionId(
@@ -1216,12 +1209,13 @@ import {
   
   
               <div>
-  
-                <label>
+
+                <label htmlFor="reports-filter-start">
                   From Date
                 </label>
-  
+
                 <input
+                  id="reports-filter-start"
                   type="date"
                   value={
                     startDate
@@ -1237,12 +1231,13 @@ import {
   
   
               <div>
-  
-                <label>
+
+                <label htmlFor="reports-filter-end">
                   To Date
                 </label>
-  
+
                 <input
+                  id="reports-filter-end"
                   type="date"
                   value={
                     endDate
@@ -1263,7 +1258,7 @@ import {
                   clearFilters
                 }
               >
-                ↻ Clear
+                Clear
               </button>
   
             </section>
@@ -1274,44 +1269,36 @@ import {
             <div className="reports-stats">
   
               <StatCard
-                icon="👥"
                 title="Total Students"
                 value={
                   summary.totalStudents
                 }
-                type="green"
                 subtitle="Registered students"
               />
-  
+
               <StatCard
-                icon="✓"
                 title="Present"
                 value={
                   summary.present
                 }
-                type="blue"
                 subtitle={`Attendance rate: ${summary.attendanceRate}%`}
               />
-  
+
               <StatCard
-                icon="×"
                 title="Absent"
                 value={
                   summary.absent
                 }
-                type="red"
                 subtitle={
                   "Students absent"
                 }
               />
-  
+
               <StatCard
-                icon="◷"
                 title="Late"
                 value={
                   summary.late
                 }
-                type="purple"
                 subtitle={
                   "Students late"
                 }
@@ -1329,7 +1316,6 @@ import {
               <section className="reports-card reports-trend-card">
   
                 <CardTitle
-                  icon="▥"
                   title="Attendance Trend"
                 />
   
@@ -1341,6 +1327,8 @@ import {
   
                   <EmptyState
                     text="No attendance trend data available."
+                    actionLabel="Clear filters"
+                    onAction={clearFilters}
                   />
   
                 ) : (
@@ -1446,7 +1434,6 @@ import {
               <section className="reports-card overall-card">
   
                 <CardTitle
-                  icon="◔"
                   title="Overall Attendance"
                 />
   
@@ -1530,7 +1517,6 @@ import {
               <section className="reports-card">
   
                 <CardTitle
-                  icon="▣"
                   title="Attendance by Course"
                 />
   
@@ -1539,6 +1525,8 @@ import {
   
                   <EmptyState
                     text="No course attendance data available."
+                    actionLabel="Clear filters"
+                    onAction={clearFilters}
                   />
   
                 ) : (
@@ -1599,9 +1587,7 @@ import {
               <section className="reports-card">
   
                 <CardTitle
-                  icon="♙"
                   title="Top Absent Students"
-                  action="View All"
                 />
   
                 {topAbsent.length ===
@@ -1609,6 +1595,8 @@ import {
   
                   <EmptyState
                     text="No absent student records."
+                    actionLabel="Clear filters"
+                    onAction={clearFilters}
                   />
   
                 ) : (
@@ -1687,9 +1675,7 @@ import {
             <section className="reports-card reports-recent">
   
               <CardTitle
-                icon="▤"
                 title="Recent Attendance Records"
-                action="View All"
               />
   
   
@@ -1702,6 +1688,8 @@ import {
   
                 <EmptyState
                   text="No attendance records found."
+                  actionLabel="Clear filters"
+                  onAction={clearFilters}
                 />
   
               ) : (
@@ -1856,7 +1844,7 @@ import {
                               <td>
                                 {
                                   record.lecturer_name ||
-                                  "System Admin"
+                                  "—"
                                 }
                               </td>
   
@@ -1893,83 +1881,58 @@ import {
   ========================================================= */
   
   function StatCard({
-    icon,
     title,
     value,
-    type,
     subtitle,
   }) {
-  
+
     return (
-  
+
       <div className="reports-stat-card">
-  
-        <div
-          className={
-            `stat-icon ${type}`
-          }
-        >
-          {icon}
-        </div>
-  
+
         <div>
-  
+
           <span>
             {title}
           </span>
-  
+
           <strong>
             {value}
           </strong>
-  
+
           <small>
             {subtitle}
           </small>
-  
+
         </div>
-  
+
       </div>
-  
+
     );
-  
+
   }
-  
-  
+
+
   function CardTitle({
-    icon,
     title,
-    action,
   }) {
-  
+
     return (
-  
+
       <div className="reports-card-title">
-  
+
         <div>
-  
-          <span>
-            {icon}
-          </span>
-  
+
           <h2>
             {title}
           </h2>
-  
+
         </div>
-  
-  
-        {action && (
-  
-          <button>
-            {action}
-          </button>
-  
-        )}
-  
+
       </div>
-  
+
     );
-  
+
   }
   
   
@@ -2022,36 +1985,56 @@ import {
   
   
   function Loading() {
-  
+
     return (
-  
-      <div className="reports-loading">
+
+      <div
+        className="reports-loading"
+        role="status"
+      >
+
+        <span
+          className="reports-spinner"
+          aria-hidden="true"
+        />
+
         Loading report data...
+
       </div>
-  
+
     );
-  
+
   }
-  
-  
+
+
   function EmptyState({
     text,
+    actionLabel,
+    onAction,
   }) {
-  
+
     return (
-  
+
       <div className="reports-empty">
-  
-        <div>
-          ▤
-        </div>
-  
+
         <p>
           {text}
         </p>
-  
+
+        {actionLabel && onAction && (
+
+          <button
+            type="button"
+            className="reports-empty-action"
+            onClick={onAction}
+          >
+            {actionLabel}
+          </button>
+
+        )}
+
       </div>
-  
+
     );
-  
+
   }

@@ -1,7 +1,111 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { getMyAttendance } from "../../services/api";
+import Footer from "../../components/Footer";
+
 import "./AttendanceConfirmation.css";
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function normalizeStatus(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function statusLabel(status) {
+  const normalized = normalizeStatus(status);
+
+  if (normalized === "present") return "Present";
+  if (normalized === "absent") return "Absent";
+  if (normalized === "late") return "Late";
+  if (normalized === "excused") return "Excused";
+
+  return status || "Unknown";
+}
+
+function statusPillClass(status) {
+  const normalized = normalizeStatus(status);
+
+  if (normalized === "present") return "present";
+  if (normalized === "absent") return "absent";
+  if (normalized === "late") return "late";
+  if (normalized === "excused") return "excused";
+
+  return "default";
+}
+
+function getCourseName(item) {
+  return (
+    item.course_name ||
+    item.course_title ||
+    item.courseName ||
+    item.course_code ||
+    item.courseCode ||
+    "Unknown Course"
+  );
+}
+
+function getSectionName(item) {
+  return (
+    item.section_name ||
+    item.sectionName ||
+    item.section ||
+    "-"
+  );
+}
+
+function getSessionDate(item) {
+  return (
+    item.session_date ||
+    item.sessionDate ||
+    item.date ||
+    item.attendance_date ||
+    item.created_at
+  );
+}
+
+function getSource(item) {
+  return item.source || item.attendance_source || "QR";
+}
+
+function sourceLabel(source) {
+  const text = String(source || "").trim();
+
+  if (!text) return "-";
+  if (text.toLowerCase().includes("qr")) return "QR code";
+
+  return text;
+}
+
+function formatDateTime(value) {
+  if (!value) return "-";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function recordTimestamp(item) {
+  const date = new Date(getSessionDate(item));
+
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+/* =========================================================
+   ATTENDANCE CONFIRMATION
+========================================================= */
 
 function AttendanceConfirmation() {
   const navigate = useNavigate();
@@ -56,7 +160,7 @@ function AttendanceConfirmation() {
       course:
         scanData.course ||
         scanData.courseName ||
-        "Course",
+        "—",
 
       courseCode:
         scanData.courseCode ||
@@ -65,7 +169,7 @@ function AttendanceConfirmation() {
       section:
         scanData.section ||
         scanData.sectionName ||
-        "Section 1",
+        "—",
 
       date,
 
@@ -103,6 +207,112 @@ function AttendanceConfirmation() {
     );
 
   /* =========================================================
+     RECENT ATTENDANCE RECORDS
+  ========================================================= */
+
+  const [records, setRecords] = useState([]);
+  const [recordsLoading, setRecordsLoading] =
+    useState(true);
+  const [recordsError, setRecordsError] =
+    useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  function goTo(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      document.body.style.overflow = "";
+      return undefined;
+    }
+    document.body.style.overflow = "hidden";
+    function onKeyDown(e) {
+      if (e.key === "Escape") setSidebarOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebarOpen]);
+
+  async function loadRecords() {
+    try {
+      const data = await getMyAttendance();
+
+      const rows = Array.isArray(data)
+        ? data
+        : data?.rows ||
+          data?.attendance ||
+          data?.records ||
+          data?.data ||
+          [];
+
+      setRecords(
+        Array.isArray(rows) ? rows : []
+      );
+    } catch (err) {
+      console.error(
+        "My attendance error:",
+        err
+      );
+
+      setRecordsError(
+        err?.message ||
+          "Failed to load your attendance records."
+      );
+    } finally {
+      setRecordsLoading(false);
+    }
+  }
+
+  function retryRecords() {
+    setRecordsLoading(true);
+    setRecordsError("");
+
+    loadRecords();
+  }
+
+  useEffect(() => {
+    loadRecords();
+  }, []);
+
+  const recentRecords = useMemo(() => {
+    return [...records]
+      .sort(
+        (a, b) =>
+          recordTimestamp(b) - recordTimestamp(a)
+      )
+      .slice(0, 5);
+  }, [records]);
+
+  const summary = useMemo(() => {
+    const total = records.length;
+
+    const present = records.filter(
+      (item) =>
+        normalizeStatus(item.status) === "present"
+    ).length;
+
+    const rate =
+      total > 0
+        ? Math.round((present / total) * 100)
+        : 0;
+
+    return {
+      total,
+      present,
+      rate,
+    };
+  }, [records]);
+
+  const summaryEmptyText = recordsLoading
+    ? "Loading..."
+    : "No records yet";
+
+  /* =========================================================
      LOGOUT
   ========================================================= */
 
@@ -110,6 +320,7 @@ function AttendanceConfirmation() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
+    setSidebarOpen(false);
     navigate("/");
   }
 
@@ -120,18 +331,34 @@ function AttendanceConfirmation() {
   return (
     <div className="confirmation-page">
 
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="confirmation-sidebar-overlay"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside className="confirmation-sidebar">
+      <aside
+        id="confirmation-sidebar"
+        className={
+          sidebarOpen
+            ? "confirmation-sidebar open"
+            : "confirmation-sidebar"
+        }
+      >
 
         {/* BRAND */}
 
         <div className="confirmation-brand">
 
           <div className="confirmation-logo">
-            ✓
+            A
           </div>
 
           <div>
@@ -168,52 +395,43 @@ function AttendanceConfirmation() {
 
         {/* NAVIGATION */}
 
-        <nav className="confirmation-nav">
+        <nav className="confirmation-nav" aria-label="Student navigation">
 
           <button
-            onClick={() =>
-              navigate("/dashboard")
-            }
+            type="button"
+            onClick={() => goTo("/dashboard")}
           >
-            <span>⌂</span>
             Dashboard
           </button>
 
           <button
-            onClick={() =>
-              navigate(
-                "/student/attendance"
-              )
-            }
+            type="button"
+            onClick={() => goTo("/student/attendance")}
           >
-            <span>▤</span>
             My Attendance
           </button>
 
           <button
+            type="button"
             className="active"
-            onClick={() =>
-              navigate(
-                "/student/scan"
-              )
-            }
+            aria-current="page"
+            onClick={() => goTo("/student/scan")}
           >
-            <span>▦</span>
             Scan Attendance
           </button>
 
-          <button>
-            <span>▣</span>
+          <button
+            type="button"
+            onClick={() => goTo("/student/correction-requests")}
+          >
             Correction Requests
           </button>
 
-          <button>
-            <span>♧</span>
-            Notifications
-
-            <b>
-              3
-            </b>
+          <button
+            type="button"
+            onClick={() => goTo("/student/chatbot")}
+          >
+            Attendance Assistant
           </button>
 
         </nav>
@@ -222,29 +440,11 @@ function AttendanceConfirmation() {
 
         <div className="confirmation-sidebar-bottom">
 
-          <div className="confirmation-motivation">
-
-            <div>
-              ★
-            </div>
-
-            <section>
-              <strong>
-                Keep going!
-              </strong>
-
-              <span>
-                Every class counts.
-              </span>
-            </section>
-
-          </div>
-
           <button
+            type="button"
             className="confirmation-logout"
             onClick={handleLogout}
           >
-            <span>↪</span>
             Logout
           </button>
 
@@ -262,33 +462,20 @@ function AttendanceConfirmation() {
 
         <header className="confirmation-topbar">
 
-          <div className="confirmation-search">
-
-            <span>
-              ⌕
-            </span>
-
-            <input
-              placeholder="Search courses, sessions, or anything..."
-            />
-
-            <kbd>
-              Ctrl + K
-            </kbd>
-
-          </div>
+          <button
+            type="button"
+            className="hamburger confirmation-menu-button"
+            aria-expanded={sidebarOpen}
+            aria-controls="confirmation-sidebar"
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => setSidebarOpen((o) => !o)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
 
           <div className="confirmation-user">
-
-            <button className="notification-button">
-
-              ♧
-
-              <b>
-                3
-              </b>
-
-            </button>
 
             <div className="header-avatar">
               {avatarLetter}
@@ -306,10 +493,6 @@ function AttendanceConfirmation() {
 
             </div>
 
-            <span>
-              ⌄
-            </span>
-
           </div>
 
         </header>
@@ -326,13 +509,9 @@ function AttendanceConfirmation() {
 
             <div className="confirmation-hero-left">
 
-              <div className="hero-success-icon">
-                ✓
-              </div>
-
               <div>
 
-                <span>
+                <span className="hero-eyebrow">
                   ATTENDANCE
                 </span>
 
@@ -344,23 +523,15 @@ function AttendanceConfirmation() {
                   Your attendance has been recorded successfully.
                 </p>
 
+                <span
+                  className={`status-pill hero-pill ${statusPillClass(
+                    attendance.status
+                  )}`}
+                >
+                  {statusLabel(attendance.status)}
+                </span>
+
               </div>
-
-            </div>
-
-            <div className="hero-decoration">
-
-              <div className="hero-calendar">
-                ✓
-              </div>
-
-              <strong>
-                Consistency
-                <br />
-                today, success
-                <br />
-                tomorrow.
-              </strong>
 
             </div>
 
@@ -376,23 +547,16 @@ function AttendanceConfirmation() {
 
             <div className="confirmation-left">
 
-              {/* SUCCESS CARD */}
+              {/* SUCCESS CARD — centered professional confirmation */}
 
-              <div className="success-card">
-
-                <div className="success-animation">
-
-                  <div className="success-ring ring-one" />
-                  <div className="success-ring ring-two" />
-
-                  <div className="big-success">
-                    ✓
-                  </div>
-
-                </div>
+              <div
+                className="success-card centered-success"
+                role="status"
+                aria-live="polite"
+              >
 
                 <h2>
-                  Attendance Recorded Successfully
+                  Your attendance has been recorded successfully.
                 </h2>
 
                 <p>
@@ -407,10 +571,6 @@ function AttendanceConfirmation() {
 
                     <div className="details-title">
 
-                      <div className="details-icon">
-                        ▣
-                      </div>
-
                       <h3>
                         Attendance Details
                       </h3>
@@ -418,7 +578,7 @@ function AttendanceConfirmation() {
                     </div>
 
                     <span className="verified-badge">
-                      ✓ Verified & Secure
+                      Recorded via {attendance.markedBy}
                     </span>
 
                   </div>
@@ -426,10 +586,6 @@ function AttendanceConfirmation() {
                   <div className="details-grid">
 
                     <div className="detail-box">
-
-                      <span className="detail-icon">
-                        ▣
-                      </span>
 
                       <div>
                         <small>
@@ -449,10 +605,6 @@ function AttendanceConfirmation() {
 
                     <div className="detail-box">
 
-                      <span className="detail-icon">
-                        ♟
-                      </span>
-
                       <div>
                         <small>
                           Section
@@ -467,10 +619,6 @@ function AttendanceConfirmation() {
                     </div>
 
                     <div className="detail-box">
-
-                      <span className="detail-icon">
-                        ▣
-                      </span>
 
                       <div>
                         <small>
@@ -496,10 +644,6 @@ function AttendanceConfirmation() {
 
                     <div className="detail-box">
 
-                      <span className="detail-icon">
-                        ◷
-                      </span>
-
                       <div>
                         <small>
                           Time
@@ -515,17 +659,19 @@ function AttendanceConfirmation() {
 
                     <div className="detail-box">
 
-                      <span className="detail-icon green">
-                        ✓
-                      </span>
-
                       <div>
                         <small>
                           Status
                         </small>
 
-                        <strong className="present-text">
-                          Present
+                        <strong
+                          className={`detail-status ${statusPillClass(
+                            attendance.status
+                          )}`}
+                        >
+                          {statusLabel(
+                            attendance.status
+                          )}
                         </strong>
 
                       </div>
@@ -533,10 +679,6 @@ function AttendanceConfirmation() {
                     </div>
 
                     <div className="detail-box">
-
-                      <span className="detail-icon">
-                        ▦
-                      </span>
 
                       <div>
                         <small>
@@ -553,82 +695,6 @@ function AttendanceConfirmation() {
 
                   </div>
 
-                  {/* VERIFICATION STEPS */}
-
-                  <div className="verification-line">
-
-                    <div className="verification-step">
-
-                      <div className="verification-check">
-                        ✓
-                      </div>
-
-                      <strong>
-                        QR Scanned
-                      </strong>
-
-                      <span>
-                        Code detected
-                      </span>
-
-                    </div>
-
-                    <div className="verification-connector" />
-
-                    <div className="verification-step">
-
-                      <div className="verification-check">
-                        ✓
-                      </div>
-
-                      <strong>
-                        Session Verified
-                      </strong>
-
-                      <span>
-                        Valid active session
-                      </span>
-
-                    </div>
-
-                    <div className="verification-connector" />
-
-                    <div className="verification-step">
-
-                      <div className="verification-check">
-                        ✓
-                      </div>
-
-                      <strong>
-                        Enrollment Verified
-                      </strong>
-
-                      <span>
-                        You are enrolled
-                      </span>
-
-                    </div>
-
-                    <div className="verification-connector" />
-
-                    <div className="verification-step">
-
-                      <div className="verification-check">
-                        ✓
-                      </div>
-
-                      <strong>
-                        Attendance Recorded
-                      </strong>
-
-                      <span>
-                        Successfully saved
-                      </span>
-
-                    </div>
-
-                  </div>
-
                 </div>
 
                 {/* ACTIONS */}
@@ -636,6 +702,7 @@ function AttendanceConfirmation() {
                 <div className="confirmation-actions">
 
                   <button
+                    type="button"
                     className="primary-confirmation-button"
                     onClick={() =>
                       navigate(
@@ -643,18 +710,11 @@ function AttendanceConfirmation() {
                       )
                     }
                   >
-                    <span>
-                      ▥
-                    </span>
-
                     View My Attendance
-
-                    <b>
-                      →
-                    </b>
                   </button>
 
                   <button
+                    type="button"
                     className="secondary-confirmation-button"
                     onClick={() =>
                       navigate(
@@ -662,10 +722,6 @@ function AttendanceConfirmation() {
                       )
                     }
                   >
-                    <span>
-                      ⌂
-                    </span>
-
                     Back to Dashboard
                   </button>
 
@@ -692,138 +748,133 @@ function AttendanceConfirmation() {
                   </div>
 
                   <button
+                    type="button"
                     onClick={() =>
                       navigate(
                         "/student/attendance"
                       )
                     }
                   >
-                    View All →
+                    View All
                   </button>
 
                 </div>
 
-                <div className="recent-table">
+                {recordsLoading ? (
+                  <div className="recent-state">
+                    <div className="recent-spinner" />
 
-                  <div className="recent-table-row table-header">
-
+                    <p>
+                      Loading recent attendance...
+                    </p>
+                  </div>
+                ) : recordsError ? (
+                  <div
+                    className="recent-error"
+                    role="alert"
+                  >
                     <span>
-                      #
+                      {recordsError}
                     </span>
 
-                    <span>
-                      Date & Time
-                    </span>
+                    <button
+                      type="button"
+                      onClick={retryRecords}
+                    >
+                      Try again
+                    </button>
+                  </div>
+                ) : !recentRecords.length ? (
+                  <div className="recent-state">
+                    <p>
+                      No attendance records yet.
+                    </p>
 
-                    <span>
-                      Course
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate("/student/scan")
+                      }
+                    >
+                      Scan Attendance QR
+                    </button>
+                  </div>
+                ) : (
+                  <div className="recent-table">
 
-                    <span>
-                      Section
-                    </span>
+                    <div className="recent-table-row table-header">
 
-                    <span>
-                      Status
-                    </span>
+                      <span>
+                        #
+                      </span>
 
-                    <span>
-                      Marked By
-                    </span>
+                      <span>
+                        Date & Time
+                      </span>
+
+                      <span>
+                        Course
+                      </span>
+
+                      <span>
+                        Section
+                      </span>
+
+                      <span>
+                        Status
+                      </span>
+
+                      <span>
+                        Marked By
+                      </span>
+
+                    </div>
+
+                    {recentRecords.map((item, index) => (
+                      <div
+                        className="recent-table-row"
+                        key={
+                          item.id ||
+                          item.attendance_id ||
+                          `${getSessionDate(item)}-${index}`
+                        }
+                      >
+                        <span>
+                          {index + 1}
+                        </span>
+
+                        <span>
+                          {formatDateTime(
+                            getSessionDate(item)
+                          )}
+                        </span>
+
+                        <span>
+                          {getCourseName(item)}
+                        </span>
+
+                        <span>
+                          {getSectionName(item)}
+                        </span>
+
+                        <span>
+                          <b
+                            className={`status-pill ${statusPillClass(
+                              item.status
+                            )}`}
+                          >
+                            {statusLabel(item.status)}
+                          </b>
+                        </span>
+
+                        <span>
+                          {sourceLabel(getSource(item))}
+                        </span>
+                      </div>
+                    ))}
 
                   </div>
-
-                  <div className="recent-table-row">
-
-                    <span>
-                      1
-                    </span>
-
-                    <span>
-                      {formattedDate} {formattedTime}
-                    </span>
-
-                    <span>
-                      {attendance.course}
-                    </span>
-
-                    <span>
-                      {attendance.section}
-                    </span>
-
-                    <span>
-                      <b className="present-badge">
-                        ✓ Present
-                      </b>
-                    </span>
-
-                    <span>
-                      ▦ QR Code
-                    </span>
-
-                  </div>
-
-                  <div className="recent-table-row">
-
-                    <span>
-                      2
-                    </span>
-
-                    <span>
-                      Sep 20, 2026 09:05 AM
-                    </span>
-
-                    <span>
-                      Web Development
-                    </span>
-
-                    <span>
-                      Sec 2
-                    </span>
-
-                    <span>
-                      <b className="present-badge">
-                        ✓ Present
-                      </b>
-                    </span>
-
-                    <span>
-                      ▦ QR Code
-                    </span>
-
-                  </div>
-
-                  <div className="recent-table-row">
-
-                    <span>
-                      3
-                    </span>
-
-                    <span>
-                      Sep 17, 2026 11:30 AM
-                    </span>
-
-                    <span>
-                      Database Systems
-                    </span>
-
-                    <span>
-                      Sec 1
-                    </span>
-
-                    <span>
-                      <b className="absent-badge">
-                        ! Absent
-                      </b>
-                    </span>
-
-                    <span>
-                      —
-                    </span>
-
-                  </div>
-
-                </div>
+                )}
 
               </div>
 
@@ -843,25 +894,11 @@ function AttendanceConfirmation() {
 
                   <div>
 
-                    <div className="summary-title-icon">
-                      ▣
-                    </div>
-
                     <h3>
                       Attendance Summary
                     </h3>
 
                   </div>
-
-                  <select defaultValue="semester">
-                    <option value="semester">
-                      This Semester
-                    </option>
-
-                    <option value="year">
-                      This Year
-                    </option>
-                  </select>
 
                 </div>
 
@@ -869,87 +906,89 @@ function AttendanceConfirmation() {
 
                   <div className="summary-stat present">
 
-                    <span>
-                      ✓
-                    </span>
-
                     <small>
                       Present
                     </small>
 
                     <strong>
-                      19
+                      {summary.present}
                     </strong>
 
                     <em>
-                      out of 25 sessions
+                      {summary.total
+                        ? `out of ${summary.total} sessions`
+                        : summaryEmptyText}
                     </em>
 
                   </div>
 
                   <div className="summary-stat sessions">
 
-                    <span>
-                      ▦
-                    </span>
-
                     <small>
                       Total Sessions
                     </small>
 
                     <strong>
-                      25
+                      {summary.total}
                     </strong>
 
                     <em>
-                      This semester
+                      {summary.total
+                        ? "All records"
+                        : summaryEmptyText}
                     </em>
 
                   </div>
 
                   <div className="summary-stat rate">
 
-                    <span>
-                      ◷
-                    </span>
-
                     <small>
                       Attendance Rate
                     </small>
 
                     <strong>
-                      76%
+                      {summary.rate}%
                     </strong>
 
                     <em>
-                      On track
+                      {summary.total
+                        ? summary.rate >= 75
+                          ? "On track"
+                          : "Keep improving"
+                        : summaryEmptyText}
                     </em>
 
                   </div>
 
                 </div>
 
-                <div className="progress-area">
+                {summary.total > 0 && (
+                  <div className="progress-area">
 
-                  <div className="progress-bar">
+                    <div className="progress-bar">
 
-                    <div
-                      className="progress-value"
-                      style={{
-                        width: "76%",
-                      }}
-                    />
+                      <div
+                        className="progress-value"
+                        style={{
+                          width: `${summary.rate}%`,
+                        }}
+                      />
+
+                    </div>
+
+                    <strong>
+                      {summary.rate}%
+                    </strong>
 
                   </div>
-
-                  <strong>
-                    76%
-                  </strong>
-
-                </div>
+                )}
 
                 <p className="summary-message">
-                  You are doing great! Keep attending your classes.
+                  {summary.total > 0
+                    ? `Based on ${summary.total} recorded session${
+                        summary.total === 1 ? "" : "s"
+                      }.`
+                    : summaryEmptyText}
                 </p>
 
               </div>
@@ -960,10 +999,6 @@ function AttendanceConfirmation() {
 
                 <div className="next-title">
 
-                  <div>
-                    !
-                  </div>
-
                   <h3>
                     What's Next?
                   </h3>
@@ -973,10 +1008,6 @@ function AttendanceConfirmation() {
                 <div className="next-list">
 
                   <div className="next-item">
-
-                    <span className="next-green">
-                      ✓
-                    </span>
 
                     <div>
                       <strong>
@@ -992,10 +1023,6 @@ function AttendanceConfirmation() {
 
                   <div className="next-item">
 
-                    <span className="next-blue">
-                      ▥
-                    </span>
-
                     <div>
                       <strong>
                         Check Your Progress
@@ -1009,10 +1036,6 @@ function AttendanceConfirmation() {
                   </div>
 
                   <div className="next-item">
-
-                    <span className="next-red">
-                      ♧
-                    </span>
 
                     <div>
                       <strong>
@@ -1028,10 +1051,6 @@ function AttendanceConfirmation() {
 
                   <div className="next-item">
 
-                    <span className="next-purple">
-                      ◎
-                    </span>
-
                     <div>
                       <strong>
                         Stay Consistent
@@ -1046,23 +1065,6 @@ function AttendanceConfirmation() {
 
                 </div>
 
-                <div className="quote-box">
-
-                  <span>
-                    “
-                  </span>
-
-                  <p>
-                    Success is the sum of small efforts,
-                    repeated day in and day out.
-                  </p>
-
-                  <small>
-                    — Robert Collier
-                  </small>
-
-                </div>
-
               </div>
 
             </aside>
@@ -1070,6 +1072,8 @@ function AttendanceConfirmation() {
           </div>
 
         </section>
+
+        <Footer />
 
       </main>
 

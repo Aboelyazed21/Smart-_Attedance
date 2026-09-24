@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import {
   getMyAttendance,
 } from "../../services/api";
+import {
+  deriveWarnings,
+  getWeeklySummary,
+  toRecords,
+} from "../../utils/attendanceInsights";
+import Footer from "../../components/Footer";
 import "../../App.css";
+import "./StudentDashboard.css";
 
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -21,6 +28,38 @@ function StudentDashboard() {
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  /* =========================================================
+     MOBILE SIDEBAR
+  ========================================================= */
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebarOpen]);
+
+  function goTo(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
 
   /* =========================================================
      LOAD ATTENDANCE
@@ -138,6 +177,21 @@ function StudentDashboard() {
       .slice(0, 5);
   }, [attendance]);
 
+  const normalizedRecords = useMemo(
+    () => toRecords(attendance),
+    [attendance]
+  );
+
+  const weekly = useMemo(
+    () => getWeeklySummary(normalizedRecords),
+    [normalizedRecords]
+  );
+
+  const warnings = useMemo(
+    () => deriveWarnings(normalizedRecords, weekly),
+    [normalizedRecords, weekly]
+  );
+
   /* =========================================================
      LOGOUT
   ========================================================= */
@@ -146,6 +200,7 @@ function StudentDashboard() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
+    setSidebarOpen(false);
     navigate("/");
   }
 
@@ -250,12 +305,19 @@ function StudentDashboard() {
           SIDEBAR
       ===================================================== */}
 
-      <aside className="student-sidebar">
+      <aside
+        id="student-sidebar"
+        className={
+          sidebarOpen
+            ? "student-sidebar open"
+            : "student-sidebar"
+        }
+      >
 
         <div className="student-brand">
 
           <div className="student-brand-logo">
-            🎓
+            A
           </div>
 
           <div>
@@ -270,20 +332,7 @@ function StudentDashboard() {
 
         {/* PROFILE */}
 
-        <div
-          className="student-profile"
-          onClick={() => navigate("/student/profile")}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              navigate("/student/profile");
-            }
-          }}
-          title="Open Student Profile"
-          style={{ cursor: "pointer" }}
-        >
+        <div className="student-profile">
 
           <div className="student-profile-avatar">
             {avatar}
@@ -303,76 +352,66 @@ function StudentDashboard() {
 
         {/* NAVIGATION */}
 
-        <nav className="student-nav">
+        <nav
+          className="student-nav"
+          aria-label="Student navigation"
+        >
 
           <button
+            type="button"
             className="student-nav-item active"
+            aria-current="page"
             onClick={() =>
-              navigate("/dashboard")
+              goTo("/dashboard")
             }
           >
-            <span>▦</span>
             Dashboard
           </button>
 
           <button
+            type="button"
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              goTo(
                 "/student/attendance"
               )
             }
           >
-            <span>✓</span>
             My Attendance
           </button>
 
           <button
+            type="button"
             className="student-nav-item"
             onClick={() =>
-              navigate(
+              goTo(
                 "/student/scan"
               )
             }
           >
-            <span>▣</span>
             Scan QR
           </button>
 
           <button
+            type="button"
             className="student-nav-item"
             onClick={() =>
-              navigate(
-                "/student/sessions"
+              goTo(
+                "/student/correction-requests"
               )
             }
           >
-            <span>◫</span>
-            My Sessions
-          </button>
-
-          <button
-            className="student-nav-item"
-            onClick={() =>
-              navigate(
-                "/student/corrections"
-              )
-            }
-          >
-            <span>⚑</span>
             Correction Requests
           </button>
 
           <button
+            type="button"
             className="student-nav-item"
             onClick={() =>
-              navigate(
-                "/student/notifications"
-              )
+              goTo("/student/chatbot")
             }
           >
-            <span>🔔</span>
-            Notifications
+            Attendance Assistant
           </button>
 
         </nav>
@@ -382,16 +421,25 @@ function StudentDashboard() {
         <div className="student-sidebar-bottom">
 
           <button
+            type="button"
             className="student-nav-item"
             onClick={handleLogout}
           >
-            <span>↪</span>
             Logout
           </button>
 
         </div>
 
       </aside>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="student-sidebar-overlay"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* =====================================================
           MAIN
@@ -403,30 +451,36 @@ function StudentDashboard() {
 
         <header className="student-dashboard-header">
 
-          <div>
-            <h1>
-              Student Dashboard
-            </h1>
+          <div className="student-header-leading">
 
-            <p>
-              Welcome back, {firstName}! 👋
-            </p>
+            <button
+              type="button"
+              className="student-menu-button hamburger"
+              aria-expanded={sidebarOpen}
+              aria-controls="student-sidebar"
+              aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+              onClick={() =>
+                setSidebarOpen((open) => !open)
+              }
+            >
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+            </button>
+
+            <div>
+              <h1>
+                Student Dashboard
+              </h1>
+
+              <p>
+                Welcome back, {firstName}
+              </p>
+            </div>
+
           </div>
 
-          <div
-            className="student-header-user"
-            onClick={() => navigate("/student/profile")}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                navigate("/student/profile");
-              }
-            }}
-            title="Open Student Profile"
-            style={{ cursor: "pointer" }}
-          >
+          <div className="student-header-user">
 
             <div className="student-header-avatar">
               {avatar}
@@ -441,13 +495,17 @@ function StudentDashboard() {
           {/* ERROR */}
 
           {error && (
-            <div className="student-dashboard-error">
+            <div
+              className="student-dashboard-error"
+              role="alert"
+            >
               {error}
 
               <button
+                type="button"
                 onClick={loadAttendance}
               >
-                Retry
+                Try again
               </button>
             </div>
           )}
@@ -460,10 +518,6 @@ function StudentDashboard() {
 
             <div className="student-stat-card">
 
-              <div className="student-stat-icon blue">
-                ✓
-              </div>
-
               <div>
                 <span>
                   Attendance Rate
@@ -471,7 +525,7 @@ function StudentDashboard() {
 
                 <strong>
                   {loading
-                    ? "..."
+                    ? "—"
                     : `${stats.percentage}%`}
                 </strong>
 
@@ -484,10 +538,6 @@ function StudentDashboard() {
 
             <div className="student-stat-card">
 
-              <div className="student-stat-icon green">
-                ✓
-              </div>
-
               <div>
                 <span>
                   Present
@@ -495,7 +545,7 @@ function StudentDashboard() {
 
                 <strong>
                   {loading
-                    ? "..."
+                    ? "—"
                     : stats.present}
                 </strong>
 
@@ -508,10 +558,6 @@ function StudentDashboard() {
 
             <div className="student-stat-card">
 
-              <div className="student-stat-icon orange">
-                ⏱
-              </div>
-
               <div>
                 <span>
                   Late
@@ -519,7 +565,7 @@ function StudentDashboard() {
 
                 <strong>
                   {loading
-                    ? "..."
+                    ? "—"
                     : stats.late}
                 </strong>
 
@@ -532,10 +578,6 @@ function StudentDashboard() {
 
             <div className="student-stat-card">
 
-              <div className="student-stat-icon red">
-                !
-              </div>
-
               <div>
                 <span>
                   Absent
@@ -543,7 +585,7 @@ function StudentDashboard() {
 
                 <strong>
                   {loading
-                    ? "..."
+                    ? "—"
                     : stats.absent}
                 </strong>
 
@@ -592,17 +634,16 @@ function StudentDashboard() {
 
               {loading ? (
                 <div className="student-empty-state">
-                  <div className="student-loading">
+                  <div
+                    className="student-loading"
+                    role="status"
+                  >
                     Loading attendance...
                   </div>
                 </div>
               ) : recentAttendance.length ===
                 0 ? (
                 <div className="student-empty-state">
-
-                  <div className="student-empty-icon">
-                    ✓
-                  </div>
 
                   <h3>
                     No attendance records
@@ -616,7 +657,7 @@ function StudentDashboard() {
                   <button
                     className="student-primary-button"
                     onClick={() =>
-                      navigate(
+                      goTo(
                         "/student/scan"
                       )
                     }
@@ -642,10 +683,6 @@ function StudentDashboard() {
                             index
                           }
                         >
-
-                          <div className="student-course-icon">
-                            📚
-                          </div>
 
                           <div className="student-attendance-info">
 
@@ -698,14 +735,13 @@ function StudentDashboard() {
               <div className="student-quick-actions">
 
                 <button
+                  type="button"
                   onClick={() =>
-                    navigate(
+                    goTo(
                       "/student/scan"
                     )
                   }
                 >
-                  <span>▣</span>
-
                   <div>
                     <strong>
                       Scan QR Code
@@ -715,19 +751,16 @@ function StudentDashboard() {
                       Mark your attendance
                     </small>
                   </div>
-
-                  <b>→</b>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() =>
-                    navigate(
+                    goTo(
                       "/student/attendance"
                     )
                   }
                 >
-                  <span>✓</span>
-
                   <div>
                     <strong>
                       My Attendance
@@ -737,41 +770,16 @@ function StudentDashboard() {
                       View full attendance
                     </small>
                   </div>
-
-                  <b>→</b>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() =>
-                    navigate(
-                      "/student/sessions"
+                    goTo(
+                      "/student/correction-requests"
                     )
                   }
                 >
-                  <span>◫</span>
-
-                  <div>
-                    <strong>
-                      My Sessions
-                    </strong>
-
-                    <small>
-                      View your classes
-                    </small>
-                  </div>
-
-                  <b>→</b>
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/student/corrections"
-                    )
-                  }
-                >
-                  <span>⚑</span>
-
                   <div>
                     <strong>
                       Correction Request
@@ -781,11 +789,138 @@ function StudentDashboard() {
                       Report an issue
                     </small>
                   </div>
+                </button>
 
-                  <b>→</b>
+                <button
+                  type="button"
+                  onClick={() =>
+                    goTo("/student/chatbot")
+                  }
+                >
+                  <div>
+                    <strong>
+                      Attendance Assistant
+                    </strong>
+
+                    <small>
+                      Weekly summary and warnings
+                    </small>
+                  </div>
                 </button>
 
               </div>
+
+            </section>
+
+          </div>
+
+          {/* =================================================
+              WEEKLY SUMMARY + WARNINGS (real data)
+          ================================================= */}
+
+          <div className="student-dashboard-grid">
+
+            <section className="student-panel" aria-label="Weekly attendance summary">
+
+              <div className="student-panel-header">
+
+                <div>
+                  <h2>
+                    Weekly Attendance Summary
+                  </h2>
+
+                  <p>
+                    Current week from your recorded sessions
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => goTo("/student/chatbot")}
+                >
+                  Ask assistant
+                </button>
+
+              </div>
+
+              <div className="student-week-grid">
+                <div>
+                  <span>Total sessions</span>
+                  <strong>{loading ? "—" : weekly.total}</strong>
+                </div>
+                <div>
+                  <span>Attended</span>
+                  <strong>{loading ? "—" : weekly.attended}</strong>
+                </div>
+                <div>
+                  <span>Present</span>
+                  <strong>{loading ? "—" : weekly.present}</strong>
+                </div>
+                <div>
+                  <span>Absent</span>
+                  <strong>{loading ? "—" : weekly.absent}</strong>
+                </div>
+                <div>
+                  <span>Late</span>
+                  <strong>{loading ? "—" : weekly.late}</strong>
+                </div>
+                <div>
+                  <span>Rate</span>
+                  <strong>{loading ? "—" : `${weekly.rate}%`}</strong>
+                </div>
+              </div>
+
+            </section>
+
+            <section className="student-panel" aria-label="Warnings summary">
+
+              <div className="student-panel-header">
+
+                <div>
+                  <h2>
+                    Warnings Summary
+                  </h2>
+
+                  <p>
+                    Derived from your attendance records
+                  </p>
+                </div>
+
+                <strong className="student-warnings-count">
+                  {loading ? "—" : `${warnings.length} warnings`}
+                </strong>
+
+              </div>
+
+              {loading ? (
+                <div className="student-empty-state">
+                  <p>Loading warnings…</p>
+                </div>
+              ) : warnings.length === 0 ? (
+                <div className="student-empty-state">
+                  <h3>No warnings</h3>
+                  <p>
+                    {normalizedRecords.length === 0
+                      ? "No attendance records yet. Warnings will appear here once sessions are recorded."
+                      : "Your attendance looks consistent."}
+                  </p>
+                </div>
+              ) : (
+                <ul className="student-warnings-list">
+                  {warnings.map((w) => (
+                    <li key={w.id}>
+                      <div>
+                        <strong>{w.type}</strong>
+                        <span>{w.date}</span>
+                      </div>
+                      {w.course && w.course !== "—" && (
+                        <small>Course: {w.course}</small>
+                      )}
+                      <p>{w.message}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
             </section>
 
@@ -861,6 +996,8 @@ function StudentDashboard() {
           </section>
 
         </section>
+
+        <Footer />
 
       </main>
 

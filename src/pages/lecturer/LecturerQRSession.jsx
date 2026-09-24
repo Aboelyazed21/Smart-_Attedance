@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   getSessions,
@@ -117,9 +117,27 @@ function getStatusClass(status) {
   return "status-absent";
 }
 
+/*
+  This app does not declare <Route> elements. App.jsx matches
+  paths manually against location.pathname, so useParams() always
+  returns an empty object and the session id was undefined.
+  Read the id straight from the URL instead.
+*/
+function readSessionId(pathname) {
+  const match = String(pathname).match(
+    /^\/lecturer\/sessions\/([^/]+)\/?$/
+  );
+
+  if (!match) return "";
+
+  return /^\d+$/.test(match[1]) ? match[1] : "";
+}
+
 export default function LecturerQRSession() {
   const navigate = useNavigate();
-  const { id: sessionId } = useParams();
+  const location = useLocation();
+
+  const sessionId = readSessionId(location.pathname);
 
   const savedUser = useMemo(() => getSavedUser(), []);
 
@@ -555,29 +573,44 @@ export default function LecturerQRSession() {
 
   if (loading) {
     return (
-      <div className="lecturer-session-loading">
-        <div className="loading-spinner" />
+      <div className="lecturer-session-loading" role="status" aria-live="polite">
+        <div className="loading-spinner" aria-hidden="true" />
         <strong>Loading session...</strong>
-        <span>Please wait.</span>
+        <span>Please wait while we fetch the attendance data.</span>
       </div>
     );
   }
 
   if (error || !session) {
     return (
-      <div className="lecturer-session-error">
-        <div className="error-icon">!</div>
+      <div className="lecturer-session-error" role="alert">
         <h2>Session unavailable</h2>
         <p>
           {error ||
             "We could not find this attendance session."}
         </p>
-        <button
-          type="button"
-          onClick={() => navigate("/lecturer/sessions")}
-        >
-          Back to Sessions
-        </button>
+
+        <div className="lecturer-session-error-actions">
+          <button
+            type="button"
+            className="session-error-primary"
+            onClick={() => {
+              setError("");
+              setLoading(true);
+              loadSession();
+            }}
+          >
+            Try again
+          </button>
+
+          <button
+            type="button"
+            className="session-error-secondary"
+            onClick={() => navigate("/lecturer/sessions")}
+          >
+            Back to Sessions
+          </button>
+        </div>
       </div>
     );
   }
@@ -600,7 +633,7 @@ export default function LecturerQRSession() {
                 navigate("/lecturer/sessions")
               }
             >
-              ← Sessions
+              Back to Sessions
             </button>
 
             <h1>My Session</h1>
@@ -621,10 +654,6 @@ export default function LecturerQRSession() {
         </header>
 
         <section className="session-summary-card">
-          <div className="session-summary-icon">
-            CAL
-          </div>
-
           <div className="session-summary-info">
             <div className="session-title-row">
               <h2>
@@ -645,16 +674,16 @@ export default function LecturerQRSession() {
 
             <div className="session-meta">
               <span>
-                CAL {formatDate(session.session_date)}
+                Date {formatDate(session.session_date)}
               </span>
 
               <span>
-                TIME {formatTime(session.scheduled_start)} -{" "}
+                Time {formatTime(session.scheduled_start)} -{" "}
                 {formatTime(session.scheduled_end)}
               </span>
 
               <span>
-                ROOM{" "}
+                Room{" "}
                 {session.room_name ||
                   session.room ||
                   "Room not assigned"}
@@ -671,8 +700,7 @@ export default function LecturerQRSession() {
               sessionStatus === "closed"
             }
           >
-            QR
-            <span>Generate QR Code</span>
+            Generate QR Code
           </button>
         </section>
 
@@ -699,7 +727,6 @@ export default function LecturerQRSession() {
                 />
               ) : (
                 <div className="qr-placeholder">
-                  <strong>QR</strong>
                   <span>
                     Generate the QR code to start
                     attendance.
@@ -718,7 +745,7 @@ export default function LecturerQRSession() {
                   <span className="live-dot" />
                   {countdown > 0
                     ? `Valid for ${minutes}:${seconds}`
-                    : "QR expired — refreshing..."}
+                    : "QR expired - refreshing..."}
                 </div>
 
                 <button
@@ -789,13 +816,13 @@ export default function LecturerQRSession() {
             </div>
 
             <div className="student-search">
-              <span>⌕</span>
               <input
                 value={search}
                 onChange={(event) =>
                   handleSearch(event.target.value)
                 }
                 placeholder="Search by name or ID..."
+                aria-label="Search students by name or ID"
               />
             </div>
 
@@ -912,7 +939,7 @@ export default function LecturerQRSession() {
                   }
                   disabled={currentPage === 1}
                 >
-                  ←
+                  Prev
                 </button>
 
                 {Array.from(
@@ -942,7 +969,7 @@ export default function LecturerQRSession() {
                   }
                   disabled={currentPage === totalPages}
                 >
-                  →
+                  Next
                 </button>
               </div>
             )}
@@ -950,7 +977,7 @@ export default function LecturerQRSession() {
         </section>
 
         {toast && (
-          <div className="session-toast">
+          <div className="session-toast" role="status" aria-live="polite">
             {toast}
           </div>
         )}
@@ -976,8 +1003,9 @@ export default function LecturerQRSession() {
                   type="button"
                   onClick={closeCorrection}
                   disabled={correctionLoading}
+                  aria-label="Close attendance editor"
                 >
-                  ×
+                  Close
                 </button>
               </div>
 
@@ -1002,9 +1030,10 @@ export default function LecturerQRSession() {
               </div>
 
               <form onSubmit={saveCorrection}>
-                <label>
+                <label htmlFor="correction-status">
                   Attendance status
                   <select
+                    id="correction-status"
                     value={correctionStatus}
                     onChange={(event) =>
                       setCorrectionStatus(
@@ -1028,9 +1057,10 @@ export default function LecturerQRSession() {
                   </select>
                 </label>
 
-                <label>
+                <label htmlFor="correction-reason">
                   Reason
                   <textarea
+                    id="correction-reason"
                     value={correctionReason}
                     onChange={(event) =>
                       setCorrectionReason(

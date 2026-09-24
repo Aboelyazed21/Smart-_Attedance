@@ -23,7 +23,7 @@ import {
   ========================================================= */
   
   function formatDate(date) {
-    if (!date) return "—";
+    if (!date) return "-";
   
     const value = new Date(date);
   
@@ -36,7 +36,7 @@ import {
   
   
   function formatTime(time) {
-    if (!time) return "—";
+    if (!time) return "-";
   
     return String(time).substring(0, 5);
   }
@@ -988,14 +988,14 @@ import {
                   >
                     {section.course_code ||
                       "COURSE"}{" "}
-                    —{" "}
+                    -{" "}
                     {section.section_name ||
                       "Section"}
                   </option>
-  
+
                 )
               )}
-  
+
             </select>
   
           </section>
@@ -1008,11 +1008,7 @@ import {
           {filteredSessions.length === 0 ? (
   
             <div style={emptyCard}>
-  
-              <div style={emptyIcon}>
-                —
-              </div>
-  
+
               <h2>
                 No attendance sessions
               </h2>
@@ -1110,7 +1106,7 @@ import {
                         Section{" "}
                         {section?.section_name ||
                           session.section_name ||
-                          "—"}
+                          "-"}
                       </p>
   
   
@@ -1141,7 +1137,7 @@ import {
                             {formatTime(
                               session.scheduled_start
                             )}
-                            {" — "}
+                            {" - "}
                             {formatTime(
                               session.scheduled_end
                             )}
@@ -1256,8 +1252,9 @@ import {
                       false
                     )
                   }
+                  aria-label="Close dialog"
                 >
-                  ×
+                  Close
                 </button>
   
               </div>
@@ -1308,7 +1305,7 @@ import {
                           >
                             {section.course_code ||
                               "COURSE"}{" "}
-                            —{" "}
+                            -{" "}
                             {section.section_name ||
                               "Section"}
                           </option>
@@ -1354,7 +1351,7 @@ import {
                             }
                           >
                             {room.building
-                              ? `${room.building} — `
+                              ? `${room.building} - `
                               : ""}
                             {room.room_name ||
                               room.roomName ||
@@ -1517,8 +1514,9 @@ import {
                     clearQrTimers();
                     setShowQrModal(false);
                   }}
+                  aria-label="Close dialog"
                 >
-                  ×
+                  Close
                 </button>
   
               </div>
@@ -1655,8 +1653,9 @@ import {
                       false
                     )
                   }
+                  aria-label="Close dialog"
                 >
-                  ×
+                  Close
                 </button>
   
               </div>
@@ -1791,7 +1790,7 @@ import {
                                 {student.attendance_time ||
                                   student.checked_in_at ||
                                   student.marked_at ||
-                                  "—"}
+                                  "-"}
   
                               </td>
   
@@ -2076,17 +2075,6 @@ import {
     padding: 30,
   };
   
-  const emptyIcon = {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    background: "#f1f5f9",
-    color: "#64748b",
-    display: "grid",
-    placeItems: "center",
-    fontSize: 24,
-  };
-  
   const loadingCard = {
     background: "#ffffff",
     border: "1px solid #e5eaf1",
@@ -2163,13 +2151,14 @@ import {
   };
   
   const closeButton = {
-    width: 34,
     height: 34,
+    padding: "0 12px",
     border: "1px solid #e2e8f0",
     background: "#ffffff",
     borderRadius: 8,
     color: "#64748b",
-    fontSize: 22,
+    fontSize: 13,
+    fontWeight: 700,
     cursor: "pointer",
   };
   

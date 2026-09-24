@@ -30,12 +30,16 @@ import AttendanceScanner from "./pages/student/AttendanceScanner";
 import StudentAttendance from "./pages/student/StudentAttendance";
 import AttendanceConfirmation from "./pages/student/AttendanceConfirmation";
 import CorrectionRequests from "./pages/student/CorrectionRequests";
+import StudentChatbot from "./pages/student/StudentChatbot";
+import StudentDashboardPage from "./pages/student/StudentDashboard";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
+import Footer from "./components/Footer";
 
 import { loginUser } from "./services/api";
 
 import "./App.css";
 import "./pages/student/StudentDashboard.css";
+import "./components/Footer.css";
 
 /* =========================================================
    GET SAVED USER
@@ -451,6 +455,34 @@ function App() {
   }
 
   /* =========================================================
+     STUDENT CHATBOT
+  ========================================================= */
+
+  if (
+    location.pathname === "/student/chatbot"
+  ) {
+    const user = getSavedUser();
+
+    if (!user) {
+      return <Login />;
+    }
+
+    const role = String(
+      user.role_name ||
+        user.role ||
+        ""
+    )
+      .toLowerCase()
+      .trim();
+
+    if (role !== "student") {
+      return <Login />;
+    }
+
+    return <StudentChatbot />;
+  }
+
+  /* =========================================================
      ADMIN ENROLLMENT MANAGEMENT
   ========================================================= */
 
@@ -502,7 +534,7 @@ function App() {
       );
     }
 
-    return <StudentDashboard />;
+    return <StudentDashboardPage />;
   }
 
   /* =========================================================
@@ -539,51 +571,30 @@ function Login() {
     setLoading,
   ] = useState(false);
 
+  const [formError, setFormError] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError("");
 
     if (!email || !password) {
-      alert(
-        "Please enter email and password"
-      );
-
+      setFormError("Please enter your email and password.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const data = await loginUser(
-        email,
-        password
-      );
+      const data = await loginUser(email, password);
 
-      localStorage.setItem(
-        "token",
-        data.token
-      );
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
-
-      console.log(
-        "Login successful:",
-        data.user
-      );
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       navigate("/dashboard");
     } catch (error) {
-      console.error(
-        "Login error:",
-        error
-      );
+      console.error("Login error:", error);
 
-      alert(
-        error.message ||
-        "Login failed"
-      );
+      setFormError(error.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -600,8 +611,8 @@ function Login() {
 
         <div className="brand">
 
-          <div className="brand-logo">
-            <span>🎓</span>
+          <div className="brand-logo" aria-hidden="true">
+            <span>A</span>
           </div>
 
           <div className="brand-text">
@@ -619,12 +630,13 @@ function Login() {
         <button
           type="button"
           className="language-button"
+          aria-label="Change language. Current language: English"
         >
           <span>
             English
           </span>
 
-          <span className="chevron">
+          <span className="chevron" aria-hidden="true">
             ⌄
           </span>
         </button>
@@ -635,12 +647,12 @@ function Login() {
           LOGIN
       ===================================================== */}
 
-      <main className="login-area">
+      <main className="login-area" id="main">
 
         <div className="login-card">
 
-          <div className="login-logo">
-            <span>🎓</span>
+          <div className="login-logo" aria-hidden="true">
+            <span>A</span>
           </div>
 
           <h2 className="app-name">
@@ -654,7 +666,7 @@ function Login() {
           <div className="welcome-section">
 
             <h3>
-              Welcome Back
+              Welcome back
             </h3>
 
             <p>
@@ -666,24 +678,29 @@ function Login() {
           <form
             className="login-form"
             onSubmit={handleSubmit}
+            noValidate
           >
+
+            {formError && (
+              <div className="form-error" role="alert">
+                {formError}
+              </div>
+            )}
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="login-email">
                 Email or University ID
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  ✉
-                </span>
-
                 <input
+                  id="login-email"
                   type="text"
-                  placeholder="Email or University ID"
+                  placeholder="you@university.edu"
                   autoComplete="username"
+                  aria-invalid={formError ? "true" : "false"}
                   value={email}
                   onChange={(e) =>
                     setEmail(e.target.value)
@@ -696,24 +713,22 @@ function Login() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="login-password">
                 Password
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  🔒
-                </span>
-
                 <input
+                  id="login-password"
                   type={
                     showPassword
                       ? "text"
                       : "password"
                   }
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   autoComplete="current-password"
+                  aria-invalid={formError ? "true" : "false"}
                   value={password}
                   onChange={(e) =>
                     setPassword(e.target.value)
@@ -723,15 +738,19 @@ function Login() {
                 <button
                   type="button"
                   className="show-password"
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                  aria-pressed={showPassword}
                   onClick={() =>
                     setShowPassword(
                       !showPassword
                     )
                   }
                 >
-                  {showPassword
-                    ? "◉"
-                    : "◌"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
 
               </div>
@@ -753,30 +772,25 @@ function Login() {
               type="submit"
               className="sign-in-button"
               disabled={loading}
+              aria-busy={loading}
             >
               <span>
                 {loading
-                  ? "Signing In..."
+                  ? "Signing in…"
                   : "Sign In"}
               </span>
-
-              {!loading && (
-                <span className="sign-arrow">
-                  →
-                </span>
-              )}
 
             </button>
 
             <div className="or-divider">
 
-              <span></span>
+              <span aria-hidden="true"></span>
 
               <p>
                 OR
               </p>
 
-              <span></span>
+              <span aria-hidden="true"></span>
 
             </div>
 
@@ -784,10 +798,6 @@ function Login() {
               to="/register"
               className="create-account-button"
             >
-              <span className="create-icon">
-                ♙+
-              </span>
-
               <span>
                 Create an Account
               </span>
@@ -803,27 +813,7 @@ function Login() {
           FOOTER
       ===================================================== */}
 
-      <footer className="page-footer">
-
-        <div className="tagline">
-
-          <span>
-            A Smarter Campus
-          </span>
-
-          <span>
-            For A Brighter Tomorrow
-          </span>
-
-        </div>
-
-        <div className="tagline-line"></div>
-
-        <div className="university-name">
-          PORT SAID UNIVERSITY
-        </div>
-
-      </footer>
+      <Footer />
 
     </div>
   );
@@ -1096,19 +1086,19 @@ function StudentDashboard() {
       value: "0",
       note: "Sessions attended this semester",
       icon: "calendar",
-      tone: "purple",
+      tone: "blue",
     },
     {
       title: "Present",
       value: "0",
-      note: "Keep building your streak",
+      note: "No records yet",
       icon: "check",
       tone: "green",
     },
     {
       title: "Absent",
       value: "0",
-      note: "Stay consistent",
+      note: "No records yet",
       icon: "alert",
       tone: "red",
     },
@@ -1129,7 +1119,7 @@ function StudentDashboard() {
 
           <div className="student-brand">
             <div className="student-brand-logo">
-              ✓
+              A
             </div>
 
             <div>
@@ -1232,49 +1222,10 @@ function StudentDashboard() {
               </span>
             </button>
 
-            <button
-              className="student-nav-item"
-              type="button"
-            >
-              <Icon
-                name="bell"
-                size={18}
-              />
-
-              <span>
-                Notifications
-              </span>
-
-              <b className="student-notification-badge">
-                3
-              </b>
-            </button>
-
           </nav>
         </div>
 
         <div className="student-sidebar-bottom">
-
-          <div className="student-sidebar-tip">
-
-            <div className="student-sidebar-tip-icon">
-              <Icon
-                name="light"
-                size={17}
-              />
-            </div>
-
-            <div>
-              <strong>
-                Keep going!
-              </strong>
-
-              <span>
-                Every class counts.
-              </span>
-            </div>
-
-          </div>
 
           <button
             className="student-logout"
@@ -1297,40 +1248,7 @@ function StudentDashboard() {
 
         <header className="student-topbar">
 
-          <div className="student-search">
-
-            <Icon
-              name="search"
-              size={18}
-            />
-
-            <input
-              type="text"
-              placeholder="Search courses, sessions, or anything..."
-            />
-
-            <span>
-              Ctrl + K
-            </span>
-
-          </div>
-
           <div className="student-topbar-right">
-
-            <button
-              className="student-notification-button"
-              type="button"
-              aria-label="Notifications"
-            >
-              <Icon
-                name="bell"
-                size={18}
-              />
-
-              <b>3</b>
-            </button>
-
-            <div className="student-header-divider" />
 
             <div className="student-header-profile">
 
@@ -1347,10 +1265,6 @@ function StudentDashboard() {
                   Student
                 </span>
               </div>
-
-              <span className="student-header-chevron">
-                ⌄
-              </span>
 
             </div>
 
@@ -1373,26 +1287,9 @@ function StudentDashboard() {
               </h1>
 
               <p>
-                Stay consistent, keep learning,
-                and make every class count.
+                Your attendance overview for today.
               </p>
 
-            </div>
-
-            <div
-              className="student-hero-art"
-              aria-hidden="true"
-            >
-              <div className="student-hero-orb orb-one" />
-              <div className="student-hero-orb orb-two" />
-              <div className="student-hero-cap">
-                ◆
-              </div>
-              <div className="student-hero-quote">
-                Small steps today,
-                <br />
-                a brighter tomorrow.
-              </div>
             </div>
 
           </div>
@@ -1424,8 +1321,6 @@ function StudentDashboard() {
                     {stat.note}
                   </small>
                 </div>
-
-                <span className="student-stat-glow" />
               </article>
             ))}
 
@@ -1522,7 +1417,7 @@ function StudentDashboard() {
 
                 <div className="student-panel-title">
 
-                  <div className="student-panel-icon purple">
+                  <div className="student-panel-icon blue">
                     <Icon
                       name="target"
                       size={18}
@@ -1781,42 +1676,22 @@ function StudentDashboard() {
 
             <section className="student-side-card motivation-card">
 
-              <div className="motivation-bubble bubble-one" />
-              <div className="motivation-bubble bubble-two" />
-
-              <div className="motivation-icon-large">
-                ✦
-              </div>
-
               <div className="motivation-copy">
 
                 <span>
-                  STAY CONSISTENT
+                  ATTENDANCE
                 </span>
 
                 <h2>
-                  Every class
-                  <br />
-                  <strong>
-                    matters.
-                  </strong>
+                  Attendance records
                 </h2>
 
                 <p>
-                  Regular attendance keeps you
-                  on track and helps you get the
-                  most out of every class.
+                  Your sessions and records appear
+                  here once attendance is captured
+                  in class.
                 </p>
 
-              </div>
-
-              <div
-                className="motivation-books"
-                aria-hidden="true"
-              >
-                ▰
-                <br />
-                ▰▰
               </div>
 
             </section>
@@ -1888,16 +1763,6 @@ function StudentDashboard() {
 
                 </div>
 
-                <div className="student-goal-message">
-                  <Icon
-                    name="light"
-                    size={14}
-                  />
-
-                  Regular attendance leads to
-                  better academic progress.
-                </div>
-
               </section>
 
               <section className="student-side-card tips-card">
@@ -1920,10 +1785,6 @@ function StudentDashboard() {
                 <ul>
                   {tips.map((tip) => (
                     <li key={tip}>
-                      <span>
-                        ✓
-                      </span>
-
                       {tip}
                     </li>
                   ))}
@@ -1948,10 +1809,6 @@ function StudentDashboard() {
             </span>
 
             <b>•</b>
-
-            <span>
-              A Smarter Campus for a Brighter Tomorrow
-            </span>
 
             <small>
               v1.0.0
@@ -2005,6 +1862,7 @@ function LecturerSections() {
   if (error) {
     return (
       <div
+        role="alert"
         style={{
           minHeight: "100vh",
           display: "grid",

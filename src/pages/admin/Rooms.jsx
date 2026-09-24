@@ -967,7 +967,7 @@ function Rooms() {
         <div className="rooms-brand">
 
           <div className="rooms-brand-logo">
-            <span>🎓</span>
+            A
           </div>
 
           <div>
@@ -1013,6 +1013,7 @@ function Rooms() {
         <nav className="rooms-nav">
 
           <button
+            aria-label="Dashboard"
             onClick={() =>
               navigateTo(
                 "/dashboard"
@@ -1030,6 +1031,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Users"
             onClick={() =>
               navigateTo(
                 "/admin/users"
@@ -1047,6 +1049,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Courses"
             onClick={() =>
               navigateTo(
                 "/admin/courses"
@@ -1064,6 +1067,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Sections"
             onClick={() =>
               navigateTo(
                 "/admin/sections"
@@ -1082,6 +1086,8 @@ function Rooms() {
 
           <button
             className="active"
+            aria-label="Rooms"
+            aria-current="page"
           >
             <Icon
               name="rooms"
@@ -1094,6 +1100,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Timetable"
             onClick={() =>
               navigateTo(
                 "/admin/timetable"
@@ -1111,6 +1118,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Attendance"
             onClick={() =>
               navigateTo(
                 "/admin/attendance"
@@ -1128,6 +1136,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Reports"
             onClick={() =>
               navigateTo(
                 "/admin/reports"
@@ -1145,6 +1154,7 @@ function Rooms() {
 
 
           <button
+            aria-label="Settings"
             onClick={() =>
               navigateTo(
                 "/admin/settings"
@@ -1168,6 +1178,7 @@ function Rooms() {
         <div className="rooms-sidebar-bottom">
 
           <button
+            aria-label="Logout"
             onClick={
               handleLogout
             }
@@ -1232,6 +1243,7 @@ function Rooms() {
               <button
                 className="header-icon-button"
                 title="Search"
+                aria-label="Search"
                 onClick={() =>
                   document
                     .getElementById(
@@ -1243,20 +1255,6 @@ function Rooms() {
                 <Icon
                   name="search"
                 />
-              </button>
-
-
-              <button
-                className="header-icon-button notification-button"
-                title="Notifications"
-              >
-                <Icon
-                  name="bell"
-                />
-
-                <span>
-                  3
-                </span>
               </button>
 
 
@@ -1299,7 +1297,7 @@ function Rooms() {
           =============================================== */}
 
           {error && !showModal && (
-            <div className="rooms-error">
+            <div className="rooms-error" role="alert">
 
               <strong>
                 Something went wrong
@@ -1319,7 +1317,7 @@ function Rooms() {
                   size={15}
                 />
 
-                Retry
+                Try again
               </button>
 
             </div>
@@ -1333,12 +1331,6 @@ function Rooms() {
           <div className="rooms-stats-grid">
 
             <div className="room-stat-card">
-
-              <div className="room-stat-icon blue">
-                <Icon
-                  name="building"
-                />
-              </div>
 
               <div>
 
@@ -1361,12 +1353,6 @@ function Rooms() {
 
             <div className="room-stat-card">
 
-              <div className="room-stat-icon purple">
-                <Icon
-                  name="door"
-                />
-              </div>
-
               <div>
 
                 <strong>
@@ -1387,12 +1373,6 @@ function Rooms() {
 
 
             <div className="room-stat-card">
-
-              <div className="room-stat-icon green">
-                <Icon
-                  name="capacity"
-                />
-              </div>
 
               <div>
 
@@ -1415,12 +1395,6 @@ function Rooms() {
 
             <div className="room-stat-card">
 
-              <div className="room-stat-icon orange">
-                <Icon
-                  name="classroom"
-                />
-              </div>
-
               <div>
 
                 <strong>
@@ -1441,12 +1415,6 @@ function Rooms() {
 
 
             <div className="room-stat-card">
-
-              <div className="room-stat-icon violet">
-                <Icon
-                  name="lab"
-                />
-              </div>
 
               <div>
 
@@ -1524,6 +1492,7 @@ function Rooms() {
                 <input
                   id="rooms-search-input"
                   type="text"
+                  aria-label="Search rooms"
                   value={search}
                   onChange={(event) =>
                     setSearch(
@@ -1536,6 +1505,7 @@ function Rooms() {
                 {search && (
                   <button
                     className="clear-search"
+                    aria-label="Clear search"
                     onClick={() =>
                       setSearch("")
                     }
@@ -1548,6 +1518,7 @@ function Rooms() {
 
 
               <select
+                aria-label="Filter by building"
                 value={
                   buildingFilter
                 }
@@ -1576,6 +1547,7 @@ function Rooms() {
 
 
               <select
+                aria-label="Filter by room type"
                 value={
                   typeFilter
                 }
@@ -1607,6 +1579,7 @@ function Rooms() {
 
 
               <select
+                aria-label="Filter by location"
                 value={
                   locationFilter
                 }
@@ -1660,6 +1633,10 @@ function Rooms() {
                     ? "active"
                     : ""
                 }
+                aria-pressed={
+                  activeBuilding ===
+                  "all"
+                }
                 onClick={() =>
                   setActiveBuilding(
                     "all"
@@ -1693,6 +1670,10 @@ function Rooms() {
                         building
                           ? "active"
                           : ""
+                      }
+                      aria-pressed={
+                        activeBuilding ===
+                        building
                       }
                       onClick={() =>
                         setActiveBuilding(
@@ -1736,13 +1717,6 @@ function Rooms() {
               ) : filteredRooms.length === 0 ? (
 
                 <div className="rooms-empty">
-
-                  <div className="rooms-empty-icon">
-                    <Icon
-                      name="rooms"
-                      size={30}
-                    />
-                  </div>
 
                   <h3>
                     No rooms found
@@ -1817,10 +1791,6 @@ function Rooms() {
 
                       <th>
                         LOCATION
-                      </th>
-
-                      <th>
-                        STATUS
                       </th>
 
                       <th>
@@ -1933,10 +1903,6 @@ function Rooms() {
                                   }
                                 </strong>
 
-                                <span>
-                                  Campus
-                                </span>
-
                               </div>
 
                             </td>
@@ -2026,21 +1992,6 @@ function Rooms() {
                                 </span>
 
                               )}
-
-                            </td>
-
-
-                            {/* STATUS */}
-
-                            <td>
-
-                              <span className="room-status available">
-
-                                <i />
-
-                                Available
-
-                              </span>
 
                             </td>
 
@@ -2138,29 +2089,6 @@ function Rooms() {
                     </strong>{" "}
                     rooms
                   </span>
-
-
-                  <div className="rooms-pagination">
-
-                    <button
-                      disabled
-                    >
-                      ‹
-                    </button>
-
-                    <button
-                      className="current"
-                    >
-                      1
-                    </button>
-
-                    <button
-                      disabled
-                    >
-                      ›
-                    </button>
-
-                  </div>
 
                 </div>
 
@@ -2344,13 +2272,6 @@ function Rooms() {
 
                 <div className="capacity-overview-item">
 
-                  <div className="capacity-overview-icon blue">
-                    <Icon
-                      name="capacity"
-                      size={25}
-                    />
-                  </div>
-
                   <strong>
                     {stats.totalCapacity}
                   </strong>
@@ -2370,13 +2291,6 @@ function Rooms() {
 
 
                 <div className="capacity-overview-item">
-
-                  <div className="capacity-overview-icon green">
-                    <Icon
-                      name="reports"
-                      size={25}
-                    />
-                  </div>
 
                   <strong>
                     {stats.averageCapacity}
@@ -2484,10 +2398,6 @@ function Rooms() {
                             seats
                           </strong>
 
-                          <span>
-                            Today
-                          </span>
-
                         </div>
 
                       </div>
@@ -2533,17 +2443,6 @@ function Rooms() {
 
               <div>
 
-                <div className="rooms-modal-icon">
-                  <Icon
-                    name={
-                      editingRoom
-                        ? "edit"
-                        : "plus"
-                    }
-                    size={22}
-                  />
-                </div>
-
                 <div>
 
                   <h2>
@@ -2565,6 +2464,7 @@ function Rooms() {
 
               <button
                 className="rooms-modal-close"
+                aria-label="Close"
                 onClick={
                   closeModal
                 }
@@ -2591,7 +2491,7 @@ function Rooms() {
             >
 
               {error && (
-                <div className="rooms-form-error">
+                <div className="rooms-form-error" role="alert">
                   {error}
                 </div>
               )}
@@ -2601,11 +2501,12 @@ function Rooms() {
 
               <div className="rooms-form-group">
 
-                <label>
+                <label htmlFor="room-building">
                   Building
                 </label>
 
                 <input
+                  id="room-building"
                   type="text"
                   name="building"
                   value={
@@ -2625,11 +2526,12 @@ function Rooms() {
 
               <div className="rooms-form-group">
 
-                <label>
+                <label htmlFor="room-name">
                   Room Name
                 </label>
 
                 <input
+                  id="room-name"
                   type="text"
                   name="roomName"
                   value={
@@ -2651,11 +2553,12 @@ function Rooms() {
 
                 <div className="rooms-form-group">
 
-                  <label>
+                  <label htmlFor="room-type">
                     Room Type
                   </label>
 
                   <select
+                    id="room-type"
                     name="roomType"
                     value={
                       form.roomType
@@ -2684,11 +2587,12 @@ function Rooms() {
 
                 <div className="rooms-form-group">
 
-                  <label>
+                  <label htmlFor="room-capacity">
                     Capacity
                   </label>
 
                   <input
+                    id="room-capacity"
                     type="number"
                     name="capacity"
                     min="1"
@@ -2737,7 +2641,7 @@ function Rooms() {
 
                   <div className="rooms-form-group">
 
-                    <label>
+                    <label htmlFor="room-latitude">
                       Latitude
                       <span>
                         Optional
@@ -2745,6 +2649,7 @@ function Rooms() {
                     </label>
 
                     <input
+                      id="room-latitude"
                       type="number"
                       name="latitude"
                       step="0.0000001"
@@ -2762,7 +2667,7 @@ function Rooms() {
 
                   <div className="rooms-form-group">
 
-                    <label>
+                    <label htmlFor="room-longitude">
                       Longitude
                       <span>
                         Optional
@@ -2770,6 +2675,7 @@ function Rooms() {
                     </label>
 
                     <input
+                      id="room-longitude"
                       type="number"
                       name="longitude"
                       step="0.0000001"

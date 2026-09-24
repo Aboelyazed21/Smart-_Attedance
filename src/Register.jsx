@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "./services/api";
+import Footer from "./components/Footer";
 import "./App.css";
 
 function Register() {
@@ -17,9 +18,11 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError("");
 
     // Check required fields
     if (
@@ -30,13 +33,13 @@ function Register() {
       !password ||
       !confirmPassword
     ) {
-      alert("Please fill in all fields");
+      setFormError("Please fill in all fields.");
       return;
     }
 
     // Check password match
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setFormError("Passwords do not match.");
       return;
     }
 
@@ -53,15 +56,12 @@ function Register() {
 
       console.log("Registration successful:", data);
 
-      alert(
-        "Account created successfully! You can now sign in."
-      );
-
-      // Go back to Login
       navigate("/");
     } catch (error) {
       console.error("Registration error:", error);
-      alert(error.message);
+      setFormError(
+        error.message || "Registration failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -76,8 +76,8 @@ function Register() {
 
         <div className="brand">
 
-          <div className="brand-logo">
-            <span>🎓</span>
+          <div className="brand-logo" aria-hidden="true">
+            <span>A</span>
           </div>
 
           <div className="brand-text">
@@ -90,9 +90,10 @@ function Register() {
         <button
           type="button"
           className="language-button"
+          aria-label="Change language. Current language: English"
         >
           <span>English</span>
-          <span className="chevron">⌄</span>
+          <span className="chevron" aria-hidden="true">⌄</span>
         </button>
 
       </header>
@@ -100,12 +101,12 @@ function Register() {
 
       {/* ================= REGISTER ================= */}
 
-      <main className="login-area">
+      <main className="login-area" id="main">
 
         <div className="login-card register-card">
 
-          <div className="login-logo">
-            <span>🎓</span>
+          <div className="login-logo" aria-hidden="true">
+            <span>A</span>
           </div>
 
           <h2 className="app-name">
@@ -120,7 +121,14 @@ function Register() {
           <form
             className="login-form"
             onSubmit={handleSubmit}
+            noValidate
           >
+
+            {formError && (
+              <div className="form-error" role="alert">
+                {formError}
+              </div>
+            )}
 
             {/* FIRST + LAST NAME */}
 
@@ -128,17 +136,14 @@ function Register() {
 
               <div className="form-group">
 
-                <label>
+                <label htmlFor="reg-first-name">
                   First Name
                 </label>
 
                 <div className="input-container">
 
-                  <span className="input-icon">
-                    👤
-                  </span>
-
                   <input
+                    id="reg-first-name"
                     type="text"
                     placeholder="First name"
                     autoComplete="given-name"
@@ -155,17 +160,14 @@ function Register() {
 
               <div className="form-group">
 
-                <label>
+                <label htmlFor="reg-last-name">
                   Last Name
                 </label>
 
                 <div className="input-container">
 
-                  <span className="input-icon">
-                    👤
-                  </span>
-
                   <input
+                    id="reg-last-name"
                     type="text"
                     placeholder="Last name"
                     autoComplete="family-name"
@@ -186,19 +188,16 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-email">
                 University Email
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  ✉
-                </span>
-
                 <input
+                  id="reg-email"
                   type="email"
-                  placeholder="Enter your university email"
+                  placeholder="you@university.edu"
                   autoComplete="email"
                   value={email}
                   onChange={(e) =>
@@ -215,17 +214,14 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-student-code">
                 University ID
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  #
-                </span>
-
                 <input
+                  id="reg-student-code"
                   type="text"
                   placeholder="Enter your university ID"
                   autoComplete="off"
@@ -244,17 +240,14 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-password">
                 Password
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  🔒
-                </span>
-
                 <input
+                  id="reg-password"
                   type={
                     showPassword
                       ? "text"
@@ -271,11 +264,17 @@ function Register() {
                 <button
                   type="button"
                   className="show-password"
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                  aria-pressed={showPassword}
                   onClick={() =>
                     setShowPassword(!showPassword)
                   }
                 >
-                  {showPassword ? "◉" : "◌"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
 
               </div>
@@ -287,17 +286,14 @@ function Register() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="reg-confirm-password">
                 Confirm Password
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  🔒
-                </span>
-
                 <input
+                  id="reg-confirm-password"
                   type={
                     showConfirmPassword
                       ? "text"
@@ -314,13 +310,19 @@ function Register() {
                 <button
                   type="button"
                   className="show-password"
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                  aria-pressed={showConfirmPassword}
                   onClick={() =>
                     setShowConfirmPassword(
                       !showConfirmPassword
                     )
                   }
                 >
-                  {showConfirmPassword ? "◉" : "◌"}
+                  {showConfirmPassword ? "Hide" : "Show"}
                 </button>
 
               </div>
@@ -334,19 +336,14 @@ function Register() {
               type="submit"
               className="sign-in-button"
               disabled={loading}
+              aria-busy={loading}
             >
 
               <span>
                 {loading
-                  ? "Creating Account..."
+                  ? "Creating account…"
                   : "Create Account"}
               </span>
-
-              {!loading && (
-                <span className="sign-arrow">
-                  →
-                </span>
-              )}
 
             </button>
 
@@ -377,27 +374,7 @@ function Register() {
 
       {/* ================= FOOTER ================= */}
 
-      <footer className="page-footer">
-
-        <div className="tagline">
-
-          <span>
-            A Smarter Campus
-          </span>
-
-          <span>
-            For A Brighter Tomorrow
-          </span>
-
-        </div>
-
-        <div className="tagline-line"></div>
-
-        <div className="university-name">
-          PORT SAID UNIVERSITY
-        </div>
-
-      </footer>
+      <Footer />
 
     </div>
   );

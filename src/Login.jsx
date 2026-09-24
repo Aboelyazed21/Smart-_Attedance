@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import Footer from "./components/Footer";
 import "./App.css";
 
 function Login() {
@@ -21,8 +22,8 @@ function Login() {
 
         <div className="brand">
 
-          <div className="brand-logo">
-            <span>🎓</span>
+          <div className="brand-logo" aria-hidden="true">
+            <span>A</span>
           </div>
 
           <div className="brand-text">
@@ -36,16 +37,13 @@ function Login() {
         <button
           type="button"
           className="language-button"
+          aria-label="Change language. Current language: English"
         >
-          <span className="globe">
-            ◎
-          </span>
-
           <span>
             English
           </span>
 
-          <span className="chevron">
+          <span className="chevron" aria-hidden="true">
             ⌄
           </span>
         </button>
@@ -55,14 +53,14 @@ function Login() {
 
       {/* LOGIN */}
 
-      <main className="login-area">
+      <main className="login-area" id="main">
 
         <div className="login-card">
 
           {/* LOGO */}
 
-          <div className="login-logo">
-            <span>🎓</span>
+          <div className="login-logo" aria-hidden="true">
+            <span>A</span>
           </div>
 
 
@@ -97,23 +95,21 @@ function Login() {
           <form
             className="login-form"
             onSubmit={handleSubmit}
+            noValidate
           >
 
             {/* EMAIL */}
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="login-email">
                 Email or University ID
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  ✉
-                </span>
-
                 <input
+                  id="login-email"
                   type="text"
                   placeholder="Email or University ID"
                   autoComplete="username"
@@ -128,17 +124,14 @@ function Login() {
 
             <div className="form-group">
 
-              <label>
+              <label htmlFor="login-password">
                 Password
               </label>
 
               <div className="input-container">
 
-                <span className="input-icon">
-                  🔒
-                </span>
-
                 <input
+                  id="login-password"
                   type={
                     showPassword
                       ? "text"
@@ -151,11 +144,13 @@ function Login() {
                 <button
                   type="button"
                   className="show-password"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
                   onClick={() =>
                     setShowPassword(!showPassword)
                   }
                 >
-                  {showPassword ? "◉" : "◌"}
+                  {showPassword ? "Hide" : "Show"}
                 </button>
 
               </div>
@@ -188,10 +183,6 @@ function Login() {
                 Sign In
               </span>
 
-              <span className="sign-arrow">
-                →
-              </span>
-
             </button>
 
 
@@ -199,13 +190,13 @@ function Login() {
 
             <div className="or-divider">
 
-              <span></span>
+              <span aria-hidden="true"></span>
 
               <p>
                 OR
               </p>
 
-              <span></span>
+              <span aria-hidden="true"></span>
 
             </div>
 
@@ -216,10 +207,6 @@ function Login() {
               to="/register"
               className="create-account-button"
             >
-
-              <span className="create-icon">
-                ♙+
-              </span>
 
               <span>
                 Create an Account
@@ -234,29 +221,7 @@ function Login() {
       </main>
 
 
-      {/* FOOTER */}
-
-      <footer className="page-footer">
-
-        <div className="tagline">
-
-          <span>
-            A Smarter Campus
-          </span>
-
-          <span>
-            For A Brighter Tomorrow
-          </span>
-
-        </div>
-
-        <div className="tagline-line"></div>
-
-        <div className="university-name">
-          PORT SAID UNIVERSITY
-        </div>
-
-      </footer>
+      <Footer />
 
     </div>
   );

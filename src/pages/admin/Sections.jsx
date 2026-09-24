@@ -1218,7 +1218,7 @@ function Sections() {
         <div className="sidebar-brand">
 
           <div className="sidebar-logo">
-            🎓
+            A
           </div>
 
           <div>
@@ -1496,7 +1496,7 @@ function Sections() {
             <div className="section-stat-card">
 
               <div className="section-stat-icon orange">
-                🎓
+                A
               </div>
 
               <div>

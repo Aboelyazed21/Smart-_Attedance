@@ -234,6 +234,14 @@ export default function LecturerReports() {
             <div className="reports-error" role="alert">
               <strong>Unable to load report.</strong>
               <span>{error}</span>
+              <button
+                type="button"
+                className="reports-secondary-button"
+                onClick={generateReport}
+                disabled={generating}
+              >
+                {generating ? "Retrying..." : "Try again"}
+              </button>
             </div>
           )}
 
@@ -242,31 +250,26 @@ export default function LecturerReports() {
               label="Total Records"
               value={statistics.total}
               type="blue"
-              icon="#"
             />
             <StatCard
               label="Present"
               value={statistics.present}
               type="green"
-              icon="+"
             />
             <StatCard
               label="Late"
               value={statistics.late}
-              type="orange"
-              icon="T"
+              type="amber"
             />
             <StatCard
               label="Absent"
               value={statistics.absent}
               type="red"
-              icon="-"
             />
             <StatCard
               label="Attendance Rate"
               value={`${statistics.attendanceRate}%`}
-              type="purple"
-              icon="%"
+              type="neutral"
             />
           </section>
 
@@ -349,19 +352,30 @@ export default function LecturerReports() {
 
           <section className="reports-table-card">
             {loading ? (
-              <div className="reports-empty-state">
+              <div
+                className="reports-empty-state"
+                role="status"
+                aria-live="polite"
+              >
                 <div className="reports-spinner" />
                 <h3>Loading Report</h3>
                 <p>Please wait while attendance data is loaded.</p>
               </div>
             ) : rows.length === 0 ? (
               <div className="reports-empty-state">
-                <div className="reports-empty-icon">R</div>
                 <h3>No Report Data</h3>
                 <p>
                   Select a section and date range, then generate the
                   report.
                 </p>
+                <button
+                  type="button"
+                  className="reports-generate-button"
+                  onClick={generateReport}
+                  disabled={generating}
+                >
+                  {generating ? "Generating..." : "Generate Report"}
+                </button>
               </div>
             ) : (
               <>
@@ -492,10 +506,9 @@ function InfoItem({ label, value }) {
   );
 }
 
-function StatCard({ label, value, type, icon }) {
+function StatCard({ label, value, type }) {
   return (
     <div className={`report-stat-card report-stat-${type}`}>
-      <div className="report-stat-icon">{icon}</div>
       <div className="report-stat-copy">
         <span>{label}</span>
         <strong>{value}</strong>

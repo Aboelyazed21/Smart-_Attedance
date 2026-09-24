@@ -87,6 +87,37 @@ function getDateValue(date) {
   return String(date).slice(0, 10);
 }
 
+function parseDateValue(value) {
+  if (!value) return null;
+
+  const [year, month, day] = String(value)
+    .slice(0, 10)
+    .split("-")
+    .map(Number);
+
+  if (!year || !month || !day) return null;
+
+  return new Date(year, month - 1, day);
+}
+
+function getStatus(item) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const start = parseDateValue(item.start_date);
+  const end = parseDateValue(item.end_date);
+
+  if (end && end < today) {
+    return { label: "Ended", className: "ended" };
+  }
+
+  if (start && start > today) {
+    return { label: "Upcoming", className: "upcoming" };
+  }
+
+  return { label: "Active", className: "active" };
+}
+
 export default function Timetable() {
   const navigate = useNavigate();
 
@@ -651,7 +682,7 @@ export default function Timetable() {
 
         <div className="tt-brand">
           <div className="tt-brand-logo">
-            🎓
+            A
           </div>
 
           <div>
@@ -668,7 +699,6 @@ export default function Timetable() {
               goTo("/dashboard")
             }
           >
-            <span>▦</span>
             Dashboard
           </button>
 
@@ -678,7 +708,6 @@ export default function Timetable() {
               goTo("/admin/users")
             }
           >
-            <span>♙</span>
             Users
           </button>
 
@@ -688,7 +717,6 @@ export default function Timetable() {
               goTo("/admin/courses")
             }
           >
-            <span>▤</span>
             Courses
           </button>
 
@@ -698,7 +726,6 @@ export default function Timetable() {
               goTo("/admin/sections")
             }
           >
-            <span>§</span>
             Sections
           </button>
 
@@ -708,14 +735,13 @@ export default function Timetable() {
               goTo("/admin/rooms")
             }
           >
-            <span>⌂</span>
             Rooms
           </button>
 
           <button
             className="tt-nav-item active"
+            aria-current="page"
           >
-            <span>◫</span>
             Timetable
           </button>
 
@@ -725,7 +751,6 @@ export default function Timetable() {
               goTo("/admin/attendance")
             }
           >
-            <span>✓</span>
             Attendance
           </button>
 
@@ -735,7 +760,6 @@ export default function Timetable() {
               goTo("/admin/reports")
             }
           >
-            <span>▥</span>
             Reports
           </button>
 
@@ -745,7 +769,6 @@ export default function Timetable() {
               goTo("/admin/settings")
             }
           >
-            <span>⚙</span>
             Settings
           </button>
 
@@ -755,7 +778,7 @@ export default function Timetable() {
 
           <div className="tt-sidebar-message">
             <strong>
-              Good Morning 👋
+              Good Morning
             </strong>
 
             <p>
@@ -768,7 +791,6 @@ export default function Timetable() {
             className="tt-nav-item tt-logout"
             onClick={logout}
           >
-            <span>↪</span>
             Logout
           </button>
 
@@ -787,10 +809,9 @@ export default function Timetable() {
         <div className="tt-topbar">
 
           <div className="tt-global-search">
-            <span>⌕</span>
-
             <input
               type="text"
+              aria-label="Search timetable"
               placeholder="Search courses, rooms, or anything..."
               value={search}
               onChange={(event) =>
@@ -802,11 +823,6 @@ export default function Timetable() {
           </div>
 
           <div className="tt-topbar-right">
-
-            <button className="tt-icon-button">
-              🔔
-              <small>1</small>
-            </button>
 
             <div className="tt-user">
 
@@ -820,8 +836,6 @@ export default function Timetable() {
                 </strong>
               </div>
 
-              <span>⌄</span>
-
             </div>
 
           </div>
@@ -833,10 +847,6 @@ export default function Timetable() {
         <header className="tt-page-header">
 
           <div className="tt-title-wrapper">
-
-            <div className="tt-title-icon">
-              📅
-            </div>
 
             <div>
               <h1>
@@ -852,8 +862,6 @@ export default function Timetable() {
           </div>
 
           <div className="tt-header-date">
-            <span>▣</span>
-
             {new Date().toLocaleDateString(
               "en-US",
               {
@@ -871,7 +879,6 @@ export default function Timetable() {
               openCreateModal
             }
           >
-            <span>＋</span>
             Add Class to Timetable
           </button>
 
@@ -882,13 +889,23 @@ export default function Timetable() {
         <section className="tt-content">
 
           {error && (
-            <div className="tt-error">
-              <span>⚠</span>
+            <div className="tt-error" role="alert">
               <div>
                 {error}
               </div>
 
               <button
+                className="tt-retry-btn"
+                onClick={() => {
+                  setError("");
+                  loadData();
+                }}
+              >
+                Try again
+              </button>
+
+              <button
+                aria-label="Dismiss"
                 onClick={() =>
                   setError("")
                 }
@@ -906,10 +923,6 @@ export default function Timetable() {
 
             <div className="tt-stat-card">
 
-              <div className="tt-stat-icon purple">
-                📖
-              </div>
-
               <div>
                 <span>Total Classes</span>
 
@@ -922,17 +935,9 @@ export default function Timetable() {
                 </small>
               </div>
 
-              <div className="tt-stat-badge green">
-                + 12%
-              </div>
-
             </div>
 
             <div className="tt-stat-card">
-
-              <div className="tt-stat-icon blue">
-                👥
-              </div>
 
               <div>
                 <span>Active Courses</span>
@@ -950,10 +955,6 @@ export default function Timetable() {
 
             <div className="tt-stat-card">
 
-              <div className="tt-stat-icon green">
-                🏫
-              </div>
-
               <div>
                 <span>Total Rooms</span>
 
@@ -969,10 +970,6 @@ export default function Timetable() {
             </div>
 
             <div className="tt-stat-card">
-
-              <div className="tt-stat-icon orange">
-                🕐
-              </div>
 
               <div>
                 <span>Total Sections</span>
@@ -997,10 +994,9 @@ export default function Timetable() {
           <div className="tt-filter-bar">
 
             <div className="tt-filter-search">
-              <span>⌕</span>
-
               <input
                 type="text"
+                aria-label="Search by course, section, or room"
                 placeholder="Search by course, section, or room..."
                 value={search}
                 onChange={(event) =>
@@ -1012,6 +1008,7 @@ export default function Timetable() {
             </div>
 
             <select
+              aria-label="Filter by course"
               value={courseFilter}
               onChange={(event) =>
                 setCourseFilter(
@@ -1036,6 +1033,7 @@ export default function Timetable() {
             </select>
 
             <select
+              aria-label="Filter by section"
               value={sectionFilter}
               onChange={(event) =>
                 setSectionFilter(
@@ -1060,6 +1058,7 @@ export default function Timetable() {
             </select>
 
             <select
+              aria-label="Filter by room"
               value={roomFilter}
               onChange={(event) =>
                 setRoomFilter(
@@ -1084,6 +1083,7 @@ export default function Timetable() {
             </select>
 
             <select
+              aria-label="Filter by day"
               value={dayFilter}
               onChange={(event) =>
                 setDayFilter(
@@ -1109,7 +1109,6 @@ export default function Timetable() {
               className="tt-reset-button"
               onClick={resetFilters}
             >
-              ↻
               Reset
             </button>
 
@@ -1121,11 +1120,13 @@ export default function Timetable() {
                     ? "active"
                     : ""
                 }
+                aria-pressed={
+                  viewMode === "list"
+                }
                 onClick={() =>
                   setViewMode("list")
                 }
               >
-                ▤
                 List
               </button>
 
@@ -1135,13 +1136,15 @@ export default function Timetable() {
                     ? "active"
                     : ""
                 }
+                aria-pressed={
+                  viewMode === "calendar"
+                }
                 onClick={() =>
                   setViewMode(
                     "calendar"
                   )
                 }
               >
-                ▦
                 Calendar
               </button>
 
@@ -1180,7 +1183,7 @@ export default function Timetable() {
                     openCreateModal
                   }
                 >
-                  ＋ Add
+                  Add
                 </button>
 
               </div>
@@ -1197,10 +1200,6 @@ export default function Timetable() {
                 </div>
               ) : filteredTimetable.length === 0 ? (
                 <div className="tt-empty">
-                  <div className="tt-empty-icon">
-                    📅
-                  </div>
-
                   <h3>
                     No timetable slots found
                   </h3>
@@ -1215,7 +1214,7 @@ export default function Timetable() {
                       openCreateModal
                     }
                   >
-                    ＋ Add Class
+                    Add Class
                   </button>
                 </div>
               ) : viewMode === "calendar" ? (
@@ -1257,10 +1256,6 @@ export default function Timetable() {
                                   className="tt-calendar-item"
                                   key={item.id}
                                 >
-                                  <div className="tt-calendar-course-icon">
-                                    📚
-                                  </div>
-
                                   <div>
                                     <strong>
                                       {item.course_code ||
@@ -1324,6 +1319,9 @@ export default function Timetable() {
                             ] ||
                             "blue";
 
+                          const status =
+                            getStatus(item);
+
                           return (
                             <tr
                               key={item.id}
@@ -1342,10 +1340,6 @@ export default function Timetable() {
 
                               <td>
                                 <div className="tt-course-cell">
-
-                                  <div className="tt-course-icon">
-                                    📖
-                                  </div>
 
                                   <div>
                                     <strong>
@@ -1420,9 +1414,11 @@ export default function Timetable() {
                               </td>
 
                               <td>
-                                <span className="tt-status active">
+                                <span
+                                  className={`tt-status ${status.className}`}
+                                >
                                   <i />
-                                  Active
+                                  {status.label}
                                 </span>
                               </td>
 
@@ -1431,33 +1427,24 @@ export default function Timetable() {
 
                                   <button
                                     className="tt-action edit"
-                                    title="Edit"
                                     onClick={() =>
                                       openEditModal(
                                         item
                                       )
                                     }
                                   >
-                                    ✎
+                                    Edit
                                   </button>
 
                                   <button
                                     className="tt-action delete"
-                                    title="Delete"
                                     onClick={() =>
                                       handleDelete(
                                         item.id
                                       )
                                     }
                                   >
-                                    🗑
-                                  </button>
-
-                                  <button
-                                    className="tt-action more"
-                                    title="More"
-                                  >
-                                    ⋯
+                                    Delete
                                   </button>
 
                                 </div>
@@ -1497,11 +1484,6 @@ export default function Timetable() {
                       }
                     )}
                   </h3>
-
-                  <div>
-                    <button>‹</button>
-                    <button>›</button>
-                  </div>
                 </div>
 
                 <div className="tt-weekdays">
@@ -1591,7 +1573,6 @@ export default function Timetable() {
                     openCreateModal
                   }
                 >
-                  <span>＋</span>
                   Add New Class
                 </button>
 
@@ -1603,20 +1584,7 @@ export default function Timetable() {
                     )
                   }
                 >
-                  <span>🏫</span>
                   Manage Rooms
-                </button>
-
-                <button
-                  className="tt-quick-action red"
-                  onClick={() =>
-                    setError(
-                      "Conflict detection can be connected to the timetable backend."
-                    )
-                  }
-                >
-                  <span>⚠</span>
-                  View Conflicts
                 </button>
 
                 <button
@@ -1625,7 +1593,6 @@ export default function Timetable() {
                     window.print();
                   }}
                 >
-                  <span>⇩</span>
                   Export Timetable
                 </button>
 
@@ -1675,10 +1642,6 @@ export default function Timetable() {
                           key={item.id}
                         >
 
-                          <div className="tt-today-icon">
-                            📘
-                          </div>
-
                           <div>
                             <strong>
                               {item.course_code ||
@@ -1689,7 +1652,6 @@ export default function Timetable() {
                             </strong>
 
                             <span>
-                              ◷{" "}
                               {formatTime(
                                 item.start_time
                               )}{" "}
@@ -1700,7 +1662,6 @@ export default function Timetable() {
                             </span>
 
                             <span>
-                              ⌖{" "}
                               {item.room_name ||
                                 "No Room"}
                             </span>
@@ -1723,9 +1684,6 @@ export default function Timetable() {
 
         <footer className="tt-footer">
           © 2026 Attendify. All rights reserved.
-          <span>
-            Smart Education. Smarter Tomorrow.
-          </span>
         </footer>
 
       </main>
@@ -1752,10 +1710,6 @@ export default function Timetable() {
             <div className="tt-modal-header">
 
               <div>
-                <div className="tt-modal-icon">
-                  📅
-                </div>
-
                 <div>
                   <h2>
                     {editingId
@@ -1772,6 +1726,7 @@ export default function Timetable() {
 
               <button
                 className="tt-modal-close"
+                aria-label="Close"
                 onClick={
                   closeModal
                 }
@@ -1791,12 +1746,13 @@ export default function Timetable() {
 
                 <div className="tt-form-group full">
 
-                  <label>
+                  <label htmlFor="tt-section">
                     Section
                     <span>*</span>
                   </label>
 
                   <select
+                    id="tt-section"
                     name="sectionId"
                     value={
                       form.sectionId
@@ -1834,11 +1790,12 @@ export default function Timetable() {
 
                 <div className="tt-form-group">
 
-                  <label>
+                  <label htmlFor="tt-room">
                     Room
                   </label>
 
                   <select
+                    id="tt-room"
                     name="roomId"
                     value={
                       form.roomId
@@ -1875,12 +1832,13 @@ export default function Timetable() {
 
                 <div className="tt-form-group">
 
-                  <label>
+                  <label htmlFor="tt-day">
                     Day
                     <span>*</span>
                   </label>
 
                   <select
+                    id="tt-day"
                     name="dayOfWeek"
                     value={
                       form.dayOfWeek
@@ -1912,12 +1870,13 @@ export default function Timetable() {
 
                 <div className="tt-form-group">
 
-                  <label>
+                  <label htmlFor="tt-start-time">
                     Start Time
                     <span>*</span>
                   </label>
 
                   <input
+                    id="tt-start-time"
                     type="time"
                     name="startTime"
                     value={
@@ -1933,12 +1892,13 @@ export default function Timetable() {
 
                 <div className="tt-form-group">
 
-                  <label>
+                  <label htmlFor="tt-end-time">
                     End Time
                     <span>*</span>
                   </label>
 
                   <input
+                    id="tt-end-time"
                     type="time"
                     name="endTime"
                     value={
@@ -1954,11 +1914,12 @@ export default function Timetable() {
 
                 <div className="tt-form-group">
 
-                  <label>
+                  <label htmlFor="tt-start-date">
                     Start Date
                   </label>
 
                   <input
+                    id="tt-start-date"
                     type="date"
                     name="startDate"
                     value={
@@ -1973,11 +1934,12 @@ export default function Timetable() {
 
                 <div className="tt-form-group">
 
-                  <label>
+                  <label htmlFor="tt-end-date">
                     End Date
                   </label>
 
                   <input
+                    id="tt-end-date"
                     type="date"
                     name="endDate"
                     value={
@@ -1993,8 +1955,8 @@ export default function Timetable() {
               </div>
 
               {error && (
-                <div className="tt-modal-error">
-                  ⚠ {error}
+                <div className="tt-modal-error" role="alert">
+                  {error}
                 </div>
               )}
 

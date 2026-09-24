@@ -4,11 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   getCourses,
   getSections,
+  API_URL,
 } from "../../services/api";
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000/api";
 
 export default function Attendance() {
   const navigate = useNavigate();
@@ -693,7 +690,7 @@ export default function Attendance() {
         <div className="attendance-brand">
 
           <div className="attendance-brand-icon">
-            🎓
+            A
           </div>
 
           <div>
@@ -717,7 +714,6 @@ export default function Attendance() {
               )
             }
           >
-            ▦
             <span>
               Dashboard
             </span>
@@ -730,7 +726,6 @@ export default function Attendance() {
               )
             }
           >
-            👤
             <span>
               Users
             </span>
@@ -743,7 +738,6 @@ export default function Attendance() {
               )
             }
           >
-            ▤
             <span>
               Courses
             </span>
@@ -756,7 +750,6 @@ export default function Attendance() {
               )
             }
           >
-            §
             <span>
               Sections
             </span>
@@ -769,7 +762,6 @@ export default function Attendance() {
               )
             }
           >
-            ⌂
             <span>
               Rooms
             </span>
@@ -782,14 +774,15 @@ export default function Attendance() {
               )
             }
           >
-            ▦
             <span>
               Timetable
             </span>
           </button>
 
-          <button className="active">
-            ✓
+          <button
+            className="active"
+            aria-current="page"
+          >
             <span>
               Attendance
             </span>
@@ -802,7 +795,6 @@ export default function Attendance() {
               )
             }
           >
-            ▥
             <span>
               Reports
             </span>
@@ -815,7 +807,6 @@ export default function Attendance() {
               )
             }
           >
-            ⚙
             <span>
               Settings
             </span>
@@ -828,7 +819,7 @@ export default function Attendance() {
           <div className="attendance-good-morning">
 
             <strong>
-              Good Morning 👋
+              Good Morning
             </strong>
 
             <span>
@@ -854,7 +845,6 @@ export default function Attendance() {
               );
             }}
           >
-            ↪
             Logout
           </button>
 
@@ -873,8 +863,8 @@ export default function Attendance() {
         <header className="attendance-topbar">
 
           <div className="attendance-global-search">
-            🔎
             <input
+              aria-label="Search attendance records"
               placeholder="Search students, courses, sections, or rooms..."
               value={search}
               onChange={(event) =>
@@ -886,11 +876,6 @@ export default function Attendance() {
           </div>
 
           <div className="attendance-user">
-
-            <span className="attendance-notification">
-              🔔
-              <b>3</b>
-            </span>
 
             <div className="attendance-user-avatar">
               {
@@ -921,10 +906,6 @@ export default function Attendance() {
 
             </div>
 
-            <span>
-              ▾
-            </span>
-
           </div>
 
         </header>
@@ -934,10 +915,6 @@ export default function Attendance() {
         <section className="attendance-header">
 
           <div className="attendance-title">
-
-            <div className="attendance-title-icon">
-              👥
-            </div>
 
             <div>
 
@@ -961,16 +938,6 @@ export default function Attendance() {
               / Attendance
             </span>
 
-            <button
-              onClick={() =>
-                navigate(
-                  "/admin/sessions"
-                )
-              }
-            >
-              + Take Attendance
-            </button>
-
           </div>
 
         </section>
@@ -980,43 +947,35 @@ export default function Attendance() {
         <section className="attendance-stats">
 
           <StatCard
-            icon="👥"
             title="Total Students"
             value={
               statistics.students
             }
             subtitle="Students in records"
-            className="green"
           />
 
           <StatCard
-            icon="✓"
             title="Present Today"
             value={
               statistics.present
             }
             subtitle={`${statistics.attendanceRate}% attendance rate`}
-            className="blue"
           />
 
           <StatCard
-            icon="×"
             title="Absent Today"
             value={
               statistics.absent
             }
             subtitle="Students absent"
-            className="orange"
           />
 
           <StatCard
-            icon="◷"
             title="Late Today"
             value={
               statistics.late
             }
             subtitle="Students late"
-            className="purple"
           />
 
         </section>
@@ -1027,9 +986,8 @@ export default function Attendance() {
 
           <div className="attendance-search">
 
-            🔎
-
             <input
+              aria-label="Search attendance records"
               placeholder="Search by student name, ID, or course..."
               value={search}
               onChange={(event) =>
@@ -1042,6 +1000,7 @@ export default function Attendance() {
           </div>
 
           <select
+            aria-label="Filter by course"
             value={courseId}
             onChange={(event) =>
               setCourseId(
@@ -1071,6 +1030,7 @@ export default function Attendance() {
           </select>
 
           <select
+            aria-label="Filter by section"
             value={sectionId}
             onChange={(event) =>
               setSectionId(
@@ -1099,6 +1059,7 @@ export default function Attendance() {
           </select>
 
           <select
+            aria-label="Filter by status"
             value={status}
             onChange={(event) =>
               setStatus(
@@ -1131,6 +1092,7 @@ export default function Attendance() {
 
           <input
             className="attendance-date-input"
+            aria-label="Filter by date"
             type="date"
             value={date}
             onChange={(event) =>
@@ -1146,7 +1108,7 @@ export default function Attendance() {
               resetFilters
             }
           >
-            ↻ Reset
+            Reset
           </button>
 
           <button
@@ -1155,7 +1117,7 @@ export default function Attendance() {
               exportAttendance
             }
           >
-            ↓ Export
+            Export
           </button>
 
         </section>
@@ -1191,19 +1153,38 @@ export default function Attendance() {
                   loadAttendance
                 }
               >
-                ↻ Refresh
+                Refresh
               </button>
 
             </div>
 
             {error && (
-              <div className="attendance-error">
-                {error}
+              <div
+                className="attendance-error"
+                role="alert"
+              >
+                <span>
+                  {error}
+                </span>
+                <button
+                  type="button"
+                  className="attendance-retry-btn"
+                  onClick={loadAttendance}
+                >
+                  Try again
+                </button>
               </div>
             )}
 
             {loading ? (
-              <div className="attendance-loading">
+              <div
+                className="attendance-loading"
+                role="status"
+              >
+                <span
+                  className="attendance-spinner"
+                  aria-hidden="true"
+                />
                 Loading attendance...
               </div>
             ) : (
@@ -1218,6 +1199,7 @@ export default function Attendance() {
                       <th>
                         <input
                           type="checkbox"
+                          aria-label="Select all rows"
                           checked={
                             filteredRecords.length >
                               0 &&
@@ -1280,6 +1262,15 @@ export default function Attendance() {
                         >
                           No attendance
                           records found.
+                          <button
+                            type="button"
+                            className="attendance-reset"
+                            onClick={
+                              loadAttendance
+                            }
+                          >
+                            Refresh
+                          </button>
                         </td>
 
                       </tr>
@@ -1300,6 +1291,7 @@ export default function Attendance() {
 
                               <input
                                 type="checkbox"
+                                aria-label={`Select row ${index + 1}`}
                                 checked={selectedRows.includes(
                                   record.attendance_id
                                 )}
@@ -1426,7 +1418,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  👁
+                                  View
                                 </button>
 
                                 <button
@@ -1437,7 +1429,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  ✎
+                                  Edit
                                 </button>
 
                                 <button
@@ -1454,7 +1446,7 @@ export default function Attendance() {
                                     )
                                   }
                                 >
-                                  ⋯
+                                  More
                                 </button>
 
                               </div>
@@ -1557,13 +1549,13 @@ export default function Attendance() {
               <div className="attendance-side-title">
 
                 <h3>
-                  Today's Classes
+                  Sections
                 </h3>
 
                 <button
                   onClick={() =>
                     navigate(
-                      "/admin/timetable"
+                      "/admin/sections"
                     )
                   }
                 >
@@ -1576,8 +1568,7 @@ export default function Attendance() {
                 .slice(0, 3)
                 .map(
                   (
-                    section,
-                    index
+                    section
                   ) => (
                     <div
                       className="attendance-class-item"
@@ -1585,10 +1576,6 @@ export default function Attendance() {
                         section.id
                       }
                     >
-
-                      <div className="attendance-class-icon">
-                        ▣
-                      </div>
 
                       <div>
 
@@ -1603,16 +1590,10 @@ export default function Attendance() {
                         <span>
                           {section.course_name ||
                             section.courseName ||
-                            "Scheduled class"}
+                            ""}
                         </span>
 
                       </div>
-
-                      <small>
-                        {index === 0
-                          ? "Ongoing"
-                          : "Upcoming"}
-                      </small>
 
                     </div>
                   )
@@ -1631,21 +1612,11 @@ export default function Attendance() {
               <div className="attendance-quick-actions">
 
                 <button
-                  onClick={() =>
-                    navigate(
-                      "/admin/sessions"
-                    )
-                  }
-                >
-                  👥 Take Attendance
-                </button>
-
-                <button
                   onClick={
                     exportAttendance
                   }
                 >
-                  ↓ Export CSV
+                  Export CSV
                 </button>
 
                 <button
@@ -1655,17 +1626,7 @@ export default function Attendance() {
                     )
                   }
                 >
-                  ▥ View Reports
-                </button>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      "/admin/sessions"
-                    )
-                  }
-                >
-                  ▣ Manage Sessions
+                  View Reports
                 </button>
 
               </div>
@@ -1686,20 +1647,41 @@ export default function Attendance() {
 
               <div className="attendance-activity">
 
-                <ActivityItem
-                  color="green"
-                  text="Attendance records loaded"
-                />
-
-                <ActivityItem
-                  color="blue"
-                  text="Attendance session system connected"
-                />
-
-                <ActivityItem
-                  color="orange"
-                  text="Attendance report available"
-                />
+                {filteredRecords.length ===
+                0 ? (
+                  <p className="attendance-activity-empty">
+                    No recent activity.
+                  </p>
+                ) : (
+                  filteredRecords
+                    .slice(0, 3)
+                    .map((record) => (
+                      <ActivityItem
+                        key={
+                          record.attendance_id ||
+                          `${record.student_id}-${record.session_id}`
+                        }
+                        color={
+                          record.attendance_status ===
+                          "present"
+                            ? "green"
+                            : record.attendance_status ===
+                              "late"
+                            ? "orange"
+                            : record.attendance_status ===
+                              "absent"
+                            ? "red"
+                            : "blue"
+                        }
+                        text={`${record.student_name || "Student"} — ${getStatusLabel(
+                          record.attendance_status
+                        )}`}
+                        time={formatTime(
+                          record.scanned_at
+                        )}
+                      />
+                    ))
+                )}
 
               </div>
 
@@ -1748,6 +1730,7 @@ export default function Attendance() {
                   </div>
 
                   <button
+                    aria-label="Close"
                     onClick={() =>
                       setSelectedRecord(
                         null
@@ -1874,6 +1857,7 @@ export default function Attendance() {
                   </div>
 
                   <button
+                    aria-label="Close"
                     onClick={() =>
                       setEditModal(
                         false
@@ -1988,20 +1972,12 @@ export default function Attendance() {
 =========================================================== */
 
 function StatCard({
-  icon,
   title,
   value,
   subtitle,
-  className,
 }) {
   return (
-    <div
-      className={`attendance-stat-card ${className}`}
-    >
-
-      <div className="attendance-stat-icon">
-        {icon}
-      </div>
+    <div className="attendance-stat-card">
 
       <div className="attendance-stat-content">
 
@@ -2066,6 +2042,7 @@ function OverviewItem({
 function ActivityItem({
   color,
   text,
+  time,
 }) {
   return (
     <div className="attendance-activity-item">
@@ -2079,7 +2056,7 @@ function ActivityItem({
       </span>
 
       <small>
-        now
+        {time}
       </small>
 
     </div>

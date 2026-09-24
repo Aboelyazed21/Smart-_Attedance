@@ -6,10 +6,8 @@
   min-height: 100vh;
   padding: 34px;
   box-sizing: border-box;
-  background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 28%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  color: #172033;
+  background: #f7f8fa;
+  color: #111827;
 }
 
 /* Header */
@@ -71,7 +69,6 @@
 }
 
 .lecturer-dashboard-refresh:hover {
-  transform: translateY(-1px);
   border-color: #b8c5d6;
   box-shadow: 0 9px 24px rgba(15, 23, 42, 0.08);
 }
@@ -79,12 +76,6 @@
 .lecturer-dashboard-refresh:disabled {
   cursor: not-allowed;
   opacity: 0.58;
-  transform: none;
-}
-
-.lecturer-dashboard-refresh-icon {
-  font-size: 18px;
-  line-height: 1;
 }
 
 /* Error */
@@ -96,10 +87,10 @@
   gap: 18px;
   margin-bottom: 20px;
   padding: 15px 17px;
-  border: 1px solid #fecdd3;
+  border: 1px solid #e5e7eb;
   border-radius: 13px;
-  background: #fff1f2;
-  color: #9f1239;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .lecturer-dashboard-error strong {
@@ -115,10 +106,10 @@
 .lecturer-dashboard-error button {
   min-height: 36px;
   padding: 0 13px;
-  border: 1px solid #fda4af;
+  border: 1px solid #e5e7eb;
   border-radius: 9px;
   background: #ffffff;
-  color: #be123c;
+  color: #b91c1c;
   font-weight: 750;
   cursor: pointer;
 }
@@ -144,25 +135,31 @@
   box-shadow: 0 7px 25px rgba(15, 23, 42, 0.045);
   cursor: pointer;
   transition:
-    transform 0.18s ease,
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
 
-.lecturer-dashboard-stat::after {
-  content: "";
-  position: absolute;
-  right: -24px;
-  bottom: -34px;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.035;
+.lecturer-dashboard-stat.blue {
+  color: #2563eb;
+}
+
+.lecturer-dashboard-stat.green {
+  color: #047857;
+}
+
+.lecturer-dashboard-stat.amber {
+  color: #b45309;
+}
+
+.lecturer-dashboard-stat.red {
+  color: #b91c1c;
+}
+
+.lecturer-dashboard-stat.neutral {
+  color: #6b7280;
 }
 
 .lecturer-dashboard-stat:hover {
-  transform: translateY(-2px);
   border-color: #cbd5e1;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
@@ -193,38 +190,6 @@
   letter-spacing: 0.04em;
 }
 
-.lecturer-dashboard-stat.blue {
-  color: #2563eb;
-}
-
-.lecturer-dashboard-stat.violet {
-  color: #7c3aed;
-}
-
-.lecturer-dashboard-stat.green {
-  color: #059669;
-}
-
-.lecturer-dashboard-stat.amber {
-  color: #d97706;
-}
-
-.lecturer-dashboard-stat.cyan {
-  color: #0891b2;
-}
-
-.lecturer-dashboard-stat.red {
-  color: #dc2626;
-}
-
-.lecturer-dashboard-stat.indigo {
-  color: #4f46e5;
-}
-
-.lecturer-dashboard-stat.orange {
-  color: #ea580c;
-}
-
 .lecturer-dashboard-stat-value {
   display: block;
   margin-top: 15px;
@@ -232,6 +197,14 @@
   font-size: 29px;
   line-height: 1;
   letter-spacing: -0.025em;
+}
+
+.lecturer-dashboard-stat-skeleton {
+  display: block;
+  width: 56px;
+  height: 24px;
+  border-radius: 6px;
+  background: #e5e7eb;
 }
 
 .lecturer-dashboard-stat-link {
@@ -300,7 +273,7 @@
 
 .lecturer-dashboard-section-row {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto 18px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   width: 100%;
@@ -317,7 +290,6 @@
 .lecturer-dashboard-section-row:hover {
   border-color: #cbd5e1;
   background: #f8fbff;
-  transform: translateX(1px);
 }
 
 .lecturer-dashboard-section-icon {
@@ -370,11 +342,6 @@
   font-weight: 650;
 }
 
-.lecturer-dashboard-section-arrow {
-  color: #94a3b8;
-  font-size: 17px;
-}
-
 /* Loading */
 
 .lecturer-dashboard-skeleton-row {
@@ -390,14 +357,8 @@
 .lecturer-dashboard-skeleton-row span {
   height: 12px;
   border-radius: 7px;
-  background: linear-gradient(
-    90deg,
-    #f1f5f9,
-    #e2e8f0,
-    #f1f5f9
-  );
-  background-size: 200% 100%;
-  animation: lecturerDashboardShimmer 1.2s infinite;
+  background: #e5e7eb;
+  animation: lecturerDashboardPulse 1.2s infinite;
 }
 
 .lecturer-dashboard-skeleton-row span:first-child {
@@ -411,13 +372,14 @@
   justify-self: end;
 }
 
-@keyframes lecturerDashboardShimmer {
-  from {
-    background-position: 200% 0;
+@keyframes lecturerDashboardPulse {
+  0%,
+  100% {
+    opacity: 1;
   }
 
-  to {
-    background-position: -200% 0;
+  50% {
+    opacity: 0.45;
   }
 }
 
@@ -430,19 +392,6 @@
   align-content: center;
   padding: 24px;
   text-align: center;
-}
-
-.lecturer-dashboard-empty-icon {
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  margin-bottom: 12px;
-  border-radius: 15px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 900;
 }
 
 .lecturer-dashboard-empty strong {
@@ -468,7 +417,7 @@
 
 .lecturer-dashboard-actions button {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 18px;
+  grid-template-columns: 40px minmax(0, 1fr);
   align-items: center;
   gap: 11px;
   width: 100%;
@@ -484,7 +433,6 @@
 .lecturer-dashboard-actions button:hover {
   border-color: #bfdbfe;
   background: #f8fbff;
-  transform: translateY(-1px);
 }
 
 .lecturer-dashboard-action-icon {
@@ -522,11 +470,6 @@
   white-space: nowrap;
 }
 
-.lecturer-dashboard-actions b {
-  color: #94a3b8;
-  font-size: 16px;
-}
-
 /* Footer */
 
 .lecturer-dashboard-footer-card {
@@ -535,10 +478,9 @@
   gap: 15px;
   margin-top: 18px;
   padding: 18px 20px;
-  border: 1px solid #dbe4ef;
+  border: 1px solid #e5e7eb;
   border-radius: 16px;
-  background:
-    linear-gradient(135deg, #ffffff, #f8fbff);
+  background: #ffffff;
 }
 
 .lecturer-dashboard-footer-avatar {
@@ -651,7 +593,7 @@
   }
 
   .lecturer-dashboard-section-row {
-    grid-template-columns: 38px minmax(0, 1fr) 17px;
+    grid-template-columns: 38px minmax(0, 1fr);
   }
 
   .lecturer-dashboard-section-count {
@@ -708,7 +650,7 @@
   }
 
   .lecturer-dashboard-actions button {
-    grid-template-columns: 36px minmax(0, 1fr) 16px;
+    grid-template-columns: 36px minmax(0, 1fr);
     padding: 10px;
   }
 
@@ -732,7 +674,7 @@
   }
 
   .lecturer-dashboard-section-row {
-    grid-template-columns: 34px minmax(0, 1fr) 15px;
+    grid-template-columns: 34px minmax(0, 1fr);
     gap: 8px;
     padding: 10px;
   }

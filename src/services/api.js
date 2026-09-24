@@ -1,38 +1,33 @@
-const API_URL =
+export const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000/api";
 
 /* =========================================================
-   GENERIC API REQUEST
+   API REQUEST
+   Attaches the bearer token and normalises failures so every
+   caller gets a readable, user-facing message (401/403/404/500
+   and network errors included) instead of a bare fetch throw.
 ========================================================= */
 
-async function apiRequest(
-  endpoint,
-  options = {}
-) {
-  const token =
-    localStorage.getItem("token");
+async function apiRequest(endpoint, options = {}) {
+  const token = localStorage.getItem("token");
 
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
-    {
+  let response;
+
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
-
       headers: {
-        "Content-Type":
-          "application/json",
-
-        ...(token
-          ? {
-              Authorization:
-                `Bearer ${token}`,
-            }
-          : {}),
-
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {}),
       },
-    }
-  );
+    });
+  } catch {
+    throw new Error(
+      "Unable to reach the server. Check your connection and try again."
+    );
+  }
 
   let data;
 
@@ -43,11 +38,23 @@ async function apiRequest(
   }
 
   if (!response.ok) {
-    throw new Error(
-      data.message ||
-        data.error ||
-        `Request failed with status ${response.status}`
-    );
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+
+    const fallback =
+      response.status === 401
+        ? "Your session has expired. Please sign in again."
+        : response.status === 403
+          ? "You do not have permission to perform this action."
+          : response.status === 404
+            ? "The requested record could not be found."
+            : response.status >= 500
+              ? "The server could not complete the request. Please try again."
+              : `Request failed with status ${response.status}`;
+
+    throw new Error(data.message || data.error || fallback);
   }
 
   return data;
@@ -63,7 +70,7 @@ export async function loginUser(
   password
 ) {
   return apiRequest(
-    "/login",
+    "/auth/login",
     {
       method: "POST",
 
@@ -84,7 +91,7 @@ export async function registerUser({
   studentCode,
 }) {
   return apiRequest(
-    "/register",
+    "/auth/register",
     {
       method: "POST",
 
@@ -106,7 +113,7 @@ export async function registerUser({
 
 export async function getCurrentUser() {
   return apiRequest(
-    "/me"
+    "/auth/me"
   );
 }
 
@@ -246,7 +253,7 @@ export async function updateCourse(
   return apiRequest(
     `/courses/${id}`,
     {
-      method: "PATCH",
+      method: "PUT",
 
       body: JSON.stringify({
         courseName,
@@ -521,14 +528,34 @@ export async function getSessions() {
 
 /* =========================================================
    GET ATTENDANCE SESSION BY ID
+
+   NOTE: The backend exposes GET /sessions (list) but has no
+   GET /sessions/:id route, so requesting the id directly 404s.
+   Resolve the record from the list instead.
 ========================================================= */
 
-export async function getSessionById(
-  id
-) {
-  return apiRequest(
-    `/sessions/${id}`
+export async function getSessionById(id) {
+  const data = await getSessions();
+
+  const sessions = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.sessions)
+      ? data.sessions
+      : Array.isArray(data?.data)
+        ? data.data
+        : Array.isArray(data?.data?.sessions)
+          ? data.data.sessions
+          : [];
+
+  const found = sessions.find(
+    (item) => Number(item.id) === Number(id)
   );
+
+  if (!found) {
+    throw new Error("Attendance session was not found.");
+  }
+
+  return found;
 }
 
 
@@ -572,7 +599,10 @@ export async function openSession(
   id
 ) {
   return apiRequest(
-    `/sessions/${id}/qr`
+    `/sessions/${id}/open`,
+    {
+      method: "POST",
+    }
   );
 }
 
@@ -581,7 +611,7 @@ export async function refreshSessionQr(
   id
 ) {
   return apiRequest(
-    `/sessions/${id}/qr/refresh`,
+    `/sessions/${id}/qr`,
     {
       method: "POST",
     }
@@ -595,7 +625,7 @@ export async function closeSession(
   return apiRequest(
     `/sessions/${id}/close`,
     {
-      method: "PATCH",
+      method: "POST",
     }
   );
 }

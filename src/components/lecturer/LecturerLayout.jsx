@@ -1,5 +1,7 @@
-﻿import { useMemo } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Footer from "../Footer";
+import "../Footer.css";
 
 import "./LecturerLayout.css";
 
@@ -48,7 +50,39 @@ export default function LecturerLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [navOpen, setNavOpen] = useState(false);
+
   const savedUser = useMemo(() => getSavedUser(), []);
+
+  /* Close the mobile drawer whenever the route changes
+     (state adjusted during render — no extra effect needed). */
+  const [lastPath, setLastPath] = useState(location.pathname);
+
+  if (lastPath !== location.pathname) {
+    setLastPath(location.pathname);
+    setNavOpen(false);
+  }
+
+  /* Escape closes the drawer and the page behind it stays still. */
+  useEffect(() => {
+    if (!navOpen) {
+      return undefined;
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setNavOpen(false);
+      }
+    }
+
+    document.body.classList.add("lecturer-sidebar-open");
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.classList.remove("lecturer-sidebar-open");
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navOpen]);
 
   const firstName =
     savedUser?.first_name ||
@@ -80,8 +114,45 @@ export default function LecturerLayout({ children }) {
   }
 
   return (
-    <div className="lecturer-layout">
-      <aside className="lecturer-layout-sidebar">
+    <div
+      className={
+        navOpen
+          ? "lecturer-layout sidebar-is-open"
+          : "lecturer-layout"
+      }
+    >
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
+
+      <button
+        type="button"
+        className="lecturer-menu-button"
+        aria-label={
+          navOpen ? "Close navigation" : "Open navigation"
+        }
+        aria-expanded={navOpen}
+        aria-controls="lecturer-sidebar"
+        onClick={() => setNavOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {navOpen && (
+        <button
+          type="button"
+          className="lecturer-sidebar-overlay"
+          aria-label="Close navigation"
+          onClick={() => setNavOpen(false)}
+        />
+      )}
+
+      <aside
+        id="lecturer-sidebar"
+        className="lecturer-layout-sidebar"
+      >
         <div className="lecturer-layout-brand">
           <div className="lecturer-layout-brand-mark">
             A
@@ -106,7 +177,10 @@ export default function LecturerLayout({ children }) {
           </div>
         </div>
 
-        <nav className="lecturer-layout-nav">
+        <nav
+          className="lecturer-layout-nav"
+          aria-label="Lecturer"
+        >
           {navigationItems.map((item) => {
             const active = isActive(item.path);
 
@@ -119,6 +193,7 @@ export default function LecturerLayout({ children }) {
                     ? "lecturer-layout-nav-item active"
                     : "lecturer-layout-nav-item"
                 }
+                aria-current={active ? "page" : undefined}
                 onClick={() => navigate(item.path)}
               >
                 <span className="lecturer-layout-nav-icon">
@@ -162,8 +237,13 @@ export default function LecturerLayout({ children }) {
         </div>
       </aside>
 
-      <main className="lecturer-layout-content">
+      <main
+        id="main-content"
+        className="lecturer-layout-content"
+        tabIndex={-1}
+      >
         {children}
+        <Footer />
       </main>
     </div>
   );

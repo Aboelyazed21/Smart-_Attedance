@@ -42,7 +42,7 @@ function Settings() {
       {/* ================= SIDEBAR ================= */}
       <aside className="settings-sidebar">
         <div className="settings-brand">
-          <div className="settings-brand-icon">✓</div>
+          <div className="settings-brand-icon">A</div>
 
           <div>
             <h2>Attendify</h2>
@@ -52,57 +52,49 @@ function Settings() {
 
         <nav className="settings-navigation">
           <a href="/dashboard">
-            <span className="settings-nav-icon">⌂</span>
             Dashboard
           </a>
 
           <a href="/admin/users">
-            <span className="settings-nav-icon">♟</span>
             Users
           </a>
 
           <a href="/admin/courses">
-            <span className="settings-nav-icon">▣</span>
             Courses
           </a>
 
           <a href="/admin/sections">
-            <span className="settings-nav-icon">§</span>
             Sections
           </a>
 
           <a href="/admin/rooms">
-            <span className="settings-nav-icon">▤</span>
             Rooms
           </a>
 
           <a href="/admin/timetable">
-            <span className="settings-nav-icon">▤</span>
             Timetable
           </a>
 
           <a href="/admin/attendance">
-            <span className="settings-nav-icon">✓</span>
             Attendance
           </a>
 
           <a href="/admin/reports">
-            <span className="settings-nav-icon">▤</span>
             Reports
           </a>
 
           <a
             href="/admin/settings"
             className="settings-nav-active"
+            aria-current="page"
           >
-            <span className="settings-nav-icon">⚙</span>
             Settings
           </a>
         </nav>
 
         <div className="settings-sidebar-bottom">
           <div className="settings-greeting">
-            <strong>Good Morning 👋</strong>
+            <strong>Good Morning</strong>
 
             <p>
               Manage your system settings
@@ -111,7 +103,7 @@ function Settings() {
           </div>
 
           <a href="/" className="settings-logout">
-            ↪ Logout
+            Logout
           </a>
         </div>
       </aside>
@@ -120,21 +112,7 @@ function Settings() {
       <main className="settings-main">
         {/* ================= TOP BAR ================= */}
         <header className="settings-topbar">
-          <div className="settings-search">
-            <span>🔎</span>
-
-            <input
-              type="text"
-              placeholder="Search students, courses, sections..."
-            />
-          </div>
-
           <div className="settings-user-area">
-            <div className="settings-notification">
-              🔔
-              <span>3</span>
-            </div>
-
             <div className="settings-avatar">
               S
             </div>
@@ -151,10 +129,6 @@ function Settings() {
           {/* Page Header */}
           <div className="settings-page-header">
             <div className="settings-title-wrapper">
-              <div className="settings-title-icon">
-                ⚙
-              </div>
-
               <div>
                 <h1>Settings</h1>
                 <p>
@@ -171,10 +145,6 @@ function Settings() {
           {/* ================= GENERAL SETTINGS ================= */}
           <section className="settings-card">
             <div className="settings-card-header">
-              <div className="settings-card-icon">
-                ▣
-              </div>
-
               <div>
                 <h2>General Settings</h2>
                 <p>
@@ -185,9 +155,12 @@ function Settings() {
 
             <div className="settings-form-grid">
               <div className="settings-field">
-                <label>System Name</label>
+                <label htmlFor="settings-system-name">
+                  System Name
+                </label>
 
                 <input
+                  id="settings-system-name"
                   type="text"
                   value={settings.systemName}
                   onChange={(e) =>
@@ -200,9 +173,12 @@ function Settings() {
               </div>
 
               <div className="settings-field">
-                <label>University Name</label>
+                <label htmlFor="settings-university-name">
+                  University Name
+                </label>
 
                 <input
+                  id="settings-university-name"
                   type="text"
                   value={settings.universityName}
                   onChange={(e) =>
@@ -215,9 +191,12 @@ function Settings() {
               </div>
 
               <div className="settings-field">
-                <label>Academic Year</label>
+                <label htmlFor="settings-academic-year">
+                  Academic Year
+                </label>
 
                 <input
+                  id="settings-academic-year"
                   type="text"
                   value={settings.academicYear}
                   onChange={(e) =>
@@ -230,9 +209,12 @@ function Settings() {
               </div>
 
               <div className="settings-field">
-                <label>Semester</label>
+                <label htmlFor="settings-semester">
+                  Semester
+                </label>
 
                 <select
+                  id="settings-semester"
                   value={settings.semester}
                   onChange={(e) =>
                     handleChange(
@@ -252,10 +234,6 @@ function Settings() {
           {/* ================= ATTENDANCE SETTINGS ================= */}
           <section className="settings-card">
             <div className="settings-card-header">
-              <div className="settings-card-icon">
-                ◷
-              </div>
-
               <div>
                 <h2>Attendance Settings</h2>
                 <p>
@@ -289,6 +267,7 @@ function Settings() {
                     )
                   }
                   aria-label="Toggle late attendance"
+                  aria-pressed={settings.allowLateAttendance}
                 >
                   <span></span>
                 </button>
@@ -308,6 +287,7 @@ function Settings() {
                 <div className="settings-number-wrapper">
                   <input
                     type="number"
+                    aria-label="Late threshold in minutes"
                     min="1"
                     max="120"
                     value={settings.lateThreshold}
@@ -336,6 +316,7 @@ function Settings() {
                 <div className="settings-number-wrapper">
                   <input
                     type="number"
+                    aria-label="QR code expiry in minutes"
                     min="1"
                     max="60"
                     value={settings.qrExpiry}
@@ -356,10 +337,6 @@ function Settings() {
           {/* ================= NOTIFICATION SETTINGS ================= */}
           <section className="settings-card">
             <div className="settings-card-header">
-              <div className="settings-card-icon">
-                ♧
-              </div>
-
               <div>
                 <h2>Notification Settings</h2>
                 <p>
@@ -393,6 +370,7 @@ function Settings() {
                     )
                   }
                   aria-label="Toggle email notifications"
+                  aria-pressed={settings.emailNotifications}
                 >
                   <span></span>
                 </button>
@@ -423,6 +401,7 @@ function Settings() {
                     )
                   }
                   aria-label="Toggle absence alerts"
+                  aria-pressed={settings.absenceAlerts}
                 >
                   <span></span>
                 </button>
@@ -433,8 +412,11 @@ function Settings() {
           {/* ================= SAVE ================= */}
           <div className="settings-actions">
             {saved && (
-              <div className="settings-saved-message">
-                ✓ Settings saved successfully
+              <div
+                className="settings-saved-message"
+                role="status"
+              >
+                Settings saved successfully
               </div>
             )}
 
@@ -443,7 +425,6 @@ function Settings() {
               className="settings-save-button"
               onClick={handleSave}
             >
-              <span>▣</span>
               Save Changes
             </button>
           </div>

@@ -273,9 +273,7 @@ export default function LecturerAttendance() {
             </div>
 
             {error && (
-              <div className="attendance-alert">
-                <div className="alert-icon">!</div>
-
+              <div className="attendance-alert" role="alert">
                 <div className="alert-content">
                   <strong>
                     Unable to load attendance
@@ -288,14 +286,13 @@ export default function LecturerAttendance() {
                   onClick={() => loadAttendance(true)}
                   disabled={refreshing}
                 >
-                  {refreshing ? "Retrying..." : "Retry"}
+                  {refreshing ? "Retrying..." : "Try again"}
                 </button>
               </div>
             )}
 
             <div className="attendance-stat-grid">
               <div className="attendance-stat-card">
-                <div className="stat-icon">AT</div>
                 <div>
                   <span>Total records</span>
                   <strong>{stats.total}</strong>
@@ -306,7 +303,6 @@ export default function LecturerAttendance() {
               </div>
 
               <div className="attendance-stat-card">
-                <div className="stat-icon">PR</div>
                 <div>
                   <span>Present</span>
                   <strong>{stats.present}</strong>
@@ -315,7 +311,6 @@ export default function LecturerAttendance() {
               </div>
 
               <div className="attendance-stat-card">
-                <div className="stat-icon">LT</div>
                 <div>
                   <span>Late</span>
                   <strong>{stats.late}</strong>
@@ -324,7 +319,6 @@ export default function LecturerAttendance() {
               </div>
 
               <div className="attendance-stat-card">
-                <div className="stat-icon">AR</div>
                 <div>
                   <span>Attendance rate</span>
                   <strong>{stats.attendanceRate}%</strong>
@@ -351,8 +345,6 @@ export default function LecturerAttendance() {
 
               <div className="attendance-filters">
                 <div className="attendance-search">
-                  <span>Q</span>
-
                   <input
                     type="text"
                     value={search}
@@ -447,14 +439,18 @@ export default function LecturerAttendance() {
               </div>
 
               {sectionsError && (
-                <div className="sections-inline-warning">
+                <div className="sections-inline-warning" role="alert">
                   {sectionsError}
                 </div>
               )}
 
               <div className="attendance-table-wrap">
                 {loading ? (
-                  <div className="attendance-loading">
+                  <div
+                    className="attendance-loading"
+                    role="status"
+                    aria-live="polite"
+                  >
                     <div className="loading-spinner" />
 
                     <strong>
@@ -467,8 +463,6 @@ export default function LecturerAttendance() {
                   </div>
                 ) : filteredRecords.length === 0 ? (
                   <div className="attendance-empty">
-                    <div className="empty-icon">AT</div>
-
                     <h3>No attendance records</h3>
 
                     <p>

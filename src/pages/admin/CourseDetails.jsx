@@ -5,8 +5,8 @@ import {
   } from "react";
   
   import {
+    useLocation,
     useNavigate,
-    useParams,
   } from "react-router-dom";
   
   import {
@@ -20,7 +20,16 @@ import {
   
   function CourseDetails() {
     const navigate = useNavigate();
-    const { id } = useParams();
+    /*
+    App.jsx renders pages by matching location.pathname directly and
+    never mounts <Route> elements, so useParams() always returned
+    undefined here. Read the course id from the URL instead.
+  */
+  const location = useLocation();
+
+  const id =
+    location.pathname.match(/^\/admin\/courses\/(\d+)\/?$/)?.[1] ??
+    "";
   
     /* =========================================================
        COURSE
@@ -561,24 +570,29 @@ import {
   
           <main className="dashboard-main">
   
-            <div className="course-details-error">
-  
-              <div className="course-error-code">
-                404
-              </div>
-  
+            <div className="course-details-error" role="alert">
+
               <h2>
-                Course not found
+                Course unavailable
               </h2>
-  
+
               <p>
-                The requested course could not
-                be found in the system.
+                {error}
               </p>
-  
+
               <button
                 type="button"
                 className="professional-save-button"
+                onClick={() =>
+                  loadCourseData()
+                }
+              >
+                Try again
+              </button>
+
+              <button
+                type="button"
+                className="professional-cancel-button"
                 onClick={() =>
                   navigate(
                     "/admin/courses"
@@ -587,7 +601,7 @@ import {
               >
                 Back to Courses
               </button>
-  
+
             </div>
   
           </main>
@@ -658,10 +672,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                D
-              </span>
-  
               Dashboard
             </button>
   
@@ -674,26 +684,19 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                U
-              </span>
-  
               Users
             </button>
   
   
             <button
               className="nav-item active"
+              aria-current="page"
               onClick={() =>
                 navigate(
                   "/admin/courses"
                 )
               }
             >
-              <span className="nav-symbol">
-                C
-              </span>
-  
               Courses
             </button>
   
@@ -706,10 +709,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                S
-              </span>
-  
               Sections
             </button>
   
@@ -722,10 +721,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                R
-              </span>
-  
               Rooms
             </button>
   
@@ -738,10 +733,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                T
-              </span>
-  
               Timetable
             </button>
   
@@ -754,10 +745,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                A
-              </span>
-  
               Attendance
             </button>
   
@@ -770,10 +757,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                P
-              </span>
-  
               Reports
             </button>
   
@@ -786,10 +769,6 @@ import {
                 )
               }
             >
-              <span className="nav-symbol">
-                S
-              </span>
-  
               Settings
             </button>
   
@@ -802,10 +781,6 @@ import {
               handleLogout
             }
           >
-            <span className="nav-symbol">
-              L
-            </span>
-  
             Logout
           </button>
   
@@ -853,14 +828,23 @@ import {
           <section className="dashboard-content">
   
             {error && (
-              <div className="dashboard-error">
-  
-                <span>
-                  !
-                </span>
-  
+              <div
+                className="dashboard-error"
+                role="alert"
+              >
+
                 {error}
-  
+
+                <button
+                  type="button"
+                  className="professional-cancel-button"
+                  onClick={() =>
+                    loadCourseData()
+                  }
+                >
+                  Try again
+                </button>
+
               </div>
             )}
   
@@ -872,11 +856,7 @@ import {
             <section className="course-details-hero">
   
               <div className="course-hero-main">
-  
-                <div className="course-hero-icon">
-                  C
-                </div>
-  
+
                 <div>
   
                   <span className="course-hero-label">
@@ -991,13 +971,9 @@ import {
                       setAddMessage("");
                     }}
                   >
-  
-                    <span className="button-icon">
-                      +
-                    </span>
-  
+
                     Add Student
-  
+
                   </button>
                 )}
   
@@ -1017,12 +993,13 @@ import {
   
                     <div className="form-group">
   
-                      <label>
+                      <label htmlFor="course-student-email">
                         Student Email
                       </label>
-  
+
                       <input
                         type="email"
+                        id="course-student-email"
                         value={
                           studentEmail
                         }
@@ -1046,11 +1023,12 @@ import {
   
                     <div className="form-group">
   
-                      <label>
+                      <label htmlFor="course-section-select">
                         Section
                       </label>
-  
+
                       <select
+                        id="course-section-select"
                         value={
                           selectedSectionId
                         }
@@ -1095,14 +1073,20 @@ import {
   
   
                   {addError && (
-                    <div className="course-form-message error">
+                    <div
+                      className="course-form-message error"
+                      role="alert"
+                    >
                       {addError}
                     </div>
                   )}
   
   
                   {addMessage && (
-                    <div className="course-form-message success">
+                    <div
+                      className="course-form-message success"
+                      role="status"
+                    >
                       {addMessage}
                     </div>
                   )}
@@ -1186,13 +1170,10 @@ import {
               <div className="course-student-toolbar">
   
                 <div className="users-search course-search">
-  
-                  <span>
-                    /
-                  </span>
-  
+
                   <input
                     type="text"
+                    aria-label="Search enrolled students"
                     placeholder="Search by name, email, code or section..."
                     value={
                       studentSearch
@@ -1225,11 +1206,7 @@ import {
                 0 ? (
   
                 <div className="course-empty-state">
-  
-                  <div className="course-empty-icon">
-                    —
-                  </div>
-  
+
                   <h3>
                     No students enrolled
                   </h3>
@@ -1248,13 +1225,9 @@ import {
                       setAddMessage("");
                     }}
                   >
-  
-                    <span className="button-icon">
-                      +
-                    </span>
-  
+
                     Add First Student
-  
+
                   </button>
   
                 </div>
@@ -1404,7 +1377,7 @@ import {
   
                                 {
                                   enrollment.status ||
-                                  "active"
+                                  "—"
                                 }
   
                               </span>

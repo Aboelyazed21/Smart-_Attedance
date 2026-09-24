@@ -5,265 +5,469 @@
 .lecturer-attendance-page {
   min-height: 100vh;
   padding: 32px;
-  background:
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 30%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  color: #172033;
+  background: #f7f8fa;
+  color: #111827;
   box-sizing: border-box;
 }
 
-/* =========================
-   Header
-   ========================= */
-
-.lecturer-attendance-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 28px;
-}
-
-.lecturer-attendance-header-content {
+.lecturer-attendance-page .lecturer-attendance-main {
   min-width: 0;
 }
 
-.lecturer-attendance-eyebrow {
-  margin: 0 0 8px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #64748b;
+/* =========================
+   Topbar
+   ========================= */
+
+.lecturer-attendance-page .lecturer-attendance-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
 }
 
-.lecturer-attendance-title {
-  margin: 0;
-  font-size: clamp(28px, 3vw, 42px);
-  line-height: 1.1;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+.lecturer-attendance-page .lecturer-attendance-topbar h1 {
+  margin: 6px 0;
+  font-size: 26px;
+  line-height: 1.2;
   color: #111827;
 }
 
-.lecturer-attendance-subtitle {
-  margin: 10px 0 0;
-  max-width: 760px;
-  color: #64748b;
-  font-size: 15px;
-  line-height: 1.7;
+.lecturer-attendance-page .lecturer-attendance-topbar p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-.lecturer-attendance-header-actions {
+.lecturer-attendance-page .topbar-user-context {
+  color: #9ca3af;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.lecturer-attendance-page .lecturer-attendance-content {
+  min-width: 0;
+}
+
+/* =========================
+   Hero
+   ========================= */
+
+.lecturer-attendance-page .attendance-hero {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.lecturer-attendance-page .attendance-hero h2 {
+  margin: 6px 0;
+  font-size: 22px;
+  line-height: 1.25;
+  color: #111827;
+}
+
+.lecturer-attendance-page .attendance-hero p {
+  margin: 0;
+  max-width: 640px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 /* =========================
    Buttons
    ========================= */
 
-.lecturer-attendance-btn {
-  min-height: 42px;
+.lecturer-attendance-page .attendance-refresh-button {
+  flex-shrink: 0;
+  min-height: 40px;
   padding: 0 16px;
-  border: 1px solid #d7dee8;
-  border-radius: 11px;
-  background: #ffffff;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease;
-}
-
-.lecturer-attendance-btn:hover {
-  transform: translateY(-1px);
-  border-color: #b9c5d6;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-}
-
-.lecturer-attendance-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.lecturer-attendance-btn.primary {
-  border-color: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
   background: #2563eb;
   color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.lecturer-attendance-btn.primary:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+.lecturer-attendance-page .attendance-refresh-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lecturer-attendance-page .clear-attendance-filters,
+.lecturer-attendance-page .attendance-alert button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lecturer-attendance-page .clear-attendance-filters:hover,
+.lecturer-attendance-page .attendance-alert button:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.lecturer-attendance-page .attendance-alert button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================
+   Error / warning states
+   ========================= */
+
+.lecturer-attendance-page .attendance-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: #fef2f2;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.lecturer-attendance-page .attendance-alert .alert-content {
+  min-width: 0;
+}
+
+.lecturer-attendance-page .attendance-alert .alert-content strong {
+  display: block;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.lecturer-attendance-page .attendance-alert .alert-content p {
+  margin: 4px 0 0;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.lecturer-attendance-page .sections-inline-warning {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #fffbeb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #b45309;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* =========================
    Stats
    ========================= */
 
-.lecturer-attendance-stats {
+.lecturer-attendance-page .attendance-stat-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-.lecturer-attendance-stat-card {
-  min-width: 0;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.055);
+.lecturer-attendance-page .attendance-stat-card {
+  display: block;
+  min-height: 0;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: none;
+  box-sizing: border-box;
 }
 
-.lecturer-attendance-stat-label {
-  margin-bottom: 8px;
-  color: #64748b;
-  font-size: 12px;
+.lecturer-attendance-page .attendance-stat-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lecturer-attendance-page .attendance-stat-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #111827;
+  font-size: 26px;
+  line-height: 1.1;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.lecturer-attendance-stat-value {
-  color: #0f172a;
-  font-size: 28px;
-  line-height: 1;
-  font-weight: 800;
-}
-
-.lecturer-attendance-stat-meta {
-  margin-top: 8px;
-  color: #94a3b8;
+.lecturer-attendance-page .attendance-stat-card small {
+  display: block;
+  margin-top: 4px;
+  color: #9ca3af;
   font-size: 12px;
+  font-weight: 400;
+}
+
+/* =========================
+   Panel
+   ========================= */
+
+.lecturer-attendance-page .attendance-panel {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.lecturer-attendance-page .attendance-panel-header {
+  margin-bottom: 16px;
+}
+
+.lecturer-attendance-page .attendance-panel-header h3 {
+  margin: 6px 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.lecturer-attendance-page .attendance-panel-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 /* =========================
    Filters
    ========================= */
 
-.lecturer-attendance-filters {
-  display: grid;
-  grid-template-columns: minmax(190px, 1.3fr) minmax(150px, 0.9fr) minmax(145px, 0.8fr) minmax(145px, 0.8fr) auto;
-  align-items: end;
-  gap: 14px;
-  margin-bottom: 24px;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.045);
+.lecturer-attendance-page .attendance-panel .attendance-filters {
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-.lecturer-attendance-filter-group {
+.lecturer-attendance-page .attendance-search {
+  height: 40px;
   min-width: 0;
-}
-
-.lecturer-attendance-filter-label {
-  display: block;
-  margin-bottom: 7px;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-filter-input,
-.lecturer-attendance-filter-select {
-  width: 100%;
-  height: 42px;
   padding: 0 12px;
-  border: 1px solid #d8e0ea;
-  border-radius: 10px;
-  outline: none;
-  background: #f8fafc;
-  color: #1e293b;
-  font-size: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #9ca3af;
   box-sizing: border-box;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease;
 }
 
-.lecturer-attendance-filter-input:focus,
-.lecturer-attendance-filter-select:focus {
-  border-color: #60a5fa;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+.lecturer-attendance-page .attendance-search:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-.lecturer-attendance-search-wrap {
-  position: relative;
-}
-
-.lecturer-attendance-search-wrap .lecturer-attendance-filter-input {
-  padding-left: 38px;
-}
-
-.lecturer-attendance-search-icon {
-  position: absolute;
-  left: 13px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
+.lecturer-attendance-page .attendance-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #111827;
   font-size: 14px;
-  pointer-events: none;
 }
 
-.lecturer-attendance-filter-actions {
-  display: flex;
-  gap: 8px;
-}
-
-/* =========================
-   Table Card
-   ========================= */
-
-.lecturer-attendance-table-card {
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.055);
-}
-
-.lecturer-attendance-table-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 22px;
-  border-bottom: 1px solid #edf1f5;
-}
-
-.lecturer-attendance-table-title {
-  margin: 0;
-  color: #172033;
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-table-count {
-  color: #64748b;
+.lecturer-attendance-page .attendance-filter-field label {
+  color: #6b7280;
   font-size: 13px;
   font-weight: 600;
 }
 
-.lecturer-attendance-table-scroll {
+.lecturer-attendance-page .attendance-filter-field select,
+.lecturer-attendance-page .attendance-filter-field input {
   width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  height: 40px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  outline: 0;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  box-sizing: border-box;
 }
+
+.lecturer-attendance-page .attendance-filter-field select:focus,
+.lecturer-attendance-page .attendance-filter-field input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* =========================
+   Loading / empty states
+   ========================= */
+
+.lecturer-attendance-page .attendance-loading {
+  flex-direction: column;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lecturer-attendance-page .attendance-loading strong {
+  color: #111827;
+  font-size: 15px;
+}
+
+.lecturer-attendance-page .attendance-loading span {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.lecturer-attendance-page .attendance-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lecturer-attendance-page .attendance-empty h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 17px;
+}
+
+.lecturer-attendance-page .attendance-empty p {
+  margin: 0 0 8px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lecturer-attendance-page .attendance-empty button {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* =========================
+   Student cell
+   ========================= */
+
+.lecturer-attendance-page .attendance-student strong {
+  display: block;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lecturer-attendance-page .attendance-student span {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #6b7280;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lecturer-attendance-page .course-info strong,
+.lecturer-attendance-page .time-info strong {
+  display: block;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lecturer-attendance-page .course-info span,
+.lecturer-attendance-page .time-info span {
+  display: block;
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* =========================
+   Status / badges
+   ========================= */
+
+.lecturer-attendance-page .attendance-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f7f8fa;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.lecturer-attendance-page .attendance-status::before {
+  content: none;
+  display: none;
+}
+
+.lecturer-attendance-page .attendance-status .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.lecturer-attendance-page .attendance-status-present {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.lecturer-attendance-page .attendance-status-late {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.lecturer-attendance-page .attendance-status-absent {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.lecturer-attendance-page .attendance-status-excused {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.lecturer-attendance-page .source-badge,
+.lecturer-attendance-page .validation-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 9px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #f7f8fa;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =========================
+   Table
+   ========================= */
 
 .lecturer-attendance-table {
   width: 100%;
@@ -272,22 +476,22 @@
 }
 
 .lecturer-attendance-table th {
-  padding: 14px 18px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .lecturer-attendance-table td {
-  padding: 16px 18px;
-  border-bottom: 1px solid #edf1f5;
-  color: #334155;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
   font-size: 13px;
   vertical-align: middle;
 }
@@ -297,7 +501,7 @@
 }
 
 .lecturer-attendance-table tbody tr:hover {
-  background: #f8fbff;
+  background: #f7f8fa;
 }
 
 .lecturer-attendance-table tbody tr:last-child td {
@@ -305,263 +509,69 @@
 }
 
 /* =========================
-   Student
+   Mobile cards
    ========================= */
 
-.lecturer-attendance-student {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  min-width: 180px;
-}
-
-.lecturer-attendance-student-avatar {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  border-radius: 50%;
-  background: #e8f0ff;
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-student-info {
-  min-width: 0;
-}
-
-.lecturer-attendance-student-name {
-  overflow: hidden;
-  color: #172033;
-  font-weight: 750;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lecturer-attendance-student-id {
-  margin-top: 3px;
-  color: #94a3b8;
-  font-size: 11px;
-}
-
-/* =========================
-   Status
-   ========================= */
-
-.lecturer-attendance-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 28px;
-  padding: 0 9px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.lecturer-attendance-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.lecturer-attendance-status.present {
-  background: #ecfdf5;
-  color: #047857;
-}
-
-.lecturer-attendance-status.late {
-  background: #fffbeb;
-  color: #b45309;
-}
-
-.lecturer-attendance-status.absent {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.lecturer-attendance-status.excused {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.lecturer-attendance-status.unknown {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-/* =========================
-   Source / Validation
-   ========================= */
-
-.lecturer-attendance-source {
-  display: inline-flex;
-  align-items: center;
-  min-height: 27px;
-  padding: 0 8px;
-  border-radius: 8px;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.lecturer-attendance-validation {
-  color: #64748b;
-  font-size: 12px;
-}
-
-.lecturer-attendance-validation.valid {
-  color: #047857;
-  font-weight: 700;
-}
-
-.lecturer-attendance-validation.invalid {
-  color: #dc2626;
-  font-weight: 700;
-}
-
-/* =========================
-   Empty / Error / Loading
-   ========================= */
-
-.lecturer-attendance-state {
-  display: flex;
-  min-height: 280px;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
-  text-align: center;
-}
-
-.lecturer-attendance-state-inner {
-  max-width: 500px;
-}
-
-.lecturer-attendance-state-icon {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 16px;
-  border-radius: 16px;
-  background: #eff6ff;
-  color: #2563eb;
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-state-title {
-  margin: 0;
-  color: #172033;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.lecturer-attendance-state-text {
-  margin: 8px 0 18px;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.lecturer-attendance-spinner {
-  width: 32px;
-  height: 32px;
-  margin: 0 auto 14px;
-  border: 3px solid #dbeafe;
-  border-top-color: #2563eb;
-  border-radius: 50%;
-  animation: lecturerAttendanceSpin 0.8s linear infinite;
-}
-
-@keyframes lecturerAttendanceSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* =========================
-   Mobile Cards
-   ========================= */
-
-.lecturer-attendance-mobile-list {
+.lecturer-attendance-page .attendance-mobile-list {
   display: none;
-  padding: 14px;
 }
 
-.lecturer-attendance-mobile-card {
+.lecturer-attendance-page .attendance-mobile-card {
   margin-bottom: 12px;
-  padding: 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  padding: 14px;
   background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
-.lecturer-attendance-mobile-card:last-child {
+.lecturer-attendance-page .attendance-mobile-card:last-child {
   margin-bottom: 0;
 }
 
-.lecturer-attendance-mobile-top {
+.lecturer-attendance-page .attendance-mobile-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.lecturer-attendance-mobile-fields {
+.lecturer-attendance-page .attendance-mobile-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
-.lecturer-attendance-mobile-field {
+.lecturer-attendance-page .attendance-mobile-grid > div {
   min-width: 0;
 }
 
-.lecturer-attendance-mobile-label {
-  margin-bottom: 4px;
-  color: #94a3b8;
-  font-size: 10px;
-  font-weight: 800;
+.lecturer-attendance-page .attendance-mobile-grid span {
+  display: block;
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.lecturer-attendance-mobile-value {
-  overflow: hidden;
-  color: #334155;
-  font-size: 12px;
-  font-weight: 650;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.lecturer-attendance-page .attendance-mobile-grid strong {
+  display: block;
+  margin-top: 2px;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-word;
 }
 
 /* =========================
    Responsive
    ========================= */
 
-@media (max-width: 1200px) {
-  .lecturer-attendance-page {
-    padding: 26px;
-  }
-
-  .lecturer-attendance-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .lecturer-attendance-filters {
+@media (max-width: 1100px) {
+  .lecturer-attendance-page .attendance-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .lecturer-attendance-filter-actions {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
   }
 }
 
@@ -570,20 +580,8 @@
     padding: 22px;
   }
 
-  .lecturer-attendance-header {
+  .lecturer-attendance-page .lecturer-attendance-topbar {
     flex-direction: column;
-  }
-
-  .lecturer-attendance-header-actions {
-    width: 100%;
-  }
-
-  .lecturer-attendance-header-actions .lecturer-attendance-btn {
-    flex: 1;
-  }
-
-  .lecturer-attendance-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -592,52 +590,30 @@
     padding: 16px;
   }
 
-  .lecturer-attendance-title {
-    font-size: 28px;
-  }
-
-  .lecturer-attendance-subtitle {
-    font-size: 13px;
-  }
-
-  .lecturer-attendance-stats {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .lecturer-attendance-stat-card {
-    padding: 15px;
-  }
-
-  .lecturer-attendance-stat-value {
+  .lecturer-attendance-page .lecturer-attendance-topbar h1 {
     font-size: 24px;
   }
 
-  .lecturer-attendance-filters {
-    grid-template-columns: 1fr;
-    padding: 15px;
-    gap: 12px;
+  .lecturer-attendance-page .attendance-hero h2 {
+    font-size: 20px;
   }
 
-  .lecturer-attendance-filter-actions {
-    grid-column: auto;
-    justify-content: stretch;
+  .lecturer-attendance-page .attendance-panel {
+    padding: 16px;
   }
 
-  .lecturer-attendance-filter-actions .lecturer-attendance-btn {
-    flex: 1;
-  }
-
-  .lecturer-attendance-table-scroll {
+  .lecturer-attendance-page .attendance-desktop-table {
     display: none;
   }
 
-  .lecturer-attendance-mobile-list {
+  .lecturer-attendance-page .attendance-mobile-list {
     display: block;
   }
+}
 
-  .lecturer-attendance-table-header {
-    padding: 16px;
+@media (max-width: 600px) {
+  .lecturer-attendance-page .attendance-panel .attendance-filters {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -646,39 +622,15 @@
     padding: 12px;
   }
 
-  .lecturer-attendance-header {
-    margin-bottom: 20px;
+  .lecturer-attendance-page .lecturer-attendance-topbar h1 {
+    font-size: 22px;
   }
 
-  .lecturer-attendance-title {
-    font-size: 24px;
+  .lecturer-attendance-page .attendance-stat-card strong {
+    font-size: 22px;
   }
 
-  .lecturer-attendance-header-actions {
-    flex-direction: column;
-  }
-
-  .lecturer-attendance-header-actions .lecturer-attendance-btn {
-    width: 100%;
-  }
-
-  .lecturer-attendance-stats {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .lecturer-attendance-stat-card {
-    padding: 13px;
-  }
-
-  .lecturer-attendance-stat-label {
-    font-size: 10px;
-  }
-
-  .lecturer-attendance-stat-value {
-    font-size: 21px;
-  }
-
-  .lecturer-attendance-mobile-fields {
+  .lecturer-attendance-page .attendance-mobile-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -688,11 +640,11 @@
     padding: 9px;
   }
 
-  .lecturer-attendance-stats {
+  .lecturer-attendance-page .attendance-stat-grid {
     grid-template-columns: 1fr;
   }
 
-  .lecturer-attendance-mobile-card {
-    padding: 13px;
+  .lecturer-attendance-page .attendance-mobile-card {
+    padding: 12px;
   }
 }

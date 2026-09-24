@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_URL } from "../../services/api";
+import "./EnrollmentManagement.css";
 
 async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("token");
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -284,6 +284,7 @@ export default function EnrollmentManagement() {
     setShowStudentModal(false);
     setEditingStudent(null);
     setStudentForm(EMPTY_FORM);
+    setError("");
   }
 
   function handleStudentChange(event) {
@@ -563,8 +564,7 @@ export default function EnrollmentManagement() {
 
     sidebar: {
       width: "260px",
-      background:
-        "linear-gradient(180deg, #092b68 0%, #071f4d 100%)",
+      background: "#092b68",
       color: "#fff",
       padding: "28px 18px",
       boxSizing: "border-box",
@@ -715,8 +715,7 @@ export default function EnrollmentManagement() {
 
     primaryButton: {
       border: "none",
-      background:
-        "linear-gradient(135deg, #1677ff, #0757d9)",
+      background: "#1677ff",
       color: "#fff",
       padding: "11px 17px",
       borderRadius: "10px",
@@ -788,8 +787,7 @@ export default function EnrollmentManagement() {
       background: "#fff",
       borderRadius: "20px",
       padding: "28px",
-      boxShadow:
-        "0 25px 80px rgba(0,0,0,0.25)",
+      boxShadow: "0 12px 32px rgba(0, 0, 0, 0.12)",
       boxSizing: "border-box",
     },
 
@@ -837,15 +835,15 @@ export default function EnrollmentManagement() {
   };
 
   return (
-    <div style={styles.page}>
+    <div className="enr-page" style={styles.page}>
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside style={styles.sidebar}>
+      <aside className="enr-sidebar" style={styles.sidebar}>
         <div style={styles.brand}>
           <div style={styles.brandIcon}>
-            🎓
+            A
           </div>
 
           <div>
@@ -895,7 +893,7 @@ export default function EnrollmentManagement() {
               navigate("/dashboard")
             }
           >
-            ▦ &nbsp; Dashboard
+            Dashboard
           </button>
 
           <button
@@ -904,7 +902,7 @@ export default function EnrollmentManagement() {
               navigate("/admin/users")
             }
           >
-            👥 &nbsp; Users
+            Users
           </button>
 
           <button
@@ -913,7 +911,7 @@ export default function EnrollmentManagement() {
               navigate("/admin/courses")
             }
           >
-            📚 &nbsp; Courses
+            Courses
           </button>
 
           <button
@@ -922,7 +920,7 @@ export default function EnrollmentManagement() {
               navigate("/admin/sections")
             }
           >
-            ▤ &nbsp; Sections
+            Sections
           </button>
 
           <button
@@ -931,7 +929,7 @@ export default function EnrollmentManagement() {
               navigate("/admin/rooms")
             }
           >
-            🏫 &nbsp; Rooms
+            Rooms
           </button>
 
           <button
@@ -940,7 +938,7 @@ export default function EnrollmentManagement() {
               navigate("/admin/timetable")
             }
           >
-            🗓 &nbsp; Timetable
+            Timetable
           </button>
 
           <button
@@ -948,12 +946,14 @@ export default function EnrollmentManagement() {
               ...styles.navButton,
               ...styles.activeNav,
             }}
+            aria-current="page"
           >
-            🎓 &nbsp; Students
+            Students
           </button>
         </nav>
 
         <button
+          className="enr-logout"
           style={{
             ...styles.navButton,
             position: "absolute",
@@ -963,7 +963,7 @@ export default function EnrollmentManagement() {
           }}
           onClick={logout}
         >
-          ↪ &nbsp; Logout
+          Logout
         </button>
       </aside>
 
@@ -971,10 +971,10 @@ export default function EnrollmentManagement() {
           MAIN
       ===================================================== */}
 
-      <main style={styles.main}>
+      <main className="enr-main" style={styles.main}>
         {/* HEADER */}
 
-        <header style={styles.header}>
+        <header className="enr-header" style={styles.header}>
           <div>
             <h1
               style={{
@@ -998,6 +998,7 @@ export default function EnrollmentManagement() {
           </div>
 
           <div
+            className="enr-header-actions"
             style={{
               display: "flex",
               gap: "10px",
@@ -1007,23 +1008,24 @@ export default function EnrollmentManagement() {
               style={styles.secondaryButton}
               onClick={loadData}
             >
-              ↻ Refresh
+              Refresh
             </button>
 
             <button
               style={styles.primaryButton}
               onClick={openCreateStudent}
             >
-              + Add Student
+              Add Student
             </button>
           </div>
         </header>
 
-        <section style={styles.content}>
+        <section className="enr-content" style={styles.content}>
           {/* ALERTS */}
 
-          {error && (
+          {error && !showStudentModal && (
             <div
+              role="alert"
               style={{
                 background: "#fee2e2",
                 border: "1px solid #fecaca",
@@ -1031,14 +1033,28 @@ export default function EnrollmentManagement() {
                 padding: "13px 16px",
                 borderRadius: "11px",
                 marginBottom: "18px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "10px",
               }}
             >
-              {error}
+              <span>{error}</span>
+
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={loadData}
+              >
+                Try again
+              </button>
             </div>
           )}
 
           {success && (
             <div
+              role="status"
               style={{
                 background: "#dcfce7",
                 border: "1px solid #bbf7d0",
@@ -1054,7 +1070,7 @@ export default function EnrollmentManagement() {
 
           {/* STATS */}
 
-          <div style={styles.stats}>
+          <div className="enr-stats" style={styles.stats}>
             <div style={styles.stat}>
               <div
                 style={{
@@ -1139,7 +1155,7 @@ export default function EnrollmentManagement() {
 
           {/* MAIN GRID */}
 
-          <div style={styles.grid}>
+          <div className="enr-grid" style={styles.grid}>
             {/* STUDENTS */}
 
             <section style={styles.card}>
@@ -1186,6 +1202,7 @@ export default function EnrollmentManagement() {
                   marginTop: "18px",
                 }}
                 placeholder="Search by name, ID, email or phone..."
+                aria-label="Search students"
                 value={studentSearch}
                 onChange={(event) =>
                   setStudentSearch(
@@ -1197,12 +1214,13 @@ export default function EnrollmentManagement() {
               <div style={styles.list}>
                 {loading ? (
                   <div
-                    style={{
-                      textAlign: "center",
-                      padding: "60px 20px",
-                      color: "#64748b",
-                    }}
+                    className="enr-loading"
+                    role="status"
                   >
+                    <span
+                      className="enr-spinner"
+                      aria-hidden="true"
+                    />
                     Loading students...
                   </div>
                 ) : filteredStudents.length ===
@@ -1214,7 +1232,23 @@ export default function EnrollmentManagement() {
                       color: "#64748b",
                     }}
                   >
-                    No students found.
+                    <p style={{ margin: "0 0 14px" }}>
+                      No students found.
+                    </p>
+
+                    <button
+                      type="button"
+                      style={styles.secondaryButton}
+                      onClick={
+                        studentSearch
+                          ? () => setStudentSearch("")
+                          : openCreateStudent
+                      }
+                    >
+                      {studentSearch
+                        ? "Clear search"
+                        : "Add Student"}
+                    </button>
                   </div>
                 ) : (
                   filteredStudents.map(
@@ -1287,6 +1321,8 @@ export default function EnrollmentManagement() {
                                   "#64748b",
                                 marginTop:
                                   "3px",
+                                wordBreak:
+                                  "break-word",
                               }}
                             >
                               {
@@ -1340,15 +1376,6 @@ export default function EnrollmentManagement() {
                     color: "#64748b",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: "45px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    👤
-                  </div>
-
                   <h3
                     style={{
                       color: "#243b61",
@@ -1440,6 +1467,7 @@ export default function EnrollmentManagement() {
                     }}
                   >
                     <div
+                      className="enr-details-grid"
                       style={{
                         display:
                           "grid",
@@ -1577,7 +1605,7 @@ export default function EnrollmentManagement() {
                         )
                       }
                     >
-                      ✏ Edit Student
+                      Edit Student
                     </button>
 
                     <button
@@ -1588,7 +1616,7 @@ export default function EnrollmentManagement() {
                         )
                       }
                     >
-                      🗑 Delete
+                      Delete
                     </button>
                   </div>
 
@@ -1633,6 +1661,7 @@ export default function EnrollmentManagement() {
                           "10px",
                       }}
                       placeholder="Search course, section or lecturer..."
+                      aria-label="Search sections"
                       value={sectionSearch}
                       onChange={(event) =>
                         setSectionSearch(
@@ -1647,6 +1676,7 @@ export default function EnrollmentManagement() {
                       }
                     >
                       <select
+                        aria-label="Select section"
                         style={{
                           ...styles.input,
                           marginBottom:
@@ -1724,7 +1754,7 @@ export default function EnrollmentManagement() {
                       >
                         {saving
                           ? "Processing..."
-                          : "+ Enroll Student"}
+                          : "Enroll Student"}
                       </button>
                     </form>
                   </div>
@@ -1806,16 +1836,17 @@ export default function EnrollmentManagement() {
                   color: "#64748b",
                 }}
               >
-                👤 Select a student first.
+                Select a student first.
               </div>
             ) : detailsLoading ? (
               <div
-                style={{
-                  textAlign: "center",
-                  padding: "50px",
-                  color: "#64748b",
-                }}
+                className="enr-loading"
+                role="status"
               >
+                <span
+                  className="enr-spinner"
+                  aria-hidden="true"
+                />
                 Loading enrollments...
               </div>
             ) : enrollments.length === 0 ? (
@@ -1826,7 +1857,19 @@ export default function EnrollmentManagement() {
                   color: "#64748b",
                 }}
               >
-                📚 No enrollments found.
+                <p style={{ margin: "0 0 14px" }}>
+                  No enrollments found.
+                </p>
+
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() =>
+                    loadEnrollments(selectedStudentId)
+                  }
+                >
+                  Refresh
+                </button>
               </div>
             ) : (
               <div style={styles.tableWrap}>
@@ -1984,7 +2027,7 @@ export default function EnrollmentManagement() {
 
       {showStudentModal && (
         <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
+          <div className="enr-modal" style={styles.modal}>
             <div
               style={{
                 display: "flex",
@@ -2024,6 +2067,7 @@ export default function EnrollmentManagement() {
 
               <button
                 type="button"
+                aria-label="Close"
                 onClick={
                   closeStudentModal
                 }
@@ -2045,18 +2089,39 @@ export default function EnrollmentManagement() {
               </button>
             </div>
 
+            {error && (
+              <div
+                role="alert"
+                style={{
+                  background: "#fee2e2",
+                  border: "1px solid #fecaca",
+                  color: "#991b1b",
+                  padding: "12px 14px",
+                  borderRadius: "11px",
+                  marginBottom: "16px",
+                  fontSize: "14px",
+                }}
+              >
+                {error}
+              </div>
+            )}
+
             <form
               onSubmit={
                 handleStudentSubmit
               }
             >
-              <div style={styles.formGrid}>
+              <div
+                className="enr-form-grid"
+                style={styles.formGrid}
+              >
                 <div style={styles.formGroup}>
-                  <label>
+                  <label htmlFor="student-first-name">
                     First Name *
                   </label>
 
                   <input
+                    id="student-first-name"
                     style={styles.input}
                     name="firstName"
                     value={
@@ -2070,11 +2135,12 @@ export default function EnrollmentManagement() {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label>
+                  <label htmlFor="student-last-name">
                     Last Name *
                   </label>
 
                   <input
+                    id="student-last-name"
                     style={styles.input}
                     name="lastName"
                     value={
@@ -2088,11 +2154,12 @@ export default function EnrollmentManagement() {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label>
+                  <label htmlFor="student-code">
                     Student Code *
                   </label>
 
                   <input
+                    id="student-code"
                     style={styles.input}
                     name="studentCode"
                     value={
@@ -2106,11 +2173,12 @@ export default function EnrollmentManagement() {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label>
+                  <label htmlFor="student-phone">
                     Phone
                   </label>
 
                   <input
+                    id="student-phone"
                     style={styles.input}
                     name="phone"
                     value={
@@ -2125,12 +2193,13 @@ export default function EnrollmentManagement() {
               </div>
 
               <div style={styles.formGroup}>
-                <label>
+                <label htmlFor="student-email">
                   Email *
                 </label>
 
                 <input
                   type="email"
+                  id="student-email"
                   style={styles.input}
                   name="email"
                   value={
@@ -2144,7 +2213,7 @@ export default function EnrollmentManagement() {
               </div>
 
               <div style={styles.formGroup}>
-                <label>
+                <label htmlFor="student-password">
                   {editingStudent
                     ? "New Password (optional)"
                     : "Password *"}
@@ -2152,6 +2221,7 @@ export default function EnrollmentManagement() {
 
                 <input
                   type="password"
+                  id="student-password"
                   style={styles.input}
                   name="password"
                   value={
@@ -2170,11 +2240,12 @@ export default function EnrollmentManagement() {
 
               {editingStudent && (
                 <div style={styles.formGroup}>
-                  <label>
+                  <label htmlFor="student-status">
                     Account Status
                   </label>
 
                   <select
+                    id="student-status"
                     style={styles.input}
                     name="status"
                     value={

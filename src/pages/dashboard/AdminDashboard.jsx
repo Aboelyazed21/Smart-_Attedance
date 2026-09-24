@@ -1,6 +1,8 @@
 ﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDashboardReport } from "../../services/api";
+import Footer from "../../components/Footer";
+import "../../components/Footer.css";
 import "./AdminDashboard.css";
 function Icon({ type, size = 22 }) {
   const common = {
@@ -139,8 +141,36 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  /* Lock the background and allow Escape while the mobile drawer is open. */
+  useEffect(() => {
+    if (!sidebarOpen) {
+      return undefined;
+    }
+
+    document.body.classList.add("admin-sidebar-open");
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.classList.remove("admin-sidebar-open");
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [sidebarOpen]);
+
+  function goTo(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
 
   async function loadDashboard(isRefresh = false) {
     try {
@@ -199,7 +229,7 @@ function AdminDashboard() {
       value: dashboardData.sessions,
       description: "Attendance sessions",
       icon: "sessions",
-      tone: "violet",
+      tone: "neutral",
     },
     {
       key: "attendance",
@@ -232,8 +262,38 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="dashboard-page admin-dashboard">
-      <aside className="dashboard-sidebar">
+    <div
+      className={`dashboard-page admin-dashboard${
+        sidebarOpen ? " sidebar-is-open" : ""
+      }`}
+    >
+      <button
+        type="button"
+        className="admin-mobile-menu-button"
+        aria-label={
+          sidebarOpen
+            ? "Close navigation"
+            : "Open navigation"
+        }
+        aria-expanded={sidebarOpen}
+        aria-controls="admin-sidebar"
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <span aria-hidden="true" />
+        <span aria-hidden="true" />
+        <span aria-hidden="true" />
+      </button>
+
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="admin-sidebar-overlay"
+          aria-label="Close navigation"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside className="dashboard-sidebar" id="admin-sidebar">
         <div className="sidebar-brand">
           <div className="sidebar-logo">A</div>
 
@@ -252,22 +312,20 @@ function AdminDashboard() {
             <strong>
               {firstName} {lastName}
             </strong>
-            <span>
-              <i className="online-dot" />
-              Administrator
-            </span>
+            <span>Administrator</span>
           </div>
         </div>
 
         <div className="sidebar-section-label">MAIN MENU</div>
 
-        <nav className="dashboard-nav">
+        <nav className="dashboard-nav" aria-label="Main menu">
           {navItems.map((item) => (
             <button
               key={item.label}
               type="button"
               className={`nav-item ${item.active ? "active" : ""}`}
-              onClick={() => navigate(item.path)}
+              aria-current={item.active ? "page" : undefined}
+              onClick={() => goTo(item.path)}
             >
               <span className="nav-icon">
                 <Icon type={item.icon} size={19} />
@@ -318,6 +376,7 @@ function AdminDashboard() {
               className={`header-refresh ${refreshing ? "is-refreshing" : ""}`}
               onClick={() => loadDashboard(true)}
               disabled={refreshing}
+              aria-busy={refreshing}
               title="Refresh dashboard"
             >
               <Icon type="refresh" size={18} />
@@ -349,16 +408,10 @@ function AdminDashboard() {
                 corrections from one place.
               </p>
             </div>
-
-            <div className="hero-badge">
-              <span className="hero-status-dot" />
-              System Active
-            </div>
           </div>
 
           {error && (
-            <div className="dashboard-error">
-              <span className="error-mark">!</span>
+            <div className="dashboard-error" role="alert">
               <div>
                 <strong>Unable to load dashboard data</strong>
                 <p>{error}</p>
@@ -380,8 +433,6 @@ function AdminDashboard() {
                   <div className="stat-icon">
                     <Icon type={stat.icon} size={21} />
                   </div>
-
-                  <span className="stat-menu">•••</span>
                 </div>
 
                 <div className="stat-value">
@@ -427,7 +478,7 @@ function AdminDashboard() {
 
                 <div className="overview-item">
                   <div className="overview-item-left">
-                    <span className="overview-icon overview-violet">
+                    <span className="overview-icon overview-neutral">
                       <Icon type="sessions" size={18} />
                     </span>
                     <div>
@@ -492,7 +543,7 @@ function AdminDashboard() {
                 <button
                   type="button"
                   className="quick-action"
-                  onClick={() => navigate("/admin/users")}
+                  onClick={() => goTo("/admin/users")}
                 >
                   <span className="quick-action-icon blue">
                     <Icon type="users" size={20} />
@@ -511,9 +562,9 @@ function AdminDashboard() {
                 <button
                   type="button"
                   className="quick-action"
-                  onClick={() => navigate("/admin/courses")}
+                  onClick={() => goTo("/admin/courses")}
                 >
-                  <span className="quick-action-icon violet">
+                  <span className="quick-action-icon neutral">
                     <Icon type="courses" size={20} />
                   </span>
 
@@ -530,7 +581,7 @@ function AdminDashboard() {
                 <button
                   type="button"
                   className="quick-action"
-                  onClick={() => navigate("/admin/reports")}
+                  onClick={() => goTo("/admin/reports")}
                 >
                   <span className="quick-action-icon green">
                     <Icon type="reports" size={20} />
@@ -556,11 +607,6 @@ function AdminDashboard() {
                 <h2>System Status</h2>
                 <p>Quick view of your attendance platform</p>
               </div>
-
-              <span className="status-pill">
-                <span />
-                Operational
-              </span>
             </div>
 
             <div className="status-grid">
@@ -618,6 +664,7 @@ function AdminDashboard() {
             </div>
           </section>
         </section>
+        <Footer />
       </main>
     </div>
   );

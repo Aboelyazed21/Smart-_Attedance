@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getMyAttendance } from "../../services/api";
+import Footer from "../../components/Footer";
 
 import "../../App.css";
 import "./StudentAttendance.css";
@@ -173,6 +174,8 @@ function StudentAttendance() {
 
   const [page, setPage] = useState(1);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const rowsPerPage = 10;
 
   const user = useMemo(() => getUser(), []);
@@ -231,6 +234,27 @@ function StudentAttendance() {
   useEffect(() => {
     loadAttendance();
   }, []);
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      document.body.style.overflow = "";
+      return undefined;
+    }
+    document.body.style.overflow = "hidden";
+    function onKeyDown(event) {
+      if (event.key === "Escape") setSidebarOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebarOpen]);
+
+  function goTo(path) {
+    setSidebarOpen(false);
+    navigate(path);
+  }
 
   const courseOptions = useMemo(() => {
     const values = attendance
@@ -593,15 +617,31 @@ function StudentAttendance() {
 
   return (
     <div className="attendance-page">
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="attendance-sidebar-overlay"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <aside className="attendance-sidebar">
+      <aside
+        id="attendance-sidebar"
+        className={
+          sidebarOpen
+            ? "attendance-sidebar open"
+            : "attendance-sidebar"
+        }
+      >
         <div>
           <div className="attendance-brand">
             <div className="attendance-brand-logo">
-              ✓
+              A
             </div>
 
             <div>
@@ -621,63 +661,54 @@ function StudentAttendance() {
             </div>
           </div>
 
-          <nav className="attendance-nav">
+          <nav className="attendance-nav" aria-label="Student navigation">
             <button
               type="button"
-              onClick={() =>
-                navigate("/dashboard")
-              }
+              onClick={() => goTo("/dashboard")}
             >
-              <span>⌂</span>
               Dashboard
             </button>
 
             <button
               type="button"
               className="active"
+              aria-current="page"
+              onClick={() => goTo("/student/attendance")}
             >
-              <span>▥</span>
               My Attendance
             </button>
 
             <button
               type="button"
-              onClick={() =>
-                navigate("/student/scan")
-              }
+              onClick={() => goTo("/student/scan")}
             >
-              <span>▦</span>
               Scan Attendance
             </button>
 
-            <button type="button">
-              <span>▤</span>
+            <button
+              type="button"
+              onClick={() =>
+                goTo("/student/correction-requests")
+              }
+            >
               Correction Requests
             </button>
 
-            <button type="button">
-              <span>♧</span>
-              Notifications
-              <b>3</b>
+            <button
+              type="button"
+              onClick={() => goTo("/student/chatbot")}
+            >
+              Attendance Assistant
             </button>
           </nav>
         </div>
 
         <div className="attendance-sidebar-bottom">
-          <div className="attendance-sidebar-tip">
-            <span>✦</span>
-            <div>
-              <strong>Keep going!</strong>
-              <small>Every class counts.</small>
-            </div>
-          </div>
-
           <button
             type="button"
             className="attendance-logout"
             onClick={handleLogout}
           >
-            <span>↪</span>
             Logout
           </button>
         </div>
@@ -689,24 +720,19 @@ function StudentAttendance() {
 
       <main className="attendance-main">
         <header className="attendance-topbar">
-          <div className="attendance-search">
-            <span>⌕</span>
-            <input
-              type="text"
-              placeholder="Search courses, sessions, or anything..."
-            />
-            <small>Ctrl + K</small>
-          </div>
-
+          <button
+            type="button"
+            className="hamburger attendance-menu-button"
+            aria-expanded={sidebarOpen}
+            aria-controls="attendance-sidebar"
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => setSidebarOpen((o) => !o)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
           <div className="attendance-topbar-right">
-            <button
-              type="button"
-              className="attendance-bell"
-            >
-              ♧
-              <b>3</b>
-            </button>
-
             <div className="attendance-header-user">
               <div>{initial}</div>
 
@@ -714,8 +740,6 @@ function StudentAttendance() {
                 <strong>{fullName}</strong>
                 <span>Student</span>
               </section>
-
-              <span>⌄</span>
             </div>
           </div>
         </header>
@@ -727,10 +751,6 @@ function StudentAttendance() {
 
           <div className="attendance-page-hero">
             <div className="attendance-page-title">
-              <div className="attendance-page-title-icon">
-                ▥
-              </div>
-
               <div>
                 <span>Attendance</span>
 
@@ -744,33 +764,16 @@ function StudentAttendance() {
             </div>
 
             <div className="attendance-breadcrumb">
-              <span
+              <button
+                type="button"
                 onClick={() =>
                   navigate("/dashboard")
                 }
               >
                 Dashboard
-              </span>
+              </button>
               <b>›</b>
               <strong>My Attendance</strong>
-            </div>
-
-            <div className="attendance-hero-art">
-              <div className="attendance-art-calendar">
-                ▣
-              </div>
-
-              <div className="attendance-art-check">
-                ✓
-              </div>
-
-              <p>
-                Consistency
-                <br />
-                today, success
-                <br />
-                tomorrow.
-              </p>
             </div>
           </div>
 
@@ -780,10 +783,6 @@ function StudentAttendance() {
 
           <div className="attendance-metrics">
             <div className="attendance-metric-card present">
-              <div className="attendance-metric-icon">
-                ✓
-              </div>
-
               <div>
                 <span>Present</span>
                 <strong>{stats.present}</strong>
@@ -797,15 +796,9 @@ function StudentAttendance() {
                     : "No records yet"}
                 </small>
               </div>
-
-              <i>↗</i>
             </div>
 
             <div className="attendance-metric-card absent">
-              <div className="attendance-metric-icon">
-                !
-              </div>
-
               <div>
                 <span>Absent</span>
                 <strong>{stats.absent}</strong>
@@ -819,29 +812,17 @@ function StudentAttendance() {
                     : "No records yet"}
                 </small>
               </div>
-
-              <i>↗</i>
             </div>
 
             <div className="attendance-metric-card total">
-              <div className="attendance-metric-icon">
-                ▤
-              </div>
-
               <div>
                 <span>Total Sessions</span>
                 <strong>{stats.total}</strong>
                 <small>This semester</small>
               </div>
-
-              <i>☷</i>
             </div>
 
             <div className="attendance-metric-card rate">
-              <div className="attendance-metric-icon">
-                %
-              </div>
-
               <div>
                 <span>Attendance Rate</span>
                 <strong>{stats.rate}%</strong>
@@ -851,8 +832,6 @@ function StudentAttendance() {
                     : "Keep improving"}
                 </small>
               </div>
-
-              <i>↗</i>
             </div>
           </div>
 
@@ -862,22 +841,12 @@ function StudentAttendance() {
 
           <div className="attendance-filters">
             <div className="attendance-filter-field">
-              <label>Semester</label>
-
-              <select defaultValue="fall-2026">
-                <option value="fall-2026">
-                  Fall 2026
-                </option>
-                <option value="spring-2026">
-                  Spring 2026
-                </option>
-              </select>
-            </div>
-
-            <div className="attendance-filter-field">
-              <label>Course</label>
+              <label htmlFor="attendance-course">
+                Course
+              </label>
 
               <select
+                id="attendance-course"
                 value={courseFilter}
                 onChange={(event) =>
                   setCourseFilter(
@@ -903,9 +872,12 @@ function StudentAttendance() {
             </div>
 
             <div className="attendance-filter-field">
-              <label>Status</label>
+              <label htmlFor="attendance-status">
+                Status
+              </label>
 
               <select
+                id="attendance-status"
                 value={statusFilter}
                 onChange={(event) =>
                   setStatusFilter(
@@ -930,9 +902,12 @@ function StudentAttendance() {
             </div>
 
             <div className="attendance-filter-field">
-              <label>From</label>
+              <label htmlFor="attendance-from">
+                From
+              </label>
 
               <input
+                id="attendance-from"
                 type="date"
                 value={fromDate}
                 onChange={(event) =>
@@ -944,9 +919,12 @@ function StudentAttendance() {
             </div>
 
             <div className="attendance-filter-field">
-              <label>To</label>
+              <label htmlFor="attendance-to">
+                To
+              </label>
 
               <input
+                id="attendance-to"
                 type="date"
                 value={toDate}
                 onChange={(event) =>
@@ -962,7 +940,6 @@ function StudentAttendance() {
               className="attendance-filter-button"
               onClick={() => setPage(1)}
             >
-              ⌕
               Filter
             </button>
 
@@ -971,7 +948,6 @@ function StudentAttendance() {
               className="attendance-reset-button"
               onClick={resetFilters}
             >
-              ↻
               Reset
             </button>
           </div>
@@ -986,7 +962,6 @@ function StudentAttendance() {
               <div className="attendance-card-header">
                 <div>
                   <div className="attendance-card-title">
-                    <span>▣</span>
                     <h2>Attendance Records</h2>
                   </div>
 
@@ -1003,13 +978,15 @@ function StudentAttendance() {
                     !filteredAttendance.length
                   }
                 >
-                  ↓
-                  Export
+                  Export CSV
                 </button>
               </div>
 
               {error && (
-                <div className="attendance-error">
+                <div
+                  className="attendance-error"
+                  role="alert"
+                >
                   <strong>Unable to load attendance</strong>
                   <span>{error}</span>
 
@@ -1033,10 +1010,6 @@ function StudentAttendance() {
                 </div>
               ) : !filteredAttendance.length ? (
                 <div className="attendance-state">
-                  <div className="attendance-state-icon">
-                    ▥
-                  </div>
-
                   <h3>
                     No attendance records found
                   </h3>
@@ -1260,20 +1233,10 @@ function StudentAttendance() {
               <div className="attendance-side-card">
                 <div className="attendance-side-card-header">
                   <div>
-                    <span>▥</span>
                     <strong>
                       Attendance Overview
                     </strong>
                   </div>
-
-                  <select defaultValue="30">
-                    <option value="30">
-                      Last 30 Days
-                    </option>
-                    <option value="semester">
-                      This Semester
-                    </option>
-                  </select>
                 </div>
 
                 <div className="attendance-chart">
@@ -1364,7 +1327,6 @@ function StudentAttendance() {
               <div className="attendance-side-card">
                 <div className="attendance-side-card-title">
                   <div>
-                    <span>◷</span>
                     <strong>
                       Course-wise Attendance
                     </strong>
@@ -1426,7 +1388,6 @@ function StudentAttendance() {
               <div className="attendance-side-card attendance-tips-card">
                 <div className="attendance-side-card-title">
                   <div>
-                    <span>💡</span>
                     <strong>
                       Tips for Better Attendance
                     </strong>
@@ -1434,47 +1395,20 @@ function StudentAttendance() {
                 </div>
 
                 <ul>
-                  <li>
-                    <span>✓</span>
-                    Attend classes regularly
-                  </li>
+                  <li>Attend classes regularly</li>
 
-                  <li>
-                    <span>✓</span>
-                    Check your timetable
-                  </li>
+                  <li>Check your timetable</li>
 
-                  <li>
-                    <span>✓</span>
-                    Scan the QR code on time
-                  </li>
+                  <li>Scan the QR code on time</li>
 
-                  <li>
-                    <span>✓</span>
-                    Keep track of your progress
-                  </li>
+                  <li>Keep track of your progress</li>
                 </ul>
-
-                <div className="attendance-quote">
-                  “Discipline is the bridge
-                  between goals and achievement.”
-                </div>
               </div>
             </aside>
           </div>
         </section>
 
-        <footer className="attendance-footer">
-          <span>Attendify</span>
-          <b>•</b>
-          <span>Port Said University</span>
-          <b>•</b>
-          <span>
-            A Smarter Campus for a Brighter Tomorrow
-          </span>
-
-          <small>v1.0.0</small>
-        </footer>
+        <Footer />
       </main>
     </div>
   );
