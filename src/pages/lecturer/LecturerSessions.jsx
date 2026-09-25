@@ -39,8 +39,41 @@ import "./LecturerSession.css";
   
   function formatTime(time) {
     if (!time) return "—";
-  
+
     return String(time).substring(0, 5);
+  }
+
+
+  /* Scan/registration time (DATETIME from the API)
+     -> "HH:MM", or "—" when there is no record. */
+
+  function formatScanTime(value) {
+    if (!value) return "—";
+
+    const raw = String(value).trim();
+
+    if (!raw) return "—";
+
+    const normalized = raw.includes("T")
+      ? raw
+      : raw.replace(" ", "T");
+
+    const date = new Date(normalized);
+
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    const match = raw.match(/(\d{1,2}):(\d{2})/);
+
+    if (match) {
+      return `${match[1].padStart(2, "0")}:${match[2]}`;
+    }
+
+    return raw;
   }
   
   
@@ -1785,12 +1818,14 @@ import "./LecturerSession.css";
   
   
                               <td>
-  
-                                {student.attendance_time ||
+
+                                {formatScanTime(
+                                  student.scanned_at ||
+                                  student.attendance_time ||
                                   student.checked_in_at ||
-                                  student.marked_at ||
-                                  "—"}
-  
+                                  student.marked_at
+                                )}
+
                               </td>
   
                             </tr>

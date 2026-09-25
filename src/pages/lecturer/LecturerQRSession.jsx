@@ -48,6 +48,35 @@ function formatTime(value) {
   return String(value).slice(0, 5);
 }
 
+function formatScanTime(value) {
+  if (!value) return "-";
+
+  const raw = String(value).trim();
+
+  if (!raw) return "-";
+
+  const normalized = raw.includes("T")
+    ? raw
+    : raw.replace(" ", "T");
+
+  const date = new Date(normalized);
+
+  if (!Number.isNaN(date.getTime())) {
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  const match = raw.match(/(\d{1,2}):(\d{2})/);
+
+  if (match) {
+    return `${match[1].padStart(2, "0")}:${match[2]}`;
+  }
+
+  return raw;
+}
+
 function normalizeRoster(data) {
   const rows = Array.isArray(data)
     ? data
@@ -837,6 +866,7 @@ export default function LecturerQRSession() {
                     <th>{t("lecQR.colStudentId")}</th>
                     <th>{t("lecQR.colName")}</th>
                     <th>{t("lecQR.colStatus")}</th>
+                    <th>{t("lecQR.colTime")}</th>
                     <th>{t("lecQR.colAction")}</th>
                   </tr>
                 </thead>
@@ -845,7 +875,7 @@ export default function LecturerQRSession() {
                   {paginatedRoster.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="5"
+                        colSpan="6"
                         className="empty-table"
                       >
                         {t("lecQR.emptyStudents")}
@@ -910,6 +940,12 @@ export default function LecturerQRSession() {
                                   t
                                 )}
                               </span>
+                            </td>
+
+                            <td>
+                              {formatScanTime(
+                                student.scanned_at
+                              )}
                             </td>
 
                             <td>
