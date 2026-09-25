@@ -1,0 +1,253 @@
+/* ============================================================
+   WEEKLY EMAIL REPORTS (ADMIN)
+   ============================================================ */
+
+.weekly-emails-page {
+  min-height: 100vh;
+  width: 100%;
+  min-width: 0;
+  background: #f5f8fc;
+  color: #102a56;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.weekly-emails-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.weekly-emails-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.weekly-emails-muted {
+  margin: 0;
+  font-size: 13px;
+  color: #5b6b82;
+}
+
+.weekly-emails-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.weekly-emails-card h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.weekly-emails-alert {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.weekly-emails-alert-error {
+  background: #fdecea;
+  border: 1px solid #f5c2c0;
+  color: #9c2b2b;
+}
+
+.weekly-emails-alert-success {
+  background: #e9f7ef;
+  border: 1px solid #bfe6cd;
+  color: #1e7e34;
+}
+
+.weekly-emails-warning {
+  background: #fff8e6;
+  border: 1px solid #f0dfa8;
+  color: #8a6d1a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.weekly-emails-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.weekly-emails-stat {
+  background: #f5f8fc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weekly-emails-stat span {
+  font-size: 12px;
+  color: #5b6b82;
+}
+
+.weekly-emails-stat strong {
+  font-size: 16px;
+}
+
+.weekly-emails-green {
+  color: #1e7e34;
+}
+
+.weekly-emails-red {
+  color: #c0392b;
+}
+
+.weekly-emails-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.weekly-emails-form-inline {
+  grid-template-columns: auto auto;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.weekly-emails-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.weekly-emails-form input,
+.weekly-emails-form select {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13px;
+  color: #102a56;
+  background: #ffffff;
+  font-family: inherit;
+}
+
+.weekly-emails-check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.weekly-emails-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.weekly-emails-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.weekly-emails-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.weekly-emails-btn-primary {
+  background: #123f7a;
+  color: #ffffff;
+}
+
+.weekly-emails-btn-secondary {
+  background: #e8eef6;
+  color: #123f7a;
+}
+
+.weekly-emails-btn-small {
+  padding: 6px 10px;
+  font-size: 12px;
+  background: #e8eef6;
+  color: #123f7a;
+}
+
+.weekly-emails-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.weekly-emails-preview {
+  width: 100%;
+  min-height: 480px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.weekly-emails-table-wrap {
+  overflow-x: auto;
+}
+
+.weekly-emails-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.weekly-emails-table th,
+.weekly-emails-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eef2f7;
+  white-space: nowrap;
+}
+
+.weekly-emails-email {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.weekly-emails-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weekly-emails-pill-sent {
+  background: #e9f7ef;
+  color: #1e7e34;
+}
+
+.weekly-emails-pill-failed {
+  background: #fdecea;
+  color: #9c2b2b;
+}
+
+.weekly-emails-pill-skipped,
+.weekly-emails-pill-pending {
+  background: #eef2f7;
+  color: #5b6b82;
+}
+
+@media (max-width: 640px) {
+  .weekly-emails-page {
+    padding: 16px;
+  }
+}

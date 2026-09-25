@@ -171,6 +171,28 @@ function AdminIcon({ type, size = 19 }) {
         </svg>
       );
 
+    case "mail":
+      return (
+        <svg {...commonProps}>
+          <rect
+            x="3"
+            y="5"
+            width="18"
+            height="14"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="m4 7 8 6 8-6"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
     case "settings":
       return (
         <svg {...commonProps}>
@@ -330,6 +352,12 @@ export default function AdminLayout({ children }) {
       short: "RP",
       path: "/admin/reports",
       icon: "reports",
+    },
+    {
+      label: "nav.weeklyEmails",
+      short: "WE",
+      path: "/admin/weekly-emails",
+      icon: "mail",
     },
     {
       label: "nav.settings",

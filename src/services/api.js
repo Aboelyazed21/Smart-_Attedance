@@ -1157,3 +1157,134 @@ export async function createCorrection({
     }
   );
 }
+
+
+/* =========================================================
+   WEEKLY EMAIL REPORTS (ADMIN)
+======================================================== */
+
+export async function getWeeklyEmailSettings() {
+  return apiRequest(
+    "/admin/weekly-reports/settings"
+  );
+}
+
+
+export async function updateWeeklyEmailSettings(
+  patch
+) {
+  return apiRequest(
+    "/admin/weekly-reports/settings",
+    {
+      method: "PATCH",
+
+      body: JSON.stringify(patch),
+    }
+  );
+}
+
+
+export async function sendWeeklyEmails({
+  periodStart,
+  periodEnd,
+  studentId,
+  force,
+  dryRun,
+} = {}) {
+  return apiRequest(
+    "/admin/weekly-reports/send",
+    {
+      method: "POST",
+
+      body: JSON.stringify({
+        periodStart,
+        periodEnd,
+        studentId,
+        force,
+        dryRun,
+      }),
+    }
+  );
+}
+
+
+export async function sendWeeklyTestEmail(
+  to
+) {
+  return apiRequest(
+    "/admin/weekly-reports/test",
+    {
+      method: "POST",
+
+      body: JSON.stringify({ to }),
+    }
+  );
+}
+
+
+export async function previewWeeklyEmail({
+  studentId,
+  periodStart,
+  periodEnd,
+} = {}) {
+  return apiRequest(
+    "/admin/weekly-reports/preview",
+    {
+      method: "POST",
+
+      body: JSON.stringify({
+        studentId,
+        periodStart,
+        periodEnd,
+      }),
+    }
+  );
+}
+
+
+export async function getWeeklyEmailLogs(
+  params = {}
+) {
+  const query =
+    new URLSearchParams();
+
+  Object.entries(params).forEach(
+    ([key, value]) => {
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        query.set(key, value);
+      }
+    }
+  );
+
+  const suffix =
+    query.toString()
+      ? `?${query.toString()}`
+      : "";
+
+  return apiRequest(
+    `/admin/weekly-reports/logs${suffix}`
+  );
+}
+
+
+export async function retryWeeklyEmail(
+  id
+) {
+  return apiRequest(
+    `/admin/weekly-reports/retry/${id}`,
+    {
+      method: "POST",
+    }
+  );
+}
+
+
+export async function getWeeklyEmailStatus() {
+  return apiRequest(
+    "/admin/weekly-reports/status"
+  );
+}

@@ -21,6 +21,7 @@ import Rooms from "./pages/admin/Rooms";
 import Timetable from "./pages/admin/Timetable";
 import Attendance from "./pages/admin/Attendance";
 import Reports from "./pages/admin/Reports";
+import WeeklyEmailReports from "./pages/admin/WeeklyEmailReports";
 import Settings from "./pages/admin/Settings";
 import AdminLayout from "./components/admin/AdminLayout";
 
@@ -313,6 +314,22 @@ function App() {
     return (
       <AdminLayout>
         <Reports />
+      </AdminLayout>
+    );
+  }
+
+  /* =========================================================
+     ADMIN WEEKLY EMAIL REPORTS
+  ========================================================= */
+
+  if (location.pathname === "/admin/weekly-emails") {
+    if (!isAdminAuthenticated()) {
+      return <Login />;
+    }
+
+    return (
+      <AdminLayout>
+        <WeeklyEmailReports />
       </AdminLayout>
     );
   }
