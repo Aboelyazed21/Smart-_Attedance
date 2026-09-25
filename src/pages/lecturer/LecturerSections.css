@@ -67,7 +67,7 @@
   display: block;
   margin-bottom: 4px;
   color: var(--sections-primary);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.2px;
 }
@@ -147,7 +147,7 @@
 .panel-label {
   display: block;
   color: var(--sections-primary);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.15px;
 }
@@ -285,7 +285,7 @@
   border-radius: 10px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -318,7 +318,7 @@
   display: block;
   margin-top: 3px;
   color: var(--sections-subtle);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 /* =========================================================
@@ -418,7 +418,7 @@
   border-radius: 6px;
   background: var(--sections-primary-soft);
   color: var(--sections-primary);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -612,7 +612,7 @@
   border-radius: 7px;
   background: var(--sections-primary-soft);
   color: var(--sections-primary);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -627,7 +627,7 @@
   border-radius: 999px;
   background: #ecfdf5;
   color: #047857;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -672,7 +672,7 @@
   display: block;
   margin-bottom: 4px;
   color: #94a3b8;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .section-meta strong {
@@ -704,14 +704,14 @@
   border-radius: 8px;
   background: #f1f5f9;
   color: #475569;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
 .student-count span {
   display: block;
   color: var(--sections-muted);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .student-count strong {

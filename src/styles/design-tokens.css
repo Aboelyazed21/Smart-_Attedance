@@ -1,0 +1,187 @@
+/* ============================================================
+   DESIGN TOKENS — single source of truth for the
+   Smart Attendance design language.
+   Additive only: defines variables + opt-in utility
+   classes. Existing page CSS keeps working untouched.
+   ============================================================ */
+
+:root {
+  /* ---------- Brand ---------- */
+  --brand-navy: #123f7a;
+  --brand-navy-deep: #0f2851;
+  --brand-blue: #147ef5;
+  --brand-blue-hover: #086fe4;
+
+  /* ---------- Neutrals ---------- */
+  --bg-page: #f5f8fc;
+  --bg-card: #ffffff;
+  --bg-muted: #eef2f7;
+  --bg-input: #f8fafc;
+  --border-subtle: #e2e8f0;
+  --border-input: #cbd5e1;
+  --text-primary: #102a56;
+  --text-body: #1e293b;
+  --text-secondary: #5b6b82;
+  --text-muted: #94a3b8;
+
+  /* ---------- Semantic (status only) ---------- */
+  --status-success: #1e7e34;
+  --status-success-bg: #e9f7ef;
+  --status-success-border: #bfe6cd;
+  --status-danger: #c0392b;
+  --status-danger-bg: #fdecea;
+  --status-danger-border: #f5c2c0;
+  --status-warning: #b7791f;
+  --status-warning-bg: #fff8e6;
+  --status-warning-border: #f0dfa8;
+  --status-info: #2563eb;
+  --status-info-bg: #eaf2ff;
+  --status-neutral: #5b6b82;
+  --status-neutral-bg: #eef2f7;
+
+  /* ---------- Shape ---------- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+
+  /* ---------- Elevation (restrained) ---------- */
+  --shadow-sm: 0 1px 2px rgba(15, 40, 81, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 40, 81, 0.08);
+  --shadow-lg: 0 8px 24px rgba(15, 40, 81, 0.12);
+
+  /* ---------- Typography ---------- */
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-title: 22px;
+  --weight-regular: 400;
+  --weight-medium: 600;
+  --weight-bold: 700;
+
+  /* ---------- Motion (functional only) ---------- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+}
+
+/* ---------- Opt-in primitives ---------- */
+
+.ui-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ui-btn-primary {
+  background: var(--brand-navy);
+  color: #ffffff;
+}
+
+.ui-btn-primary:hover:not(:disabled) {
+  background: var(--brand-navy-deep);
+}
+
+.ui-btn-secondary {
+  background: var(--bg-muted);
+  color: var(--brand-navy);
+}
+
+.ui-btn-secondary:hover:not(:disabled) {
+  background: var(--border-subtle);
+}
+
+.ui-input,
+.ui-select,
+.ui-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  padding: 9px 10px;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.ui-input:focus,
+.ui-select:focus,
+.ui-textarea:focus {
+  outline: none;
+  border-color: var(--brand-blue);
+}
+
+.ui-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--weight-bold);
+  line-height: 1.5;
+}
+
+.ui-status-success {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.ui-status-danger {
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
+}
+
+.ui-status-warning {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.ui-status-info {
+  background: var(--status-info-bg);
+  color: var(--status-info);
+}
+
+.ui-status-neutral {
+  background: var(--status-neutral-bg);
+  color: var(--status-neutral);
+}
+
+.ui-muted {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ---------- Motion safety ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

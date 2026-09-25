@@ -93,7 +93,7 @@
   border-radius: 20px;
   background: #ef4444;
   color: #fff;
-  font-size: 7px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -120,7 +120,7 @@
 
 .attendance-user-info span {
   display: block;
-  font-size: 8px;
+  font-size: 11px;
   color: #94a2b6;
   margin-top: 1px;
 }
@@ -166,7 +166,7 @@
 .attendance-title p {
   margin: 3px 0 0;
   color: #94a3b8;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .attendance-header-actions {
@@ -177,7 +177,7 @@
 
 .attendance-header-actions > span {
   color: #8b9ab0;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .attendance-header-actions button {
@@ -265,7 +265,7 @@
 .attendance-stat-content span {
   display: block;
   color: #8b9ab0;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .attendance-stat-content strong {
@@ -280,7 +280,7 @@
   display: block;
   margin-top: 1px;
   color: #a0adbd;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 /* =========================================================
@@ -331,7 +331,7 @@
   color: #52657d;
   padding: 0 8px;
   outline: 0;
-  font-size: 8px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -344,7 +344,7 @@
   height: 32px;
   border-radius: 6px;
   padding: 0 10px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -404,7 +404,7 @@
 .attendance-table-header p {
   margin: 3px 0 0;
   color: #9ba9bb;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .attendance-table-header button {
@@ -413,7 +413,7 @@
   background: #fff;
   color: #5d718b;
   padding: 5px 8px;
-  font-size: 8px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -452,7 +452,7 @@
   background: #fbfcfe;
   border-bottom: 1px solid #eaf0f5;
   color: #667991;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
   text-align: left;
   white-space: nowrap;
@@ -463,7 +463,7 @@
   padding: 5px 8px;
   border-bottom: 1px solid #edf1f5;
   color: #52667f;
-  font-size: 8px;
+  font-size: 11px;
   vertical-align: middle;
 }
 
@@ -504,14 +504,14 @@
   justify-content: center;
   background: #eaf2ff;
   color: #1678f7;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
 .attendance-student strong {
   display: block;
   color: #27456d;
-  font-size: 8px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -519,20 +519,20 @@
   display: block;
   margin-top: 2px;
   color: #9ba8b9;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .attendance-course strong {
   display: block;
   color: #2b4c75;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .attendance-course span {
   display: block;
   margin-top: 2px;
   color: #9aa9bb;
-  font-size: 7px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -548,7 +548,7 @@
   gap: 4px;
   padding: 4px 7px;
   border-radius: 20px;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -701,7 +701,7 @@
 
 .attendance-donut span {
   color: #94a2b5;
-  font-size: 6px;
+  font-size: 10px;
   margin-top: 2px;
 }
 
@@ -714,7 +714,7 @@
 .attendance-overview-chart p {
   margin: 4px 0 0;
   color: #9ba9bb;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .attendance-overview-list {
@@ -740,7 +740,7 @@
 
 .attendance-overview-item > div > span {
   color: #5d718a;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .attendance-overview-item > strong {
@@ -752,7 +752,7 @@
 
 .attendance-overview-item > strong small {
   color: #9ba9bb;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -813,7 +813,7 @@
 .attendance-modal-header p {
   margin: 4px 0 0;
   color: #8e9eb1;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .attendance-modal-header > button {
@@ -848,7 +848,7 @@
 .attendance-detail span {
   display: block;
   color: #94a2b5;
-  font-size: 7px;
+  font-size: 11px;
   margin-bottom: 4px;
 }
 
@@ -920,7 +920,7 @@
   border-radius: 6px;
   background: #fff;
   color: #5c7088;
-  font-size: 8px;
+  font-size: 11px;
   cursor: pointer;
 }
 

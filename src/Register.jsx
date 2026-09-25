@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "./services/api";
 import { useLanguage } from "./utils/i18n";
+import { toast } from "./components/Toast";
 import { usePlatformSettings } from "./utils/platformSettings";
 import ThemeToggle from "./components/ThemeToggle";
 import "./App.css";
@@ -340,9 +341,7 @@ function Register() {
 
       console.log("Registration successful:", data);
 
-      alert(
-        t("reg.success")
-      );
+      toast.success(t("reg.success"));
 
       // Go back to Login
       navigate("/");

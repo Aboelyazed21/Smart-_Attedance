@@ -8,6 +8,10 @@ import "./App.css";
 function Login() {
   const { t } = useLanguage();
   const { platformName } = usePlatformSettings();
+
+  const platformInitial =
+    String(platformName || "A").trim().charAt(0).toUpperCase() ||
+    "A";
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
@@ -26,7 +30,7 @@ function Login() {
         <div className="brand">
 
           <div className="brand-logo">
-            <span>🎓</span>
+            <span aria-hidden="true">{platformInitial}</span>
           </div>
 
           <div className="brand-text">
@@ -66,7 +70,7 @@ function Login() {
           {/* LOGO */}
 
           <div className="login-logo">
-            <span>🎓</span>
+            <span aria-hidden="true">{platformInitial}</span>
           </div>
 
 
@@ -114,7 +118,10 @@ function Login() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  ✉
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="m4 7 8 6 8-6" />
+                  </svg>
                 </span>
 
                 <input
@@ -139,7 +146,10 @@ function Login() {
               <div className="input-container">
 
                 <span className="input-icon">
-                  🔒
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                  </svg>
                 </span>
 
                 <input
@@ -222,7 +232,9 @@ function Login() {
             >
 
               <span className="create-icon">
-                ♙+
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
               </span>
 
               <span>

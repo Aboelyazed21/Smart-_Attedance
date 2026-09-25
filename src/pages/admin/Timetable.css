@@ -87,7 +87,7 @@
   background: #ef3655;
   color: white;
   border-radius: 50%;
-  font-size: 8px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,7 +293,7 @@
 
 .tt-stat-card small {
   color: #9aaabd;
-  font-size: 8px;
+  font-size: 11px;
   margin-top: 3px;
 }
 
@@ -302,7 +302,7 @@
   align-self: flex-start;
   border-radius: 7px;
   padding: 4px 7px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -472,7 +472,7 @@
 .tt-table th {
   background: #fbfcfe;
   color: #617894;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   text-align: left;
   padding: 11px 9px;
@@ -498,7 +498,7 @@
 
 .tt-row-number {
   color: #91a3b8;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .tt-course-cell {
@@ -528,7 +528,7 @@
   display: block;
   margin-top: 2px;
   color: #8a9cb2;
-  font-size: 8px;
+  font-size: 11px;
   max-width: 115px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -544,14 +544,14 @@
   display: block;
   margin-top: 2px;
   color: #96a6b9;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .tt-day-badge {
   display: inline-flex;
   padding: 5px 8px;
   border-radius: 8px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -591,7 +591,7 @@
   gap: 5px;
   padding: 5px 8px;
   border-radius: 8px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -880,7 +880,7 @@
 
 .tt-weekdays span {
   color: #9aaabd;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -891,7 +891,7 @@
   align-items: center;
   justify-content: center;
   margin: auto;
-  font-size: 8px;
+  font-size: 11px;
   color: #4c6684;
   border-radius: 50%;
 }
@@ -988,14 +988,14 @@
 .tt-today-item strong {
   display: block;
   color: #24466d;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.4;
 }
 
 .tt-today-item span {
   display: block;
   color: #8294aa;
-  font-size: 8px;
+  font-size: 11px;
   margin-top: 4px;
 }
 
@@ -1039,7 +1039,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .tt-day-items {
@@ -1082,7 +1082,7 @@
 .tt-calendar-item small {
   display: block;
   color: #8294aa;
-  font-size: 8px;
+  font-size: 11px;
   margin-top: 2px;
 }
 
@@ -1093,7 +1093,7 @@
 .tt-footer {
   padding: 20px 25px;
   color: #91a1b4;
-  font-size: 8px;
+  font-size: 11px;
   display: flex;
   justify-content: space-between;
 }

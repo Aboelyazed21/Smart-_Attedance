@@ -178,7 +178,7 @@
     2px solid
     #ffffff;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -438,7 +438,7 @@
   color:
     #8a97aa;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -794,7 +794,7 @@
   color:
     #8794a9;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .rooms-tabs button:hover {
@@ -853,7 +853,7 @@
   color:
     #71829e;
 
-  font-size: 8px;
+  font-size: 11px;
 
   font-weight: 800;
 
@@ -1008,7 +1008,7 @@
   color:
     #8492a8;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -1031,7 +1031,7 @@
   color:
     #8b98aa;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -1047,7 +1047,7 @@
 
   border-radius: 7px;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 
   white-space: nowrap;
@@ -1107,7 +1107,7 @@
   color:
     #8795a8;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -1123,7 +1123,7 @@
 
   white-space: nowrap;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .location-cell svg {
@@ -1135,7 +1135,7 @@
   color:
     #a0abba;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -1151,7 +1151,7 @@
 
   border-radius: 8px;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -1210,7 +1210,7 @@
 
   cursor: pointer;
 
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 
   transition:
@@ -1607,7 +1607,7 @@
   color:
     #8a98ab;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .distribution-legend {
@@ -1688,7 +1688,7 @@
 
   text-align: center;
 
-  font-size: 7px;
+  font-size: 11px;
 }
 
 
@@ -1774,7 +1774,7 @@
   color:
     #8997aa;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -1870,7 +1870,7 @@
   color:
     #8290a5;
 
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .recent-room-meta {
@@ -1883,7 +1883,7 @@
   color:
     #193866;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .recent-room-meta span {
@@ -1894,7 +1894,7 @@
   color:
     #99a4b4;
 
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .recent-empty {
@@ -2122,7 +2122,7 @@
   color:
     #9aa6b7;
 
-  font-size: 7px;
+  font-size: 11px;
 
   font-weight: 500;
 }
@@ -2235,7 +2235,7 @@
   color:
     #8c9aad;
 
-  font-size: 8px;
+  font-size: 11px;
 }
 
 

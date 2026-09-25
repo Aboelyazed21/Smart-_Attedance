@@ -98,7 +98,7 @@
   display: block;
   margin-top: 5px;
   color: rgba(255,255,255,.65);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 1px;
   font-weight: 700;
 }
@@ -155,7 +155,7 @@
 .student-dashboard .student-profile span {
   margin-top: 3px;
   color: rgba(255,255,255,.62);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .student-dashboard .student-nav {
@@ -403,7 +403,7 @@
 
 .student-dashboard .student-stat-card span {
   color: #7387a2;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 650;
 }
 
@@ -417,7 +417,7 @@
 .student-dashboard .student-stat-card small {
   margin-top: 5px;
   color: #9aa8ba;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 /* =========================================================
@@ -461,14 +461,14 @@
 .student-dashboard .student-panel-header p {
   margin: 3px 0 0;
   color: #95a4b8;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .student-dashboard .student-panel-header button {
   border: 0;
   background: transparent;
   color: #287cf0;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -521,14 +521,14 @@
 .student-dashboard .student-attendance-info span {
   margin-top: 3px;
   color: #91a0b4;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .student-dashboard .student-status {
   flex: 0 0 auto;
   padding: 5px 8px;
   border-radius: 20px;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -588,7 +588,7 @@
   max-width: 280px;
   margin: 5px 0 13px;
   color: #9aa8ba;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -601,7 +601,7 @@
   border-radius: 7px;
   color: #fff;
   background: #287cf0;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -675,7 +675,7 @@
 .student-dashboard .student-quick-actions small {
   margin-top: 3px;
   color: #899bb2;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .student-dashboard .student-action-arrow {
@@ -713,7 +713,7 @@
 .student-dashboard .student-information-grid span {
   display: block;
   color: #8b9bb0;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .student-dashboard .student-information-grid strong {
@@ -816,7 +816,7 @@
   }
 
   .student-dashboard .student-dashboard-header p {
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .student-dashboard .student-dashboard-content {
@@ -2241,7 +2241,7 @@
 }
 
 .student-dashboard .student-brand span {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1.4px;
 }
 

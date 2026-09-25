@@ -195,7 +195,7 @@
   border-radius: 7px;
   background: rgba(36, 206, 135, .13);
   color: #74f2b8;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 1px;
 }
@@ -535,7 +535,7 @@
 
 .workspace-count span {
   color: var(--muted);
-  font-size: 8px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .8px;
 }
@@ -567,7 +567,7 @@
   border-radius: 7px;
   background: #edf4ff;
   color: var(--blue);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -677,7 +677,7 @@
   border-radius: 11px;
   background: #edf5ff;
   color: #1e6de1;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
   text-align: center;
 }
@@ -1095,7 +1095,7 @@
   display: block;
   margin-top: 6px;
   color: #93a0b2;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -1198,7 +1198,7 @@
 
 .qr-session-summary span {
   color: #8795a9;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .5px;
@@ -1345,7 +1345,7 @@
 
 .roster-stat-grid span {
   color: #8290a4;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 750;
 }
 
@@ -1390,7 +1390,7 @@
   background: #fbfcfe;
   color: #8795a9;
   border-bottom: 1px solid var(--line);
-  font-size: 8px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .7px;
   text-align: left;
@@ -1416,7 +1416,7 @@
   border-radius: 50%;
   background: #eaf2ff;
   color: var(--blue);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -1433,7 +1433,7 @@
 .roster-student span {
   margin-top: 3px;
   color: #91a0b5;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .roster-status-present {
@@ -1705,7 +1705,7 @@
 .correction-student-card span {
   margin-top: 4px;
   color: #8b98ab;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .correction-field {
@@ -1754,7 +1754,7 @@
 
 .correction-hint {
   color: #96a2b3;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -1849,7 +1849,7 @@
 .lecturer-brand span {
   margin-top: 5px;
   color: #aeb8c7;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1.25px;
 }
 
@@ -1998,7 +1998,7 @@
 .hero-eyebrow,
 .section-kicker {
   color: #6f7a89;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1.1px;
 }
 
@@ -2048,7 +2048,7 @@
   height: 36px;
   flex-basis: 36px;
   border-radius: 8px;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .stat-blue { background: #edf2ff; color: #356ae6; }
@@ -2058,7 +2058,7 @@
 
 .lecturer-stat-card span { color: #7a8492; font-size: 9px; }
 .lecturer-stat-card strong { color: #18212f; font-size: 21px; }
-.lecturer-stat-card small { color: #9aa2ad; font-size: 8px; }
+.lecturer-stat-card small { color: #9aa2ad; font-size: 11px; }
 
 /* Workspace */
 .lecturer-workspace-card {
@@ -2091,7 +2091,7 @@
 }
 
 .workspace-count strong { color: #18212f; font-size: 15px; }
-.workspace-count span { font-size: 7px; }
+.workspace-count span { font-size: 11px; }
 
 .lecturer-filters {
   grid-template-columns: minmax(220px, 1fr) 160px 140px auto;
@@ -2136,7 +2136,7 @@
   background: #f8f9fa;
   color: #7b8592;
   border-bottom: 1px solid #e4e7eb;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .lecturer-sessions-table td {
@@ -2157,14 +2157,14 @@
   border-radius: 8px;
   background: #f0f3f7;
   color: #526071;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .course-cell { gap: 9px; }
 .course-cell strong { color: #1d2736; font-size: 10px; }
 .course-cell span,
 .room-cell span,
-.schedule-cell span { color: #8b95a2; font-size: 8px; }
+.schedule-cell span { color: #8b95a2; font-size: 11px; }
 .room-cell strong,
 .schedule-cell strong { color: #4b5666; font-size: 9px; }
 
@@ -2173,14 +2173,14 @@
   border-radius: 7px;
   background: #f3f5f7;
   color: #596575;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .lecturer-status,
 .roster-status {
   min-height: 24px;
   border-radius: 7px;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .session-actions button,
@@ -2189,7 +2189,7 @@
 .action-danger {
   min-height: 30px;
   border-radius: 7px;
-  font-size: 8px;
+  font-size: 11px;
   box-shadow: none;
 }
 
@@ -2633,7 +2633,7 @@
   .sessions-mobile-brand small {
     margin-top: 3px;
     color: #8390a1;
-    font-size: 7px;
+    font-size: 11px;
     letter-spacing: .9px;
   }
 

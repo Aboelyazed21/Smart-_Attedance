@@ -9,6 +9,7 @@ import {
 import Register from "./Register";
 import ThemeToggle from "./components/ThemeToggle";
 import { useLanguage, LanguageToggle } from "./utils/i18n";
+import { toast } from "./components/Toast";
 import { usePlatformSettings } from "./utils/platformSettings";
 import MaintenancePage from "./pages/MaintenancePage";
 import ForgotPassword from "./ForgotPassword";
@@ -837,9 +838,7 @@ function Login() {
     e.preventDefault();
 
     if (!identifier || !password) {
-      alert(
-        "Please enter your university email or university ID and password"
-      );
+      toast.error("Please enter your university email or university ID and password");
 
       return;
     }
@@ -874,10 +873,7 @@ function Login() {
         error
       );
 
-      alert(
-        error.message ||
-        "Login failed"
-      );
+      toast.error(error.message || "Login failed");
     } finally {
       setLoading(false);
     }

@@ -180,7 +180,7 @@ body {
   color:
     rgba(255, 255, 255, 0.95);
 
-  font-size: 8px;
+  font-size: 11px;
 
   font-weight: 700;
 
@@ -408,13 +408,13 @@ body {
 
   color: #123b70;
 
-  font-size: 33px;
+  font-size: 28px;
 
-  line-height: 1;
+  line-height: 1.15;
 
-  font-weight: 800;
+  font-weight: 700;
 
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 
   position: relative;
 
@@ -452,11 +452,11 @@ body {
 
   color: #12386a;
 
-  font-size: 24px;
+  font-size: 20px;
 
-  line-height: 1.1;
+  line-height: 1.2;
 
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .welcome-section p {
@@ -857,7 +857,7 @@ body {
 }
 
 .university-name {
-  font-size: 8px;
+  font-size: 11px;
 
   letter-spacing: 4px;
 
@@ -895,7 +895,7 @@ body {
 ===================================================== */
 
 .login-page .app-uni {
-  margin: 4px 0 0;
+  margin: 4px 0 14px;
 
   color: #5b6b80;
 
@@ -1709,7 +1709,7 @@ body {
   }
 
   .brand-text p {
-    font-size: 7px;
+    font-size: 11px;
   }
 
   .language-button {
@@ -1847,7 +1847,7 @@ body {
   }
 
   .university-name {
-    font-size: 7px;
+    font-size: 11px;
 
     letter-spacing: 3px;
   }
@@ -1961,7 +1961,7 @@ body {
 .sidebar-brand span {
   display: block;
   margin-top: 3px;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1.5px;
   opacity: 0.75;
 }
@@ -4614,7 +4614,7 @@ button {
 }
 
 .admin-dashboard .sidebar-brand span {
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 2px;
   color: rgba(255,255,255,.62);
 }
@@ -7294,7 +7294,7 @@ button {
 
     color: rgba(255, 255, 255, 0.68) !important;
 
-    font-size: 7px !important;
+    font-size: 11px !important;
     font-weight: 600 !important;
 
     letter-spacing: 0.6px !important;

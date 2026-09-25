@@ -5,7 +5,8 @@ import {
   getCourses,
   getSections,
 } from "../../services/api";
-import { useLanguage } from "../../utils/i18n";
+import { useLanguage } from "../../utils/i18n";
+import { toast } from "../../components/Toast";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -456,9 +457,9 @@ export default function Attendance() {
         url
       );
     } catch (err) {
-      alert(
-        err.message ||
-          t("attendance.could_not_export_attendance")
+      toast.error(
+        err.message ||
+          t("attendance.could_not_export_attendance")
       );
     }
   }
@@ -490,8 +491,8 @@ export default function Attendance() {
     if (
       !editReason.trim()
     ) {
-      alert(
-        t("attendance.please_enter_a_reason_for_the_manual_cha")
+      toast.error(
+        t("attendance.please_enter_a_reason_for_the_manual_cha")
       );
 
       return;
@@ -526,13 +527,13 @@ export default function Attendance() {
 
       await loadAttendance();
 
-      alert(
-        t("attendance.attendance_updated_successfully")
+      toast.success(
+        t("attendance.attendance_updated_successfully")
       );
     } catch (err) {
-      alert(
-        err.message ||
-          t("attendance.could_not_update_attendance")
+      toast.error(
+        err.message ||
+          t("attendance.could_not_update_attendance")
       );
     } finally {
       setSaving(false);

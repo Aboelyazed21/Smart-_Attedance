@@ -1,0 +1,113 @@
+/* ============================================================
+   GLOBAL TOAST NOTIFICATIONS
+   Subtle, professional feedback. No giant icons, no emojis.
+   ============================================================ */
+
+.toast-host {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.toast-item {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #64748b;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 40, 81, 0.12);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1e293b;
+  animation: toast-enter 0.18s ease-out;
+}
+
+.toast-item-success {
+  border-left-color: #1e7e34;
+}
+
+.toast-item-error {
+  border-left-color: #c0392b;
+}
+
+.toast-item-info {
+  border-left-color: #2563eb;
+}
+
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.toast-close {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.toast-close:hover {
+  color: #475569;
+  background: #f1f5f9;
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-host {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+  }
+}
+
+/* Dark mode follows the app theme (data-theme on <html>). */
+
+[data-theme="dark"] .toast-item {
+  background: #26365a;
+  border-color: #3b4f7e;
+  color: #edf1f9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .toast-close {
+  color: #8ea0c2;
+}
+
+[data-theme="dark"] .toast-close:hover {
+  color: #edf1f9;
+  background: #33456b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-item {
+    animation: none;
+  }
+}

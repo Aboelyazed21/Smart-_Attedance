@@ -19,7 +19,8 @@ import {
 } from "../../services/api";
 import "./Sections.css";
 import "./Sections.css";
-import { useLanguage } from "../../utils/i18n";
+import { useLanguage } from "../../utils/i18n";
+import { toast } from "../../components/Toast";
 
 function SectionIcon({ name, size = 15 }) {
   const paths = {
@@ -764,8 +765,8 @@ function Sections() {
     e.preventDefault();
 
     if (!sectionForm.courseId) {
-      alert(
-        t("sections.please_select_a_course")
+      toast.error(
+        t("sections.please_select_a_course")
       );
       return;
     }
@@ -773,8 +774,8 @@ function Sections() {
     if (
       !sectionForm.sectionName.trim()
     ) {
-      alert(
-        t("sections.please_enter_section_name")
+      toast.error(
+        t("sections.please_enter_section_name")
       );
       return;
     }
@@ -782,8 +783,8 @@ function Sections() {
     if (
       !sectionForm.academicYear.trim()
     ) {
-      alert(
-        t("sections.please_enter_academic_year")
+      toast.error(
+        t("sections.please_enter_academic_year")
       );
       return;
     }
@@ -852,9 +853,9 @@ function Sections() {
         err
       );
 
-      alert(
-        err.message ||
-        t("sections.failed_to_save_section")
+      toast.error(
+        err.message ||
+          t("sections.failed_to_save_section")
       );
 
     } finally {
@@ -902,9 +903,9 @@ function Sections() {
 
     } catch (err) {
 
-      alert(
-        err.message ||
-        t("sections.failed_to_delete_section")
+      toast.error(
+        err.message ||
+          t("sections.failed_to_delete_section")
       );
 
     }
@@ -1109,8 +1110,8 @@ function Sections() {
 
     if (!student.id) {
 
-      alert(
-        t("sections.enrollment_id_is_missing")
+      toast.error(
+        t("sections.enrollment_id_is_missing")
       );
 
       return;
@@ -1129,9 +1130,9 @@ function Sections() {
 
     } catch (err) {
 
-      alert(
-        err.message ||
-        t("sections.failed_to_remove_student")
+      toast.error(
+        err.message ||
+          t("sections.failed_to_remove_student")
       );
 
     }
@@ -1251,9 +1252,9 @@ function Sections() {
 
     } catch (err) {
 
-      alert(
-        err.message ||
-        t("sections.failed_to_update_student")
+      toast.error(
+        err.message ||
+          t("sections.failed_to_update_student")
       );
 
     } finally {
@@ -2040,7 +2041,7 @@ function Sections() {
                         <div className="section-empty-students">
 
                           <div>
-                            👥
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
                           </div>
 
                           <h3>

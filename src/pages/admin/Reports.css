@@ -86,7 +86,7 @@
   border-radius: 50%;
   background: #ef4444;
   color: white;
-  font-size: 8px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,7 +116,7 @@
 .reports-user span {
   display: block;
   color: #8390a5;
-  font-size: 8px;
+  font-size: 11px;
   margin-top: 2px;
 }
 
@@ -348,7 +348,7 @@
 
 .reports-stat-card small {
   color: #9aa5b5;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -522,7 +522,7 @@
 .trend-column small {
   text-align: center;
   color: #8895a8;
-  font-size: 7px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -582,7 +582,7 @@
 
 .donut span {
   color: #8b98aa;
-  font-size: 8px;
+  font-size: 11px;
   margin-top: 3px;
 }
 
@@ -703,7 +703,7 @@
 
 .absent-header {
   color: #8a96a8;
-  font-size: 8px;
+  font-size: 11px;
   padding: 8px 0;
   border-bottom: 1px solid #edf1f5;
 }
@@ -730,7 +730,7 @@
   padding: 4px 7px;
   border-radius: 12px;
   text-align: center;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 
@@ -772,7 +772,7 @@
   background: #f7f9fc;
   color: #78869a;
   text-align: left;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   padding: 10px;
   border-bottom: 1px solid #e6ebf2;
@@ -797,7 +797,7 @@
 .recent-table td small {
   display: block;
   color: #9aa5b5;
-  font-size: 7px;
+  font-size: 11px;
   margin-top: 3px;
 }
 
@@ -806,7 +806,7 @@
   display: inline-flex;
   padding: 5px 9px;
   border-radius: 20px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
 }
 
