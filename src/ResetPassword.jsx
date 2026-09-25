@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { resetPassword } from "./services/api";
 import { useLanguage } from "./utils/i18n";
+import { usePlatformSettings } from "./utils/platformSettings";
 import "./App.css";
 
 function getQueryToken() {
@@ -43,7 +44,12 @@ function checkStrength(password) {
 
 function ResetPassword() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const navigate = useNavigate();
+
+  const platformInitial =
+    String(platformName || "A").trim().charAt(0).toUpperCase() ||
+    "A";
 
   const token = useMemo(() => getQueryToken(), []);
 
@@ -99,11 +105,11 @@ function ResetPassword() {
       <header className="top-header">
         <div className="brand">
           <div className="brand-logo">
-            <span aria-hidden="true">A</span>
+            <span aria-hidden="true">{platformInitial}</span>
           </div>
 
           <div className="brand-text">
-            <h1>Attendify</h1>
+            <h1>{platformName}</h1>
             <p>{t("brand.tagline")}</p>
           </div>
         </div>
@@ -112,7 +118,7 @@ function ResetPassword() {
       <main className="login-area">
         <div className="login-card">
           <div className="login-logo">
-            <span aria-hidden="true">A</span>
+            <span aria-hidden="true">{platformInitial}</span>
           </div>
 
           <h2 className="app-name">

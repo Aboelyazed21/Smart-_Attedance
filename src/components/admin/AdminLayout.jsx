@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "../ThemeToggle";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./AdminLayout.css";
 
 /* =========================================================
@@ -301,6 +302,7 @@ export default function AdminLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -504,7 +506,7 @@ export default function AdminLayout({ children }) {
           <div className="admin-brand-mark">A</div>
 
           <div className="admin-brand-text">
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </div>
         </div>

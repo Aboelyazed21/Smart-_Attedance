@@ -10,6 +10,7 @@ import ThemeToggle from "../../components/ThemeToggle";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
 import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./CorrectionRequests.css";
 
 function Icon({ name, size = 18 }) {
@@ -166,6 +167,7 @@ function capitalize(value) {
 
 function CorrectionRequests() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const user = getSavedUser();
@@ -483,7 +485,7 @@ function CorrectionRequests() {
           </div>
 
           <div>
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </div>
         </div>

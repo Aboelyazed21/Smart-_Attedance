@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Settings.css";
-import { useLanguage } from "../../utils/i18n";
+import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
+import {
+  getAdminSettings,
+  updateAdminSettings,
+} from "../../services/api";
 
 function SettingsIcon({ name, size = 16 }) {
   const paths = {
@@ -59,23 +64,79 @@ function SettingsIcon({ name, size = 16 }) {
   );
 }
 
-function Settings() {
+function toDatetimeLocal(value) {
+  if (!value) return "";
+
+  const text = String(value).trim().replace(" ", "T");
+
+  const match = text.match(
+    /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/
+  );
+
+  return match ? `${match[1]}T${match[2]}` : "";
+}
+
+function Settings() {
   const { t } = useLanguage();
-  const [settings, setSettings] = useState({
-    systemName: "Attendify",
-    universityName: "Badr University in Assiut",
-    academicYear: "2025/2026",
-    semester: "Fall",
-
-    allowLateAttendance: true,
-    lateThreshold: 15,
-    qrExpiry: 10,
-
-    emailNotifications: true,
-    absenceAlerts: true,
-  });
-
-  const [saved, setSaved] = useState(false);
+  const { refresh: refreshPlatform } = usePlatformSettings();
+  const [settings, setSettings] = useState({
+    systemName: "",
+    universityName: "Badr University in Assiut",
+    academicYear: "2025/2026",
+    semester: "Fall",
+
+    allowLateAttendance: true,
+    lateThreshold: 15,
+    qrExpiry: 10,
+
+    emailNotifications: true,
+    absenceAlerts: true,
+
+    maintenanceMode: false,
+    maintenanceMessage: "",
+    maintenanceUntil: "",
+  });
+
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPlatformSettings() {
+      try {
+        const data = await getAdminSettings();
+
+        if (cancelled) return;
+
+        setSettings((prev) => ({
+          ...prev,
+          systemName: data.platformName || prev.systemName,
+          maintenanceMode: Boolean(data.maintenanceMode),
+          maintenanceMessage: data.maintenanceMessage || "",
+          maintenanceUntil: toDatetimeLocal(
+            data.maintenanceUntil
+          ),
+        }));
+      } catch (error) {
+        if (!cancelled) {
+          setLoadError(
+            error.message ||
+              t("settings.failed_to_load_platform")
+          );
+        }
+      }
+    }
+
+    loadPlatformSettings();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (field, value) => {
     setSettings((prev) => ({
@@ -86,15 +147,36 @@ function Settings() {
     setSaved(false);
   };
 
-  const handleSave = () => {
-    console.log("Settings saved:", settings);
-
-    setSaved(true);
-
-    setTimeout(() => {
-      setSaved(false);
-    }, 3000);
-  };
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setSaveError("");
+      setSaved(false);
+
+      await updateAdminSettings({
+        platformName: settings.systemName,
+        maintenanceMode: settings.maintenanceMode,
+        maintenanceMessage: settings.maintenanceMessage,
+        maintenanceUntil: settings.maintenanceUntil || null,
+      });
+
+      // Push the new platform name / maintenance state
+      // to the whole app immediately (no rebuild needed).
+      await refreshPlatform();
+
+      setSaved(true);
+
+      setTimeout(() => {
+        setSaved(false);
+      }, 3000);
+    } catch (error) {
+      setSaveError(
+        error.message || t("settings.failed_to_save_platform")
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="settings-page admin-settings-page">
@@ -208,25 +290,127 @@ function Settings() {
                 />
               </div>
 
-              <div className="settings-field">
-                <label>{t("settings.semester")}</label>
-
-                <select
-                  value={settings.semester}
-                  onChange={(e) =>
-                    handleChange(
-                      "semester",
-                      e.target.value
-                    )
-                  }
-                >
-                  <option value="Fall">{t("settings.fall")}</option>
-                  <option value="Spring">{t("settings.spring")}</option>
-                  <option value="Summer">{t("settings.summer")}</option>
-                </select>
-              </div>
-            </div>
-          </section>
+              <div className="settings-field">
+                <label>{t("settings.semester")}</label>
+
+                <select
+                  value={settings.semester}
+                  onChange={(e) =>
+                    handleChange(
+                      "semester",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="Fall">{t("settings.fall")}</option>
+                  <option value="Spring">{t("settings.spring")}</option>
+                  <option value="Summer">{t("settings.summer")}</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {loadError && (
+            <div
+              className="settings-error-message"
+              role="alert"
+            >
+              {loadError}
+            </div>
+          )}
+
+          {/* ================= PLATFORM STATUS ================= */}
+          <section className="settings-card">
+            <div className="settings-card-header">
+              <div className="settings-card-icon">
+                <SettingsIcon name="bell" size={18} />
+              </div>
+
+              <div>
+                <h2>{t("settings.platform_status")}</h2>
+                <p>
+                  {t("settings.platform_status_hint")}
+                </p>
+              </div>
+            </div>
+
+            <div className="attendance-settings-grid">
+              {/* Maintenance Mode */}
+              <div className="attendance-setting-item">
+                <div>
+                  <h3>
+                    {t("settings.maintenance_mode")}
+                  </h3>
+
+                  <p>
+                    {settings.maintenanceMode
+                      ? t("settings.maintenance_on_hint")
+                      : t("settings.maintenance_off_hint")}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className={`settings-toggle ${
+                    settings.maintenanceMode
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    handleChange(
+                      "maintenanceMode",
+                      !settings.maintenanceMode
+                    )
+                  }
+                  aria-label={t(
+                    "settings.toggle_maintenance_mode"
+                  )}
+                >
+                  <span></span>
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-form-grid">
+              <div className="settings-field settings-field-wide">
+                <label>
+                  {t("settings.maintenance_message")}
+                </label>
+
+                <textarea
+                  rows={3}
+                  maxLength={500}
+                  value={settings.maintenanceMessage}
+                  placeholder={t(
+                    "settings.maintenance_message_ph"
+                  )}
+                  onChange={(e) =>
+                    handleChange(
+                      "maintenanceMessage",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="settings-field">
+                <label>
+                  {t("settings.maintenance_until")}
+                </label>
+
+                <input
+                  type="datetime-local"
+                  value={settings.maintenanceUntil}
+                  onChange={(e) =>
+                    handleChange(
+                      "maintenanceUntil",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+            </div>
+          </section>
 
           {/* ================= ATTENDANCE SETTINGS ================= */}
           <section className="settings-card">
@@ -407,22 +591,34 @@ function Settings() {
             </div>
           </section>
 
-          {/* ================= SAVE ================= */}
-          <div className="settings-actions">
-            {saved && (
-              <div className="settings-saved-message" role="status">
-                {t("settings.settings_saved_successfully")}
-              </div>
-            )}
-
-            <button
-              type="button"
-              className="settings-save-button"
-              onClick={handleSave}
-            >
-              {t("settings.save_changes")}
-            </button>
-          </div>
+          {/* ================= SAVE ================= */}
+          <div className="settings-actions">
+            {saved && (
+              <div className="settings-saved-message" role="status">
+                {t("settings.settings_saved_successfully")}
+              </div>
+            )}
+
+            {saveError && (
+              <div
+                className="settings-error-message"
+                role="alert"
+              >
+                {saveError}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="settings-save-button"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving
+                ? t("settings.saving")
+                : t("settings.save_changes")}
+            </button>
+          </div>
         </section>
       </main>
     </div>

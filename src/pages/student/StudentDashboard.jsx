@@ -6,6 +6,7 @@ import {
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "../../App.css";
 import "./StudentDashboard.css";
 
@@ -100,6 +101,7 @@ function formatStatus(value) {
 
 function StudentDashboard() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -410,7 +412,7 @@ function StudentDashboard() {
           </div>
 
           <div>
-            <h2>Attendify</h2>
+            <h2>{platformName}</h2>
 
             <span>
               {t("brand.tagline")}

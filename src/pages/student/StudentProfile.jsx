@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./StudentProfile.css";
 
 const API_BASE_URL =
@@ -183,7 +184,8 @@ async function requestJson(path, token, options = {}) {
 export default function StudentProfile() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const savedUser = useMemo(() => getSavedUser(), []);
 
   // Client mirrors of the backend authority in
@@ -670,7 +672,7 @@ export default function StudentProfile() {
           </span>
 
           <span className="brand-text">
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </span>
         </button>
@@ -1333,7 +1335,10 @@ export default function StudentProfile() {
 
       <footer className="profile-footer">
         <span>
-          {t("stuProfile.footerCopy")}
+          © {new Date().getFullYear()} {platformName}.{" "}
+          {lang === "ar"
+            ? "جميع الحقوق محفوظة."
+            : "All rights reserved."}
         </span>
 
         <button type="button" onClick={handleLogout}>

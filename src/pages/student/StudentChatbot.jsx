@@ -14,6 +14,7 @@ import Footer from "../../components/Footer";
 import "../../components/Footer.css";
 import StudentMobileNav from "./StudentMobileNav";
 import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./StudentChatbot.css";
 
 function getSavedUser() {
@@ -26,6 +27,7 @@ function getSavedUser() {
 
 function StudentChatbot() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const navigate = useNavigate();
   const user = getSavedUser();
   const firstName = user?.first_name || user?.firstName || t("role.student");
@@ -169,7 +171,7 @@ function StudentChatbot() {
             A
           </div>
           <div>
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </div>
         </div>

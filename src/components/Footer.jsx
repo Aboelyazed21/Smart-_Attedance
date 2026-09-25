@@ -1,12 +1,14 @@
 import { useLanguage } from "../utils/i18n";
+import { usePlatformSettings } from "../utils/platformSettings";
 
 function Footer() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
 
   return (
     <footer className="app-footer">
       <div className="app-footer-inner">
-        <span className="app-footer-brand">Attendify</span>
+        <span className="app-footer-brand">{platformName}</span>
         <span className="app-footer-sep" aria-hidden="true">
           •
         </span>

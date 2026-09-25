@@ -4,6 +4,7 @@ import Footer from "../Footer";
 import "../Footer.css";
 import ThemeToggle from "../ThemeToggle";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 
 import "./LecturerLayout.css";
 
@@ -61,7 +62,7 @@ function getPageTitle(pathname) {
   if (pathname.startsWith("/lecturer/sessions/"))
     return "Session Details";
   if (pathname.startsWith("/lecturer/")) return "Lecturer Portal";
-  return "Attendify";
+  return "Lecturer Portal";
 }
 
 function NavIcon({ name }) {
@@ -131,6 +132,11 @@ export default function LecturerLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
+
+  const platformInitial =
+    String(platformName || "A").trim().charAt(0).toUpperCase() ||
+    "A";
 
   const [navOpen, setNavOpen] = useState(false);
 
@@ -225,7 +231,7 @@ export default function LecturerLayout({ children }) {
         </button>
 
         <div className="lecturer-mobile-header-text">
-          <strong>Attendify</strong>
+          <strong>{platformName}</strong>
           <span>{getPageTitle(location.pathname)}</span>
         </div>
 
@@ -266,11 +272,11 @@ export default function LecturerLayout({ children }) {
       >
         <div className="lecturer-layout-brand">
           <div className="lecturer-layout-brand-mark">
-            A
+            {platformInitial}
           </div>
 
           <div className="lecturer-layout-brand-text">
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </div>
         </div>

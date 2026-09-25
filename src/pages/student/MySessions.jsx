@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { getMySessions } from "../../services/api";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./MySessions.css";
 
 function Icon({ name, size = 18 }) {
@@ -220,6 +221,7 @@ function MySessions() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const user = getSavedUser();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -405,7 +407,7 @@ function MySessions() {
           </div>
 
           <div>
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </div>
         </div>

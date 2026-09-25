@@ -9,6 +9,8 @@ import {
 import Register from "./Register";
 import ThemeToggle from "./components/ThemeToggle";
 import { useLanguage, LanguageToggle } from "./utils/i18n";
+import { usePlatformSettings } from "./utils/platformSettings";
+import MaintenancePage from "./pages/MaintenancePage";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 
@@ -125,6 +127,30 @@ function isLecturerAuthenticated() {
 
 function App() {
   const location = useLocation();
+  const platform = usePlatformSettings();
+
+  /* =========================================================
+     GLOBAL MAINTENANCE GATE
+     Admins bypass. Public auth pages stay reachable so the
+     admin login flow never locks out.
+  ========================================================= */
+
+  const PUBLIC_AUTH_PATHS = [
+    "/",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/logout",
+  ];
+
+  if (
+    platform.loaded &&
+    platform.maintenanceMode &&
+    !isAdminAuthenticated() &&
+    !PUBLIC_AUTH_PATHS.includes(location.pathname)
+  ) {
+    return <MaintenancePage />;
+  }
 
   /* =========================================================
      REGISTER
@@ -781,6 +807,11 @@ function AuthIcon({ name, size = 17 }) {
 function Login() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
+
+  const platformInitial =
+    String(platformName || "A").trim().charAt(0).toUpperCase() ||
+    "A";
 
   const [
     showPassword,
@@ -864,12 +895,12 @@ function Login() {
         <div className="brand">
 
           <div className="brand-logo">
-            <span aria-hidden="true">A</span>
+            <span aria-hidden="true">{platformInitial}</span>
           </div>
 
           <div className="brand-text">
             <h1>
-              Attendify
+              {platformName}
             </h1>
 
             <p>
@@ -893,7 +924,7 @@ function Login() {
       >
         <div className="auth-brand-copy">
           <h2>
-            Attendify
+            {platformName}
           </h2>
 
           <p>
@@ -932,11 +963,11 @@ function Login() {
         <div className="login-card">
 
           <div className="login-logo">
-            <span aria-hidden="true">A</span>
+            <span aria-hidden="true">{platformInitial}</span>
           </div>
 
           <h2 className="app-name">
-            Attendify
+            {platformName}
           </h2>
 
           <p className="app-description">
@@ -1126,6 +1157,11 @@ function Login() {
 function LecturerLogout() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
+
+  const platformInitial =
+    String(platformName || "A").trim().charAt(0).toUpperCase() ||
+    "A";
 
   return (
     <div className="logout-page">
@@ -1140,11 +1176,11 @@ function LecturerLogout() {
           className="logout-logo"
           aria-hidden="true"
         >
-          A
+          {platformInitial}
         </div>
 
         <p className="logout-eyebrow">
-          Attendify
+          {platformName}
         </p>
 
         <h1>
@@ -1188,6 +1224,7 @@ function LecturerLogout() {
 function StudentDashboard() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
 
   const [user] = useState(() =>
     getSavedUser()
@@ -1871,11 +1908,14 @@ function StudentDashboard() {
               className="student-brand-logo"
               aria-hidden="true"
             >
-              A
+              {String(platformName || "A")
+                .trim()
+                .charAt(0)
+                .toUpperCase() || "A"}
             </div>
 
             <div>
-              <h2>Attendify</h2>
+              <h2>{platformName}</h2>
               <span>
                 {t("brand.tagline")}
               </span>

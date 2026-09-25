@@ -14,6 +14,7 @@ import {
   updateAttendanceCorrection,
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./AttendanceSessions.css";
 
 function formatDate(date) {
@@ -128,6 +129,7 @@ function normalizeRoster(data) {
 
 function AttendanceSessions() {
   const navigate = useNavigate();
+  const { platformName } = usePlatformSettings();
   const savedUser = useMemo(() => getSavedUser(), []);
 
   const [sessions, setSessions] = useState([]);
@@ -775,9 +777,9 @@ function AttendanceSessions() {
           className="sessions-mobile-brand"
           onClick={() => handleMobileNavigation("/lecturer/sessions")}
         >
-          <span className="sessions-mobile-brand-mark">A</span>
+          <span className="sessions-mobile-brand-mark">{String(platformName || "A").trim().charAt(0).toUpperCase() || "A"}</span>
           <span>
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <small>Smart Attendance</small>
           </span>
         </button>
@@ -811,9 +813,9 @@ function AttendanceSessions() {
             onClick={() => handleMobileNavigation("/lecturer/sessions")}
             aria-label="Go to attendance sessions"
           >
-            <div className="lecturer-brand-mark">A</div>
+            <div className="lecturer-brand-mark">{String(platformName || "A").trim().charAt(0).toUpperCase() || "A"}</div>
             <div>
-              <strong>Attendify</strong>
+              <strong>{platformName}</strong>
               <span>SMART ATTENDANCE</span>
             </div>
           </button>

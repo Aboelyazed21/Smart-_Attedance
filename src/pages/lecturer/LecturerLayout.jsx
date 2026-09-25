@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./LecturerLayout.css";
 
 function getSavedUser() {
@@ -173,6 +174,7 @@ const navigationItems = [
 export default function LecturerLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { platformName } = usePlatformSettings();
 
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false);
@@ -319,7 +321,7 @@ export default function LecturerLayout({ children }) {
           <LogoMark />
 
           <span className="lecturer-layout-mobile-brand-text">
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <small>Smart Attendance</small>
           </span>
         </button>
@@ -372,7 +374,7 @@ export default function LecturerLayout({ children }) {
             <LogoMark />
 
             <div className="lecturer-layout-brand-text">
-              <strong>Attendify</strong>
+              <strong>{platformName}</strong>
               <span>SMART ATTENDANCE</span>
             </div>
           </button>

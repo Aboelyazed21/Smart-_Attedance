@@ -11,6 +11,7 @@ import "./styles/language-toggle.css";
 import "./styles/rtl.css";
 import { initTheme } from "./utils/theme";
 import { LanguageProvider } from "./utils/i18n";
+import { PlatformSettingsProvider } from "./utils/platformSettings";
 
 initTheme();
 
@@ -37,7 +38,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <LanguageProvider>
-        <App />
+        <PlatformSettingsProvider>
+          <App />
+        </PlatformSettingsProvider>
       </LanguageProvider>
     </BrowserRouter>
   </React.StrictMode>

@@ -10,7 +10,8 @@ import {
 } from "../../services/api";
 
 import "./Timetable.css";
-import { useLanguage } from "../../utils/i18n";
+import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 
 const DAYS = [
   { value: "saturday", label: "Saturday" },
@@ -228,7 +229,8 @@ function TtIcon({ name, size = 16 }) {
 }
 
 export default function Timetable() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const [timetable, setTimetable] = useState([]);
   const [sections, setSections] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -2163,7 +2165,10 @@ export default function Timetable() {
         </section>
 
         <footer className="tt-footer">
-          {t("timetable.2026_attendify_all_rights_reserved")}
+                    © 2026 {platformName}.{" "}
+          {lang === "ar"
+            ? "جميع الحقوق محفوظة."
+            : "All rights reserved."}
           <span>
             {t("timetable.smart_education_smarter_tomorrow")}
           </span>

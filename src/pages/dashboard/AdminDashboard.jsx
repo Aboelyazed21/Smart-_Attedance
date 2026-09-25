@@ -2,7 +2,8 @@
 import { useNavigate } from "react-router-dom";
 import { getDashboardReport } from "../../services/api";
 import "./AdminDashboard.css";
-import { useLanguage } from "../../utils/i18n";
+import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 function Icon({ type, size = 22 }) {
   const common = {
     width: size,
@@ -127,8 +128,9 @@ function Icon({ type, size = 22 }) {
   return <svg {...common}>{icons[type] || icons.dashboard}</svg>;
 }
 
-function AdminDashboard() {
+function AdminDashboard() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const navigate = useNavigate();
 
   const [dashboardData, setDashboardData] = useState({
@@ -226,11 +228,11 @@ function AdminDashboard() {
       <main className="dashboard-main">
         <header className="dashboard-header">
           <div className="header-title-area">
-            <div className="breadcrumb">
-              <span>Attendify</span>
-              <span>/</span>
-              <strong>{t("nav.dashboard")}</strong>
-            </div>
+            <div className="breadcrumb">
+              <span>{platformName}</span>
+              <span>/</span>
+              <strong>{t("nav.dashboard")}</strong>
+            </div>
 
             <h1>{t("nav.dashboard")}</h1>
 

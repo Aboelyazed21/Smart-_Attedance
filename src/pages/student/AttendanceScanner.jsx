@@ -7,6 +7,7 @@ import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
 import { useLanguage } from "../../utils/i18n";
+import { usePlatformSettings } from "../../utils/platformSettings";
 import "./AttendanceScanner.css";
 
 function Icon({ name, size = 18 }) {
@@ -154,6 +155,7 @@ function getCameraErrorMessage(error) {
 
 function AttendanceScanner() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const user = getSavedUser();
@@ -645,7 +647,7 @@ function AttendanceScanner() {
           </div>
 
           <div>
-            <strong>Attendify</strong>
+            <strong>{platformName}</strong>
             <span>{t("brand.tagline")}</span>
           </div>
         </div>

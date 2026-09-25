@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "./utils/i18n";
+import { usePlatformSettings } from "./utils/platformSettings";
 
 import "./App.css";
 
 function Login() {
   const { t } = useLanguage();
+  const { platformName } = usePlatformSettings();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
@@ -28,7 +30,7 @@ function Login() {
           </div>
 
           <div className="brand-text">
-            <h1>Attendify</h1>
+            <h1>{platformName}</h1>
             <p>{t("brand.tagline")}</p>
           </div>
 
@@ -71,7 +73,7 @@ function Login() {
           {/* TITLE */}
 
           <h2 className="app-name">
-            Attendify
+            {platformName}
           </h2>
 
           <p className="app-description">

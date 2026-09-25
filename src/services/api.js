@@ -43,6 +43,22 @@ async function apiRequest(
   }
 
   if (!response.ok) {
+    // Maintenance mode: tell the platform settings
+    // provider to refetch and show the maintenance page.
+    // A single event keeps every caller consistent
+    // without polling or redirect loops.
+    if (
+      response.status === 503 &&
+      data &&
+      data.maintenance === true &&
+      typeof window !== "undefined" &&
+      typeof window.dispatchEvent === "function"
+    ) {
+      window.dispatchEvent(
+        new Event("platform-maintenance")
+      );
+    }
+
     // Attach machine-readable context so callers can
     // branch on real backend states (e.g. 409 conflict
     // with a `conflict` payload). The message behavior
@@ -1286,5 +1302,49 @@ export async function retryWeeklyEmail(
 export async function getWeeklyEmailStatus() {
   return apiRequest(
     "/admin/weekly-reports/status"
+  );
+}
+
+
+/* =========================================================
+   PLATFORM SETTINGS
+======================================================== */
+
+/* Public safe settings (no authentication required). */
+
+export async function getPublicSettings() {
+  return apiRequest(
+    "/settings/public"
+  );
+}
+
+
+/* Admin platform settings (name + maintenance mode). */
+
+export async function getAdminSettings() {
+  return apiRequest(
+    "/admin/settings"
+  );
+}
+
+
+export async function updateAdminSettings({
+  platformName,
+  maintenanceMode,
+  maintenanceMessage,
+  maintenanceUntil,
+} = {}) {
+  return apiRequest(
+    "/admin/settings",
+    {
+      method: "PATCH",
+
+      body: JSON.stringify({
+        platformName,
+        maintenanceMode,
+        maintenanceMessage,
+        maintenanceUntil,
+      }),
+    }
   );
 }
