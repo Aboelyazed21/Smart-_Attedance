@@ -4,7 +4,9 @@ import { getMyAttendance } from "../../services/api";
 import ThemeToggle from "../../components/ThemeToggle";
 import {
   answerAttendanceQuestion,
+  assessRisk,
   deriveWarnings,
+  getCourseStats,
   getOverallStats,
   getWeeklySummary,
   toRecords,
@@ -104,6 +106,18 @@ function StudentChatbot() {
     () => deriveWarnings(records, weekly),
     [records, weekly]
   );
+  const byCourse = useMemo(() => getCourseStats(records), [records]);
+  const risk = useMemo(
+    () => assessRisk(records, overall, weekly, warnings, byCourse),
+    [records, overall, weekly, warnings, byCourse]
+  );
+  const atRiskCourses = useMemo(
+    () =>
+      (risk.courseRisks || []).filter(
+        (c) => (c.flag === "danger" || c.flag === "critical") && c.total >= 2
+      ),
+    [risk]
+  );
 
   function send(text) {
     const question = String(text ?? input).trim();
@@ -120,6 +134,9 @@ function StudentChatbot() {
         overall,
         weekly,
         warnings,
+        byCourse,
+        records,
+        risk,
       });
       setMessages((m) => [
         ...m,
@@ -274,6 +291,54 @@ function StudentChatbot() {
             </div>
           )}
 
+          {!loading && (risk.level === "danger" || risk.level === "critical") && (
+            <div
+              className={`chatbot-risk risk-${risk.level}`}
+              role="alert"
+            >
+              <span className="chatbot-risk-icon" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 4v9" />
+                  <path d="M12 17h.01" />
+                  <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+                </svg>
+              </span>
+              <div className="chatbot-risk-text">
+                <strong>
+                  {risk.level === "critical"
+                    ? t("stuChat.riskCritical")
+                    : t("stuChat.riskHigh")}
+                </strong>
+                <span>
+                  {risk.reasons[0]?.message || ""}
+                  {risk.anomalies[0] ? ` ${risk.anomalies[0].message}` : ""}
+                </span>
+                {atRiskCourses.length > 0 && (
+                  <span className="chatbot-risk-courses">
+                    {t("stuChat.riskCourses").replace(
+                      "{list}",
+                      atRiskCourses
+                        .map((c) => `${c.course} (${c.rate}%)`)
+                        .join(", ")
+                    )}
+                  </span>
+                )}
+              </div>
+              <span className="chatbot-risk-score">
+                {risk.score}/100
+              </span>
+            </div>
+          )}
+
           <div className="chatbot-summary-grid" aria-live="polite">
             <div className="chatbot-card">
               <span>{t("stuChat.totalWeek")}</span>
@@ -310,6 +375,30 @@ function StudentChatbot() {
               <small>{t("stuChat.warningsSub")}</small>
             </div>
           </div>
+
+          {!loading && atRiskCourses.length > 0 && (
+            <div className="chatbot-course-flags" aria-label={t("stuChat.courseRiskLabel")}>
+              {atRiskCourses.map((c) => (
+                <div
+                  key={c.course}
+                  className={`chatbot-course-flag flag-${c.flag}`}
+                >
+                  <span className="chatbot-course-flag-dot" aria-hidden="true" />
+                  <div>
+                    <strong>{c.course}</strong>
+                    <small>
+                      {c.rate}% · {c.absent}/{c.total} {t("stuChat.absent").toLowerCase()}
+                    </small>
+                  </div>
+                  <span className="chatbot-course-flag-tag">
+                    {c.flag === "critical"
+                      ? t("stuChat.flagCritical")
+                      : t("stuChat.flagDanger")}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="chatbot-panels">
             <section className="chatbot-panel" aria-label={t("stuChat.conversationLabel")}>

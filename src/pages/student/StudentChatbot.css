@@ -288,6 +288,143 @@
   cursor: pointer;
 }
 
+/* ---- AI risk banner (red alarm when absence is high) ---- */
+
+.chatbot-risk {
+  margin-bottom: 12px;
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #7f1d1d;
+}
+
+.chatbot-risk.risk-critical {
+  background: #fee2e2;
+  border-color: #f87171;
+  animation: chatbot-risk-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes chatbot-risk-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.08);
+  }
+}
+
+.chatbot-risk-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.chatbot-risk-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.chatbot-risk-text strong {
+  display: block;
+  font-size: 13px;
+}
+
+.chatbot-risk-text span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #991b1b;
+}
+
+.chatbot-risk-courses {
+  font-weight: 700;
+}
+
+.chatbot-risk-score {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ---- Per-course red flags ---- */
+
+.chatbot-course-flags {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.chatbot-course-flag {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fff7f7;
+}
+
+.chatbot-course-flag.flag-critical {
+  border-color: #f87171;
+  background: #fee2e2;
+}
+
+.chatbot-course-flag-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #dc2626;
+}
+
+.chatbot-course-flag div {
+  min-width: 0;
+  flex: 1;
+}
+
+.chatbot-course-flag strong {
+  display: block;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatbot-course-flag small {
+  display: block;
+  margin-top: 1px;
+  font-size: 11px;
+  color: #991b1b;
+}
+
+.chatbot-course-flag-tag {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .chatbot-summary-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));

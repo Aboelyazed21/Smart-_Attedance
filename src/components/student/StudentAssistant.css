@@ -50,6 +50,98 @@
   display: none;
 }
 
+/* ---- Risk states: launcher turns red when absence is high ---- */
+
+.student-assistant-fab.is-watch {
+  border-color: #f59e0b;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.student-assistant-fab.is-danger {
+  border-color: #dc2626;
+  background: #fef2f2;
+  box-shadow:
+    0 4px 16px rgba(220, 38, 38, 0.4),
+    0 0 0 4px rgba(220, 38, 38, 0.15);
+  animation: student-assistant-alarm 1.6s ease-in-out infinite;
+}
+
+@keyframes student-assistant-alarm {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 16px rgba(220, 38, 38, 0.4),
+      0 0 0 4px rgba(220, 38, 38, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 4px 20px rgba(220, 38, 38, 0.6),
+      0 0 0 8px rgba(220, 38, 38, 0.08);
+  }
+}
+
+.student-assistant-fab-badge {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  z-index: 2;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  border: 2px solid #ffffff;
+}
+
+/* ---- In-panel risk banner ---- */
+
+.student-assistant-risk {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-bottom: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #7f1d1d;
+}
+
+.student-assistant-risk-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.student-assistant-risk-text strong {
+  display: block;
+  font-size: 13px;
+}
+
+.student-assistant-risk-text span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #991b1b;
+}
+
+.student-assistant-risk.risk-critical {
+  background: #fee2e2;
+  border-bottom-color: #fca5a5;
+}
+
 .student-assistant-panel {
   position: fixed;
   right: calc(16px + env(safe-area-inset-right, 0px));

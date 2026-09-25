@@ -6,7 +6,9 @@ import {
 } from "../../services/api";
 import {
   answerAttendanceQuestion,
+  assessRisk,
   deriveWarnings,
+  getCourseStats,
   getOverallStats,
   getWeeklySummary,
   toRecords,
@@ -39,21 +41,24 @@ function normalizeSummary(payload, fallbackRecords) {
     payload.overall &&
     payload.weekly
   ) {
+    const records = toRecords(payload.records || fallbackRecords);
     const warnings = Array.isArray(payload.warnings)
       ? payload.warnings
       : deriveWarnings(
-          toRecords(payload.records || fallbackRecords),
+          records,
           payload.weekly
         );
+    const byCourse = Array.isArray(payload.byCourse)
+      ? payload.byCourse
+      : Array.isArray(payload.weekly?.byCourse)
+        ? payload.weekly.byCourse
+        : getCourseStats(records);
     return {
       overall: payload.overall,
       weekly: payload.weekly,
       warnings,
-      byCourse: Array.isArray(payload.byCourse)
-        ? payload.byCourse
-        : Array.isArray(payload.weekly?.byCourse)
-          ? payload.weekly.byCourse
-          : [],
+      byCourse,
+      records,
       source: "summary",
     };
   }
@@ -65,7 +70,8 @@ function normalizeSummary(payload, fallbackRecords) {
     overall,
     weekly,
     warnings: deriveWarnings(records, weekly),
-    byCourse: [],
+    byCourse: getCourseStats(records),
+    records,
     source: "local",
   };
 }
@@ -126,6 +132,15 @@ export default function StudentAssistant() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open ]);
 
+  // Background risk check: load once for students so the
+  // launcher icon can turn red before the panel is opened.
+  useEffect(() => {
+    if (isStudent && !loadedRef.current) {
+      loadSummary();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStudent]);
+
   useEffect(() => {
     if (!open) return undefined;
     function onKeyDown(event) {
@@ -142,13 +157,34 @@ export default function StudentAssistant() {
 
   const context = useMemo(() => {
     if (!summary) return null;
+    const risk = assessRisk(
+      summary.records || [],
+      summary.overall,
+      summary.weekly,
+      summary.warnings,
+      summary.byCourse || []
+    );
     return {
       overall: summary.overall,
       weekly: summary.weekly,
       warnings: summary.warnings,
       byCourse: summary.byCourse,
+      records: summary.records || [],
+      risk,
     };
   }, [summary]);
+
+  const riskLevel = context?.risk?.level || "safe";
+  const isDanger =
+    riskLevel === "danger" || riskLevel === "critical";
+  const isWatch = riskLevel === "watch";
+  const alertCount = useMemo(() => {
+    if (!context) return 0;
+    const atRisk = (context.risk?.courseRisks || []).filter(
+      (c) => (c.flag === "danger" || c.flag === "critical") && c.total >= 2
+    ).length;
+    return atRisk > 0 ? atRisk : context.warnings.length;
+  }, [context]);
 
   function send(text) {
     const question = String(text ?? input).trim();
@@ -189,9 +225,20 @@ export default function StudentAssistant() {
       {!open && (
         <button
           type="button"
-          className="student-assistant-fab"
-          aria-label={t("stuAssistant.openLabel")}
-          title={t("stuAssistant.title")}
+          className={`student-assistant-fab${isDanger ? " is-danger" : isWatch ? " is-watch" : ""}`}
+          aria-label={
+            isDanger
+              ? t("stuAssistant.openLabelDanger").replace("{n}", alertCount)
+              : t("stuAssistant.openLabel")
+          }
+          title={
+            isDanger
+              ? t("stuAssistant.riskHigh").replace(
+                  "{c}",
+                  context?.risk?.worstCourse?.course || ""
+                )
+              : t("stuAssistant.title")
+          }
           onClick={() => setOpen(true)}
         >
           <img
@@ -202,6 +249,28 @@ export default function StudentAssistant() {
             className="student-assistant-fab-img"
             aria-hidden="true"
           />
+          {isDanger && (
+            <span
+              className="student-assistant-fab-badge"
+              aria-hidden="true"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 4v9" />
+                <path d="M12 17h.01" />
+                <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+              </svg>
+              {alertCount > 0 ? alertCount : ""}
+            </span>
+          )}
         </button>
       )}
 
@@ -266,6 +335,48 @@ export default function StudentAssistant() {
             </div>
           ) : (
             <>
+              {isDanger && context?.risk && (
+                <div
+                  className={`student-assistant-risk risk-${context.risk.level}`}
+                  role="alert"
+                >
+                  <span
+                    className="student-assistant-risk-icon"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 4v9" />
+                      <path d="M12 17h.01" />
+                      <path d="M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3l-7.6-13.3a2 2 0 0 0-3.4 0z" />
+                    </svg>
+                  </span>
+                  <div className="student-assistant-risk-text">
+                    <strong>
+                      {context.risk.level === "critical"
+                        ? t("stuAssistant.riskCritical")
+                        : t("stuAssistant.riskHigh").replace(
+                            "{c}",
+                            context.risk.worstCourse?.course || ""
+                          )}
+                    </strong>
+                    <span>
+                      {(context.risk.reasons[0]?.message || "") +
+                        (context.risk.anomalies[0]
+                          ? ` ${context.risk.anomalies[0].message}`
+                          : "")}
+                    </span>
+                  </div>
+                </div>
+              )}
               {summary && (
                 <div className="student-assistant-week">
                   <span>
