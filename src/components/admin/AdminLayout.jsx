@@ -217,12 +217,20 @@ function AdminIcon({ type, size = 19 }) {
       return (
         <svg {...commonProps}>
           <path
-            d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"
+            d="M12 4 2.5 9l9.5 5 9.5-5-9.5-5Z"
             stroke="currentColor"
             strokeWidth="1.8"
+            strokeLinejoin="round"
           />
           <path
-            d="M8 8h8M8 12h8M8 16h5"
+            d="M6.5 11.5V16c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M21.5 9v5"
             stroke="currentColor"
             strokeWidth="1.8"
             strokeLinecap="round"
@@ -529,6 +537,7 @@ export default function AdminLayout({ children }) {
                 className={`admin-nav-item ${
                   active ? "active" : ""
                 }`}
+                title={t(item.label)}
                 onClick={() => handleNavigation(item.path)}
               >
                 <span className="admin-nav-icon">
@@ -537,10 +546,6 @@ export default function AdminLayout({ children }) {
 
                 <span className="admin-nav-label">
                   {t(item.label)}
-                </span>
-
-                <span className="admin-nav-short">
-                  {item.short}
                 </span>
               </button>
             );
@@ -553,6 +558,7 @@ export default function AdminLayout({ children }) {
           <button
             type="button"
             className="admin-logout-item"
+            title={t("action.logout")}
             onClick={handleLogout}
           >
             <span className="admin-nav-icon">
@@ -561,10 +567,6 @@ export default function AdminLayout({ children }) {
 
             <span className="admin-nav-label">
               {t("action.logout")}
-            </span>
-
-            <span className="admin-nav-short">
-              OUT
             </span>
           </button>
 
