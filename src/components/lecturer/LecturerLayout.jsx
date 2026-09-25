@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../Footer";
 import "../Footer.css";
 import ThemeToggle from "../ThemeToggle";
+import NotificationBell from "../NotificationBell";
+import "../NotificationBell.css";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import { usePlatformSettings } from "../../utils/platformSettings";
 
@@ -237,6 +239,8 @@ export default function LecturerLayout({ children }) {
 
         <ThemeToggle />
 
+        <NotificationBell />
+
         <div
           className="lecturer-mobile-header-avatar"
           aria-hidden="true"
@@ -349,6 +353,7 @@ export default function LecturerLayout({ children }) {
           <div className="lecturer-layout-theme">
             <span>{t("common.theme")}</span>
             <ThemeToggle />
+            <NotificationBell />
           </div>
         </div>
       </aside>

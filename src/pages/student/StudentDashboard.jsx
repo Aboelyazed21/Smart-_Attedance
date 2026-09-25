@@ -5,6 +5,8 @@ import {
 } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import { useLanguage } from "../../utils/i18n";
 import { usePlatformSettings } from "../../utils/platformSettings";
 import "../../App.css";
@@ -509,6 +511,8 @@ function StudentDashboard() {
           </div>
 
           <div className="student-header-user">
+
+            <NotificationBell />
 
             <div className="student-header-avatar">
               {avatar}

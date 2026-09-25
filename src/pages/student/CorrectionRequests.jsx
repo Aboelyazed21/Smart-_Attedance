@@ -7,6 +7,8 @@ import {
 } from "../../services/api";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import ThemeToggle from "../../components/ThemeToggle";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
 import { useLanguage } from "../../utils/i18n";
@@ -580,6 +582,7 @@ function CorrectionRequests() {
       <main className="correction-main">
         <header className="correction-topbar">
           <ThemeToggle />
+          <NotificationBell />
           <div className="correction-global-search">
             <Icon name="search" size={16} />
             <input

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import { usePlatformSettings } from "../../utils/platformSettings";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import "./StudentProfile.css";
 
 const API_BASE_URL =
@@ -717,6 +719,7 @@ export default function StudentProfile() {
         </nav>
 
         <div className="top-profile">
+          <NotificationBell />
           <div className="top-avatar">{getInitials()}</div>
 
           <div className="top-profile-info">

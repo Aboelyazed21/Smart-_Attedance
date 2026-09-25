@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "../ThemeToggle";
+import NotificationBell from "../NotificationBell";
+import "../NotificationBell.css";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import { usePlatformSettings } from "../../utils/platformSettings";
 import "./AdminLayout.css";
@@ -573,6 +575,7 @@ export default function AdminLayout({ children }) {
               {t("common.theme")}
             </span>
             <ThemeToggle />
+            <NotificationBell />
           </div>
         </div>
       </aside>

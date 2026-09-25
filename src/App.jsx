@@ -8,6 +8,8 @@ import {
 
 import Register from "./Register";
 import ThemeToggle from "./components/ThemeToggle";
+import NotificationBell from "./components/NotificationBell";
+import "./components/NotificationBell.css";
 import { useLanguage, LanguageToggle } from "./utils/i18n";
 import { toast } from "./components/Toast";
 import { usePlatformSettings } from "./utils/platformSettings";
@@ -2084,6 +2086,8 @@ function StudentDashboard() {
         <header className="student-topbar">
 
           <ThemeToggle />
+
+          <NotificationBell />
 
           <LanguageToggle />
 

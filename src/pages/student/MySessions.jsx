@@ -9,6 +9,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { getMySessions } from "../../services/api";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import { useLanguage, LanguageToggle } from "../../utils/i18n";
 import { usePlatformSettings } from "../../utils/platformSettings";
 import "./MySessions.css";
@@ -529,6 +531,7 @@ function MySessions() {
 
       <main className="sessions-main">
         <header className="sessions-topbar">
+          <NotificationBell />
           <div className="sessions-user-area">
             <div className="sessions-top-avatar">
               {avatarLetter}

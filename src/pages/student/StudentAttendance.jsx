@@ -7,6 +7,8 @@ import {
 
 import { getMyAttendance } from "../../services/api";
 import ThemeToggle from "../../components/ThemeToggle";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
@@ -681,6 +683,7 @@ function StudentAttendance() {
       <main className="student-main">
         <header className="student-topbar">
           <ThemeToggle />
+          <NotificationBell />
           <div
             className="student-topbar-right"
             style={{ marginLeft: "auto" }}

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
 import ThemeToggle from "../../components/ThemeToggle";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import {
   answerAttendanceQuestion,
   assessRisk,
@@ -252,6 +254,7 @@ function StudentChatbot() {
             <span>{t("stuChat.topbarSub")}</span>
           </div>
           <ThemeToggle />
+          <NotificationBell />
           <div className="chatbot-user-area">
             <div className="chatbot-top-avatar" aria-hidden="true">
               {avatarLetter}

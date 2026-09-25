@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLanguage } from "../../utils/i18n";
+import { useLanguage } from "../../utils/i18n";
+import { uploadSectionStudents } from "../../services/api";
 const API_BASE =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000/api";
@@ -78,8 +79,13 @@ export default function EnrollmentManagement() {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const [uploadSectionId, setUploadSectionId] = useState("");
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState(null);
 
   const [showStudentModal, setShowStudentModal] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -737,8 +743,80 @@ export default function EnrollmentManagement() {
     },
   };
 
-  return (
-    <div style={styles.page}>
+  /* =========================================================
+     BULK UPLOAD STUDENTS INTO ONE SECTION (CSV / EXCEL)
+  ========================================================= */
+
+  function downloadUploadTemplate() {
+    const header =
+      "first_name,last_name,student_code,email,phone,university_id,department,level,academic_year,password";
+
+    const example =
+      "Ahmed,Mohamed,STU-1001,ahmed@example.com,01001234567,U-1001,CS,2,2026,";
+
+    const blob = new Blob([`${header}\n${example}\n`], {
+      type: "text/csv;charset=utf-8",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "section-students-template.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  async function handleBulkUpload(event) {
+    event.preventDefault();
+
+    setError("");
+    setSuccess("");
+    setUploadResult(null);
+
+    if (!uploadSectionId) {
+      setError(t("enroll.please_select_a_section"));
+      return;
+    }
+
+    if (!uploadFile) {
+      setError(t("enroll.please_choose_a_file"));
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const result = await uploadSectionStudents(
+        Number(uploadSectionId),
+        uploadFile
+      );
+
+      setUploadResult(result);
+      setSuccess(
+        result.message || t("enroll.upload_finished")
+      );
+      setUploadFile(null);
+
+      await loadData();
+    } catch (err) {
+      setError(
+        err.message || t("enroll.failed_to_upload_students")
+      );
+
+      if (Array.isArray(err.details) && err.details.length > 0) {
+        setUploadResult({ errors: err.details });
+      }
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div style={styles.page}>
       <main style={styles.main}>
         {/* HEADER */}
 
@@ -775,16 +853,219 @@ export default function EnrollmentManagement() {
               onClick={loadData}
             >{t("action.refresh")}</button>
 
-            <button
-              style={styles.primaryButton}
-              onClick={openCreateStudent}
-            >
-              {t("enroll.add_student")}
-            </button>
-          </div>
-        </header>
-
-        <section style={styles.content}>
+            <button
+              style={styles.primaryButton}
+              onClick={openCreateStudent}
+            >
+              {t("enroll.add_student")}
+            </button>
+          </div>
+        </header>
+
+        {/* BULK UPLOAD STUDENTS INTO A SECTION */}
+
+        <section
+          style={{
+            ...styles.card,
+            marginBottom: "20px",
+            borderInlineStart: "4px solid #2563eb",
+          }}
+        >
+          <h2
+            style={{
+              margin: "0 0 5px",
+              color: "#102f61",
+              fontSize: "17px",
+            }}
+          >
+            {t("enroll.bulk_upload_title")}
+          </h2>
+
+          <p
+            style={{
+              margin: "0 0 14px",
+              color: "#64748b",
+              fontSize: "13px",
+            }}
+          >
+            {t("enroll.bulk_upload_desc")}
+          </p>
+
+          <form onSubmit={handleBulkUpload}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "1fr 1fr auto",
+                gap: "10px",
+                alignItems: "end",
+              }}
+            >
+              <label
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#334155",
+                }}
+              >
+                {t("enroll.target_section")}
+
+                <select
+                  style={styles.input}
+                  value={uploadSectionId}
+                  onChange={(event) =>
+                    setUploadSectionId(
+                      event.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    {t("enroll.select_section")}
+                  </option>
+
+                  {sections.map((section) => (
+                    <option
+                      key={section.section_id}
+                      value={section.section_id}
+                    >
+                      {section.course_code} -{" "}
+                      {section.course_name} |
+                      Section{" "}
+                      {section.section_name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#334155",
+                }}
+              >
+                {t("enroll.csv_excel_file")}
+
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  style={styles.input}
+                  onChange={(event) =>
+                    setUploadFile(
+                      event.target.files?.[0] || null
+                    )
+                  }
+                />
+              </label>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                }}
+              >
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={downloadUploadTemplate}
+                >
+                  {t("enroll.download_template")}
+                </button>
+
+                <button
+                  type="submit"
+                  style={{
+                    ...styles.primaryButton,
+                    opacity:
+                      uploading ||
+                      !uploadSectionId ||
+                      !uploadFile
+                        ? 0.6
+                        : 1,
+                  }}
+                  disabled={
+                    uploading ||
+                    !uploadSectionId ||
+                    !uploadFile
+                  }
+                >
+                  {uploading
+                    ? t("enroll.uploading")
+                    : t("enroll.upload_students")}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {uploadResult && (
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                background:
+                  (uploadResult.skipped || 0) > 0
+                    ? "#fffbeb"
+                    : "#f0fdf4",
+                border: `1px solid ${
+                  (uploadResult.skipped || 0) > 0
+                    ? "#fde68a"
+                    : "#bbf7d0"
+                }`,
+                fontSize: "13px",
+                color: "#334155",
+              }}
+            >
+              <div>
+                {t("enroll.upload_created").replace(
+                  "{n}",
+                  uploadResult.created ?? 0
+                )}
+                {" · "}
+                {t("enroll.upload_enrolled").replace(
+                  "{n}",
+                  uploadResult.enrolled ?? 0
+                )}
+                {" · "}
+                {t("enroll.upload_skipped").replace(
+                  "{n}",
+                  uploadResult.skipped ?? 0
+                )}
+              </div>
+
+              {Array.isArray(uploadResult.errors) &&
+                uploadResult.errors.length > 0 && (
+                  <ul
+                    style={{
+                      margin: "8px 0 0",
+                      paddingInlineStart: "18px",
+                      color: "#991b1b",
+                    }}
+                  >
+                    {uploadResult.errors
+                      .slice(0, 8)
+                      .map((rowError, index) => (
+                        <li key={index}>
+                          {t("enroll.row").replace(
+                            "{n}",
+                            rowError.line ?? "?"
+                          )}
+                          : {rowError.message}
+                        </li>
+                      ))}
+                  </ul>
+                )}
+            </div>
+          )}
+        </section>
+
+        <section style={styles.content}>
           {/* ALERTS */}
 
           {error && (

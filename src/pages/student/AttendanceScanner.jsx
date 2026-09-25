@@ -3,6 +3,8 @@ import { Html5Qrcode } from "html5-qrcode";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMyAttendance } from "../../services/api";
 import ThemeToggle from "../../components/ThemeToggle";
+import NotificationBell from "../../components/NotificationBell";
+import "../../components/NotificationBell.css";
 import StudentAssistant from "../../components/student/StudentAssistant";
 import "../../components/student/StudentAssistant.css";
 import StudentMobileNav from "./StudentMobileNav";
@@ -756,6 +758,7 @@ function AttendanceScanner() {
       <main className="scan-main">
         <header className="scan-topbar">
           <ThemeToggle />
+          <NotificationBell />
           <div className="scan-user-area">
             <div className="top-avatar">{avatarLetter}</div>
 

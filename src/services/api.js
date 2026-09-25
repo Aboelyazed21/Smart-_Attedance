@@ -1176,6 +1176,119 @@ export async function createCorrection({
 
 
 /* =========================================================
+   NOTIFICATION CENTER (ALL ROLES)
+   Unified bell feed: direct + role-broadcast rows.
+========================================================= */
+
+export async function getNotifications(limit = 30) {
+  return apiRequest(
+    `/notifications?limit=${Number(limit) || 30}`
+  );
+}
+
+
+export async function markNotificationRead(id) {
+  return apiRequest(
+    `/notifications/${Number(id)}/read`,
+    {
+      method: "PATCH",
+    }
+  );
+}
+
+
+export async function markAllNotificationsRead() {
+  return apiRequest(
+    "/notifications/read-all",
+    {
+      method: "PATCH",
+    }
+  );
+}
+
+
+/* =========================================================
+   SECTION STUDENT UPLOAD (CSV / EXCEL)
+   Admin  -> /admin/import/sections/:id/students
+   Lecturer (own sections) -> /lecturer/enrollment/...
+========================================================= */
+
+function getRoleName() {
+  try {
+    const user = JSON.parse(
+      localStorage.getItem("user") || "null"
+    );
+
+    return String(
+      user?.role_name || user?.role || ""
+    )
+      .toLowerCase()
+      .trim();
+  } catch {
+    return "";
+  }
+}
+
+
+export async function uploadSectionStudents(
+  sectionId,
+  file
+) {
+  const role = getRoleName();
+
+  const endpoint =
+    role === "admin" || role === "administrator"
+      ? `/admin/import/sections/${Number(sectionId)}/students`
+      : `/lecturer/enrollment/sections/${Number(sectionId)}/students/upload`;
+
+  const token = localStorage.getItem("token");
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const response = await fetch(
+    `${API_URL}${endpoint}`,
+    {
+      method: "POST",
+
+      headers: {
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
+      },
+
+      body: formData,
+    }
+  );
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+
+  if (!response.ok) {
+    const error = new Error(
+      data.message ||
+        data.error ||
+        `Upload failed with status ${response.status}`
+    );
+
+    error.status = response.status;
+    error.details = data.errors || data.details;
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+/* =========================================================
    WEEKLY EMAIL REPORTS (ADMIN)
 ======================================================== */
 
