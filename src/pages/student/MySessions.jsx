@@ -211,6 +211,18 @@ function getAttendanceStatus(session) {
     };
   }
 
+  // COALESCE(absent):
+  // enrolled لكن مفيش attendance_event + السيشن closed => Absent بدل NULL/Not recorded
+  // scheduled/active => تفضل Not recorded عشان يقدر يعمل Scan
+  const sessionStatus = getSessionStatus(session);
+
+  if (sessionStatus === "closed" || sessionStatus === "cancelled") {
+    return {
+      label: "Absent",
+      className: "absent",
+    };
+  }
+
   return {
     label: "Not recorded",
     className: "not-recorded",
