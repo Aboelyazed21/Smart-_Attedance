@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useLanguage } from "./utils/i18n";
-import { usePlatformSettings } from "./utils/platformSettings";
+import { useLanguage } from "../utils/i18n";
+import { usePlatformSettings } from "../utils/platformSettings";
 
-import "./App.css";
+import "../App.css";
 
 function Login() {
   const { t } = useLanguage();

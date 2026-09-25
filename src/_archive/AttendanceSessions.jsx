@@ -12,9 +12,9 @@ import {
   addStudentToLecturerSection,
   removeLecturerEnrollment,
   updateAttendanceCorrection,
-} from "../../services/api";
+} from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { usePlatformSettings } from "../../utils/platformSettings";
+import { usePlatformSettings } from "../utils/platformSettings";
 import "./AttendanceSessions.css";
 
 function formatDate(date) {

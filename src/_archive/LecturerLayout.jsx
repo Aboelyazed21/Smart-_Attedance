@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { usePlatformSettings } from "../../utils/platformSettings";
+import { usePlatformSettings } from "../utils/platformSettings";
 import "./LecturerLayout.css";
 
 function getSavedUser() {

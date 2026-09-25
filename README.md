@@ -1,19 +1,39 @@
-# React + Vite
+# Attendify Frontend (Smart Attendance)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + Vite SPA for the Smart Attendance platform.
+Talks to the backend REST API (`VITE_API_URL`, default
+`http://localhost:5000/api`). Never connects to MySQL directly.
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev     # local dev server
+npm run build   # production build (also run by Vercel)
+npm run lint    # oxlint
+```
 
-## React Compiler
+## Folder map
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+| Folder | Purpose |
+|---|---|
+| `src/App.jsx` | Route table (pathname-based) + inline `Login`, `StudentDashboard`, `LecturerLogout`. Role guards live here |
+| `src/main.jsx` | Providers: router, language, platform settings, global toast host |
+| `src/pages/admin/` | Admin screens (users, courses, sections, rooms, timetable, attendance, reports, enrollments, settings, weekly emails) — one `.jsx` + `.css` per screen |
+| `src/pages/lecturer/` | Lecturer screens (dashboard, sessions, QR session, attendance, reports) + live `LecturerLayout.jsx` |
+| `src/pages/student/` | Student screens (dashboard, scan, attendance, corrections, sessions, profile, chatbot) |
+| `src/pages/dashboard/` | Role dashboards rendered inside layouts |
+| `src/components/admin/` | `AdminLayout` (sidebar + nav). `components/lecturer/` is the live lecturer layout |
+| `src/components/Toast.jsx` | Global toast notifications (`toast.success/error/info`) mounted once in `main.jsx` |
+| `src/services/api.js` | All backend calls in one place (token header, 503 maintenance event). Add new endpoints here |
+| `src/utils/i18n.jsx` | Arabic/English strings (`useLanguage().t(key)`) |
+| `src/utils/platformSettings.jsx` | Platform name + maintenance mode from `GET /api/settings/public` (`usePlatformSettings()`) |
+| `src/styles/` | Central `design-tokens.css` (colors, buttons, inputs, status pills) + theme/RTL/responsive layers |
+| `src/_archive/` | Unmounted screens, documented in its own README. Not part of the build graph |
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+## Conventions
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- New admin screen: add `pages/admin/X.jsx` + `X.css`, route in `App.jsx` (admin guard), nav item in `AdminLayout`, strings in `i18n.jsx`.
+- Never hardcode the platform name — use `usePlatformSettings().platformName`.
+- Never use `alert()` — use the global `toast`.
+- Never use emojis as UI icons — use the inline SVG icon pattern.
