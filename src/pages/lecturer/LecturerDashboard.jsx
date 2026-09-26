@@ -319,7 +319,7 @@ export default function LecturerDashboard() {
         stats?.correctionRequests?.pending
       ),
       tone: "orange",
-      action: () => navigate("/lecturer/attendance"),
+      action: () => navigate("/lecturer/corrections"),
     },
   ];
 

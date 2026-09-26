@@ -45,6 +45,11 @@ const navigationItems = [
     path: "/lecturer/attendance",
   },
   {
+    label: "nav.corrections",
+    icon: "corrections",
+    path: "/lecturer/corrections",
+  },
+  {
     label: "nav.reports",
     icon: "reports",
     path: "/lecturer/reports",
@@ -56,6 +61,7 @@ const pageTitles = {
   "/lecturer/sessions": "Attendance Sessions",
   "/lecturer/sections": "My Sections",
   "/lecturer/attendance": "Attendance",
+  "/lecturer/corrections": "Correction Requests",
   "/lecturer/reports": "Reports",
 };
 
@@ -102,6 +108,12 @@ function NavIcon({ name }) {
         <path d="M10 19V5" />
         <path d="M16 19v-7" />
         <path d="M22 19H2" />
+      </>
+    ),
+    corrections: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
       </>
     ),
     logout: (

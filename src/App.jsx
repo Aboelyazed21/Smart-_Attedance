@@ -35,6 +35,7 @@ import LecturerSessions from "./pages/lecturer/LecturerSessions";
 import LecturerQRSession from "./pages/lecturer/LecturerQRSession";
 import LecturerLayout from "./components/lecturer/LecturerLayout";
 import LecturerAttendance from "./pages/lecturer/LecturerAttendance";
+import LecturerCorrections from "./pages/lecturer/LecturerCorrections";
 import LecturerReports from "./pages/lecturer/LecturerReports";
 
 import AttendanceScanner from "./pages/student/AttendanceScanner";
@@ -443,6 +444,22 @@ function App() {
     return (
       <LecturerLayout>
         <LecturerAttendance />
+      </LecturerLayout>
+    );
+  }
+
+  /* =========================================================
+     LECTURER CORRECTION REQUESTS INBOX
+  ========================================================= */
+
+  if (location.pathname === "/lecturer/corrections") {
+    if (!isLecturerAuthenticated()) {
+      return <Login />;
+    }
+
+    return (
+      <LecturerLayout>
+        <LecturerCorrections />
       </LecturerLayout>
     );
   }
