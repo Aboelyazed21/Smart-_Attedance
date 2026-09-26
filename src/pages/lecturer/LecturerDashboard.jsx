@@ -316,7 +316,11 @@ export default function LecturerDashboard() {
     {
       label: t("lecDash.statPendingCorrections"),
       value: formatNumber(
-        stats?.correctionRequests?.pending
+        typeof stats?.correctionRequests === "number"
+          ? stats.correctionRequests
+          : (stats?.correctionRequests?.pending ??
+            stats?.pendingCorrections ??
+            0)
       ),
       tone: "orange",
       action: () => navigate("/lecturer/corrections"),

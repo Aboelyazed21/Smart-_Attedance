@@ -1178,9 +1178,8 @@ export async function createCorrection({
 /* =========================================================
    CORRECTION REQUESTS (LECTURER)
    Lecturer inbox for student correction requests.
-   Backend is role-aware: GET /corrections returns only
-   requests that belong to the lecturer's own sections.
-   Fallbacks keep older backends working.
+   GET /corrections?status=&sectionId= (lecturer sees only
+   own sections, admin sees all).
 ======================================================== */
 
 export async function getLecturerCorrections(params = {}) {
@@ -1200,32 +1199,7 @@ export async function getLecturerCorrections(params = {}) {
     ? `?${query.toString()}`
     : "";
 
-  const candidates = [
-    `/corrections${suffix}`,
-    `/lecturer/corrections${suffix}`,
-    `/corrections/pending${suffix}`,
-  ];
-
-  let lastError = null;
-
-  for (const endpoint of candidates) {
-    try {
-      return await apiRequest(endpoint);
-    } catch (error) {
-      lastError = error;
-      // Only fall through on "not found / not implemented".
-      // Auth errors (401/403) must surface immediately.
-      if (
-        error?.status !== 404 &&
-        error?.status !== 405 &&
-        error?.status !== 501
-      ) {
-        throw error;
-      }
-    }
-  }
-
-  throw lastError;
+  return apiRequest(`/corrections${suffix}`);
 }
 
 
@@ -1239,70 +1213,24 @@ export async function reviewCorrection(
   } = {}
 ) {
   const normalizedDecision = String(
-    decision || status || finalStatus || ""
+    decision || status || ""
   ).toLowerCase();
 
   const comment = String(reviewerComment ?? "").trim();
 
-  const payloadVariants = [
-    {
-      status: normalizedDecision,
-      decision: normalizedDecision,
-      reviewerComment: comment,
-      reviewer_comment: comment,
-      comment,
-      finalStatus: String(finalStatus || normalizedDecision || ""),
-      final_status: String(finalStatus || normalizedDecision || ""),
-    },
-  ];
+  const body = {
+    status: normalizedDecision,
+    reviewerComment: comment,
+  };
 
-  const endpoints = [
-    `/corrections/${Number(id)}/review`,
-    `/corrections/${Number(id)}`,
-    `/lecturer/corrections/${Number(id)}/review`,
-  ];
-
-  let lastError = null;
-
-  for (const endpoint of endpoints) {
-    for (const body of payloadVariants) {
-      try {
-        // Approve / reject is a state transition -> PATCH.
-        // POST is also attempted for backends that model it
-        // as an action endpoint.
-        try {
-          return await apiRequest(endpoint, {
-            method: "PATCH",
-            body: JSON.stringify(body),
-          });
-        } catch (patchError) {
-          if (
-            patchError?.status === 404 ||
-            patchError?.status === 405
-          ) {
-            return await apiRequest(endpoint, {
-              method: "POST",
-              body: JSON.stringify(body),
-            });
-          }
-          throw patchError;
-        }
-      } catch (error) {
-        lastError = error;
-        if (
-          error?.status !== 404 &&
-          error?.status !== 405 &&
-          error?.status !== 501
-        ) {
-          throw error;
-        }
-        // otherwise try next endpoint
-        break;
-      }
-    }
+  if (finalStatus) {
+    body.finalStatus = String(finalStatus).toLowerCase();
   }
 
-  throw lastError;
+  return apiRequest(`/corrections/${Number(id)}/review`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
 
 
